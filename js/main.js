@@ -159,6 +159,7 @@ function render() {
   const v = views[route] || views.heute;
   const r = v(arg) || {};
   main.innerHTML = r.html || '';
+  main.classList.toggle('wide', !!r.wide);
   if (r.mount) cleanup = r.mount(main) || null;
   if (!r.keepScroll) window.scrollTo(0, 0);
 }
@@ -178,10 +179,10 @@ function continueRoom() {
   open.sort((a, b) => lastActivity(b) - lastActivity(a));
   return open[0] || null;
 }
-function miniRoom(r) {
+function miniRoom(r, phone = false) {
   const pct = roomPct(r.id);
   return `<li><a href="#/raum/${r.id}"><span class="state ${roomDone(r.id) ? 'done' : ''}">${roomDone(r.id) ? '✓' : pct ? pct + '%' : '▶'}</span>
-    <span class="grow"><span class="t">${esc(r.title)}</span><span class="s">${r.type === 'wargame' ? '🎮 Wargame' : 'Level ' + LEVELS.find(l => l.id === r.level).n + ' · ' + esc(LEVELS.find(l => l.id === r.level).title)}${r.machine.kind === 'target' ? ' · am Handy mit Termux' : ''}</span></span></a></li>`;
+    <span class="grow"><span class="t">${esc(r.title)}</span><span class="s">${r.type === 'wargame' ? '🎮 Wargame' : 'Level ' + LEVELS.find(l => l.id === r.level).n + ' · ' + esc(LEVELS.find(l => l.id === r.level).title)}${phone && r.machine.kind === 'target' ? ' · mit Termux' : ''}</span></span></a></li>`;
 }
 
 views.heute = () => {
@@ -194,7 +195,7 @@ views.heute = () => {
     .sort((x, y) => (phone ? rank[x.machine.kind] - rank[y.machine.kind] : (x.machine.kind === 'target') - (y.machine.kind === 'target')))
     .slice(0, 3);
   const phoneList = pick(onPhone, true), pcList = pick(onPC, false);
-  const section = (icon, title, list) => list.length ? `<div class="card"><h3 style="margin:0 0 .3rem">${icon} ${title}</h3><ul class="list">${list.map(miniRoom).join('')}</ul></div>` : '';
+  const section = (icon, title, list) => list.length ? `<div class="card"><h3 style="margin:0 0 .3rem">${icon} ${title}</h3><ul class="list">${list.map(r => miniRoom(r, icon === '📱')).join('')}</ul></div>` : '';
   return {
     html: `
     <section class="stack">
@@ -206,7 +207,11 @@ views.heute = () => {
         <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>Tage in Folge</span></div></div>
       </div>
 
-      ${cont ? `<a class="card lime" href="#/raum/${cont.id}" style="display:block;text-decoration:none;color:inherit">
+      ${!cont && (loc === 'pc' ? pcList : phoneList)[0] ? (() => { const f = (loc === 'pc' ? pcList : phoneList)[0]; return `<a class="card lime" href="#/raum/${f.id}" style="display:block;text-decoration:none;color:inherit">
+        <span class="badge real">Los geht’s</span>
+        <h2 style="margin:.4rem 0 .2rem">${esc(f.title)}</h2>
+        <span class="small muted">${esc(f.desc)} →</span>
+      </a>`; })() : cont ? `<a class="card lime" href="#/raum/${cont.id}" style="display:block;text-decoration:none;color:inherit">
         <span class="badge real">Weitermachen</span>
         <h2 style="margin:.4rem 0 .2rem">${esc(cont.title)}</h2>
         <div class="bar"><i style="width:${roomPct(cont.id)}%"></i></div>
@@ -1045,7 +1050,7 @@ function machineBadge(r) {
 function roomCard(r) {
   const lock = roomLock(r), pct = roomPct(r.id);
   return `<a class="card tight ${roomDone(r.id) ? 'lime' : ''}" href="#/raum/${r.id}" style="display:block;text-decoration:none;color:inherit;margin-bottom:.6rem">
-    <div class="row between"><span>${typeBadge(r)} ${machineBadge(r)}</span><span class="small muted">${esc(r.difficulty)} · ~${r.minutes} min</span></div>
+    <div class="row between"><span>${typeBadge(r)} ${machineBadge(r)}</span><span class="small muted">~${r.minutes} min</span></div>
     <b style="display:block;margin-top:.4rem">${lock.length ? '🔒 ' : ''}${esc(r.title)}</b>
     <span class="small muted">${esc(r.desc)}</span>
     <div class="bar" style="margin-top:.5rem"><i style="width:${pct}%"></i></div>
@@ -1201,20 +1206,28 @@ views.raum = (id) => {
   if (!r) return views.raeume();
   const lock = roomLock(r);
   const head = `<a class="back" href="#/pfad">← Lernen</a>
-    <div class="row">${typeBadge(r)}<span class="badge plain">Level ${LEVELS.find(l => l.id === r.level).n}</span><span class="badge plain">${esc(r.difficulty)}</span>${machineBadge(r)}</div>
+    <div class="row">${typeBadge(r)}<span class="badge plain">Level ${LEVELS.find(l => l.id === r.level).n}</span>${machineBadge(r)}<span class="small muted">~${r.minutes} min</span></div>
     <h1 style="margin-top:.5rem">${esc(r.title)}</h1><p>${esc(r.desc)}</p>`;
   if (lock.length) return { html: head + `<div class="card warn"><b>🔒 Gesperrt</b><ul>${lock.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` };
   const rs = roomState(r.id);
   return {
     html: head + `
-    <div class="card tight"><div class="bar"><i style="width:${roomPct(r.id)}%" id="rbar"></i></div><span class="small muted" id="rstat">${roomPct(r.id)} % · ${roomPoints(r.id)} Punkte</span></div>
-    <div class="task-meta" style="margin:.8rem 0">
-      <div><b>Lernziel</b>${esc(r.ziel)}</div><div><b>Scope</b>${esc(r.scope)}</div><div><b>Stopp-Regel</b>${esc(r.stop)}</div><div><b>Aufräumen</b>${esc(r.cleanup)}</div>
-      <div><b>Werkzeuge</b>${r.tools.map(esc).join(', ')}</div>
+    <div class="card tight"><div class="bar"><i style="width:${roomPct(r.id)}%" id="rbar"></i></div><span class="small muted" id="rstat">${roomPct(r.id)} % · ${roomPoints(r.id)} Punkte</span>
+      <p class="small" style="margin:.4rem 0 0">🎯 <b>Erlaubt:</b> ${esc(r.scope)}</p>
+      <details class="small" style="margin-top:.3rem"><summary class="muted">Mehr Infos: Lernziel, Regeln, Werkzeuge</summary>
+        <div class="task-meta" style="margin-top:.5rem">
+          <div><b>Lernziel</b>${esc(r.ziel)}</div><div><b>Stopp-Regel</b>${esc(r.stop)}</div><div><b>Aufräumen</b>${esc(r.cleanup)}</div>
+          <div><b>Werkzeuge</b>${r.tools.map(esc).join(', ')}</div>
+        </div>
+      </details>
     </div>
+    <div class="room-grid">
+    <div class="room-side">
     ${machineHTML(r)}
     ${r.machine.kind === 'sandbox' ? '<div id="rterm"></div><button class="btn ghost small" id="rreset" style="margin-top:.4rem">Raum-Terminal neu starten</button>' : ''}
-    <div class="stack" style="margin-top:.8rem">${r.tasks.map((t, i) => {
+    </div>
+    <div class="room-tasks">
+    <div class="stack">${r.tasks.map((t, i) => {
       const done = t.questions.every(q => qOk(r.id, qKey(t, q)));
       return `<details class="card" ${done ? '' : (i === r.tasks.findIndex(tt => !tt.questions.every(q => qOk(r.id, qKey(tt, q)))) ? 'open' : '')}>
         <summary><span class="state ${done ? 'done' : ''}" style="display:inline-grid;margin-right:.5rem;vertical-align:middle">${done ? '✓' : i + 1}</span>Task ${i + 1}: ${esc(t.title)}</summary>
@@ -1222,7 +1235,9 @@ views.raum = (id) => {
         ${t.questions.map(q => questionHTML(r, t, q)).join('')}
       </details>`;
     }).join('')}</div>
-    <div id="rdone"></div>`,
+    <div id="rdone"></div>
+    </div></div>`,
+    wide: true,
     mount(root) {
       bindCopy(root);
       $$('[data-copyfile]', root).forEach(b => b.onclick = async () => {

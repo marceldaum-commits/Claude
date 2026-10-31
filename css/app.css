@@ -194,6 +194,16 @@ table.args td:first-child { font-family: var(--mono); color: var(--lime); white-
   main { padding-bottom: 2rem; }
 }
 
+/* ---------- Raum: am PC Aufgaben und Terminal nebeneinander ---------- */
+.room-grid { display: flex; flex-direction: column; gap: .8rem; margin-top: .8rem; }
+@media (min-width: 1100px) {
+  main.wide { max-width: min(1320px, calc(100vw - 240px)); }
+  main.wide ~ .nav { left: max(0px, calc(50% - min(660px, 50vw - 120px) - 120px)); }
+  .room-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; }
+  .room-tasks { order: 1; }
+  .room-side { order: 2; position: sticky; top: 64px; max-height: calc(100vh - 80px); overflow: auto; }
+}
+
 /* ---------- Modal ---------- */
 .modal { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, .7); display: grid; place-items: end center; padding: 0; }
 @media (min-width: 640px) { .modal { place-items: center; padding: 1rem; } }
