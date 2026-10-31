@@ -3,7 +3,11 @@
 // Prüfungen werden dabei nur aus nachvollziehbaren Versuchen als bestanden übernommen (siehe state.js).
 import { mergeStates, upgrade, looksLikeState, pushBackup } from './state.js';
 
-const SUPABASE_ESM = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
+// Neuere Version zuerst (unterstützt das neue Key-Format sb_publishable_…), ältere als Rückfall.
+const SUPABASE_ESM = [
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/+esm',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm',
+];
 let client = null;
 let user = null;
 let status = { state: 'off', msg: 'Nur lokal (keine Synchronisierung eingerichtet)' };
@@ -22,7 +26,11 @@ function setStatus(state, msg) { status = { state, msg }; listeners.forEach(f =>
 async function getClient() {
   if (client) return client;
   if (!syncConfigured()) return null;
-  const { createClient } = await import(SUPABASE_ESM);
+  let createClient, lastErr;
+  for (const url of SUPABASE_ESM) {
+    try { ({ createClient } = await import(url)); break; } catch (e) { lastErr = e; }
+  }
+  if (!createClient) throw lastErr || new Error('Supabase-Bibliothek nicht ladbar');
   const c = globalThis.KLY_CONFIG;
   client = createClient(c.supabaseUrl, c.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'kly.auth' } });
   return client;
