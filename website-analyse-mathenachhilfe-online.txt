@@ -1,0 +1,469 @@
+================================================================================
+  WEBSITE-ANALYSE: www.mathenachhilfe-online.com
+  Stand der Prüfung: 31.10.2026
+================================================================================
+
+UMFANG DER PRÜFUNG
+------------------
+- 80 Seiten geprüft: alle 73 Seiten aus der Sitemap (wp-sitemap.xml) plus
+  /lesestudio/, /lesestudio/entdecken/, /probestunde/, /login/,
+  /registrieren/, /warenkorb/ und /kasse/.
+- Jede Seite wurde in einem echten Browser geladen, am Desktop (1440 px) und
+  am Handy (390 px, iPhone-Größe).
+- Geprüft wurden: Seitentitel, Meta-Beschreibung, Überschriften, Canonical,
+  Open-Graph-Tags, Alt-Texte von Bildern, JavaScript-Fehler, Ladezeit,
+  horizontales Scrollen am Handy, alle 221 internen und externen Links sowie
+  die Texte aller Seiten (ca. 29.000 Wörter).
+- NICHT geprüft: Es wurden keine Formulare abgeschickt und keine Bestellungen
+  ausgelöst. Auch der Login-Bereich wurde nicht betreten.
+
+
+KURZFAZIT
+---------
+Die Seite liegt deutlich über dem Niveau typischer Nachhilfe-Websites.
+Design, Tonalität ("Hä? -> Aha.", "Aus Fragen wird Klarheit.") und die
+Ehrlichkeit bei Preisen und Bedingungen sind stark. Technisch ist sie sauber:
+keine JavaScript-Fehler, kein horizontales Scrollen am Handy, alle Bilder mit
+Alt-Text, gute Sicherheits-Header, durchgehend ein eindeutiger Seitentitel.
+
+Die größten Hebel liegen nicht im Design, sondern hier:
+  1. Weniger Hürden auf dem Weg zur Probestunde
+  2. Sichtbare Baustellen und Reste entfernen ("im Aufbau", Entwicklertext,
+     kaputter PDF-Link)
+  3. Die eigene Stärke (25 Jahre Erfahrung, 623 x 5 Sterne) noch offensiver
+     zeigen
+  4. Einheitliche Marke und einheitliche Ansprache (du/ihr statt Sie)
+
+
+================================================================================
+ PRIORITÄT A – SOFORT BEHEBEN (Fehler, die Besucher sehen)
+================================================================================
+
+A1. Kaputter PDF-Link auf der Garantie-Seite (404)
+    Seite: /ueber-uns/zufriedenheitsgarantie/
+    Link "Bisherige Garantieunterlagen als PDF ansehen" führt ins Leere:
+    /wp-content/uploads/2026/02/Qualitaetsversprechen_Mathenachhilfe-Online_
+    Marcel-Daum.pdf -> 404 Nicht gefunden
+    Das ist besonders heikel, weil der Text sagt: "Für frühere Vereinbarungen
+    gelten weiterhin die damals zugesagten Bedingungen." Bestandskunden finden
+    diese Bedingungen dann nicht.
+    -> PDF wieder hochladen oder den Link korrigieren.
+
+A2. Sichtbarer Entwickler-/Platzhaltertext
+    Seite: /angebot/  (Abschnitt "DEIN FORTSCHRITT")
+    Dort steht für Besucher sichtbar:
+      "Der Lernweg wächst sanft, sobald diese Karte sichtbar wird."
+    Darunter ist ein leerer Fortschrittsbalken zu sehen. Das ist offenbar eine
+    Notiz zur Animation, die angezeigt wird, weil die Animation (zumindest
+    in unserem Test) nicht startet.
+    -> Text entfernen und die Animation prüfen. Falls sie nicht zuverlässig
+       läuft, den Balken statisch "gefüllt" anzeigen.
+
+A3. Seite "Buchung" ist öffentlich, aber "noch im Aufbau"
+    Seite: /buchung/  (steht in der Sitemap, wird also von Google gefunden)
+    Text: "Die automatische Terminplanung ist noch im Aufbau",
+          "Online-Kalender ansehen – noch im Aufbau"
+    Wirkt unfertig und kostet Vertrauen.
+    -> Bis der Kalender fertig ist: Seite auf "noindex" setzen und aus der
+       Sitemap nehmen oder ganz auf /probestunde/ bzw. /kontakt/ umleiten.
+       Den Button "Online-Kalender ansehen – noch im Aufbau" entfernen.
+
+A4. Interner Satz auf der Preisseite
+    Seite: /stundenpakete-preise/
+    "Die folgenden Preise stammen aus den aktuell veröffentlichten
+    Stundenpaketen im Shop."
+    Das klingt nach einer Notiz an sich selbst bzw. an den Entwickler.
+    -> Ersetzen, z. B.: "Alle Preise sind Endpreise. Ihr zahlt nur die
+       Stunden, die ihr bucht."
+
+A5. Falsche URLs bei zwei Lehrkräften (Tippfehler)
+    /team/adriana-lugoli/  -> Name auf der Seite: Adriana LLUGOLLI
+    /team/alica-kuc/       -> Name auf der Seite: ALISA Kuc
+    -> Slugs korrigieren auf /team/adriana-llugolli/ und /team/alisa-kuc/ und
+       eine 301-Weiterleitung von der alten Adresse einrichten (z. B. mit dem
+       Plugin "Redirection").
+
+A6. Fachbegriff falsch
+    Seite: /faecher-klassenstufen/
+    "Stochastik & Analyse" -> richtig: "Stochastik & Analysis"
+    Gerade auf einer Mathe-Seite fällt das Eltern und Schülern der Oberstufe
+    auf.
+
+A7. Kaputtes Bild auf der Startseite
+    Das Bild /wp-content/uploads/2026/09/20190925_130306-225x300.jpg wird beim
+    Laden abgebrochen.
+    -> In der Mediathek prüfen, ob das Bild bzw. diese Bildgröße existiert,
+       und gegebenenfalls ersetzen.
+
+
+================================================================================
+ PRIORITÄT B – MEHR ANFRAGEN (Conversion)
+================================================================================
+
+B1. Cookie-Banner verdeckt am Handy den wichtigsten Button
+    Auf ALLEN Seiten liegt der Banner am Handy mitten im Bildschirm. Auf der
+    Startseite verdeckt er genau den Button "Kostenfreie Probestunde
+    anfragen", auf /probestunde/ das Formular.
+    Dazu kommt, dass der lila "Akzeptieren"-Button nicht zum
+    Farbschema (Navy, Blau, Orange) passt.
+    -> Banner als schmale Leiste am unteren Rand anzeigen und Farben an das
+       Design anpassen (Akzeptieren in Navy, Ablehnen gleichwertig daneben,
+       wie es die DSGVO-Praxis verlangt).
+
+B2. Das Probestunden-Formular hat zu viele Hürden
+    Seite: /probestunde/
+    Aktuell muss man:
+      - Fachbereich, Fach, Schulform, Klasse und Lehrkraft wählen
+      - vier Pflichtfelder ausfüllen (inkl. Handynummer)
+      - eine reCAPTCHA-Einwilligung anhaken
+      - auf "Anfrage vorbereiten" klicken
+      - und DANN noch selbst per WhatsApp oder E-Mail absenden.
+    Der Hinweis dazu ("Ein Öffnen ist keine Versandbestätigung, und spätere
+    Textänderungen im externen Programm werden hier nicht gespeichert...")
+    ist für Eltern schwer verständlich.
+    Jeder zusätzliche Schritt kostet Anfragen. Vor allem der Wechsel in eine
+    andere App bricht oft ab, weil dort niemand auf "Senden" drückt.
+    Vorschläge:
+      - Das Formular direkt absenden lassen (Bestätigung per E-Mail) und
+        WhatsApp nur als ZUSÄTZLICHE Option anbieten.
+      - Handynummer ODER E-Mail als Pflicht, nicht beides.
+      - Pflichtfelder auf das Nötigste reduzieren: Name, Kontakt, Fach,
+        Klasse. Die Lehrkraft-Auswahl optional machen.
+      - Statt der reCAPTCHA-Checkbox ein unsichtbares Verfahren nutzen
+        (z. B. Honeypot-Feld oder Cloudflare Turnstile). Das spart auch die
+        Einwilligungs-Checkbox. Rechtlich mit dem Datenschutz-Berater
+        abstimmen.
+      - Den Text unter dem Button auf 1–2 Sätze kürzen.
+
+B3. Die eigene Stärke "seit 2001" fehlt auf der Startseite
+    25 Jahre Nachhilfe-Erfahrung, Lehrerfahrung an Gymnasium, Grundschule und
+    in der Erwachsenenbildung sowie Dozent für Abschlusskurse im Landkreis
+    Aschaffenburg: Das steht nur auf /ueber-uns/ und /team/marcel-daum/.
+    -> Auf der Startseite in die Gründer-Karte aufnehmen, z. B.:
+       "Marcel Daum · Gründer · seit 2001 in der Nachhilfe"
+       Oder als dritten Vertrauenspunkt neben "5,0 / 623 Bewertungen".
+
+B4. Reihenfolge am Handy (Startseite)
+    Am Handy folgen auf die Überschrift sofort der Preis-Kasten und erst
+    danach die "Hä? -> Aha."-Karte. Der Probestunden-Button ist durch den
+    Cookie-Banner verdeckt (siehe B1).
+    -> Am Handy: Überschrift, dann ein kurzer Satz, dann der
+       Probestunden-Button, dann die Bewertungen und erst dann der Preis.
+
+B5. Bestandskunden zahlen mehr als Neukunden
+    Neukundenpaket: ab 23,50 €/Std. (470,00 € für 20 Std.)
+    Bestandskunden: ab 23,75 €/Std. (475,00 € für 20 Std.)
+    Rabatte für Neukunden sind üblich. Wenn Bestandskunden beide Preise
+    nebeneinander auf /stundenpakete-preise/ sehen, kann das aber als
+    "Treue wird bestraft" ankommen.
+    -> Entweder den Neukundenpreis nur auf der Neukunden-Produktseite zeigen
+       oder als "Startrabatt für das erste Paket" bezeichnen. Alternativ
+       Bestandskunden einen kleinen Vorteil geben (z. B. einen
+       Treue-/Empfehlungsbonus).
+
+B6. PayPal-Gebühr (2,99 €)
+    Rechtlich ist ein PayPal-Aufschlag nach der BGH-Rechtsprechung (2021)
+    grundsätzlich zulässig, und er wird auch transparent ausgewiesen. Er
+    taucht aber auf vielen Seiten mehrfach auf (eigene rote Hinweisbox
+    "Hinweis zu PayPal" usw.) und wirkt dadurch kleinlich.
+    -> Gebühr entweder einpreisen oder nur einmal dezent im Checkout
+       erwähnen. Rote Warnboxen eher für echte Warnungen nutzen.
+
+B7. Teamübersicht: gleicher Text bei mehreren Lehrkräften
+    Seite: /team/
+    Bei 6 Lehrkräften (inkl. Marcel Daum) steht derselbe Platzhaltertext:
+    "Lerne diese Lehrkraft persönlich kennen. Wir beraten dich zur passenden
+    Unterstützung für dein Fach und deine Klassenstufe."
+    Adriana Llugolli hat kein Foto (nur die Initialen "AL").
+    -> Für jede Lehrkraft einen persönlichen Satz (1 Zeile aus dem eigenen
+       Profiltext) und ein Foto ergänzen.
+
+B8. "Ein Blick in unseren Unterricht" ist eingeklappt (Startseite)
+    Das könnte der überzeugendste Inhalt sein, steckt aber hinter einem "+".
+    -> Ein Tafelbild-Beispiel oder einen 30–60-Sekunden-Clip sichtbar zeigen.
+
+B9. Seite "Garantie" ohne Garantie
+    Die URL heißt /ueber-uns/zufriedenheitsgarantie/, der Inhalt beschreibt
+    aber nur "kostenlos kennenlernen". Das Wort Garantie kommt nicht mehr vor.
+    -> Entweder eine echte, einfache Zusage formulieren (z. B. "Passt die
+       erste bezahlte Stunde nicht, wechseln wir kostenlos die Lehrkraft")
+       oder die Seite umbenennen (URL + 301-Weiterleitung).
+
+
+================================================================================
+ PRIORITÄT C – TEXT & EINHEITLICHKEIT
+================================================================================
+
+C1. Du / ihr / Sie gemischt
+    Die Seite spricht fast überall mit "du" bzw. "ihr" an. Ausnahmen:
+      - /termine-aendern-absagen/      komplett per "Sie"
+      - /faecher-klassenstufen/        "In der Buchung wählen Sie Fach, ..."
+      - /team/marcel-daum/             2x "Kontaktieren Sie uns noch heute, um
+                                       mehr über meinen Lehransatz zu erfahren
+                                       und wie wir Ihnen helfen können, Ihre
+                                       Bildungsziele zu erreichen!"
+    -> Einheitlich auf du/ihr umstellen.
+
+C2. Gründer-Profil klingt teils nach Werbe-Vorlage
+    Seite: /team/marcel-daum/
+    Formulierungen wie "Kontaktieren Sie uns noch heute ... Ihre
+    Bildungsziele zu erreichen!" (2x wiederholt), "Warum mein Lehransatz
+    funktioniert:" und "Warum meine Nachhilfe besonders ist:" wirken generisch
+    und passen nicht zum sonst sehr persönlichen, ruhigen Ton der Seite.
+    Es gibt außerdem inhaltliche Doppelungen ("seit 2001" steht 4x,
+    Erfahrung an Gymnasium/Grundschule 2x).
+    -> Kürzen und in eigener Stimme schreiben, z. B. eine kurze echte
+       Anekdote aus dem Unterricht statt der Aufzählungen.
+
+C3. Mehrere Markennamen nebeneinander
+    Auf der Seite kommen vor: "Nachhilfe – Online", "Nachhilfe Online",
+    "Mathenachhilfe-Online", "Mathe mit Marcel", "MathPro" und
+    "Easy Learning". Die Domain heißt mathenachhilfe-online.com.
+    -> Einen Hauptnamen festlegen und die anderen klar als Produktnamen
+       führen. "Nachhilfe – Online" allein ist sehr allgemein und kaum zu
+       merken oder zu googeln. "Mathe mit Marcel" ist persönlich und
+       einprägsam und passt zum Gründer-Fokus.
+       Mindestens den Seitentitel-Zusatz vereinheitlichen. Aktuell gibt es
+       "| Nachhilfe Online" und "– Nachhilfe – Online" gemischt.
+
+C4. Zwei verschiedene E-Mail-Adressen
+    Kontakt: marcel.daum@mathenachhilfe-online.com
+    Impressum / Buchung: website@mathenachhilfe-online.com
+    -> Für Kunden eine Adresse nutzen (z. B. kontakt@...).
+
+C5. Kontaktformular auf 300 Zeichen begrenzt
+    Seite: /kontakt/
+    Eltern schildern ihr Anliegen gerne ausführlicher. 300 Zeichen sind etwa
+    2–3 Sätze.
+    -> Auf 1000–1500 Zeichen erhöhen.
+
+C6. Unfertige Angebote im Shop
+    /shop/: "Die gedruckten Ausgaben für Klasse 6 und Klasse 7 sind in
+    Vorbereitung."
+    /faecher-klassenstufen/: "Der aktuelle Mathematik-Check ist in der
+    Beta-Testphase."
+    Das ist ehrlich, häuft sich aber zusammen mit /buchung/ ("im Aufbau").
+    -> "In Vorbereitung"-Hinweise nur dort zeigen, wo sie wirklich nötig
+       sind, oder positiv formulieren ("Neu ab Frühjahr: ...").
+
+C7. Gruppennachhilfe-Preis schwer verständlich
+    "ab 30,76 € / Gruppenstunde (60 Min.) – Ab 2 Teilnehmer. Für die gesamte
+    Gruppe (2 Teilnehmer)."
+    Eltern wollen wissen, was sie PRO KIND zahlen.
+    -> Zusätzlich "= ca. 15,38 € pro Kind und Stunde" angeben.
+
+C8. Produktseiten sehr lang
+    /produkt/einzelnachhilfe-neukundenpaket/ ist am Handy ca. 9.000 Pixel
+    hoch (rund 11 Bildschirmlängen). Viele Infos (Ratenzahlung, PayPal,
+    Probestunde, Vorteile) wiederholen sich gegenüber anderen Seiten.
+    Darunter stehen die WooCommerce-Standardelemente (Reiter "Beschreibung /
+    Zusätzliche Informationen", "Artikelnummer: NHO-EIN-002 Kategorien: ..."),
+    die optisch nicht zum restlichen Design passen.
+    -> Kürzen und Details in aufklappbare Abschnitte legen.
+       Artikelnummer und Kategorien ausblenden und die Reiter an das Design
+       anpassen.
+
+
+================================================================================
+ PRIORITÄT D – SEO (bei Google besser gefunden werden)
+================================================================================
+
+D1. Keine Open-Graph-Tags auf der GESAMTEN Website
+    Auf keiner der 80 Seiten gibt es og:title, og:description oder og:image.
+    Folge: Wenn Eltern den Link per WhatsApp, Facebook oder Instagram teilen,
+    erscheint keine schöne Vorschau mit Bild. Bei Nachhilfe ist
+    Weiterempfehlung per WhatsApp der wichtigste Kanal!
+    -> Ein SEO-Plugin (Rank Math oder Yoast) einrichten oder die Tags im
+       Theme ergänzen. Ein Standard-Teilen-Bild (1200 x 630 px) mit Logo und
+       "5,0 ★ · 623 Bewertungen" anlegen.
+
+D2. Fehlende Meta-Beschreibungen
+    Ohne Beschreibung:
+      /das-ist-dabei/
+      /textaufgaben-verstehen/
+      /lesestudio/
+      /lesestudio/entdecken/
+    (Warenkorb, Login und Registrieren sind auf noindex, dort ist es egal.)
+    -> Jeweils 140–160 Zeichen mit Nutzen und Handlungsaufforderung.
+       Beispiel /textaufgaben-verstehen/:
+       "Kostenloser Mathe-Kompass als PDF: Textaufgaben Schritt für Schritt
+        verstehen – mit Beispielen, Übungen, Lösungen und Vokabelteil."
+
+D3. Mehrere H1-Überschriften
+    /das-ist-dabei/              2x H1
+    /textaufgaben-verstehen/     2x H1
+    /lesestudio/                 4x H1
+    /lesestudio/entdecken/       4x H1
+    -> Pro Seite genau eine H1, der Rest wird H2.
+
+D4. Lesestudio: doppelter Titel, kein Canonical, 401-Fehler
+    /lesestudio/ und /lesestudio/entdecken/ haben denselben Titel
+    ("Mathe Lesestudio"), keinen Canonical-Link und lösen in der
+    Browser-Konsole einen 401-Fehler (Unauthorized) aus. Vermutlich fragt
+    eine REST-Abfrage Daten ab, die nur angemeldete Nutzer bekommen.
+    Außerdem stehen beide Seiten nicht in der Sitemap.
+    -> Eine der beiden Seiten per Canonical auf die andere verweisen lassen,
+       eigene Titel vergeben, den 401-Aufruf für Gäste abfangen und das
+       Lesestudio in die Sitemap aufnehmen. Es ist gut für Google, weil dort
+       viel Inhalt steht.
+
+D5. Zu lange Seitentitel (werden bei Google abgeschnitten)
+    /textaufgaben-verstehen/  (76 Zeichen)
+       "Textaufgaben verstehen – dein kostenloser Mathe-Kompass – Nachhilfe
+        – Online"
+       -> "Textaufgaben verstehen: kostenloser Mathe-Kompass (PDF)"
+    /ueber-uns/zufriedenheitsgarantie/  (71 Zeichen)
+
+D6. Startseiten-Titel zu allgemein
+    Aktuell: "Online-Nachhilfe in vielen Fächern | Nachhilfe Online"
+    -> z. B.: "Online-Nachhilfe Mathe, Deutsch & Englisch | 5,0 ★ Google"
+       Oder mit Gründer-Bezug: "Online-Nachhilfe mit Marcel Daum & Team |
+       seit 2001". Mathe sollte vorne stehen, da es Kern und Domainname ist.
+
+D7. Startseite: 20 Lehrernamen als H3
+    Die Lehrkräfte im Karussell sind als H3-Überschriften ausgezeichnet. Das
+    verwässert die Überschriftenstruktur.
+    -> Namen im Karussell als normalen Text (z. B. <p class="...">)
+       auszeichnen.
+
+D8. Bewertungen strukturiert auszeichnen
+    Schema.org "EducationalOrganization" ist bereits vorhanden (gut!).
+    -> "aggregateRating" (5,0 / 623) ergänzen. Hinweis: Google zeigt Sterne
+       für die eigene Organisation in der Regel nicht mehr an. Für
+       Produktseiten (E-Books) lohnt es sich aber, sobald dort echte
+       Produktbewertungen vorhanden sind.
+
+D9. Lokale Suche nutzen
+    Viele Eltern suchen "Mathe Nachhilfe Aschaffenburg". Der Firmensitz ist
+    Aschaffenburg und das Google-Profil hat 623 Bewertungen. Das ist ein
+    starkes lokales Signal.
+    -> Eine Landingpage "Online-Nachhilfe für Aschaffenburg & Umgebung"
+       (bzw. Unterfranken / Rhein-Main) mit Bezug zu den Abschlusskursen im
+       Landkreis anlegen. Optional auch Seiten für die Bundesländer mit den
+       meisten Kunden (Bayern: Mittlere Reife/Abitur; Hessen: Realschul-
+       abschluss/Abitur).
+
+D10. Inhalte für Suchanfragen von Eltern
+    Bereits vorhanden und gut: /mathe-lerntipps/, /warum-ueben-nicht-reicht/,
+    /gute-schueler-und-nachhilfe/, /online-nachhilfe-oder-praesenznachhilfe-
+    der-vergleich/.
+    -> Ausbauen mit konkreten Themen-Seiten, die oft gesucht werden, z. B.
+       "Bruchrechnung einfach erklärt", "Prozentrechnung Klasse 7",
+       "Abschlussprüfung Mathe Realschule Bayern 2027 – so bereitest du dich
+       vor". Jede Seite mit Verweis auf das passende E-Book und die
+       Probestunde.
+
+
+================================================================================
+ PRIORITÄT E – TECHNIK & GESCHWINDIGKEIT
+================================================================================
+
+E1. Kein Seiten-Caching
+    Jede Seite wird mit "Cache-Control: no-cache, no-store, private"
+    ausgeliefert, also bei jedem Aufruf neu erzeugt.
+    Gemessene Ladezeiten (bis alles fertig geladen ist):
+      - Infoseiten:     ca. 1,5–2,5 s
+      - Startseite:     ca. 4,3 s
+      - Produktseiten:  bis 5,7 s (/produkt/einzelnachhilfe/)
+    -> Ein Cache-Plugin einsetzen (z. B. WP Rocket, LiteSpeed Cache oder
+       das Plesk-eigene nginx-Caching) für alle Seiten außer Warenkorb, Kasse
+       und Login. Das kann die Zeit bis zur ersten Antwort deutlich senken.
+
+E2. Viele Skripte
+    Die Startseite lädt ca. 40 <script>-Blöcke. Das ist für WordPress
+    plus WooCommerce nicht ungewöhnlich, belastet aber Handys.
+    -> WooCommerce-, PayPal- und Stripe-Skripte nur auf Shop-, Produkt-,
+       Warenkorb- und Kassenseiten laden (z. B. mit "Perfmatters" oder
+       "Asset CleanUp").
+
+E3. AGB-Link wird per JavaScript eingefügt
+    Im Footer erzeugt das Skript "nho-agb-footer-link" den AGB-Link erst im
+    Browser. Ohne JavaScript (manche Crawler, Barrierefreiheits-Tools) fehlt
+    er.
+    -> Den AGB-Link fest ins Footer-Menü eintragen und das Skript entfernen.
+
+E4. Link "Meine Lernberichte" für Gäste
+    Auf jeder Seite ist ein Link zu /meine-lernberichte/ vorhanden, der Gäste
+    zum Login umleitet. Falls er für Gäste sichtbar ist: nur für angemeldete
+    Nutzer anzeigen.
+
+E5. Alte interne Links mit Umleitung
+    /vorteile-der-online-mathe-nachhilfe/ und
+    /online-nachhilfe-oder-praesenznachhilfe-der-vergleich/
+    verlinken auf /online-nachhilfe/ (301-Umleitung).
+    -> Direkt auf /angebot/online-nachhilfe/ verlinken.
+
+E6. /kasse/ zeigt den Titel "Warenkorb"
+    Ein Aufruf von /kasse/ mit leerem Warenkorb leitet auf /warenkorb/ um. Das
+    ist korrekt (WooCommerce-Standard). Kein Handlungsbedarf, nur zur Info.
+
+Was technisch bereits GUT ist (beibehalten):
+  + HTTPS mit HSTS, strenge Content-Security-Policy, X-Frame-Options
+  + xmlrpc.php gesperrt (403), Benutzerliste über die REST-API geschützt (401)
+  + Alle Bilder mit Alt-Text, lang="de" gesetzt
+  + Keine JavaScript-Fehler (außer im Lesestudio, siehe D4)
+  + Kein horizontales Scrollen am Handy auf allen 80 Seiten
+  + Jede Seite mit eindeutigem Titel und Canonical (bis auf das Lesestudio)
+  + Warenkorb, Login und Registrierung korrekt auf noindex
+  + robots.txt und Sitemap sauber eingerichtet
+  + Impressum nach DDG aktuell (Stand 28.09.2026)
+
+
+================================================================================
+ IDEEN FÜR DIE ZUKUNFT
+================================================================================
+
+- Echte Erfolgsgeschichten: "Von 5 auf 2 in sechs Monaten" mit (anonymisiertem)
+  Elternzitat. Das wirkt stärker als allgemeine Sterne.
+- Kurzes Vorstellungsvideo von Marcel (60 s) auf der Startseite und der
+  Über-uns-Seite. Der persönliche Faktor ist das Alleinstellungsmerkmal.
+- Empfehlungsprogramm: "Familie empfiehlt Familie – 1 Stunde gratis für
+  beide". Das passt perfekt zum Familien-Stundenkonto.
+- Online-Terminbuchung (/buchung/) fertigstellen. Das wäre der größte Hebel
+  gegen den Umweg über WhatsApp/E-Mail.
+- Newsletter/Lerntipps per E-Mail für Leute, die das kostenlose
+  Textaufgaben-PDF laden (E-Mail-Adresse gegen PDF, mit Einwilligung).
+
+
+================================================================================
+ CHECKLISTE ZUM ABHAKEN
+================================================================================
+
+[ ] A1  PDF Garantieunterlagen wiederherstellen (404)
+[ ] A2  Text "Der Lernweg wächst sanft..." auf /angebot/ entfernen
+[ ] A3  /buchung/ auf noindex oder umleiten
+[ ] A4  Internen Satz auf /stundenpakete-preise/ ersetzen
+[ ] A5  Slugs adriana-llugolli / alisa-kuc korrigieren + 301
+[ ] A6  "Analyse" -> "Analysis"
+[ ] A7  Kaputtes Bild auf der Startseite ersetzen
+[ ] B1  Cookie-Banner am Handy als Leiste unten, Farben anpassen
+[ ] B2  Probestunden-Formular vereinfachen, direkt absenden
+[ ] B3  "Seit 2001" auf die Startseite
+[ ] B4  Reihenfolge am Handy: CTA vor Preis
+[ ] B5  Neukunden-/Bestandskundenpreis besser darstellen
+[ ] B6  PayPal-Hinweise reduzieren
+[ ] B7  Teamkarten: persönliche Texte + Foto Adriana
+[ ] B8  Unterrichtsbeispiel sichtbar machen
+[ ] B9  Garantie-Seite umbenennen oder echte Zusage
+[ ] C1  Durchgehend du/ihr
+[ ] C2  Gründer-Profil überarbeiten
+[ ] C3  Markenname festlegen
+[ ] C4  Eine Kontakt-E-Mail
+[ ] C5  Kontaktformular auf 1000+ Zeichen
+[ ] C6  "In Vorbereitung"-Hinweise reduzieren
+[ ] C7  Gruppenpreis pro Kind angeben
+[ ] C8  Produktseiten kürzen, WooCommerce-Reste stylen
+[ ] D1  Open-Graph-Tags + Teilen-Bild
+[ ] D2  Meta-Beschreibungen ergänzen (4 Seiten)
+[ ] D3  Nur eine H1 pro Seite (4 Seiten)
+[ ] D4  Lesestudio: Titel, Canonical, 401, Sitemap
+[ ] D5  Lange Titel kürzen (2 Seiten)
+[ ] D6  Startseiten-Titel schärfen
+[ ] D7  Lehrernamen im Karussell nicht als H3
+[ ] D9  Lokale Landingpage Aschaffenburg
+[ ] E1  Seiten-Cache einrichten
+[ ] E2  Shop-Skripte nur auf Shopseiten laden
+[ ] E3  AGB-Link fest im Footer
+[ ] E5  Interne 301-Links aktualisieren
+
+================================================================================
