@@ -10,6 +10,10 @@ import { defaultState, mergeStates, scoreAttempt, examPassed, attemptValid } fro
 import { LEVEL1 } from '../js/content/level1.js';
 import { STORY1 } from '../js/content/story1.js';
 import { LEVELS } from '../js/content/curriculum.js';
+import { ROOMS, BADGES } from '../js/content/rooms.js';
+import { flagFor } from '../js/flags.js';
+import { streak, markActivity } from '../js/state.js';
+import { spawn, execFileSync } from 'node:child_process';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 let pass = 0, fail = 0;
@@ -315,6 +319,108 @@ t('config.js enthält keine Geheimnisse', () => {
   ok(!/service_role/i.test(c.replace(/\/\/.*$/gm, '')), 'service_role-Key im Frontend');
 });
 t('Curriculum: 10 Level', () => { eq(LEVELS.length, 10); eq(LEVELS.map(l => l.n), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); });
+
+// ------------------------------------------------ Räume
+const at = async (name, fn) => { try { await fn(); pass++; } catch (e) { fail++; console.error('✗', name, '\n  ', e.message); } };
+const TOKEN = 'KLY-ABC123';
+await at('Flag-Formel identisch mit server.py', async () => {
+  eq(await flagFor(TOKEN, 'r1', 'header'), 'KLY{7fc25f48f25700cd}');
+});
+t('Räume vollständig', () => {
+  const src = readFileSync(join(ROOT, 'labs/kly-target/server.py'), 'utf8');
+  for (const r of ROOMS) {
+    for (const k of ['ziel', 'scope', 'stop', 'cleanup', 'desc']) ok(r[k], `${r.id}: ${k}`);
+    ok(r.nach?.beobachtung && r.nach?.grenzen, `${r.id}: nach`);
+    for (const tk of r.tasks) for (const q of tk.questions) {
+      ok(q.points > 0, `${r.id}.${tk.id}.${q.id} Punkte`);
+      if (q.type === 'mc') ok(q.options[q.answer], 'mc');
+      if (q.type === 'text') ok(q.accept?.length, 'accept');
+      if (q.type === 'flag') ok(r.machine.kind === 'sandbox' ? r.flags.includes(q.flag) : src.includes(`flag("${r.id}", "${q.flag}")`) || src.includes(`flag('${r.id}', '${q.flag}')`), `${r.id}: Flag ${q.flag} fehlt im Ziel`);
+      if (q.type !== 'confirm') ok(q.hint, `${r.id}.${tk.id}.${q.id} Hinweis`);
+    }
+    if (r.machine.kind === 'target') for (const p of r.machine.ports) ok(src.includes(String(p)), `Port ${p}`);
+  }
+  eq(new Set(BADGES.map(b => b.id)).size, BADGES.length);
+});
+await at('R0 Sandbox-Raum lösbar', async () => {
+  const r = ROOMS.find(x => x.id === 'r0'); const F = {};
+  for (const f of r.flags) F[f] = await flagFor(TOKEN, 'r0', f);
+  const s = sh(); r.setup(s, F);
+  ok(s.exec('cat start/.spur').out.includes(F.hidden));
+  ok(!s.exec('ls start').out.includes('.spur'));
+  const g = s.exec('grep SECRET logs/*.log').out; ok(g.startsWith('logs/app-02.log:') && g.includes(F.grep));
+  eq(s.exec('stat -c %a tresor/schloss.txt').out, '0\n');
+  ok(s.exec('cat tresor/schloss.txt').err.includes('Keine Berechtigung'));
+  s.exec('chmod u+r tresor/schloss.txt'); ok(s.exec('cat tresor/schloss.txt').out.includes(F.chmod));
+  const f = s.exec('find ~/raum0/archiv -name "*.key"').out.trim(); eq(f, HOME + '/raum0/archiv/2026/q2/tief/drin/zugang.key');
+  ok(s.exec('cat ' + f).out.includes(F.find));
+  eq(s.exec('grep -c "^DENY" firewall.log').out, '7\n');
+  eq(s.exec('grep "^DENY" firewall.log | cut -d" " -f2 | sort | uniq -c | sort -nr | head -1').out.trim(), '4 10.13.37.21');
+  const qs = Object.fromEntries(r.tasks.flatMap(tk => tk.questions.map(q => [tk.id + q.id, q])));
+  ok(qs.t2q1.accept.some(re => re.test('app-02.log'))); ok(qs.t3q1.accept.some(re => re.test('000')));
+  ok(qs.t4q1.accept.some(re => re.test('~/raum0/archiv/2026/q2/tief/drin/zugang.key')));
+});
+
+// Echte Zielmaschinen (Python, ohne Docker) starten und mit curl/nc lösen
+const hasBin = (b) => { try { execFileSync('sh', ['-c', `command -v ${b}`]); return true; } catch { return false; } };
+if (hasBin('python3') && hasBin('curl')) {
+  const procs = ['r1', 'r2', 'r3'].map(r => spawn('python3', [join(ROOT, 'labs/kly-target/server.py'), r], { env: { ...process.env, KLY_TOKEN: TOKEN } }));
+  await new Promise(res => setTimeout(res, 900));
+  const curl = (...a) => { try { return execFileSync('curl', ['-s', '--max-time', '3', ...a]).toString(); } catch (e) { return (e.stdout || '').toString(); } };
+  const room = (id) => ROOMS.find(x => x.id === id);
+  const accept = (id, tk, q, v) => room(id).tasks.find(x => x.id === tk).questions.find(x => x.id === q).accept.some(re => re.test(v));
+  await at('R1 mit echtem curl lösbar', async () => {
+    const h = curl('-I', 'http://127.0.0.1:10080/');
+    ok(accept('r1', 't1', 'q1', h.match(/^HTTP\/1\.0 (\d+)/)[1]));
+    ok(accept('r1', 't1', 'q2', h.match(/^Server: (.*)\r?$/m)[1].trim()));
+    ok(h.includes(await flagFor(TOKEN, 'r1', 'header')));
+    ok(accept('r1', 't3', 'q1', curl('http://127.0.0.1:10080/robots.txt').match(/Disallow: (\S+)/)[1]));
+    ok(curl('http://127.0.0.1:10080/intern/').includes('notiz.txt'));
+    ok(curl('http://127.0.0.1:10080/intern/notiz.txt').includes(await flagFor(TOKEN, 'r1', 'robots')));
+    ok(accept('r1', 't4', 'q1', curl('-o', '/dev/null', '-w', '%{http_code}', 'http://127.0.0.1:10080/admin')));
+    ok(accept('r1', 't4', 'q2', curl('-o', '/dev/null', '-w', '%{http_code}', 'http://127.0.0.1:10080/gibtsnicht')));
+    const alt = curl('-I', 'http://127.0.0.1:10080/alt');
+    ok(accept('r1', 't5', 'q1', alt.match(/^HTTP\/1\.0 (\d+)/)[1])); ok(accept('r1', 't5', 'q2', alt.match(/^Location: (\S+)/m)[1]));
+    ok(curl('-L', 'http://127.0.0.1:10080/alt').includes(await flagFor(TOKEN, 'r1', 'redirect')));
+  });
+  await at('R2 Ports/Banner lösbar', async () => {
+    const net = await import('node:net');
+    const open = [];
+    await Promise.all(Array.from({ length: 100 }, (_, i) => 10100 + i).map(p => new Promise(res => { const c = net.connect(p, '127.0.0.1'); c.on('connect', () => { open.push(p); c.destroy(); res(); }); c.on('error', res); })));
+    open.sort();
+    ok(accept('r2', 't2', 'q1', String(open.length)), 'offene Ports: ' + open); ok(accept('r2', 't2', 'q2', String(open[0])));
+    const banner = await new Promise(res => { let d = ''; const c = net.connect(10122, '127.0.0.1'); c.on('data', x => d += x); c.on('close', () => res(d)); c.on('error', () => res(d)); });
+    ok(banner.includes(await flagFor(TOKEN, 'r2', 'banner')));
+    ok(accept('r2', 't4', 'q1', curl('-I', 'http://127.0.0.1:10188/').match(/^Server: (.*)\r?$/m)[1].trim()));
+    ok(curl('http://127.0.0.1:10188/').includes(await flagFor(TOKEN, 'r2', 'web2')));
+  });
+  await at('R3 Challenge lösbar', async () => {
+    eq(curl('-o', '/dev/null', '-w', '%{http_code}', 'http://127.0.0.1:10280/backup'), '301');
+    const bak = curl('http://127.0.0.1:10280/backup/config.bak');
+    ok(bak.includes(await flagFor(TOKEN, 'r3', 'user')));
+    const h = curl('-I', 'http://127.0.0.1:10280/admin'); ok(/^HTTP\/1\.0 401/.test(h) && /WWW-Authenticate: Basic/.test(h));
+    const u = bak.match(/admin_user=(\S+)/)[1], pw = bak.match(/admin_pass=(\S+)/)[1];
+    ok(curl('-u', `${u}:${pw}`, 'http://127.0.0.1:10280/admin').includes(await flagFor(TOKEN, 'r3', 'admin')));
+    ok(accept('r3', 't3', 'q1', u));
+  });
+  procs.forEach(p => p.kill());
+}
+
+t('Merge: Räume und Aktivität', () => {
+  const a = defaultState(), b = defaultState();
+  a.rooms.r1 = { answers: { 't1.q1': { ok: true, at: 5, attempts: 1 } }, hints: {} };
+  b.rooms.r1 = { answers: { 't1.q1': { ok: false, attempts: 4 }, 't2.q1': { ok: true, at: 9, attempts: 2 } }, hints: { 't2.q1': true } };
+  a.activity['2026-10-30'] = 2; b.activity['2026-10-31'] = 1;
+  const m = mergeStates(b, a);
+  ok(m.rooms.r1.answers['t1.q1'].ok && m.rooms.r1.answers['t2.q1'].ok); eq(m.rooms.r1.answers['t1.q1'].attempts, 4);
+  ok(m.rooms.r1.hints['t2.q1']); eq(Object.keys(m.activity).length, 2);
+});
+t('Serie (Streak)', () => {
+  const s = defaultState(); const now = new Date(Date.UTC(2026, 9, 31, 12));
+  eq(streak(s, now), 0);
+  for (const d of [29, 30]) markActivity(s, new Date(Date.UTC(2026, 9, d, 10)));
+  eq(streak(s, now), 2, 'bis gestern'); markActivity(s, now); eq(streak(s, now), 3);
+});
 
 console.log(`\n${pass} bestanden, ${fail} fehlgeschlagen`);
 process.exit(fail ? 1 : 0);

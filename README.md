@@ -12,6 +12,23 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 | Sync PC ↔ Handy | Optional über Supabase (siehe [docs/SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)). Ohne Einrichtung: rein lokal + Export/Import. |
 | KI-Coach | Noch nicht angebunden. Es werden keine Daten an eine KI übertragen. |
 
+## Räume nach dem TryHackMe-Prinzip (ab 1.1.0)
+
+- **Räume** mit nummerierten Tasks, Fragen und **Flags** (`KLY{…}`). Flags werden aus dem persönlichen
+  Lab-Token berechnet – jede Person hat eigene, Abschreiben funktioniert nicht.
+- **Walkthroughs** (geführt, mit Erklärungen) und **Challenges** (ohne Anleitung, Hinweis erst nach 3 Versuchen).
+- **Zielmaschinen** (`labs/kly-target`): absichtlich verwundbare, synthetische Trainingsziele.
+  PC: per Docker, Ports nur auf `127.0.0.1`. Handy: dasselbe Skript direkt in Termux (`python server.py r1`).
+- **Lernpfade** (Level 1–10), **Abzeichen**, **Raum-Punkte** und **Lernserie** – reine Motivation,
+  sie schalten keine Prüfung frei.
+
+| Raum | Typ | Level | Ziel |
+|---|---|---|---|
+| r0 Terminal-Spuren | Walkthrough | 1 | Sandbox-Simulation |
+| r1 Erste Zielmaschine | Walkthrough | 1 | echtes Ziel, curl |
+| r2 Ports & Dienste | Walkthrough | 2 | echtes Ziel, nmap/nc |
+| r3 Leck im Dev-Server | Challenge | 2 | echtes Ziel, Red + Blue |
+
 ## Inhalt (Stand 1.0.0)
 
 - **Level 1 – Linux Grundlagen: vollständig ausgearbeitet**

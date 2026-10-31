@@ -4,8 +4,10 @@ import { mountTerminal } from './terminal-ui.js';
 import { verifyEvidence, normAnswer } from './verify.js';
 import {
   loadState, saveState, defaultState, today, pushBackup, listBackups, mergeStates,
-  scoreAttempt, examPassed, computeXp, PASS_RATIO,
+  scoreAttempt, examPassed, computeXp, PASS_RATIO, streak, markActivity,
 } from './state.js';
+import { flagFor, normFlag } from './flags.js';
+import { ROOMS, BADGES } from './content/rooms.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS } from './content/curriculum.js';
@@ -20,6 +22,7 @@ const EX = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
 const LESSON = Object.fromEntries(LESSONS.map(l => [l.id, l]));
 const STORY = Object.fromEntries(STORIES.map(s => [s.id, s]));
 const EXAMS = { L1: LEVEL1.exam };
+const ROOM = Object.fromEntries(ROOMS.map(r => [r.id, r]));
 
 let state = loadState();
 const getState = () => state;
@@ -81,6 +84,7 @@ function nextStep() {
       if (e.required && !isPassed(eid)) return { kind: 'ex', id: eid, title: e.title, href: `#/uebung/${eid}`, e };
     }
   }
+  for (const rid of ['r0', 'r1']) if (!roomDone(rid) && !roomLock(ROOM[rid]).length) return { kind: 'room', title: 'Raum: ' + ROOM[rid].title, href: `#/raum/${rid}` };
   const s = STORY.s1;
   if (!state.story.s1?.done) return { kind: 'story', title: s.title, href: '#/story/s1' };
   if (!examPassed(state, 'L1', EXAMS.L1.items.length)) return { kind: 'exam', title: EXAMS.L1.title, href: '#/pruefung/L1' };
@@ -114,8 +118,8 @@ function renderTop() {
 }
 
 function renderNav(route) {
-  const items = [['heute', '⌂', 'Heute'], ['pfad', '◆', 'Lernpfad'], ['story', '▶', 'Story'], ['terminal', '>_', 'Terminal'], ['mehr', '≡', 'Mehr']];
-  const map = { lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr' };
+  const items = [['heute', '⌂', 'Heute'], ['pfad', '◆', 'Pfade'], ['raeume', '▣', 'Räume'], ['terminal', '>_', 'Terminal'], ['mehr', '≡', 'Mehr']];
+  const map = { lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'raeume', story: 'raeume' };
   const on = map[route] || route;
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
 }
@@ -177,13 +181,13 @@ views.heute = () => {
         <h1 style="margin-top:.5rem">Hallo ${esc(state.profile.name)} – Linux Grundlagen</h1>
         <div class="bar" aria-label="Fortschritt ${p.pct}%"><i style="width:${p.pct}%"></i></div>
         <p class="small muted">${p.done} von ${p.total} Pflichtschritten (Lektionen + Pflichtübungen)</p>
-        <div class="kpis"><div class="kpi"><b>${xp}</b><span>Kurs-XP</span></div><div class="kpi"><b>${Object.values(state.exercises).filter(e => e.passedAt).length}</b><span>Übungen bestanden</span></div><div class="kpi"><b>${s1?.done ? STORY.s1.points : 0}</b><span>Story-Punkte</span></div></div>
+        <div class="kpis"><div class="kpi"><b>${xp}</b><span>Kurs-XP</span></div><div class="kpi"><b>${Object.values(state.exercises).filter(e => e.passedAt).length}</b><span>Übungen bestanden</span></div><div class="kpi"><b>${roomPointsTotal()}</b><span>Raum-Punkte</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>Tage-Serie</span></div><div class="kpi"><b>${earnedBadges().length}/${BADGES.length}</b><span>Abzeichen</span></div><div class="kpi"><b>${s1?.done ? STORY.s1.points : 0}</b><span>Story-Punkte</span></div></div>
       </div>
 
       <a class="card lime" href="${nx.href}" style="display:block;text-decoration:none;color:inherit">
         <span class="badge real">Nächster Schritt</span>
         <h2 style="margin:.4rem 0 .2rem">${esc(nx.title)}</h2>
-        <span class="small muted">${nx.kind === 'lesson' ? 'Lektion – erst verstehen, dann üben' : nx.kind === 'ex' ? (nx.e.kind === 'real' ? 'Echter Auftrag in deiner Kali-Umgebung' : 'Übung in der Sandbox-Simulation') : nx.kind === 'story' ? 'Story-Mission' : nx.kind === 'exam' ? 'Kumulative Prüfung' : ''} →</span>
+        <span class="small muted">${nx.kind === 'lesson' ? 'Lektion – erst verstehen, dann üben' : nx.kind === 'ex' ? (nx.e.kind === 'real' ? 'Echter Auftrag in deiner Kali-Umgebung' : 'Übung in der Sandbox-Simulation') : nx.kind === 'story' ? 'Story-Mission' : nx.kind === 'room' ? 'Raum mit Flags' : nx.kind === 'exam' ? 'Kumulative Prüfung' : ''} →</span>
       </a>
 
       <div class="card">
@@ -192,6 +196,11 @@ views.heute = () => {
         <ul class="list">${daily.map(id => exItem(id, true)).join('') || '<li class="item muted">Alles erledigt – wiederhole frei im Archiv.</li>'}</ul>
       </div>
 
+      <a class="card" href="#/raeume" style="display:block;text-decoration:none;color:inherit">
+        <span class="badge plain">Räume</span> <span class="badge real">Flags · Zielmaschinen</span>
+        <h3 style="margin-top:.5rem">${ROOMS.filter(r => !roomLock(r).length).length} von ${ROOMS.length} Räumen offen · ${ROOMS.filter(r => roomDone(r.id)).length} gemeistert</h3>
+        <p class="small muted">Walkthroughs mit Erklärungen, Challenges ohne Anleitung – Flags findest du nur durch echte Arbeit.</p>
+      </a>
       <div class="grid two">
         <a class="card" href="#/story/s1" style="text-decoration:none;color:inherit;display:block">
           <span class="badge sim">Story-Lab</span> <span class="badge real">+ echte Kali-Schritte</span>
@@ -234,7 +243,7 @@ views.pfad = () => ({
     return `<li><a href="#/level/${l.id}">
       <span class="state ${passed ? 'done' : unlocked ? '' : 'lock'}">${passed ? '✓' : unlocked ? l.n : '🔒'}</span>
       <span class="grow"><span class="t">Level ${l.n} – ${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span>
-      ${l.status === 'ready' ? '' : '<span class="badge plain">in Vorbereitung</span>'}
+      ${ROOMS.some(r => r.level === l.id) ? `<span class="badge plain">${ROOMS.filter(r => r.level === l.id).length} Räume</span>` : ''}${l.status === 'ready' ? '' : '<span class="badge plain">in Vorbereitung</span>'}
     </a></li>`;
   }).join('')}</ul>`,
 });
@@ -250,6 +259,7 @@ views.level = (id) => {
       <div class="card stack"><p>${esc(l.goal)}</p>
         <h3>Geplante Themen</h3><ul>${l.topics.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
         <h3>Werkzeuge</h3><ul>${l.tools.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+        ${ROOMS.some(r => r.level === l.id) ? `<h3>Räume (bereits verfügbar)</h3>${ROOMS.filter(r => r.level === l.id).map(roomCard).join('')}` : ''}
         <p class="honest">Ehrlicher Stand: Für dieses Level steht der Lehrplan, Lektionen/Übungen/Prüfung sind noch nicht ausgearbeitet.</p></div>`,
     };
   }
@@ -266,6 +276,7 @@ views.level = (id) => {
         </a>
         <ul class="list" style="margin-left:2.2rem">${ls.exercises.map(id => exItem(id)).join('')}</ul>
       </div>`).join('')}
+      ${ROOMS.filter(r => r.level === 'L1').map(roomCard).join('')}
       <a class="card ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><span class="badge sim">Story</span> <b>${esc(STORY.s1.title)}</b><br><span class="small muted">Empfohlen vor der Prüfung · bringt Story-Punkte, keine Prüfungsfreigabe</span></a>
       <a class="card ${pre.ok ? 'violet' : ''}" href="#/pruefung/L1" style="display:block;text-decoration:none;color:inherit"><b>Prüfung Level 1</b><br><span class="small muted">${pre.ok ? 'Freigeschaltet' : '🔒 erst nach allen Lektionen und Pflichtübungen'}</span></a>
     </div>`,
@@ -458,6 +469,7 @@ views.uebung = (id) => {
 
       const finish = () => {
         const first = !st.passedAt;
+        markActivity(state);
         if (first) { st.passedAt = Date.now(); st.knobelOk = true; }
         else st.repeats = (st.repeats || 0) + 1;
         save();
@@ -580,7 +592,7 @@ views.story = (id = 's1') => {
           $('#sevfb', root).innerHTML = resultsHTML(res);
           if (res.ok) {
             ss.evidence[sc.id] = { command: res.command, output: res.output.slice(0, 4000), at: Date.now() };
-            prog().ev = true; save();
+            prog().ev = true; markActivity(state); save();
             term.slot.innerHTML = '';
             term.printHTML(`<span class="good">✓ Beleg geprüft: ${esc(res.command)}</span>`);
             if (sc.answer && !prog().ans) term.printHTML('<span class="story">Jetzt: antwort &lt;…&gt;</span>');
@@ -772,6 +784,7 @@ function runExam(root, lv, ex) {
     const attempt = { id: 'a-' + Date.now().toString(36) + '-' + state.deviceId, at: Date.now(), items: results, score: sc.score, passed: sc.passed };
     state.exams[lv] = state.exams[lv] || { attempts: [] };
     state.exams[lv].attempts.push(attempt);
+    markActivity(state);
     save();
     $$('button, input', box).forEach(x => { if (x.id !== 'submit') x.disabled = true; });
     $('#submit', box).remove();
@@ -823,6 +836,7 @@ views.mehr = () => {
     html: `<h1>Mehr</h1>
     <div class="stack">
       <div class="card"><ul class="list">
+        <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne XP)</span></span></a></li>
         <li><a href="#/werkzeuge"><span class="state">⚒</span><span class="grow"><span class="t">Werkzeuge</span><span class="s">Kali-Tools: Zweck, Scope, Beleg</span></span></a></li>
         <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen</span><span class="s">Level 1</span></span></a></li>
@@ -935,6 +949,217 @@ views.mehr = () => {
       const sn = $('#syncnow', root); if (sn) sn.onclick = () => syncNow(getState, applyState);
       const lo = $('#logout', root); if (lo) lo.onclick = async () => { await signOut(); render(); };
     },
+  };
+};
+
+// ---------------------------------------------------------------- Räume (TryHackMe-Prinzip)
+const qKey = (t, q) => `${t.id}.${q.id}`;
+const allQs = (r) => r.tasks.flatMap(t => t.questions.map(q => ({ t, q, key: qKey(t, q) })));
+const roomState = (id) => state.rooms[id] || (state.rooms[id] = { answers: {}, hints: {} });
+const qOk = (rid, key) => !!state.rooms[rid]?.answers?.[key]?.ok;
+function roomDone(id) { return allQs(ROOM[id]).every(x => qOk(id, x.key)); }
+function roomPct(id) { const qs = allQs(ROOM[id]); return Math.round(qs.filter(x => qOk(id, x.key)).length / qs.length * 100); }
+function roomPoints(id) { return allQs(ROOM[id]).filter(x => qOk(id, x.key)).reduce((n, x) => n + (x.q.points || 0), 0); }
+function roomPointsTotal() { return ROOMS.reduce((n, r) => n + roomPoints(r.id), 0); }
+
+function roomLock(r) {
+  const why = [];
+  if (!levelUnlocked(r.level)) { const n = LEVELS.find(l => l.id === r.level).n; why.push(`Prüfung Level ${n - 1} bestehen`); }
+  for (const l of r.requires?.lessons || []) if (!lessonDone(l)) why.push(`Lektion „${LESSON[l].title}“ lesen`);
+  for (const x of r.requires?.rooms || []) if (!roomDone(x)) why.push(`Raum „${ROOM[x].title}“ abschließen`);
+  return why;
+}
+
+function roomCard(r) {
+  const lock = roomLock(r), pct = roomPct(r.id);
+  return `<a class="card tight ${roomDone(r.id) ? 'lime' : ''}" href="#/raum/${r.id}" style="display:block;text-decoration:none;color:inherit;margin-bottom:.6rem">
+    <div class="row between"><span>${r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>'} ${r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">Sandbox</span>'}</span><span class="small muted">${esc(r.difficulty)} · ~${r.minutes} min</span></div>
+    <b style="display:block;margin-top:.4rem">${lock.length ? '🔒 ' : ''}${esc(r.title)}</b>
+    <span class="small muted">${esc(r.desc)}</span>
+    <div class="bar" style="margin-top:.5rem"><i style="width:${pct}%"></i></div>
+    <span class="small muted">${pct} % · ${roomPoints(r.id)} Punkte${lock.length ? ' · gesperrt: ' + esc(lock[0]) : ''}</span>
+  </a>`;
+}
+
+function earnedBadges() {
+  const anyAns = (pred) => ROOMS.some(r => allQs(r).some(x => qOk(r.id, x.key) && pred(r, x.q)));
+  const done = ROOMS.filter(r => roomDone(r.id));
+  const s = streak(state);
+  const map = {
+    'erste-flag': anyAns((r, q) => q.type === 'flag'),
+    'echter-beleg': EXERCISES.some(e => e.kind === 'real' && isPassed(e.id)),
+    'zielmaschine': anyAns((r, q) => r.machine.kind === 'target' && q.type !== 'confirm'),
+    'erster-raum': done.length > 0,
+    'ohne-hinweis': done.some(r => !Object.keys(state.rooms[r.id]?.hints || {}).length),
+    'challenge': done.some(r => r.type === 'challenge'),
+    'story-1': !!state.story.s1?.done,
+    'level-1': examPassed(state, 'L1', EXAMS.L1.items.length),
+    'streak-3': s >= 3,
+    'streak-7': s >= 7,
+  };
+  return BADGES.filter(b => map[b.id]);
+}
+
+views.raeume = () => ({
+  html: `<h1>Räume</h1>
+  <p class="muted small">Wie auf einer CTF-Lernplattform: Jeder Raum hat Tasks mit Fragen und Flags. <b>Walkthroughs</b> erklären, <b>Challenges</b> prüfen deine Selbstständigkeit. Flags werden aus deinem persönlichen Token berechnet – du findest sie nur durch eigene Arbeit.</p>
+  ${LEVELS.filter(l => ROOMS.some(r => r.level === l.id) || l.id === 'L1').map(l => `<h2 style="margin-top:1rem">Level ${l.n} · ${esc(l.title)}</h2>
+    ${ROOMS.filter(r => r.level === l.id).map(roomCard).join('')}
+    ${l.id === 'L1' ? `<a class="card tight ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><span class="badge sim">Story-Mission</span> <span class="badge real">+ echte Schritte</span><b style="display:block;margin-top:.4rem">${storyLocked(STORY.s1).length ? '🔒 ' : ''}${esc(STORY.s1.title)}</b><span class="small muted">${esc(STORY.s1.teaser)}</span></a>` : ''}`).join('')}`,
+});
+
+function machineHTML(r) {
+  const m = r.machine;
+  if (m.kind !== 'target') return '';
+  const name = `kly-${m.room}`;
+  const ports = m.ports.map(p => `-p 127.0.0.1:${p}:${p}`).join(' ');
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '') + 'labs/kly-target/';
+  const httpsApp = location.protocol === 'https:';
+  const fetchCmd = `mkdir -p ~/kly-labs/kly-target && cd ~/kly-labs/kly-target\ncurl -fsSL -O ${base}server.py -O ${base}Dockerfile`;
+  const loc = state.location || 'pc';
+  const pc = `
+    <h4>🖥️ PC: Kali-VM mit Docker</h4>
+    <details><summary>Einmalig: Docker prüfen / einrichten</summary>
+      <p class="small">Erst prüfen, nicht blind installieren:</p>${scriptBlock('Prüfen:', 'command -v docker && docker info --format "Docker {{.ServerVersion}} läuft"')}
+      <p class="small">Fehlt Docker, bewusst einmalig einrichten (danach ab- und wieder anmelden):</p>${scriptBlock('Einrichten (Kali):', 'sudo apt update && sudo apt install -y docker.io\nsudo systemctl enable --now docker\nsudo usermod -aG docker $USER')}
+    </details>
+    <p class="small"><b>1. Lab-Dateien holen</b> – ${httpsApp ? 'per curl direkt aus der App:' : 'Download-Links unten in der VM öffnen oder die App-ZIP (Mehr → App herunterladen) entpacken. Ordner: ~/kly-labs/kly-target'}</p>
+    ${httpsApp ? scriptBlock('Holen:', fetchCmd) : ''}
+    <p class="small"><a href="labs/kly-target/server.py" download>server.py</a> · <a href="labs/kly-target/Dockerfile" download>Dockerfile</a> · <a href="labs/kly-target/README.md" download>README</a></p>
+    ${scriptBlock('2. Einmalig bauen:', 'cd ~/kly-labs/kly-target && docker build -t kly-target .')}
+    ${scriptBlock('3. Maschine starten:', `docker run -d --rm --name ${name} -e KLY_TOKEN={{TOKEN}} ${ports} kly-target ${m.room}`)}
+    ${scriptBlock('4. Prüfen:', `docker ps --filter name=${name}\ndocker logs ${name}`)}
+    ${scriptBlock('Stoppen:', `docker stop ${name}`)}`;
+  const phone = `
+    <h4>📱 Handy: Termux (ohne Docker, ohne Root)</h4>
+    ${scriptBlock('Einmalig prüfen:', 'command -v python || pkg install python')}
+    ${httpsApp ? scriptBlock('Lab-Datei holen:', `mkdir -p ~/kly-labs && cd ~/kly-labs\ncurl -fsSL -O ${base}server.py`) : '<p class="small">server.py herunterladen (<a href="labs/kly-target/server.py" download>Link</a>) und nach ~/kly-labs kopieren.</p>'}
+    ${scriptBlock('Maschine starten (läuft im Vordergrund):', `cd ~/kly-labs && KLY_TOKEN={{TOKEN}} python server.py ${m.room}`)}
+    <p class="small muted">Für deine Befehle eine zweite Termux-Sitzung öffnen (vom linken Rand wischen → „New session“). Stoppen: Strg+C im Server-Fenster.</p>`;
+  return `<div class="card lime stack" id="machine">
+    <div class="row between"><h3 style="margin:0">Zielmaschine ${esc(name)}</h3><span class="badge real">echt · nur 127.0.0.1</span></div>
+    <p class="small">Ports: ${m.ports.map(p => `<code>127.0.0.1:${p}</code>`).join(' ')} · Token: <code>${esc(state.labToken)}</code></p>
+    ${loc === 'windows' ? '<div class="feedback no small">Heute ist Windows gewählt. Die Zielmaschine läuft in deiner Kali-VM oder in Termux.</div>' : ''}
+    ${roomState(r.id).startedAt ? '' : '<button class="btn go" id="startm">▶ Maschine starten – Anleitung anzeigen</button>'}
+    <div id="mhow" ${roomState(r.id).startedAt ? '' : 'hidden'}>${loc === 'phone' ? phone + '<details><summary>PC-Anleitung</summary>' + pc + '</details>' : pc + `<details ${loc === 'both' ? 'open' : ''}><summary>Handy-Anleitung</summary>${phone}</details>`}</div>
+    <p class="honest">Die App startet nichts selbst – sie zeigt dir die Befehle. Die Maschine ist ein absichtlich verwundbares Trainingsziel mit synthetischen Daten und ist nur auf deinem Gerät erreichbar.</p>
+  </div>`;
+}
+
+function questionHTML(r, t, q) {
+  const key = qKey(t, q), a = state.rooms[r.id]?.answers?.[key], ok = !!a?.ok;
+  const id = `${t.id}-${q.id}`;
+  let input = '';
+  if (q.type === 'mc') {
+    input = shuffle(q.options.map((o, i) => ({ o, i })), [...key].reduce((n, c) => n + c.charCodeAt(0), 7)).map(({ o, i }) => `<button class="opt ${ok && i === q.answer ? 'right' : ''}" data-k="${key}" data-i="${i}" ${ok ? 'disabled' : ''}>${esc(o)}</button>`).join('');
+  } else if (q.type === 'confirm') {
+    input = `<button class="btn small ${ok ? '' : 'go'}" data-k="${key}" data-confirm ${ok ? 'disabled' : ''}>${ok ? '✓ Erledigt' : 'Erledigt'}</button>`;
+  } else {
+    input = `<div class="row" style="flex-wrap:nowrap"><input type="text" id="in-${id}" data-k="${key}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${q.type === 'flag' ? 'KLY{…}' : 'Antwort'}" ${ok ? 'disabled value="✓ gelöst"' : ''}><button class="btn small primary" data-k="${key}" data-send ${ok ? 'disabled' : ''}>Senden</button></div>`;
+  }
+  return `<div class="q" id="q-${id}" style="margin:.7rem 0">
+    <div class="row between"><b class="small">${ok ? '✓ ' : ''}${esc(q.q)}</b><span class="small muted">${q.points} P.</span></div>
+    ${input}<div class="qfb small" data-fb="${key}"></div></div>`;
+}
+
+views.raum = (id) => {
+  const r = ROOM[id];
+  if (!r) return views.raeume();
+  const lock = roomLock(r);
+  const head = `<a class="back" href="#/raeume">← Räume</a>
+    <div class="row">${r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>'}<span class="badge plain">Level ${LEVELS.find(l => l.id === r.level).n}</span><span class="badge plain">${esc(r.difficulty)}</span>${r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">Sandbox-Simulation</span>'}</div>
+    <h1 style="margin-top:.5rem">${esc(r.title)}</h1><p>${esc(r.desc)}</p>`;
+  if (lock.length) return { html: head + `<div class="card warn"><b>🔒 Gesperrt</b><ul>${lock.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` };
+  const rs = roomState(r.id);
+  return {
+    html: head + `
+    <div class="card tight"><div class="bar"><i style="width:${roomPct(r.id)}%" id="rbar"></i></div><span class="small muted" id="rstat">${roomPct(r.id)} % · ${roomPoints(r.id)} Punkte</span></div>
+    <div class="task-meta" style="margin:.8rem 0">
+      <div><b>Lernziel</b>${esc(r.ziel)}</div><div><b>Scope</b>${esc(r.scope)}</div><div><b>Stopp-Regel</b>${esc(r.stop)}</div><div><b>Aufräumen</b>${esc(r.cleanup)}</div>
+      <div><b>Werkzeuge</b>${r.tools.map(esc).join(', ')}</div>
+    </div>
+    ${machineHTML(r)}
+    ${r.machine.kind === 'sandbox' ? '<div id="rterm"></div><button class="btn ghost small" id="rreset" style="margin-top:.4rem">Raum-Terminal neu starten</button>' : ''}
+    <div class="stack" style="margin-top:.8rem">${r.tasks.map((t, i) => {
+      const done = t.questions.every(q => qOk(r.id, qKey(t, q)));
+      return `<details class="card" ${done ? '' : (i === r.tasks.findIndex(tt => !tt.questions.every(q => qOk(r.id, qKey(tt, q)))) ? 'open' : '')}>
+        <summary><span class="state ${done ? 'done' : ''}" style="display:inline-grid;margin-right:.5rem;vertical-align:middle">${done ? '✓' : i + 1}</span>Task ${i + 1}: ${esc(t.title)}</summary>
+        <p style="white-space:pre-line">${esc(t.body)}</p>
+        ${t.questions.map(q => questionHTML(r, t, q)).join('')}
+      </details>`;
+    }).join('')}</div>
+    <div id="rdone"></div>`,
+    mount(root) {
+      bindCopy(root);
+      const sm = $('#startm', root);
+      if (sm) sm.onclick = () => { rs.startedAt = Date.now(); save(); sm.remove(); $('#mhow', root).hidden = false; };
+      let sh = null;
+      const startSandbox = async () => {
+        const F = {};
+        for (const f of r.flags || []) F[f] = await flagFor(state.labToken, r.id, f);
+        $('#rterm', root).innerHTML = '';
+        sh = new Shell({ fs: baseFS() });
+        r.setup(sh, F);
+        mountTerminal($('#rterm', root), sh, { title: `Raum · ${r.title}`, welcome: 'Raum-Sandbox bereit. Arbeitsordner: ~/raum0 · help zeigt Befehle.' });
+      };
+      if (r.machine.kind === 'sandbox') { startSandbox(); $('#rreset', root).onclick = startSandbox; }
+
+      const find = (key) => { for (const t of r.tasks) for (const q of t.questions) if (qKey(t, q) === key) return { t, q }; };
+      const fbOf = (key) => root.querySelector(`[data-fb="${CSS.escape(key)}"]`);
+      const showDone = () => {
+        $('#rbar', root).style.width = roomPct(r.id) + '%';
+        $('#rstat', root).textContent = `${roomPct(r.id)} % · ${roomPoints(r.id)} Punkte`;
+        if (roomDone(r.id)) {
+          if (!rs.doneAt) { rs.doneAt = Date.now(); save(); toast(`Raum „${r.title}“ gemeistert!`); }
+          const n = r.nach;
+          $('#rdone', root).innerHTML = `<div class="card lime debrief"><h3>✓ Raum abgeschlossen · ${roomPoints(r.id)} Punkte</h3><dl><dt>Beobachtung</dt><dd>${esc(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${esc(n.schluss)}</dd><dt>Grenzen</dt><dd>${esc(n.grenzen)}</dd><dt>Nächster Schritt</dt><dd>${esc(n.naechster)}</dd></dl><p class="small">Aufräumen nicht vergessen: <code>${esc(r.cleanup)}</code></p></div>`;
+        }
+      };
+      const verdict = async (key, value) => {
+        const { q } = find(key);
+        const ans = rs.answers[key] || (rs.answers[key] = { attempts: 0 });
+        if (ans.ok) return;
+        let ok = false;
+        if (q.type === 'flag') ok = normFlag(value) === await flagFor(state.labToken, r.id, q.flag);
+        else if (q.type === 'text') ok = q.accept.some(re => re.test(String(value).trim()));
+        else if (q.type === 'mc') ok = +value === q.answer;
+        else if (q.type === 'confirm') ok = true;
+        ans.attempts++;
+        const fb = fbOf(key);
+        if (ok) {
+          ans.ok = true; ans.at = Date.now(); markActivity(state); save();
+          fb.innerHTML = `<span style="color:var(--lime)">✓ Richtig · +${q.points} Punkte</span>`;
+          $$(`[data-k="${CSS.escape(key)}"]`, root).forEach(x => { x.disabled = true; if (x.tagName === 'BUTTON' && x.dataset.i == q.answer) x.classList.add('right'); });
+          showDone();
+        } else {
+          save();
+          const limit = r.type === 'challenge' ? 3 : 2;
+          const canHint = q.hint && ans.attempts >= limit && !rs.hints[key];
+          fb.innerHTML = `<span style="color:var(--red)">✗ Nicht korrekt (${ans.attempts}. Versuch).</span> ${q.type === 'flag' && !/^KLY\{[0-9a-f]{16}\}$/.test(normFlag(value)) ? 'Flags haben das Format KLY{16 Hex-Zeichen}. ' : ''}${rs.hints[key] ? `<div class="feedback info">${esc(q.hint)}</div>` : canHint ? `<button class="btn small" data-hint="${key}">Hinweis anzeigen (einmalig)</button>` : q.hint ? `<span class="muted">Hinweis ab ${limit} eigenen Versuchen.</span>` : ''}`;
+          const hb = fb.querySelector('[data-hint]');
+          if (hb) hb.onclick = () => { rs.hints[key] = true; save(); hb.outerHTML = `<div class="feedback info">${esc(q.hint)}</div>`; };
+          if (q.type === 'mc') { const b = root.querySelector(`[data-k="${CSS.escape(key)}"][data-i="${value}"]`); b && b.classList.add('wrong'); }
+        }
+      };
+      $$('[data-send]', root).forEach(b => b.onclick = () => verdict(b.dataset.k, root.querySelector(`input[data-k="${CSS.escape(b.dataset.k)}"]`).value));
+      $$('input[data-k]', root).forEach(i => i.onkeydown = (e) => { if (e.key === 'Enter') verdict(i.dataset.k, i.value); });
+      $$('.opt[data-k]', root).forEach(b => b.onclick = () => verdict(b.dataset.k, b.dataset.i));
+      $$('[data-confirm]', root).forEach(b => b.onclick = () => verdict(b.dataset.k, ''));
+      if (roomDone(r.id)) showDone();
+    },
+  };
+};
+
+views.profil = () => {
+  const got = new Set(earnedBadges().map(b => b.id));
+  const days = [...Array(28)].map((_, i) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - 27 + i); return today(d); });
+  return {
+    html: `<a class="back" href="#/mehr">← Mehr</a><h1>${esc(state.profile.name)}s Profil</h1>
+    <div class="kpis" style="grid-template-columns:repeat(2,1fr)"><div class="kpi"><b>${computeXp(state, EX)}</b><span>Kurs-XP</span></div><div class="kpi"><b>${roomPointsTotal()}</b><span>Raum-Punkte</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>Tage-Serie</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>Räume gemeistert</span></div></div>
+    <div class="card" style="margin-top:.8rem"><h3>Letzte 4 Wochen</h3>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
+    <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${esc(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
+    <p class="honest">Punkte, Abzeichen und Serien sind Motivation – sie schalten keine Prüfung und kein Level frei.</p>`,
   };
 };
 

@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '1.0.0';
+self.KLY_VERSION = '1.1.0';
 self.KLY_FILES = [
   'index.html',
   'manifest.webmanifest',
@@ -14,10 +14,15 @@ self.KLY_FILES = [
   'js/state.js',
   'js/sync.js',
   'js/export.js',
+  'js/flags.js',
   'js/content/curriculum.js',
   'js/content/level1.js',
   'js/content/story1.js',
   'js/content/tools.js',
+  'js/content/rooms.js',
+  'labs/kly-target/server.py',
+  'labs/kly-target/Dockerfile',
+  'labs/kly-target/README.md',
   'icons/icon.svg',
   'icons/icon-192.png',
   'icons/icon-512.png',

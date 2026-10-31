@@ -27,6 +27,8 @@ export function defaultState() {
     story: {},                // missionId -> { scene, sceneAt, done, doneAt, attempts:{sceneId:n}, hintUsed:{}, evidence:{sceneId:{command,output}}, answers:{}, report:{} }
     archive: {},              // exerciseId -> firstSeenAt
     daily: {},                // YYYY-MM-DD -> [exerciseIds]
+    rooms: {},                // roomId -> { startedAt, answers:{ 'tX.qY': {ok, at, attempts} }, hints:{}, doneAt }
+    activity: {},             // YYYY-MM-DD -> Anzahl erfolgreicher Lernaktionen (für Serien)
     settings: { sound: false },
     updatedAt: 0,
   };
@@ -50,7 +52,7 @@ export function loadState(storage = globalThis.localStorage) {
 export function upgrade(s) {
   const d = defaultState();
   const out = { ...d, ...s };
-  for (const k of ['lessons', 'exercises', 'exams', 'story', 'archive', 'daily', 'settings', 'profile']) out[k] = { ...d[k], ...(s?.[k] || {}) };
+  for (const k of ['lessons', 'exercises', 'exams', 'story', 'archive', 'daily', 'settings', 'profile', 'rooms', 'activity']) out[k] = { ...d[k], ...(s?.[k] || {}) };
   if (!out.labToken) out.labToken = d.labToken;
   if (!out.deviceId) out.deviceId = d.deviceId;
   out.schema = SCHEMA;
@@ -160,6 +162,21 @@ export function mergeStates(a, b) {
   out.daily = { ...b.daily, ...a.daily };
   for (const d of Object.keys(out.daily)) out.daily[d] = [...new Set([...(a.daily[d] || []), ...(b.daily[d] || [])])];
 
+  // Räume: gelöste Fragen bleiben gelöst, Versuche maximal, Hinweise vereinigt
+  out.rooms = {};
+  for (const id of new Set([...Object.keys(a.rooms), ...Object.keys(b.rooms)])) {
+    const x = a.rooms[id] || {}, y = b.rooms[id] || {};
+    const answers = {};
+    for (const q of new Set([...Object.keys(x.answers || {}), ...Object.keys(y.answers || {})])) {
+      const p = x.answers?.[q] || {}, r = y.answers?.[q] || {};
+      answers[q] = { ok: !!(p.ok || r.ok), at: minPos(p.ok ? p.at : 0, r.ok ? r.at : 0) || Math.max(p.at || 0, r.at || 0), attempts: Math.max(p.attempts || 0, r.attempts || 0) };
+    }
+    out.rooms[id] = { startedAt: minPos(x.startedAt, y.startedAt), answers, hints: { ...(x.hints || {}), ...(y.hints || {}) }, doneAt: minPos(x.doneAt, y.doneAt) };
+    if (!out.rooms[id].doneAt) delete out.rooms[id].doneAt;
+  }
+  out.activity = {};
+  for (const d of new Set([...Object.keys(a.activity), ...Object.keys(b.activity)])) out.activity[d] = Math.max(a.activity[d] || 0, b.activity[d] || 0);
+
   // Lernort: zuletzt gewählter
   const loc = (a.locationAt || 0) >= (b.locationAt || 0) ? a : b;
   out.location = loc.location; out.locationDay = loc.locationDay; out.locationAt = loc.locationAt;
@@ -183,6 +200,21 @@ export function computeXp(state, exerciseIndex) {
     if (e.passedAt && exerciseIndex[id]) xp += exerciseIndex[id].xp || 10;
   }
   return xp;
+}
+
+// Lernserie: aufeinanderfolgende Tage mit Aktivität bis heute (oder gestern, wenn heute noch nichts war)
+export function streak(state, now = new Date()) {
+  const has = (d) => (state.activity?.[d] || 0) > 0;
+  const day = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  if (!has(today(day))) day.setUTCDate(day.getUTCDate() - 1);
+  let n = 0;
+  while (has(today(day))) { n++; day.setUTCDate(day.getUTCDate() - 1); }
+  return n;
+}
+
+export function markActivity(state, now = new Date()) {
+  const d = today(now);
+  state.activity[d] = (state.activity[d] || 0) + 1;
 }
 
 // Neutrale Kopie (für Export ohne persönliche Daten nicht nötig – dort wird kein Stand exportiert)
