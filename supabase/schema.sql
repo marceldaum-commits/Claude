@@ -15,12 +15,15 @@ drop policy if exists "progress_insert_own" on public.progress;
 drop policy if exists "progress_update_own" on public.progress;
 
 create policy "progress_select_own" on public.progress
-  for select using (auth.uid() = user_id);
+  for select to authenticated using ((select auth.uid()) = user_id);
 
 create policy "progress_insert_own" on public.progress
-  for insert with check (auth.uid() = user_id);
+  for insert to authenticated with check ((select auth.uid()) = user_id);
 
 create policy "progress_update_own" on public.progress
-  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 
--- Kein DELETE-Policy: Der Lernstand kann über die App nicht gelöscht werden (Schutz vor Verlust).
+-- Nicht angemeldete Zugriffe bekommen nichts; Löschen ist gar nicht erlaubt (Schutz vor Verlust).
+revoke all on public.progress from anon;
+grant select, insert, update on public.progress to authenticated;
+revoke delete, truncate, references, trigger on public.progress from authenticated;
