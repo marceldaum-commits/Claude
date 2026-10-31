@@ -34,6 +34,9 @@ Die größten Hebel liegen nicht im Design, sondern hier:
      zeigen
   4. Einheitliche Marke und einheitliche Ansprache (du/ihr statt Sie)
 
+Fertige Texte (vorher/nachher) und Schritt-für-Schritt-Anleitungen zu den
+Punkten stehen im Kapitel "SO GEHT ES BESSER" weiter unten.
+
 
 ================================================================================
  PRIORITÄT A – SOFORT BEHEBEN (Fehler, die Besucher sehen)
@@ -428,6 +431,427 @@ Was technisch bereits GUT ist (beibehalten):
   + Warenkorb, Login und Registrierung korrekt auf noindex
   + robots.txt und Sitemap sauber eingerichtet
   + Impressum nach DDG aktuell (Stand 28.09.2026)
+
+
+================================================================================
+ SO GEHT ES BESSER – KONKRETE UMSETZUNG MIT VORHER / NACHHER
+================================================================================
+
+Hier stehen fertige Texte und konkrete Arbeitsschritte zu den Punkten oben.
+Texte in [eckigen Klammern] musst du selbst ergänzen, weil ich die Fakten
+nicht kenne. Alles andere kann direkt übernommen oder angepasst werden.
+
+
+--------------------------------------------------------------------------------
+ 1. STARTSEITE – OBERER BEREICH (zu B3, B4, D6)
+--------------------------------------------------------------------------------
+
+VORHER (Handy-Reihenfolge):
+  Bewertungs-Kasten -> "Aus Fragen wird Klarheit." -> Text -> [Cookie-Banner]
+  -> Preis-Kasten -> "Hä? -> Aha."-Karte -> ...
+
+NACHHER (Handy-Reihenfolge):
+  1. Überschrift:  "Aus Fragen wird Klarheit."
+  2. Unterzeile:   "Persönliche Online-Nachhilfe in Mathe und weiteren
+                    Fächern – seit 2001, von Marcel Daum und Team."
+  3. Button:       [ Kostenlose Probestunde anfragen ]
+  4. Vertrauen in einer Zeile:
+                   "★ 5,0 bei 623 Google-Bewertungen · 20 Lehrkräfte ·
+                    seit 2001"
+  5. Erst dann:    Preis-Kasten, "Hä? -> Aha."-Karte usw.
+
+Den Erklärtext unter dem ersten Button kürzen:
+  VORHER: "Erzähl uns kurz, in welchem Fach und welcher Klasse du
+           Unterstützung suchst. Gemeinsam finden wir die passende
+           Lehrkraft und einen Termin für deine Probestunde."
+  NACHHER: "Unverbindlich. Wir melden uns innerhalb von [24 Stunden]."
+  (Nur verwenden, wenn ihr diese Antwortzeit wirklich einhaltet.)
+
+Gründer-Karte:
+  VORHER: "Marcel Daum – Gründer & persönlicher Ansprechpartner"
+  NACHHER: "Marcel Daum – Gründer · Nachhilfe seit 2001 · Dozent für
+            Abschlusskurse in Aschaffenburg und Hessen"
+
+Seitentitel (in Rank Math / Yoast unter "SEO-Titel"):
+  VORHER: "Online-Nachhilfe in vielen Fächern | Nachhilfe Online"
+  NACHHER: "Online-Nachhilfe Mathe & mehr | seit 2001 · 5,0 ★"
+
+
+--------------------------------------------------------------------------------
+ 2. COOKIE-BANNER (zu B1)
+--------------------------------------------------------------------------------
+
+Der Banner stammt vom Plugin "Complianz" (im Quelltext an "cmplz"
+erkennbar). So stellst du ihn um:
+  1. WordPress -> Complianz -> Einwilligungsbanner -> Banner bearbeiten
+  2. Position: "Unten" bzw. "Banner unten" statt "Box / Mitte rechts"
+  3. Farben: Akzeptieren-Button auf das Navy der Seite (#101b43, die
+     Theme-Variable --nho-navy), Ablehnen-Button gleich groß daneben.
+  4. Text kürzen:
+     VORHER: "Um dir ein optimales Erlebnis zu bieten, verwenden wir
+              Technologien wie Cookies, um Geräteinformationen zu speichern
+              und/oder darauf zuzugreifen. Wenn du diesen Technologien
+              zustimmst, ... beeinträchtigt werden."  (ca. 60 Wörter)
+     NACHHER: "Wir nutzen Cookies für Statistik (Microsoft Clarity) und den
+              Spam-Schutz unserer Formulare (Google reCAPTCHA). Du entscheidest."
+     (Die genannten Dienste gegen die tatsächlich eingesetzten prüfen.)
+  5. Danach am Handy testen: Der Probestunden-Button muss sichtbar bleiben.
+
+
+--------------------------------------------------------------------------------
+ 3. PROBESTUNDEN-FORMULAR (zu B2)
+--------------------------------------------------------------------------------
+
+VORHER:
+  Fachbereich* -> Fach* -> Schulform* -> Klasse* -> Lehrkraft
+  Vorname* Nachname* Handynummer* E-Mail*
+  Nachricht (optional)
+  [ ] reCAPTCHA-Einwilligung
+  [Anfrage vorbereiten] -> dann WhatsApp oder E-Mail selbst absenden
+
+NACHHER:
+  Schritt 1 – "Worum geht's?"
+    Fach*          (ein Feld mit Auswahl: Mathe, Deutsch, Englisch, Physik,
+                    Chemie, Anderes)
+    Klasse*        (Auswahl 1–13, Uni, Sonstiges)
+    Schulform      (optional)
+  Schritt 2 – "Wie erreichen wir euch?"
+    Name*
+    Handy oder E-Mail*   (ein Pflichtfeld reicht, das andere optional)
+    Wunschzeiten   (optional, z. B. "nachmittags, Mo/Mi")
+    Nachricht      (optional)
+  [ Probestunde anfragen ]   <- schickt direkt ab, ohne Umweg
+
+  Danach eine Bestätigungsseite:
+    "Danke, [Vorname]! Deine Anfrage ist bei uns angekommen. Marcel meldet
+     sich innerhalb von [24 Stunden] bei dir. Schneller geht's per WhatsApp:
+     [ Jetzt per WhatsApp schreiben ]"
+
+  Den Hinweis unter dem Button ersetzen:
+    VORHER: "Wenn du unten WhatsApp oder E-Mail auswählst, speichern wir
+             deine Anfrage und den vorbereiteten Nachrichtentext ... Ein
+             Öffnen ist keine Versandbestätigung ..."  (ca. 80 Wörter)
+    NACHHER: "Wir nutzen deine Angaben nur, um uns wegen der Probestunde bei
+             dir zu melden. Datenschutzhinweise"
+
+  Spam-Schutz ohne Checkbox:
+    - Honeypot-Feld (unsichtbares Feld, das nur Bots ausfüllen) oder
+      Cloudflare Turnstile statt reCAPTCHA mit Einwilligung.
+    - Bei Contact Form 7, WPForms, Fluent Forms usw. ist ein Honeypot meist
+      mit einem Klick einschaltbar.
+    - Datenschutzerklärung entsprechend anpassen.
+
+  Die Lehrkraft-Auswahl kann bleiben, aber als optionaler Zusatz:
+    "Wunsch-Lehrkraft? (optional) – sonst empfehlen wir dir jemanden."
+
+
+--------------------------------------------------------------------------------
+ 4. KLEINGEDRUCKTES ENTSCHLACKEN (zu C9, B6)
+--------------------------------------------------------------------------------
+
+Startseite, Preis-Kasten:
+  VORHER: "ab 23,50 € je 60 Minuten im 20-Stundenpaket
+           Materialien & persönliche Begleitung inklusive.
+           Rechnerischer Stundenpreis gerundet. Maßgeblich ist der
+           Gesamtpreis des gewählten Stundenpakets."
+  NACHHER: "ab 23,50 € pro Stunde (60 Min.)
+           im 20-Stunden-Paket · Materialien inklusive · kein Abo"
+
+Startseite, Vorteile:
+  VORHER: "Ihr nutzt euer Paket flexibel für verschiedene Fächer und
+           Lehrkräfte – auch für Geschwister. Die Auswahl richtet sich nach
+           dem verfügbaren Angebot."
+  NACHHER: "Ein Paket für die ganze Familie: verschiedene Fächer,
+           verschiedene Lehrkräfte, auch für Geschwister."
+
+Startseite, Familien-Grafik:
+  VORHER: "Gemeinsam nutzbar im Rahmen eures gebuchten Pakets. Lehrkraft,
+           Variante und Preis prüft ihr beim jeweiligen Angebot."
+  NACHHER: Satz streichen. Die Grafik erklärt es bereits.
+
+Preisseite (/stundenpakete-preise/):
+  VORHER: "Erst kennenlernen, dann in Ruhe entscheiden. Die folgenden Preise
+           stammen aus den aktuell veröffentlichten Stundenpaketen im Shop."
+  NACHHER: "Erst kennenlernen, dann in Ruhe entscheiden. Alle Preise sind
+           Endpreise – ohne Abo, ohne Anmeldegebühr."
+  (Nur so schreiben, wenn es keine Anmeldegebühr gibt.)
+
+  VORHER (pro Paket): "Leistungsumfang, Lehrkraft, Variante und
+           Paketgesamtpreis prüfst du auf der Produktseite."
+  NACHHER: Streichen. Der Button "Angebot ansehen" sagt das schon.
+
+PayPal:
+  VORHER: eigene rote Box "Hinweis zu PayPal" auf Produktseiten plus
+          Erwähnungen auf Preisseite und Produkttexten.
+  NACHHER: Nur noch an EINER Stelle, im Checkout neben der Zahlungsart:
+          "PayPal (+2,99 €) – Überweisung ist kostenlos."
+  Alternative: Gebühr in den Paketpreis einrechnen und den Hinweis
+          komplett streichen.
+
+Allgemeine Regel für alle Seiten:
+  Steht unter einem Button oder Preis mehr als ein Satz, prüfen:
+    - Rechtlich nötig?  -> einmal auf "Ablauf & wichtige Infos" oder in die
+                           AGB, hier nur ein Link "Alle Bedingungen".
+    - Nicht nötig?      -> streichen.
+
+
+--------------------------------------------------------------------------------
+ 5. BAUSTELLEN BESEITIGEN (zu A1–A4, C6)
+--------------------------------------------------------------------------------
+
+A1 – Garantie-PDF (404):
+  1. Medien -> Datei hinzufügen -> Original-PDF hochladen
+  2. Neue Adresse kopieren und auf /ueber-uns/zufriedenheitsgarantie/ im
+     Link ersetzen.
+  3. Prüfen: Link im privaten Browserfenster anklicken.
+
+A2 – Seite /angebot/, Abschnitt "DEIN FORTSCHRITT":
+  VORHER: "Verstehen. Üben. Selbst können.
+           [leerer Balken]
+           Der Lernweg wächst sanft, sobald diese Karte sichtbar wird."
+  NACHHER: "Verstehen. Üben. Selbst können.
+           [Balken mit drei Stationen: Verstehen ● – Üben ● – Selbst
+            können ●]
+           Schritt für Schritt vom ersten Aha-Moment zur sicheren
+           Klassenarbeit."
+
+A3 – /buchung/:
+  Variante 1 (schnell): Seite in WordPress auf "Entwurf" setzen und mit dem
+    Plugin "Redirection" eine 301-Weiterleitung /buchung/ -> /probestunde/
+    anlegen.
+  Variante 2: Seite behalten, aber so umschreiben:
+    VORHER: "Die automatische Terminplanung ist noch im Aufbau. ...
+             Online-Kalender ansehen – noch im Aufbau"
+    NACHHER: "Deinen Termin stimmen wir persönlich ab – so findet ihr
+             garantiert eine Zeit, die zur Lehrkraft und zu eurem Alltag
+             passt. [ Per WhatsApp anfragen ] [ Per E-Mail anfragen ]"
+    Den Kalender-Button entfernen, bis er funktioniert.
+
+C6 – Shop, gedruckte Bücher:
+  VORHER: "Die gedruckten Ausgaben für Klasse 6 und Klasse 7 sind in
+           Vorbereitung. Sobald sie bei Amazon erhältlich sind, findest du
+           hier die passenden Buchlinks."
+  NACHHER: Abschnitt ausblenden, bis die Bücher erhältlich sind. Dann mit
+           Amazon-Link wieder einblenden.
+
+
+--------------------------------------------------------------------------------
+ 6. GRÜNDER-PROFIL /team/marcel-daum/ (zu C1, C2)
+--------------------------------------------------------------------------------
+
+Streichen (zweimal vorhanden):
+  "Kontaktieren Sie uns noch heute, um mehr über meinen Lehransatz zu
+   erfahren und wie wir Ihnen helfen können, Ihre Bildungsziele zu
+   erreichen!"
+
+Ersetzen durch (einmal, am Ende):
+  "Lust, das selbst auszuprobieren? In einer kostenlosen Probestunde merkst
+   du schnell, ob meine Art zu erklären zu dir passt.
+   [ Probestunde anfragen ]"
+
+"Meine Methodik" – Vorschlag für einen kürzeren, persönlicheren Text:
+  "Ich erkläre selten sofort die Lösung. Stattdessen frage ich: Was weißt
+   du schon? Was fehlt dir? So findest du den Weg meistens selbst – und
+   genau das bleibt hängen. Erst die einfache Idee, dann die Fachbegriffe.
+   So arbeite ich seit 2001."
+
+"Meine Erfahrung" – Doppelungen zusammenfassen:
+  "Seit 2001 gebe ich Nachhilfe in Mathe und Physik. Ich habe an einem
+   Gymnasium, an einer Grundschule und in der Erwachsenenbildung
+   unterrichtet, in einem Nachhilfeinstitut gearbeitet und leite seit
+   [Jahr] Abschlusskurse für Realschulen und Gymnasien im Landkreis
+   Aschaffenburg und in Hessen."
+
+Optional: Eine kurze echte Geschichte, z. B.
+  "[Ein Schüler/eine Schülerin], der/die in Klasse [X] kurz vor dem
+   Aufgeben war, hat [Ergebnis]. Solche Momente sind der Grund, warum ich
+   das mache."
+  (Nur mit echter, anonymisierter Geschichte.)
+
+Termine-Seite (/termine-aendern-absagen/) auf "du/ihr" umstellen:
+  VORHER: "Wenn sich etwas ändert, melden Sie sich bitte kurz. Wir stimmen
+           den neuen Termin persönlich mit Ihnen ... ab."
+  NACHHER: "Wenn sich etwas ändert, meldet euch kurz. Wir stimmen den
+           neuen Termin persönlich mit euch ... ab."
+  Genauso auf /faecher-klassenstufen/:
+  VORHER: "In der Buchung wählen Sie Fach, Schulform und Klassenstufe."
+  NACHHER: "Bei der Anfrage wählst du Fach, Schulform und Klasse."
+
+
+--------------------------------------------------------------------------------
+ 7. TEAM-KARTEN (zu B7)
+--------------------------------------------------------------------------------
+
+VORHER (bei 6 Lehrkräften identisch):
+  "Lerne diese Lehrkraft persönlich kennen. Wir beraten dich zur passenden
+   Unterstützung für dein Fach und deine Klassenstufe."
+
+NACHHER: ein eigener Satz pro Person, aus dem jeweiligen Profiltext
+gezogen. Muster:
+  "[Studium/Beruf] · erklärt am liebsten [Thema] · [kurze Eigenschaft]"
+Beispiel für Marcel Daum:
+  "Seit 2001 in der Nachhilfe · Mathe, Physik, BWL · erklärt erst die Idee,
+   dann die Formel."
+
+Adriana Llugolli: Foto anfragen. Bis dahin ein neutrales Illustrations-
+Avatar im Stil der Seite statt der Initialen "AL".
+
+
+--------------------------------------------------------------------------------
+ 8. GARANTIE-SEITE (zu B9)
+--------------------------------------------------------------------------------
+
+Möglichkeit 1 – Echte, einfache Zusage (stärker für die Conversion):
+  Überschrift: "Unser Versprechen"
+  Text: "Passt es nach der ersten bezahlten Stunde nicht, wechseln wir
+         kostenlos die Lehrkraft. Und nicht genutzte Stunden verfallen nie."
+  (Nur übernehmen, was ihr wirklich zusagen wollt. Mit den AGB abgleichen.)
+
+Möglichkeit 2 – Ehrlich umbenennen:
+  Seitentitel: "Kostenlos kennenlernen"
+  URL: /ueber-uns/kostenlos-kennenlernen/
+  301-Weiterleitung von /ueber-uns/zufriedenheitsgarantie/ einrichten.
+
+
+--------------------------------------------------------------------------------
+ 9. PREISDARSTELLUNG (zu B5, C7)
+--------------------------------------------------------------------------------
+
+Neukunden / Bestandskunden auf /stundenpakete-preise/:
+  VORHER: zwei Karten nebeneinander
+    "Einzelnachhilfe – Neukundenpaket   ab 23,50 €"
+    "Einzelnachhilfe – Bestandskunden   ab 23,75 €"
+  NACHHER: eine Karte
+    "Einzelnachhilfe 1:1        ab 23,75 € pro Stunde
+     Startvorteil: Euer erstes Paket ab 23,50 € pro Stunde."
+  So wirkt der Unterschied als Bonus für Neue, nicht als Aufschlag für
+  Treue.
+
+Gruppennachhilfe:
+  VORHER: "ab 30,76 € / Gruppenstunde (60 Min.) Ab 2 Teilnehmer. Für die
+           gesamte Gruppe (2 Teilnehmer)."
+  NACHHER: "ab 15,38 € pro Kind und Stunde
+           (bei 2 Kindern; 30,76 € pro Gruppenstunde)"
+
+
+--------------------------------------------------------------------------------
+ 10. MARKE VEREINHEITLICHEN (zu C3, C4)
+--------------------------------------------------------------------------------
+
+Empfehlung:
+  Hauptmarke:   "Mathe mit Marcel"  (persönlich, einprägsam, passt zur
+                Domain und zum Gründer)
+  Unterzeile:   "Online-Nachhilfe in Mathe und weiteren Fächern"
+  Produkte:     "MathPro WunschVideo", "Easy Learning" usw. bleiben
+                Produktnamen und werden nicht als zweite Marke geführt.
+
+Falls "Nachhilfe – Online" bleiben soll, weil die Seite bewusst breiter als
+Mathe sein soll:
+  - Einheitlich "Nachhilfe Online" (ohne Gedankenstrich, der beim Tippen
+    und Suchen stört)
+  - "by Mathe mit Marcel" überall gleich als Zusatz verwenden
+  - Titel-Zusatz überall gleich, z. B. " | Nachhilfe Online"
+    (Einstellung im SEO-Plugin unter "Titel-Trennzeichen / Seitenname")
+
+E-Mail:
+  Eine Adresse nach außen, z. B. kontakt@mathenachhilfe-online.com, die
+  intern weiterleitet. Diese im Impressum, im Kontakt und im Footer
+  verwenden.
+
+
+--------------------------------------------------------------------------------
+ 11. SEO-TEXTE ZUM EINFÜGEN (zu D2, D5)
+--------------------------------------------------------------------------------
+
+Meta-Beschreibungen (im SEO-Plugin bei der jeweiligen Seite):
+
+  /das-ist-dabei/
+    "Einzelunterricht, Unterlagen als PDF, Fragen per WhatsApp zwischen den
+     Stunden und Stunden ohne Verfallsdatum – das ist bei uns dabei."
+
+  /textaufgaben-verstehen/
+    "Kostenloser Mathe-Kompass als PDF: Textaufgaben Schritt für Schritt
+     verstehen – mit Beispielen, Übungen, Lösungen und Vokabelteil."
+
+  /lesestudio/
+    "Mathematik verstehen – Klasse 6 bis 13: Kostenlos in unsere E-Books
+     hineinlesen, direkt im Browser."
+
+  /lesestudio/entdecken/
+    -> Canonical auf /lesestudio/ setzen, dann ist keine eigene
+       Beschreibung nötig.
+
+Gekürzte Titel:
+  /textaufgaben-verstehen/
+    "Textaufgaben verstehen: kostenloser Mathe-Kompass (PDF)"
+  /ueber-uns/zufriedenheitsgarantie/
+    "Kostenlos kennenlernen | Nachhilfe Online"
+
+
+--------------------------------------------------------------------------------
+ 12. TECHNIK IN SCHRITTEN (zu D1, D3, D7, E1, E2, E3)
+--------------------------------------------------------------------------------
+
+Open-Graph / WhatsApp-Vorschau (D1):
+  1. Plugin "Rank Math SEO" installieren (kostenlos), Einrichtungsassistent
+     durchlaufen.
+  2. Rank Math -> Titel & Meta -> Social Meta: Standardbild hochladen
+     (1200 x 630 px, Logo + "5,0 ★ · 623 Google-Bewertungen").
+  3. Test: Link in WhatsApp an dich selbst schicken oder unter
+     https://www.opengraph.xyz prüfen.
+
+Nur eine H1 pro Seite (D3):
+  Auf /das-ist-dabei/, /textaufgaben-verstehen/, /lesestudio/ und
+  /lesestudio/entdecken/ im Editor die zweite und jede weitere "Überschrift
+  1" auf "Überschrift 2" umstellen.
+
+Lehrernamen auf der Startseite (D7):
+  Im Karussell-Template die Namen von <h3> auf <p class="team-name">
+  umstellen. Das Aussehen über CSS gleich lassen.
+
+Seiten-Cache (E1):
+  Variante A – Plesk: Websites & Domains -> Apache & nginx-Einstellungen ->
+    "nginx-Caching aktivieren". Ausnahmen für /warenkorb/, /kasse/,
+    /mein-konto/, /login/ und Cookies "woocommerce_items_in_cart",
+    "wordpress_logged_in" eintragen.
+  Variante B – Plugin: "WP Rocket" (kostenpflichtig, sehr einfach) oder
+    "LiteSpeed Cache" (nur bei LiteSpeed-Server). WooCommerce-Seiten
+    erkennen beide automatisch.
+  Danach prüfen: Die Header sollten nicht mehr "no-store" zeigen. Testen
+  mit https://pagespeed.web.dev
+
+Skripte nur auf Shopseiten (E2):
+  Plugin "Asset CleanUp" (kostenlos) oder "Perfmatters":
+  WooCommerce, PayPal und Stripe auf allen Seiten außer /shop/,
+  /produkt/*, /warenkorb/ und /kasse/ deaktivieren. Danach eine
+  Testbestellung durchspielen.
+
+AGB-Link fest im Footer (E3):
+  Design -> Menüs (bzw. Website-Editor -> Footer) -> Link "AGB" ->
+  /agb/ ins Footer-Menü eintragen. Danach das Skript "nho-agb-footer-link"
+  (vermutlich in functions.php oder einem Code-Snippet-Plugin) entfernen.
+
+Falsche Lehrer-URLs (A5):
+  1. Seite bearbeiten -> Permalink ändern auf adriana-llugolli bzw.
+     alisa-kuc
+  2. Plugin "Redirection": 301 von /team/adriana-lugoli/ ->
+     /team/adriana-llugolli/ und von /team/alica-kuc/ -> /team/alisa-kuc/
+     (Rank Math kann das beim Ändern auch automatisch.)
+
+
+--------------------------------------------------------------------------------
+ EMPFOHLENE REIHENFOLGE
+--------------------------------------------------------------------------------
+
+ Tag 1 (ca. 1–2 Std.):  A1–A7 und Punkt 5 dieses Kapitels – Baustellen weg
+ Tag 2 (ca. 2 Std.):    Cookie-Banner (2), Startseite oben (1), Rank Math +
+                        Teilen-Bild (12)
+ Tag 3 (ca. 3–4 Std.):  Probestunden-Formular (3) – größter Hebel
+ Woche 2:               Kleingedrucktes (4), Gründer-Profil (6),
+                        Team-Karten (7), Preise (9), Cache (12)
+ Danach:                Marke (10), lokale Landingpage (D9), Inhalte (D10)
+
+Die Zeiten sind grobe Schätzungen für jemanden, der WordPress kennt.
 
 
 ================================================================================
