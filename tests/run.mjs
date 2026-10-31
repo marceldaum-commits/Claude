@@ -335,10 +335,13 @@ t('Räume vollständig', () => {
       ok(q.points > 0, `${r.id}.${tk.id}.${q.id} Punkte`);
       if (q.type === 'mc') ok(q.options[q.answer], 'mc');
       if (q.type === 'text') ok(q.accept?.length, 'accept');
-      if (q.type === 'flag') ok(r.machine.kind === 'sandbox' ? r.flags.includes(q.flag) : src.includes(`flag("${r.id}", "${q.flag}")`) || src.includes(`flag('${r.id}', '${q.flag}')`), `${r.id}: Flag ${q.flag} fehlt im Ziel`);
+      if (q.type === 'flag') ok(r.machine.kind === 'sandbox' ? r.flags.includes(q.flag)
+        : r.machine.kind === 'ssh' ? new RegExp(`\\$\\(code ${q.flag}\\)`).test(readFileSync(join(ROOT, 'labs', r.machine.lab, 'setup.sh'), 'utf8'))
+        : src.includes(`flag("${r.id}", "${q.flag}")`) || src.includes(`flag('${r.id}', '${q.flag}')`), `${r.id}: Flag ${q.flag} fehlt im Ziel`);
       if (q.type !== 'confirm') ok(q.hint, `${r.id}.${tk.id}.${q.id} Hinweis`);
     }
     if (r.machine.kind === 'target') for (const p of r.machine.ports) ok(src.includes(String(p)), `Port ${p}`);
+    if (r.machine.kind === 'ssh') for (const f of r.machine.files) ok(existsSync(join(ROOT, 'labs', r.machine.lab, f)), `${r.id}: ${f} fehlt`);
   }
   eq(new Set(BADGES.map(b => b.id)).size, BADGES.length);
 });
@@ -359,6 +362,45 @@ await at('R0 Sandbox-Raum lösbar', async () => {
   const qs = Object.fromEntries(r.tasks.flatMap(tk => tk.questions.map(q => [tk.id + q.id, q])));
   ok(qs.t2q1.accept.some(re => re.test('app-02.log'))); ok(qs.t3q1.accept.some(re => re.test('000')));
   ok(qs.t4q1.accept.some(re => re.test('~/raum0/archiv/2026/q2/tief/drin/zugang.key')));
+});
+
+await at('W1 Nachtfalter komplett lösbar (Sandbox)', async () => {
+  const r = ROOMS.find(x => x.id === 'w1'); const F = {};
+  for (const f of r.flags) F[f] = await flagFor(TOKEN, 'w1', f);
+  const solved = [];
+  const s = new Shell({ fs: baseFS(), commands: r.commands({ F, solve: (f) => solved.push(f) }) });
+  r.setup(s, F, new Set());
+  const run = (c) => s.exec(c);
+  const code = (txt) => (txt.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
+  const step = (n, cmd) => { const c = code(run(cmd).out); eq(c, F['l' + n], `Stufe ${n} via ${cmd}`); ok(/Richtig|Letzte/.test(run('entsperren ' + c).out), `entsperren ${n}`); };
+  ok(run('cat stufe1/notizen.txt').err.includes('Keine Berechtigung'), 'stufe1 anfangs zu');
+  step(0, 'cat stufe0/hallo.txt');
+  ok(!run('ls stufe1').out.includes('.tagebuch')); step(1, 'cat stufe1/.tagebuch');
+  const big = run('ls -l stufe2/fotos').out.split('\n').find(l => / [1-9]\d* Okt/.test(l)); ok(big, 'eine nicht-leere Datei');
+  step(2, 'cat stufe2/fotos/' + big.trim().split(/\s+/).pop());
+  const hit = run('grep -r Treffpunkt stufe3/chats').out; ok(hit.split('\n').filter(Boolean).length === 1); step(3, 'grep -r Treffpunkt stufe3/chats');
+  const nr = run('sort stufe4/anrufe.log | uniq -c | sort -nr | head -1').out.trim().split(/\s+/)[1];
+  step(4, `cat stufe4/kontakte/${nr}.vcf`);
+  ok(run('cat stufe5/tresor/inhalt.txt').err.includes('Keine Berechtigung'));
+  run('chmod u+rx stufe5/tresor'); run('chmod u+r stufe5/tresor/inhalt.txt'); step(5, 'cat stufe5/tresor/inhalt.txt');
+  step(6, 'base64 -d stufe6/nachricht.b64');
+  step(7, 'rev stufe7/spiegel.txt');
+  const f8 = run('find stufe8/archiv -perm 600').out.trim(); ok(f8 && !f8.includes('\n'), 'genau ein Treffer'); step(8, 'cat ' + f8);
+  step(9, 'grep GEHEIM stufe9/.funk/protokoll.log | cut -d" " -f3 | base64 -d');
+  ok(run('cat stufe10/finale.txt').out.includes('Kellerserver'));
+  eq(solved, r.flags, 'alle Codes an die App gemeldet');
+  ok(run('entsperren KLY{0000000000000000}').err.includes('Falscher'));
+  // Neustart mit gespeichertem Fortschritt: gelöste Stufen bleiben offen
+  const s2 = new Shell({ fs: baseFS(), commands: r.commands({ F, solve() {} }) }); r.setup(s2, F, new Set(['l0', 'l1']));
+  ok(s2.exec('ls stufe2').out.includes('fotos') && s2.exec('ls stufe3').err.includes('Keine Berechtigung'));
+});
+t('W2 Kellerserver: Codes und Scope', () => {
+  const sh = readFileSync(join(ROOT, 'labs/kly-keller/setup.sh'), 'utf8');
+  const df = readFileSync(join(ROOT, 'labs/kly-keller/Dockerfile'), 'utf8');
+  ok(/sha256sum \| cut -c1-16/.test(sh) && sh.includes('$TOKEN:w2:$1'), 'Code-Formel wie flags.js');
+  ok(sh.includes('PermitRootLogin no') && sh.includes('AllowTcpForwarding no'), 'SSH gehärtet');
+  ok(df.includes('-p 127.0.0.1:2220:22'), 'Startbefehl nur Loopback');
+  const w2 = ROOMS.find(x => x.id === 'w2'); eq(w2.tasks.length, 10);
 });
 
 // Echte Zielmaschinen (Python, ohne Docker) starten und mit curl/nc lösen

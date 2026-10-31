@@ -1026,10 +1026,17 @@ function roomLock(r) {
   return why;
 }
 
+function typeBadge(r) {
+  return r.type === 'wargame' ? '<span class="badge real">Wargame</span>' : r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>';
+}
+function machineBadge(r) {
+  return r.machine.kind === 'ssh' ? '<span class="badge real">🖥️ Kali · echtes SSH</span>' : r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">📱 Sandbox</span>';
+}
+
 function roomCard(r) {
   const lock = roomLock(r), pct = roomPct(r.id);
   return `<a class="card tight ${roomDone(r.id) ? 'lime' : ''}" href="#/raum/${r.id}" style="display:block;text-decoration:none;color:inherit;margin-bottom:.6rem">
-    <div class="row between"><span>${r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>'} ${r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">Sandbox</span>'}</span><span class="small muted">${esc(r.difficulty)} · ~${r.minutes} min</span></div>
+    <div class="row between"><span>${typeBadge(r)} ${machineBadge(r)}</span><span class="small muted">${esc(r.difficulty)} · ~${r.minutes} min</span></div>
     <b style="display:block;margin-top:.4rem">${lock.length ? '🔒 ' : ''}${esc(r.title)}</b>
     <span class="small muted">${esc(r.desc)}</span>
     <div class="bar" style="margin-top:.5rem"><i style="width:${pct}%"></i></div>
@@ -1044,7 +1051,9 @@ function earnedBadges() {
   const map = {
     'erste-flag': anyAns((r, q) => q.type === 'flag'),
     'echter-beleg': EXERCISES.some(e => e.kind === 'real' && isPassed(e.id)),
-    'zielmaschine': anyAns((r, q) => r.machine.kind === 'target' && q.type !== 'confirm'),
+    'zielmaschine': anyAns((r, q) => r.machine.kind !== 'sandbox' && q.type !== 'confirm'),
+    'nachtfalter': roomDone('w1'),
+    'kellerserver': roomDone('w2'),
     'erster-raum': done.length > 0,
     'ohne-hinweis': done.some(r => !Object.keys(state.rooms[r.id]?.hints || {}).length),
     'challenge': done.some(r => r.type === 'challenge'),
@@ -1059,13 +1068,44 @@ function earnedBadges() {
 views.raeume = () => ({
   html: `<h1>Räume</h1>
   <p class="muted small">Wie auf einer CTF-Lernplattform: Jeder Raum hat Tasks mit Fragen und Flags. <b>Walkthroughs</b> erklären, <b>Challenges</b> prüfen deine Selbstständigkeit. Flags werden aus deinem persönlichen Token berechnet – du findest sie nur durch eigene Arbeit.</p>
+  <h2 style="margin-top:1rem">Wargames – Linux als Spiel</h2>
+  <p class="small muted">Jede Lösung öffnet das nächste Level. Zwei getrennte Geschichten: eine fürs Handy, eine für die Kali-VM.</p>
+  ${ROOMS.filter(r => r.type === 'wargame').map(roomCard).join('')}
   ${LEVELS.filter(l => ROOMS.some(r => r.level === l.id) || l.id === 'L1').map(l => `<h2 style="margin-top:1rem">Level ${l.n} · ${esc(l.title)}</h2>
-    ${ROOMS.filter(r => r.level === l.id).map(roomCard).join('')}
+    ${ROOMS.filter(r => r.level === l.id && r.type !== 'wargame').map(roomCard).join('')}
     ${l.id === 'L1' ? `<a class="card tight ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><span class="badge sim">Story-Mission</span> <span class="badge real">+ echte Schritte</span><b style="display:block;margin-top:.4rem">${storyLocked(STORY.s1).length ? '🔒 ' : ''}${esc(STORY.s1.title)}</b><span class="small muted">${esc(STORY.s1.teaser)}</span></a>` : ''}`).join('')}`,
 });
 
+function sshMachineHTML(r) {
+  const m = r.machine;
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '') + `labs/${m.lab}/`;
+  const httpsApp = location.protocol === 'https:' && !PREVIEW;
+  const dir = `~/kly-labs/${m.lab}`;
+  return `<div class="card lime stack" id="machine">
+    <div class="row between"><h3 style="margin:0">Server ${esc(m.name)}</h3><span class="badge real">echt · nur 127.0.0.1</span></div>
+    <p class="small">SSH-Port <code>127.0.0.1:${m.port}</code> · Token: <code>${esc(state.labToken)}</code> · Nur am PC (Kali-VM mit Docker).</p>
+    ${state.location === 'phone' ? '<div class="feedback info small">Du bist gerade am Handy. Dieses Spiel läuft in der Kali-VM – am Handy wartet „Nachtfalter“ auf dich.</div>' : ''}
+    ${roomState(r.id).startedAt ? '' : '<button class="btn go" id="startm">▶ Server starten – Anleitung anzeigen</button>'}
+    <div id="mhow" ${roomState(r.id).startedAt ? '' : 'hidden'}>
+      <details><summary>Einmalig: Docker prüfen / einrichten</summary>
+        ${scriptBlock('Prüfen:', 'command -v docker && docker info --format "Docker {{.ServerVersion}} läuft"')}
+        ${scriptBlock('Einrichten (Kali):', 'sudo apt update && sudo apt install -y docker.io\nsudo systemctl enable --now docker\nsudo usermod -aG docker $USER')}
+        <p class="small muted">Danach einmal ab- und wieder anmelden.</p>
+      </details>
+      ${httpsApp ? scriptBlock('1. Dateien holen:', `mkdir -p ${dir} && cd ${dir}\ncurl -fsSL ${m.files.map(f => '-O ' + base + f).join(' ')}`) : `<p class="small"><b>1. Dateien holen:</b> ${m.files.map(f => `<a href="labs/${m.lab}/${f}" download>${f}</a>`).join(' · ')} nach <code>${dir}</code></p>`}
+      ${scriptBlock('2. Einmalig bauen (dauert beim ersten Mal 1–2 Minuten):', `cd ${dir} && docker build -t ${m.name} .`)}
+      ${scriptBlock('3. Server starten:', `docker run -d --rm --name ${m.name} -e KLY_TOKEN={{TOKEN}} -p 127.0.0.1:${m.port}:22 ${m.name}`)}
+      ${scriptBlock('4. Anmelden (Passwort: ' + m.pass + '):', `ssh ${m.user}@127.0.0.1 -p ${m.port}`)}
+      <p class="small muted">Nächste Level: <code>exit</code>, dann <code>ssh BENUTZER@127.0.0.1 -p ${m.port}</code> mit dem gefundenen Code als Passwort. Meldet ssh beim Neustart „REMOTE HOST IDENTIFICATION HAS CHANGED“: <code>ssh-keygen -R "[127.0.0.1]:${m.port}"</code></p>
+      ${scriptBlock('Stoppen:', `docker stop ${m.name}`)}
+    </div>
+    <p class="honest">Absichtlich verwundbarer Übungsserver mit erfundenen Daten. Er ist nur auf deinem PC erreichbar. Bei jedem Start wird er neu aufgebaut – deine Codes bleiben gleich.</p>
+  </div>`;
+}
+
 function machineHTML(r) {
   const m = r.machine;
+  if (m.kind === 'ssh') return sshMachineHTML(r);
   if (m.kind !== 'target') return '';
   const name = `kly-${m.room}`;
   const ports = m.ports.map(p => `-p 127.0.0.1:${p}:${p}`).join(' ');
@@ -1124,7 +1164,7 @@ views.raum = (id) => {
   if (!r) return views.raeume();
   const lock = roomLock(r);
   const head = `<a class="back" href="#/raeume">← Räume</a>
-    <div class="row">${r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>'}<span class="badge plain">Level ${LEVELS.find(l => l.id === r.level).n}</span><span class="badge plain">${esc(r.difficulty)}</span>${r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">Sandbox-Simulation</span>'}</div>
+    <div class="row">${typeBadge(r)}<span class="badge plain">Level ${LEVELS.find(l => l.id === r.level).n}</span><span class="badge plain">${esc(r.difficulty)}</span>${machineBadge(r)}</div>
     <h1 style="margin-top:.5rem">${esc(r.title)}</h1><p>${esc(r.desc)}</p>`;
   if (lock.length) return { html: head + `<div class="card warn"><b>🔒 Gesperrt</b><ul>${lock.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` };
   const rs = roomState(r.id);
@@ -1159,9 +1199,11 @@ views.raum = (id) => {
         const F = {};
         for (const f of r.flags || []) F[f] = await flagFor(state.labToken, r.id, f);
         $('#rterm', root).innerHTML = '';
-        sh = new Shell({ fs: baseFS() });
-        r.setup(sh, F);
-        mountTerminal($('#rterm', root), sh, { title: `Raum · ${r.title}`, welcome: 'Raum-Sandbox bereit. Arbeitsordner: ~/raum0 · help zeigt Befehle.' });
+        const solved = new Set(allQs(r).filter(x => x.q.type === 'flag' && qOk(r.id, x.key)).map(x => x.q.flag));
+        const solve = (flag, value) => { const x = allQs(r).find(y => y.q.flag === flag); if (x) verdict(x.key, value); };
+        sh = new Shell({ fs: baseFS(), commands: r.commands ? r.commands({ F, solve }) : {} });
+        r.setup(sh, F, solved);
+        mountTerminal($('#rterm', root), sh, { title: `Raum · ${r.title}`, welcome: r.welcome || 'Raum-Sandbox bereit. Arbeitsordner: ~/raum0 · help zeigt Befehle.' });
       };
       if (r.machine.kind === 'sandbox') { startSandbox(); $('#rreset', root).onclick = startSandbox; }
 
@@ -1189,6 +1231,7 @@ views.raum = (id) => {
         const fb = fbOf(key);
         if (ok) {
           ans.ok = true; ans.at = Date.now(); markActivity(state); save();
+          if (r.onSolve && sh && q.type === 'flag') r.onSolve(sh, q.flag);
           fb.innerHTML = `<span style="color:var(--lime)">✓ Richtig · +${q.points} Punkte</span>`;
           $$(`[data-k="${CSS.escape(key)}"]`, root).forEach(x => { x.disabled = true; if (x.tagName === 'BUTTON' && x.dataset.i == q.answer) x.classList.add('right'); });
           showDone();

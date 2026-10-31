@@ -442,8 +442,20 @@ export class Shell {
     return { flags, vals, pos };
   }
 
+  // Wie echtes Linux: Jeder Ordner auf dem Weg braucht das x-Recht (Durchsuchen)
+  _traversable(p) {
+    const parts = VFS.normalize(p, this.cwd).split('/').filter(Boolean);
+    let node = this.fs.root;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!node || node.t !== 'd' || !canDo(node, 1)) return false;
+      node = node.kids[parts[i]];
+    }
+    return !node || node.t !== 'd' || canDo(node, 1);
+  }
+
   _readable(p, cmd) {
     const n = this.node(p);
+    if (n && !this._traversable(p)) return { err: `${cmd}: ${p}: Keine Berechtigung\n` };
     if (!n) return { err: `${cmd}: ${p}: Datei oder Verzeichnis nicht gefunden\n` };
     if (n.t === 'd') return { err: `${cmd}: ${p}: Ist ein Verzeichnis\n` };
     if (!canDo(n, 4)) return { err: `${cmd}: ${p}: Keine Berechtigung\n` };

@@ -21,6 +21,19 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Wargames (ab 1.3.0) – Linux als Spiel
+
+Jedes Level ist ein Rätsel, die Lösung (Code `KLY{…}`) öffnet das nächste. Zwei getrennte Geschichten:
+
+| Spiel | Wo | Story | Technik |
+|---|---|---|---|
+| **w1 Nachtfalter** | Handy/überall, im App-Terminal | Du findest das Handy der Hackerin Mara Falk – zehn verschlossene Stufen. | Sandbox-**Simulation**, `entsperren CODE` öffnet die nächste Stufe |
+| **w2 Der Kellerserver** | PC, Kali-VM | Erster Tag im IT-Team einer (erfundenen) Spedition: Konto für Konto bis zum Chef. | Echter Debian-Server per Docker + **SSH** (`labs/kly-keller`), nur `127.0.0.1:2220` |
+
+Themen Nachtfalter: versteckte Dateien, Dateigrößen, `grep -r`, `sort | uniq -c`, `chmod`, `base64`, `rev`, `find -perm`, Pipelines.
+Themen Kellerserver: SSH, `.bash_history`, `grep` in großen Dateien, `tar`, `file`/`zcat`, `ps aux`, Gruppen & `find -group`,
+`git log -p`, SSH-Schlüssel, `curl -H` gegen einen internen Dienst.
+
 ## Räume nach dem TryHackMe-Prinzip (ab 1.1.0)
 
 - **Räume** mit nummerierten Tasks, Fragen und **Flags** (`KLY{…}`). Flags werden aus dem persönlichen

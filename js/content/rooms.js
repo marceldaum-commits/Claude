@@ -4,10 +4,11 @@
 // Fragetypen: flag (aus Lab-Token berechnet), text (accept: RegExp[]), mc (options, answer), confirm (kein Antwortwert)
 
 import { HOME } from '../shell.js';
+import { WARGAMES } from './wargames.js';
 
 const T = (...lines) => lines.join('\n');
 
-export const ROOMS = [
+const BASE_ROOMS = [
   // ================================================================ R0
   {
     id: 'r0', title: 'Terminal-Spuren', type: 'walkthrough', level: 'L1', difficulty: 'leicht', minutes: 25,
@@ -255,6 +256,10 @@ export const ROOMS = [
   },
 ];
 
+// Reihenfolge: erst Sandbox-Raum, dann die Wargames neben den Zielmaschinen-Räumen
+const byId = Object.fromEntries([...BASE_ROOMS, ...WARGAMES].map(r => [r.id, r]));
+export const ROOMS = ['r0', 'w1', 'r1', 'w2', 'r2', 'r3'].map(id => byId[id]);
+
 // Abzeichen (aus dem Lernstand abgeleitet – nicht speicherbar, nicht fälschbar über Merge)
 export const BADGES = [
   { id: 'erste-flag', icon: '⚑', title: 'Erste Flag', desc: 'Eine Flag gefunden.' },
@@ -263,6 +268,8 @@ export const BADGES = [
   { id: 'erster-raum', icon: '▣', title: 'Raum gemeistert', desc: 'Einen Raum vollständig abgeschlossen.' },
   { id: 'ohne-hinweis', icon: '◎', title: 'Ohne Netz', desc: 'Einen Raum ohne einen einzigen Hinweis abgeschlossen.' },
   { id: 'challenge', icon: '⚔', title: 'Challenger', desc: 'Einen Challenge-Raum abgeschlossen.' },
+  { id: 'nachtfalter', icon: '🦋', title: 'Nachtfalter', desc: 'Das Handy-Wargame komplett gelöst.' },
+  { id: 'kellerserver', icon: '🗝', title: 'Bis zum Chef', desc: 'Den Kellerserver komplett geknackt.' },
   { id: 'story-1', icon: '▶', title: 'Stiller Alarm', desc: 'Story-Mission 1 abgeschlossen.' },
   { id: 'level-1', icon: '★', title: 'Linux-Grundlagen', desc: 'Prüfung Level 1 bestanden.' },
   { id: 'streak-3', icon: '🔥', title: '3-Tage-Serie', desc: 'An 3 Tagen in Folge gelernt.' },
