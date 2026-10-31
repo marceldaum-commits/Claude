@@ -10,6 +10,7 @@ import { NETZ_ROOMS } from './netz.js';
 import { LEVEL4_ROOMS } from './level4.js';
 import { LEVEL9_ROOMS } from './level9.js';
 import { FUNKTURM } from './funkturm.js';
+import { LEITERN } from './leitern.js';
 
 const T = (...lines) => lines.join('\n');
 
@@ -262,8 +263,14 @@ const BASE_ROOMS = [
 ];
 
 // Reihenfolge: erst Sandbox-Raum, dann die Wargames neben den Zielmaschinen-Räumen
-const byId = Object.fromEntries([...BASE_ROOMS, ...WARGAMES, ...WEB_ROOMS, ...NETZ_ROOMS, ...LEVEL4_ROOMS, ...LEVEL9_ROOMS, ...FUNKTURM].map(r => [r.id, r]));
-export const ROOMS = ['r0', 'w1', 'w4', 'r1', 'w2', 'n1', 'r2', 'r3', 'h1', 'j1', 'w3', 'b1'].map(id => byId[id]);
+const byId = Object.fromEntries([...BASE_ROOMS, ...WARGAMES, ...WEB_ROOMS, ...NETZ_ROOMS, ...LEVEL4_ROOMS, ...LEVEL9_ROOMS, ...FUNKTURM, ...LEITERN].map(r => [r.id, r]));
+// Leitern: Art (track) und Schwierigkeit (stufe) für die Übersicht
+const LEITER_INFO = {
+  w1: ['linux', 'Einstieg'], w4: ['linux', 'mittel'], w3: ['linux', 'Skripte'], w5: ['linux', 'schwerer'], w8: ['linux', 'schwer'],
+  w6: ['hacking', 'leicht'], w7: ['hacking', 'mittel'], w9: ['hacking', 'schwer'], w2: ['kali', 'echtes SSH'],
+};
+for (const [id, [track, stufe]] of Object.entries(LEITER_INFO)) Object.assign(byId[id], { track, stufe });
+export const ROOMS = ['r0', 'w1', 'w4', 'w5', 'w8', 'r1', 'w2', 'n1', 'r2', 'r3', 'h1', 'w6', 'w7', 'w9', 'j1', 'w3', 'b1'].map(id => byId[id]);
 
 // Abzeichen (aus dem Lernstand abgeleitet – nicht speicherbar, nicht fälschbar über Merge)
 export const BADGES = [
@@ -276,6 +283,8 @@ export const BADGES = [
   { id: 'nachtfalter', icon: '🦋', title: 'Nachtfalter', desc: 'Das Handy-Wargame komplett gelöst.' },
   { id: 'kellerserver', icon: '🗝', title: 'Bis zum Chef', desc: 'Den Kellerserver komplett geknackt.' },
   { id: 'funkturm', icon: '📡', title: 'Auf dem Dach', desc: 'Alle 20 Etagen des Funkturms geschafft.' },
+  { id: 'leitern-linux', icon: '🛤', title: 'Linux-Profi', desc: 'Stellwerk und Tresorraum geschafft.' },
+  { id: 'leitern-ctf', icon: '🏴', title: 'CTF-Spieler', desc: 'Bewerbung, Operation Nebel und Das Phantom geschafft.' },
   { id: 'kollektiv', icon: '⚙', title: 'Im Kollektiv', desc: 'Nachtfalter II mit eigenen Skripten gelöst.' },
   { id: 'ermittler', icon: '🔎', title: 'Ermittler', desc: 'Den Einbruch im Kollektiv rekonstruiert.' },
   { id: 'story-1', icon: '▶', title: 'Stiller Alarm', desc: 'Story-Mission 1 abgeschlossen.' },

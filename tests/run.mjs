@@ -535,6 +535,32 @@ await at('W4 Funkturm: alle 20 Etagen mit den Lösungswegen', async () => {
   ok(!s2.exec('ls ~/turm/etage03').err && s2.exec('ls ~/turm/etage04').err.includes('Keine Berechtigung'));
 });
 
+for (const id of ['w5', 'w6', 'w7', 'w8', 'w9']) {
+  await at(`Leiter ${id}: alle Stufen mit den Lösungswegen`, async () => {
+    const r = ROOMS.find(x => x.id === id); const F = {};
+    for (const f of r.flags) F[f] = await flagFor(TOKEN, id, f);
+    const solved = [];
+    const s = new Shell({ fs: baseFS(), commands: r.commands({ F, solve: (f) => solved.push(f) }) }); r.setup(s, F, new Set());
+    const run = (c) => { const x = s.exec(c); return (x.out || '') + (x.err || ''); };
+    const code = (t) => (t.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
+    ok(s.exec(`cd ${r.dirOf(1)}`).err?.includes('Keine Berechtigung'), 'Stufe 1 anfangs zu');
+    r.floors.forEach((fl, n) => {
+      s.exec(`cd ${r.dirOf(n)}`);
+      let out; try { out = fl.solve(run); } catch (e) { throw new Error(`${id} Stufe ${n}: ${e.message}`); }
+      eq(code(out), F['l' + n], `${id} Stufe ${n} (${fl.t}): ${String(out).slice(0, 160)}`);
+      ok(/Richtig|Geschafft/.test(run('entsperren ' + F['l' + n])), `${id} entsperren ${n}`);
+      const last = fl.hints.at(-1); ok(/^Lösung/.test(last), `${id} Stufe ${n}: Lösung als letzter Tipp`);
+    });
+    eq(solved, r.flags);
+    ok(run(`cat ${r.dirOf(r.floors.length)}/ZIEL.txt`).length > 20, 'Ziel lesbar');
+  });
+}
+await at('Leitern: Scope – fremde Ziele werden verweigert', async () => {
+  const r = ROOMS.find(x => x.id === 'w6'); const F = {}; for (const f of r.flags) F[f] = 'x';
+  const s = new Shell({ fs: baseFS(), commands: r.commands({ F, solve() {} }) }); r.setup(s, F, new Set());
+  ok(s.exec('curl http://8.8.8.8/').err.includes('SANDBOX-SCOPE')); ok(s.exec('curl http://example.com/').err.includes('resolve'));
+});
+
 t('W2 Kellerserver: Codes und Scope', () => {
   const sh = readFileSync(join(ROOT, 'labs/kly-keller/setup.sh'), 'utf8');
   const df = readFileSync(join(ROOT, 'labs/kly-keller/Dockerfile'), 'utf8');

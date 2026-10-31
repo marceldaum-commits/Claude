@@ -254,18 +254,21 @@ function kindLabel(e) {
 
 // ---------------------------------------------------------------- Lernpfad
 views.pfad = () => {
-  const inLevel = (r, l) => r.level === l.id && (r.type !== 'wargame' || l.id !== 'L1'); // Level-1-Wargames stehen oben
-  const withRooms = LEVELS.filter(l => l.id === 'L1' || ROOMS.some(r => inLevel(r, l)));
+  const inLevel = (r, l) => r.level === l.id && r.type !== 'wargame'; // Leitern stehen oben
+  const withRooms = LEVELS.filter(l => l.id === 'L1' || ROOMS.some(r => r.level === l.id));
   const later = LEVELS.filter(l => !withRooms.includes(l));
   return {
     html: `<h1>Lernen</h1>
     <p class="muted small">Vom Linux-Anfänger bis zum <b>eJPT</b>. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
-    <h2 style="margin-top:1rem">🎮 Wargames</h2>
-    <p class="small muted">Linux als Spiel: Jede Lösung öffnet das nächste Level.</p>
-    ${ROOMS.filter(r => r.type === 'wargame').map(roomCard).join('')}
+    <h2 style="margin-top:1rem">🎮 Leitern</h2>
+    <p class="small muted">Rätsel-Ketten mit Story: Jede Lösung öffnet die nächste Stufe. Fang oben an und arbeite dich hoch.</p>
+    ${[['linux', '🐧 Linux-Leitern', ['Einstieg', 'mittel', 'Skripte', 'schwerer', 'schwer']], ['hacking', '🏴 Hacking-Leitern (CTF)', ['leicht', 'mittel', 'schwer']], ['kali', '🖥️ In deiner Kali-VM', ['echtes SSH']]].map(([tr, title, order]) => `
+      <h3 style="margin:.9rem 0 .4rem">${title}</h3>
+      ${ROOMS.filter(r => r.track === tr).sort((a, b) => order.indexOf(a.stufe) - order.indexOf(b.stufe)).map(roomCard).join('')}`).join('')}
     ${withRooms.map(l => `<h2 style="margin-top:1.2rem">Level ${l.n} · ${esc(l.title)}</h2>
       <p class="small muted" style="margin-top:-.2rem">${esc(l.goal)}</p>
       ${ROOMS.filter(r => inLevel(r, l)).map(roomCard).join('')}
+      ${ROOMS.filter(r => r.level === l.id && r.type === 'wargame' && l.id !== 'L1').map(r => `<a class="small" href="#/raum/${r.id}" style="display:block;margin:.2rem 0 .6rem">🎮 Passende Leiter: <b>${esc(r.title)}</b> →</a>`).join('')}
       ${l.id === 'L1' ? `<div class="grid two">
         <a class="card tight" href="#/level/L1" style="display:block;text-decoration:none;color:inherit"><b>📖 Linux-Spickzettel</b><br><span class="small muted">${LESSONS.length} Kapitel zum Nachschlagen + Übungen</span></a>
         <a class="card tight ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><b>🎬 ${esc(STORY.s1.title)}</b><br><span class="small muted">Story-Mission${storyLocked(STORY.s1).length ? ' · braucht ein paar Übungen' : ''}</span></a>
@@ -1120,7 +1123,7 @@ function machineBadge(r) {
 function roomCard(r) {
   const lock = roomLock(r), pct = roomPct(r.id);
   return `<a class="card tight ${roomDone(r.id) ? 'lime' : ''}" href="#/raum/${r.id}" style="display:block;text-decoration:none;color:inherit;margin-bottom:.6rem">
-    <div class="row between"><span>${typeBadge(r)} ${machineBadge(r)}</span><span class="small muted">~${r.minutes} min</span></div>
+    <div class="row between"><span>${typeBadge(r)} ${r.stufe ? `<span class="badge plain">${esc(r.stufe)}</span>` : ''} ${machineBadge(r)}</span><span class="small muted">~${r.minutes} min</span></div>
     <b style="display:block;margin-top:.4rem">${lock.length ? '🔒 ' : ''}${esc(r.title)}</b>
     <span class="small muted">${esc(r.desc)}</span>
     <div class="bar" style="margin-top:.5rem"><i style="width:${pct}%"></i></div>
@@ -1140,6 +1143,8 @@ function earnedBadges() {
     'kellerserver': roomDone('w2'),
     'kollektiv': roomDone('w3'),
     'funkturm': roomDone('w4'),
+    'leitern-linux': roomDone('w5') && roomDone('w8'),
+    'leitern-ctf': roomDone('w6') && roomDone('w7') && roomDone('w9'),
     'ermittler': roomDone('b1'),
     'erster-raum': done.length > 0,
     'ohne-hinweis': done.some(r => !Object.keys(state.rooms[r.id]?.hints || {}).length),

@@ -21,6 +21,23 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Fünf weitere Leitern (ab 2.2.0)
+
+Lernen → 🎮 Leitern, sortiert nach Art und Schwierigkeit (je 10 Stufen, Story, Tipp-Leiter, 🔁):
+
+| Leiter | Art | Stufe | Themen |
+|---|---|---|---|
+| w5 Das Stellwerk | Linux | schwerer | grep -ril, awk-Filter, sort -t -k, diff, xxd, sha256sum, strings, cut -c, Schleifen |
+| w8 Der Tresorraum | Linux | schwer | find mit mehreren Bedingungen, awk NF, Quoting, export, $((…)), Listen vergleichen/verknüpfen, grep -o |
+| w6 Die Bewerbung | Hacking (CTF) | leicht | Quelltext, robots.txt, Header, Cookies, JS, .bak, .env, Prüfsummen, Metadaten, Sitemap |
+| w7 Operation Nebel | Hacking (CTF) | mittel | Zonendatei, Pfadsuche, JWT, API, Git-Verlauf, Konfig-Diff, Kodierungskette, Mitschnitt, Logs |
+| w9 Das Phantom | Hacking (CTF) | schwer | Base64url, JWT-Kopf, Klartext-Protokolle, MD5, Log-Korrelation, XOR, Akrostichon, Mehrfach-Kodierung |
+
+„Hacking“ heißt hier: CTF-Disziplinen Aufklärung, Datenlecks, Kodierung/Krypto und Forensik in erfundenen Systemen –
+keine Exploits oder Passwort-Angriffe. Neu in der Shell: `<` Eingabeumleitung, `grep -o` und Grund-Regex (`\+`),
+`xxd` (auch `-r -p`), `strings`, `sha256sum`, `md5sum`, `head/tail -c`, `basename`, `dirname`.
+Die Tests spielen alle 50 Stufen mit den Lösungswegen der Tipps durch.
+
 ## Wargame „Der Funkturm“ (ab 2.1.0)
 
 Deutsches Linux-Wargame mit 20 Etagen (w4), mobil und am PC spielbar: Jede Nacht sendet der alte Funkturm von

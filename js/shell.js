@@ -156,6 +156,66 @@ function globToRe(g) {
   return new RegExp('^' + g.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.') + '$');
 }
 
+// ---------------------------------------------------------------- Text-/Byte-Hilfen
+// grep ohne -E: Grund-Syntax (BRE) -> JavaScript. \+ \? \( \) \{ \} \| sind Metazeichen, + ? ( ) { } | wörtlich.
+function breToJs(p) {
+  let out = '';
+  for (let i = 0; i < p.length; i++) {
+    const c = p[i];
+    if (c === '\\' && i + 1 < p.length) { const n = p[i + 1]; out += '+?(){}|'.includes(n) ? n : '\\' + n; i++; }
+    else if ('+?(){}|'.includes(c)) out += '\\' + c;
+    else out += c;
+  }
+  return out;
+}
+const utf8 = (s) => new TextEncoder().encode(s);
+function bytesToText(bytes) {
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(bytes)); }
+  catch { return String.fromCharCode(...bytes); }
+}
+function sha256hex(str) {
+  const K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+  const H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  const b = [...utf8(str)]; const l = b.length * 8;
+  b.push(0x80); while (b.length % 64 !== 56) b.push(0);
+  for (let i = 7; i >= 0; i--) b.push(i > 3 ? 0 : (l >>> (i * 8)) & 255);
+  const r = (x, n) => (x >>> n) | (x << (32 - n)); const w = new Array(64);
+  for (let o = 0; o < b.length; o += 64) {
+    for (let i = 0; i < 16; i++) w[i] = (b[o + 4 * i] << 24) | (b[o + 4 * i + 1] << 16) | (b[o + 4 * i + 2] << 8) | b[o + 4 * i + 3];
+    for (let i = 16; i < 64; i++) { const s0 = r(w[i - 15], 7) ^ r(w[i - 15], 18) ^ (w[i - 15] >>> 3), s1 = r(w[i - 2], 17) ^ r(w[i - 2], 19) ^ (w[i - 2] >>> 10); w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0; }
+    let [a, bb, c, d, e, f, g, h] = H;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (h + (r(e, 6) ^ r(e, 11) ^ r(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = ((r(a, 2) ^ r(a, 13) ^ r(a, 22)) + ((a & bb) ^ (a & c) ^ (bb & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = bb; bb = a; a = (t1 + t2) | 0;
+    }
+    [a, bb, c, d, e, f, g, h].forEach((v, i) => { H[i] = (H[i] + v) | 0; });
+  }
+  return H.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+}
+function md5hex(str) {
+  const k = [], s = [7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21];
+  for (let i = 0; i < 64; i++) k[i] = Math.floor(Math.abs(Math.sin(i + 1)) * 2 ** 32) | 0;
+  const b = [...utf8(str)]; const l = b.length * 8;
+  b.push(0x80); while (b.length % 64 !== 56) b.push(0);
+  for (let i = 0; i < 8; i++) b.push(i < 4 ? (l >>> (i * 8)) & 255 : 0);
+  let [a0, b0, c0, d0] = [0x67452301, 0xefcdab89 | 0, 0x98badcfe | 0, 0x10325476];
+  for (let o = 0; o < b.length; o += 64) {
+    const m = []; for (let i = 0; i < 16; i++) m[i] = b[o + 4 * i] | (b[o + 4 * i + 1] << 8) | (b[o + 4 * i + 2] << 16) | (b[o + 4 * i + 3] << 24);
+    let [A, B, C, D] = [a0, b0, c0, d0];
+    for (let i = 0; i < 64; i++) {
+      let F, g;
+      if (i < 16) { F = (B & C) | (~B & D); g = i; } else if (i < 32) { F = (D & B) | (~D & C); g = (5 * i + 1) % 16; } else if (i < 48) { F = B ^ C ^ D; g = (3 * i + 5) % 16; } else { F = C ^ (B | ~D); g = (7 * i) % 16; }
+      F = (F + A + k[i] + m[g]) | 0; A = D; D = C; C = B; B = (B + ((F << s[i]) | (F >>> (32 - s[i])))) | 0;
+    }
+    a0 = (a0 + A) | 0; b0 = (b0 + B) | 0; c0 = (c0 + C) | 0; d0 = (d0 + D) | 0;
+  }
+  return [a0, b0, c0, d0].map(x => [0, 1, 2, 3].map(i => ((x >>> (8 * i)) & 255).toString(16).padStart(2, '0')).join('')).join('');
+}
+
+export const sha256hexSync = (s) => sha256hex(s);
+export const md5hexSync = (s) => md5hex(s);
+
 // ---------------------------------------------------------------- Mini-Bash-Hilfen
 // Teile außerhalb von Anführungszeichen (um Leerzeichen in NAME=wert zu erkennen)
 // $(…) und $((…)) entfernen (für die Prüfung, ob NAME=wert Leerzeichen enthält)
@@ -242,7 +302,8 @@ function splitIf(inner) {
 const KNOWN = ['pwd', 'whoami', 'id', 'hostname', 'date', 'ls', 'cd', 'mkdir', 'rmdir', 'touch', 'echo', 'cat', 'cp', 'mv', 'rm',
   'chmod', 'stat', 'find', 'grep', 'wc', 'head', 'tail', 'sort', 'uniq', 'cut', 'ps', 'jobs', 'sleep', 'kill', 'curl', 'getent',
   'clear', 'history', 'help', 'man', 'command', 'which', 'type', 'true', 'false', 'exit', 'uname', 'file',
-  'tr', 'sed', 'awk', 'seq', 'test', '[', 'bash', 'sh', 'export', 'read', 'diff'];
+  'tr', 'sed', 'awk', 'seq', 'test', '[', 'bash', 'sh', 'export', 'read', 'diff',
+  'xxd', 'strings', 'sha256sum', 'md5sum', 'basename', 'dirname'];
 
 const MAN = {
   pwd: 'pwd – zeigt das aktuelle Arbeitsverzeichnis als absoluten Pfad.',
@@ -537,7 +598,6 @@ export class Shell {
     let bg = false;
     if (toks.length && toks[toks.length - 1].op === '&') { bg = true; toks = toks.slice(0, -1); }
     if (toks.some(t => t.op === '&')) return { out: '', err: 'bash: & ist in der Sandbox nur am Zeilenende erlaubt\n', code: 2 };
-    if (toks.some(t => t.op === '<')) return { out: '', err: 'bash: Eingabeumleitung < wird in der Sandbox nicht unterstützt – nutze cat DATEI | …\n', code: 2 };
 
     const cmds = []; let cur = [];
     for (const t of toks) { if (t.op === '|') { cmds.push(cur); cur = []; } else cur.push(t); }
@@ -548,7 +608,8 @@ export class Shell {
     for (let i = 0; i < cmds.length; i++) {
       const parsed = this._parseRedirects(cmds[i]);
       if (parsed.error) return { out: '', err: parsed.error, code: 2 };
-      const { args, redirOut, append, redirErr, errToOut } = parsed;
+      const { args, redirOut, append, redirErr, errToOut, redirIn } = parsed;
+      if (redirIn) { const f = this._readable(redirIn, 'bash'); if (f.err) return { out: '', err: f.err, code: 1 }; stdin = f.data; }
       if (!args.length) continue;
       const [name, ...rest] = args;
       if (bg && i === cmds.length - 1) {
@@ -576,9 +637,14 @@ export class Shell {
   }
 
   _parseRedirects(toks) {
-    const args = []; let redirOut = null, append = false, redirErr = null, errToOut = false;
+    const args = []; let redirOut = null, append = false, redirErr = null, errToOut = false, redirIn = null;
     for (let i = 0; i < toks.length; i++) {
       const t = toks[i];
+      if (t.op === '<') {
+        const nx = toks[i + 1];
+        if (!nx || nx.op) return { error: "bash: Syntaxfehler: Datei nach '<' fehlt\n" };
+        redirIn = this._expandWord(nx)[0]; i++; continue;
+      }
       if (t.op === '>' || t.op === '>>') {
         const nx = toks[i + 1];
         if (!nx || nx.op) return { error: "bash: Syntaxfehler: Ziel nach '" + t.op + "' fehlt\n" };
@@ -593,7 +659,7 @@ export class Shell {
       if (t.op) return { error: `bash: Syntaxfehler beim unerwarteten Wort '${t.op}'\n` };
       args.push(...this._expandWord(t));
     }
-    return { args, redirOut, append, redirErr, errToOut };
+    return { args, redirOut, append, redirErr, errToOut, redirIn };
   }
 
   _writeTo(path, data, append) {
@@ -1023,6 +1089,45 @@ export class Shell {
     return { out, code: 0 };
   }
 
+  _hashCmd(args, stdin, name, fn) {
+    const { parts, err } = this._inputs(args.filter(a => !a.startsWith('-')), stdin, name);
+    return { out: parts.map(p => `${fn(p.data)}  ${p.name ?? '-'}\n`).join(''), err, code: err ? 1 : 0 };
+  }
+  c_sha256sum(args, stdin) { return this._hashCmd(args, stdin, 'sha256sum', sha256hex); }
+  c_md5sum(args, stdin) { return this._hashCmd(args, stdin, 'md5sum', md5hex); }
+
+  c_xxd(args, stdin) {
+    const rev = args.includes('-r'), plain = args.includes('-p') || args.includes('-ps');
+    const { parts, err } = this._inputs(args.filter(a => !a.startsWith('-')), stdin, 'xxd'); if (err) return { out: '', err, code: 2 };
+    const data = parts.map(p => p.data).join('');
+    if (rev) {
+      if (!plain) return { out: '', err: 'xxd: In der Sandbox geht -r nur zusammen mit -p (xxd -r -p)\n', code: 1 };
+      const hex = data.replace(/[^0-9a-fA-F]/g, '');
+      const bytes = []; for (let i = 0; i + 1 < hex.length; i += 2) bytes.push(parseInt(hex.slice(i, i + 2), 16));
+      return { out: bytesToText(bytes), code: 0 };
+    }
+    const b = [...utf8(data)];
+    if (plain) { let out = ''; for (let i = 0; i < b.length; i += 30) out += b.slice(i, i + 30).map(x => x.toString(16).padStart(2, '0')).join('') + '\n'; return { out, code: 0 }; }
+    let out = '';
+    for (let i = 0; i < b.length; i += 16) {
+      const row = b.slice(i, i + 16);
+      const hex = row.map(x => x.toString(16).padStart(2, '0')).join('').replace(/(.{4})/g, '$1 ').trim();
+      out += `${i.toString(16).padStart(8, '0')}: ${hex.padEnd(39)}  ${row.map(x => (x >= 32 && x < 127 ? String.fromCharCode(x) : '.')).join('')}\n`;
+    }
+    return { out, code: 0 };
+  }
+
+  c_strings(args, stdin) {
+    const { vals, pos } = this._opts(args, ['n']);
+    const min = vals.n ? parseInt(vals.n, 10) : 4;
+    const { parts, err } = this._inputs(pos, stdin, 'strings');
+    const out = parts.map(p => (p.data.match(new RegExp(`[\\x20-\\x7e\\t]{${min},}`, 'g')) || []).join('\n')).filter(Boolean).join('\n');
+    return { out: out ? out + '\n' : '', err, code: err ? 1 : 0 };
+  }
+
+  c_basename(args) { if (!args[0]) return { out: '', err: 'basename: Operand fehlt\n', code: 1 }; let b = args[0].replace(/\/+$/, '').split('/').pop(); if (args[1] && b.endsWith(args[1])) b = b.slice(0, -args[1].length); return { out: b + '\n', code: 0 }; }
+  c_dirname(args) { if (!args[0]) return { out: '', err: 'dirname: Operand fehlt\n', code: 1 }; const p = args[0].replace(/\/+$/, ''); const i = p.lastIndexOf('/'); return { out: (i < 0 ? '.' : i === 0 ? '/' : p.slice(0, i)) + '\n', code: 0 }; }
+
   c_echo(args) {
     let nl = '\n';
     if (args[0] === '-n') { nl = ''; args = args.slice(1); }
@@ -1214,7 +1319,7 @@ export class Shell {
     const pat = pos.shift();
     let re;
     try {
-      let src = flags.has('F') ? pat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : pat.replace(/\\\|/g, '|');
+      let src = flags.has('F') ? pat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : flags.has('E') ? pat : breToJs(pat);
       if (flags.has('w')) src = `\\b(?:${src})\\b`;
       re = new RegExp(src, flags.has('i') ? 'i' : '');
     } catch { return { out: '', err: `grep: ungültiger regulärer Ausdruck: ${pat}\n`, code: 2 }; }
@@ -1251,6 +1356,11 @@ export class Shell {
         if (!hit) return;
         count++; found = true;
         if (flags.has('c') || flags.has('l')) return;
+        if (flags.has('o') && !flags.has('v')) {
+          const g = new RegExp(re.source, re.flags + 'g');
+          for (const m of l.matchAll(g)) if (m[0]) out += (multi ? f.p + ':' : '') + (flags.has('n') ? (idx + 1) + ':' : '') + m[0] + '\n';
+          return;
+        }
         out += (multi ? f.p + ':' : '') + (flags.has('n') ? (idx + 1) + ':' : '') + l + '\n';
       });
       if (flags.has('c')) out += (multi ? f.p + ':' : '') + count + '\n';
@@ -1283,10 +1393,11 @@ export class Shell {
 
   _headTail(args, stdin, tail) {
     const norm = args.map(a => /^-\d+$/.test(a) ? ['-n', a.slice(1)] : [a]).flat();
-    const { vals, pos } = this._opts(norm, ['n']);
+    const { vals, pos } = this._opts(norm, ['n', 'c']);
     const n = vals.n !== undefined ? parseInt(vals.n, 10) : 10;
     const { parts, err } = this._inputs(pos, stdin, tail ? 'tail' : 'head');
     let out = '';
+    if (vals.c !== undefined) { const c = parseInt(vals.c, 10); for (const p of parts) out += tail ? p.data.slice(-c) : p.data.slice(0, c); return { out, err, code: err ? 1 : 0 }; }
     for (const p of parts) {
       if (parts.length > 1) out += `==> ${p.name} <==\n`;
       const lines = p.data.replace(/\n$/, '').split('\n');
