@@ -263,6 +263,27 @@ C8. Produktseiten sehr lang
        Artikelnummer und Kategorien ausblenden und die Reiter an das Design
        anpassen.
 
+C9. Zu viel Absicherungstext (gilt für die ganze Seite)
+    Unter fast jedem Button und jedem Preis steht ein Kleingedrucktes mit
+    Einschränkungen. Beispiele:
+      - "Rechnerischer Stundenpreis gerundet. Maßgeblich ist der Gesamtpreis
+         des gewählten Stundenpakets." (obwohl 470 € / 20 = genau 23,50 €)
+      - "Ein Öffnen ist keine Versandbestätigung, und spätere Textänderungen
+         im externen Programm werden hier nicht gespeichert."
+      - "Gemeinsam nutzbar im Rahmen eures gebuchten Pakets. Lehrkraft,
+         Variante und Preis prüft ihr beim jeweiligen Angebot."
+      - "Die Auswahl richtet sich nach dem verfügbaren Angebot."
+      - "Bisherige Vereinbarungen bleiben bestehen..." (Garantie-Seite)
+    Einzeln ist jeder Satz korrekt. In der Summe wirkt die Seite aber
+    vorsichtig und abwehrend statt einladend. Eltern lesen "Achtung,
+    Einschränkung" an Stellen, an denen sie eigentlich überzeugt werden
+    sollen.
+    -> Jeden dieser Sätze prüfen: Ist er rechtlich nötig?
+       - Ja: einmal zentral in die AGB oder auf "Ablauf & wichtige Infos"
+         legen und dorthin verlinken.
+       - Nein: streichen.
+       Faustregel: Bei Buttons und Preisen steht höchstens EIN kurzer Satz.
+
 
 ================================================================================
  PRIORITÄT D – SEO (bei Google besser gefunden werden)
@@ -453,6 +474,7 @@ Was technisch bereits GUT ist (beibehalten):
 [ ] C6  "In Vorbereitung"-Hinweise reduzieren
 [ ] C7  Gruppenpreis pro Kind angeben
 [ ] C8  Produktseiten kürzen, WooCommerce-Reste stylen
+[ ] C9  Kleingedrucktes an Buttons/Preisen streichen oder zentral bündeln
 [ ] D1  Open-Graph-Tags + Teilen-Bild
 [ ] D2  Meta-Beschreibungen ergänzen (4 Seiten)
 [ ] D3  Nur eine H1 pro Seite (4 Seiten)
