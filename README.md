@@ -21,6 +21,17 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Level 4 und 9, Lernpfade für alle Level (ab 2.0.0)
+
+- **Mini-Bash in der Sandbox:** Variablen, `$(…)`, `$((…))`, `for`, `while read … < DATEI`, `if/elif/else` mit `[ … ]`,
+  ausführbare Skripte (`./skript.sh`, braucht `chmod +x`), dazu `tr`, `sed` (s///, Np, Nd), `awk` (Felder, Muster,
+  Summen), `seq`, `grep -q/-h`.
+- **w3 Nachtfalter II: Das Kollektiv** (Level 4, Handy/PC): Maras Geschichte geht weiter – 9 Stufen mit Variablen,
+  Schleifen, Bedingungen, tr/sed/awk und einem selbst geschriebenen Skript; 🔁 Wiederholungen aus Nachtfalter.
+- **b1 Die Nacht im Kollektiv** (Level 9): erfundener Einbruch, Logs auswerten (Brute-Force, Web-Scan, offene Sicherung,
+  Login, Befehlsverlauf), Zeitleiste und Gegenmaßnahmen. Adressen aus den Dokumentations-Bereichen (RFC 5737).
+- **Lernpfade** mit kostenlosen, legalen Übungsquellen für Level 4–8 und 10.
+
 ## Labs vom Handy spielen (ab 1.8.0)
 
 Mehr → „Labs vom Handy spielen“: Schritt-für-Schritt-Anleitung, um Kellerserver, Juice Shop und Zielmaschinen

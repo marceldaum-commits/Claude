@@ -430,6 +430,70 @@ await at('N1 Netzwerk-Simulation lösbar', async () => {
   ok(acc('t3', 'q4', s.exec('grep -c "/tcp *open" notizen/tcp.txt').out.trim()), 'offene Ports zählen: ' + s.exec('grep -c "/tcp *open" notizen/tcp.txt').out);
   ok(s.exec('nmap -A 10.10.20.10').out.includes('|_http-title: Stadtwerke Kundenportal'));
 });
+await at('Mini-Bash: Variablen, Schleifen, if, tr/sed/awk, Skripte', async () => {
+  const s = sh();
+  s.fs.put(HOME + '/d/a.log', 'INFO x\nERROR y\nERROR z\n'); s.fs.put(HOME + '/d/b.log', 'ERROR q\n'); s.fs.put(HOME + '/d/c.log', 'INFO\n');
+  s.fs.put(HOME + '/liste.txt', 'a.log\nfehlt.log\nb.log\n'); s.fs.put(HOME + '/daten.csv', 'falter;x;10\nmotte;y;5\nfalter;z;7\n');
+  s.fs.put(HOME + '/s.sh', '#!/bin/bash\n# Kommentar\nfor f in d/*.log\ndo\n  echo "$f: $(grep -c ERROR $f)"\ndone\necho "Argument: $1"\n', 0o644);
+  const cases = [
+    ['X=5; echo $X', '5\n'], ['NAME="Seppi Hacker"; echo "Hallo $NAME"', 'Hallo Seppi Hacker\n'],
+    ['for f in d/*.log; do grep -c ERROR $f; done', '2\n1\n0\n'],
+    ['for f in d/*.log; do tail -n 1 $f; done | tr -d "\\n"', 'ERROR zERROR qINFO'],
+    ['n=0; for f in d/*.log; do n=$((n + $(grep -c ERROR $f))); done; echo $n', '3\n'],
+    ['for i in $(seq 1 3); do echo "Nr $i"; done', 'Nr 1\nNr 2\nNr 3\n'],
+    ['while read f; do if [ -f d/$f ]; then echo "da: $f"; else echo "fehlt: $f"; fi; done < liste.txt', 'da: a.log\nfehlt: fehlt.log\nda: b.log\n'],
+    ['cat liste.txt | while read z; do echo "> $z"; done', '> a.log\n> fehlt.log\n> b.log\n'],
+    ['if false; then echo ja; elif [ 1 = 1 ]; then echo elif; fi', 'elif\n'],
+    ["echo 'Uryyb' | tr 'A-Za-z' 'N-ZA-Mn-za-m'", 'Hello\n'], ['echo a#b#c | sed "s/#//g"', 'abc\n'],
+    ["awk -F';' '$1==\"falter\" {s+=$3} END {print s}' daten.csv", '17\n'],
+    ['chmod +x s.sh; ./s.sh X', 'd/a.log: 2\nd/b.log: 1\nd/c.log: 0\nArgument: X\n'],
+    ['for i in 1 2; do for j in a b; do echo $i$j; done; done', '1a\n1b\n2a\n2b\n'],
+    ['echo fi done if', 'fi done if\n'], ['echo eins && echo zwei || echo drei', 'eins\nzwei\n'],
+  ];
+  for (const [c, want] of cases) eq(s.exec(c).out, want, c);
+  s.fs.put(HOME + '/t.sh', 'echo hi\n', 0o644);
+  ok(s.exec('./t.sh').err.includes('Keine Berechtigung'), 'ohne x kein Start');
+  ok(s.exec('for i in a b; do echo $i').err, 'fehlendes done gemeldet');
+});
+await at('W3 Nachtfalter II komplett lösbar', async () => {
+  const r = ROOMS.find(x => x.id === 'w3'); const F = {};
+  for (const f of r.flags) F[f] = await flagFor(TOKEN, 'w3', f);
+  const solved = [];
+  const s = new Shell({ fs: baseFS(), commands: r.commands({ F, solve: (f) => solved.push(f) }) }); r.setup(s, F, new Set());
+  const code = (t) => (t.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
+  const step = (n, cmds) => { s.exec(`cd ~/kollektiv/stufe${n}`); let out = ''; for (const c of cmds) out = s.exec(c).out; eq(code(out), F['l' + n], `Stufe ${n}`); ok(/Richtig|Letzte/.test(s.exec('entsperren ' + F['l' + n]).out)); };
+  ok(s.exec('ls ~/kollektiv/stufe1').err.includes('Keine Berechtigung'));
+  step(0, ['A=$(cat teil1); B=$(cat teil2); C=$(cat teil3); echo "$A$B$C"']);
+  step(1, ['for f in funk/*; do tail -n 1 $f; done | tr -d "\\n"']);
+  step(2, ["cat abgefangen.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'"]);
+  step(3, ["grep CODE protokoll.log | sed 's/XX//g'"]);
+  const sum = s.exec("cd ~/kollektiv/stufe4; awk -F';' '$1==\"falter\" {s+=$3} END {print s}' einsaetze.csv").out.trim();
+  step(4, [`cat tresor/${sum}.txt`]);
+  ok(s.exec('cd ~/kollektiv/stufe5; ./entschluessler.sh').err.includes('Keine Berechtigung'));
+  step(5, ['chmod +x entschluessler.sh', './entschluessler.sh']);
+  step(6, ['while read n; do [ -f archiv/$n ] && cat archiv/$n; done < kandidaten.txt']);
+  step(7, ['for d in knoten/*; do if [ "$(cat $d/version)" = "1.2" ]; then cat $d/teil; fi; done | tr -d "\\n"']);
+  s.exec('cd ~/kollektiv/stufe8');
+  s.exec(`echo 'for f in wachen/*.log; do echo "$(grep -c ALARM $f) $f"; done | sort -nr' > wachbericht.sh`);
+  s.exec('chmod +x wachbericht.sh');
+  const top = s.exec('./wachbericht.sh | head -1').out.trim().split(' ')[1]; ok(top, 'Skript-Ausgabe');
+  step(8, [`cat schluessel/${top.replace('wachen/', '').replace('.log', '')}.txt`]);
+  ok(s.exec('cat ~/kollektiv/finale/nachricht.txt').out.includes('Level 9'));
+  eq(solved, r.flags);
+  for (const t of r.tasks) for (const q of t.questions) ok(/^Lösung/.test(q.hints.at(-1)), `${t.id}: Lösung als letzter Tipp`);
+});
+await at('B1 Spurensuche lösbar', async () => {
+  const r = ROOMS.find(x => x.id === 'b1'); const F = { spur: await flagFor(TOKEN, 'b1', 'spur') };
+  const s = new Shell({ fs: baseFS(), commands: r.commands() }); r.setup(s, F);
+  const acc = (tk, q, v) => r.tasks.find(x => x.id === tk).questions.find(x => x.id === q).accept.some(re => re.test(v));
+  const top = s.exec("grep Failed logs/auth.log | sed 's/.* from //' | cut -d' ' -f1 | sort | uniq -c | sort -nr | head -1").out.trim().split(/\s+/);
+  ok(acc('t1', 'q1', top[1]), top.join(' ')); ok(acc('t1', 'q2', s.exec('grep Failed logs/auth.log | grep -c 203.0.113.77').out.trim()));
+  const ok2 = s.exec('grep Accepted logs/auth.log | grep 203.0.113.77').out; ok(/for backup/.test(ok2) && acc('t2', 'q2', ok2.match(/\d\d:\d\d:\d\d/)[0]));
+  ok(s.exec('grep 203.0.113.77 logs/access.log').out.includes('Nikto/2.5.0'));
+  ok(s.exec('grep 203.0.113.77 logs/access.log | grep " 200 "').out.includes('/backup/kollektiv-server.tar.gz'));
+  ok(s.exec(`grep gruss logs/verlauf.txt | cut -d'"' -f2 | base64 -d`).out.includes(F.spur));
+});
+
 t('W2 Kellerserver: Codes und Scope', () => {
   const sh = readFileSync(join(ROOT, 'labs/kly-keller/setup.sh'), 'utf8');
   const df = readFileSync(join(ROOT, 'labs/kly-keller/Dockerfile'), 'utf8');

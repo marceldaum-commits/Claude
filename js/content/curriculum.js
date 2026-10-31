@@ -64,6 +64,38 @@ export const LEVELS = [
   },
 ];
 
+// Kostenlose, legale Übungsquellen je Level (kein Abo nötig). Ergänzt die Räume der App.
+export const PFADE = {
+  L4: [
+    { t: 'App: „Nachtfalter II: Das Kollektiv“', url: '#/raum/w3', why: 'Variablen, Schleifen, Bedingungen und eigene Skripte – mit Maras Geschichte.' },
+    { t: 'Deine Skripte in Kali', url: '#/raum/w3', why: 'Alles aus dem Kollektiv funktioniert 1:1 in Kali. Schreib die Skripte mit nano wachbericht.sh nach und führe sie echt aus.' },
+    { t: 'OverTheWire Bandit, Level 0–15', url: 'https://overthewire.org/wargames/bandit/', why: 'Viele Level lassen sich mit einer Schleife oder Pipe in einer Zeile lösen – perfektes Training.' },
+  ],
+  L5: [
+    { t: 'App: Der Kellerserver', url: '#/raum/w2', why: 'Benutzer, Gruppen, Rechte, Prozesse, SSH-Schlüssel – die Grundlage für alles in diesem Level.' },
+    { t: 'OverTheWire Bandit, Level 16–25', url: 'https://overthewire.org/wargames/bandit/', why: 'Programme mit Sonderrechten (setuid) und Cronjobs – genau die Themen dieses Levels, legal und kostenlos.' },
+    { t: 'GTFOBins (Nachschlagewerk)', url: 'https://gtfobins.github.io/', why: 'Zeigt, wie normale Linux-Programme missbraucht werden können, wenn Rechte falsch gesetzt sind. Zum Verstehen und Nachschlagen.' },
+  ],
+  L6: [
+    { t: 'OWASP: Passwörter richtig speichern', url: 'https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html', why: 'Warum Hashes, Salt und langsame Verfahren wichtig sind – erst die Verteidigung verstehen.' },
+    { t: 'PortSwigger: Authentifizierung', url: 'https://portswigger.net/web-security/authentication', why: 'Online-Labs zu schwachen Logins – im erlaubten Rahmen bei PortSwigger.' },
+    { t: 'Juice Shop: Login-Aufgaben', url: '#/raum/j1', why: 'Mehrere Aufgaben rund um schwache Passwörter – auf deinem eigenen Juice Shop.' },
+  ],
+  L7: [
+    { t: 'Exploit-DB (Recherche)', url: 'https://www.exploit-db.com/', why: 'Von der gefundenen Version zur bekannten Schwachstelle. In Kali offline: searchsploit.' },
+    { t: 'Metasploitable 2 (offizielle Übungs-VM)', url: 'https://docs.rapid7.com/metasploit/metasploitable-2/', why: 'Absichtlich verwundbare VM von Rapid7. Nur im „Host-only“-Netz deiner Virtualisierung betreiben – nie im Heimnetz oder Internet.' },
+    { t: 'Hack The Box – Starting Point', url: 'https://app.hackthebox.com/starting-point', why: 'Geführte Übungsmaschinen; die ersten Stufen sind mit Gratis-Konto spielbar.' },
+  ],
+  L8: [
+    { t: 'App: Inventur bei den Stadtwerken', url: '#/raum/n1', why: 'Dateiserver (SMB) und andere Dienste im Netz erkennen.' },
+    { t: 'Hack The Box – „Dancing“ (Starting Point)', url: 'https://app.hackthebox.com/starting-point', why: 'Windows-Dateifreigaben (SMB) aufklären – mit Gratis-Konto.' },
+  ],
+  L10: [
+    { t: 'eJPT – Infos beim Anbieter INE', url: 'https://ine.com/', why: 'Praktische Einstiegsprüfung für Pentester. Prüfe dort Inhalte, Preis und Ablauf.' },
+    { t: 'Alles wiederholen', url: '#/pfad', why: 'Wenn du alle Räume und Wargames der App ohne Lösungstipps schaffst, bist du auf einem sehr guten Weg.' },
+  ],
+};
+
 export const LOCATIONS = {
   pc: { label: 'Kali am PC', short: 'PC', icon: '🖥️', desc: 'Kali-VM unter Windows – App und Terminal nebeneinander.' },
   phone: { label: 'Handy (Termux / NetHunter Rootless)', short: 'Handy', icon: '📱', desc: 'Galaxy S23, nicht gerootet. Manche Werkzeuge sind eingeschränkt.' },

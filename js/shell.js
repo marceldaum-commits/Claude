@@ -156,11 +156,93 @@ function globToRe(g) {
   return new RegExp('^' + g.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.') + '$');
 }
 
+// ---------------------------------------------------------------- Mini-Bash-Hilfen
+// Teile außerhalb von Anführungszeichen (um Leerzeichen in NAME=wert zu erkennen)
+// $(…) und $((…)) entfernen (für die Prüfung, ob NAME=wert Leerzeichen enthält)
+function stripSubs(s) {
+  let out = '', i = 0;
+  while (i < s.length) {
+    if (s[i] === '$' && s[i + 1] === '(') { let d = 0, j = i + 1; for (; j < s.length; j++) { if (s[j] === '(') d++; else if (s[j] === ')' && --d === 0) break; } i = j + 1; out += 'X'; continue; }
+    out += s[i++];
+  }
+  return out;
+}
+function unquotedPart(s) { return s.replace(/'[^']*'|"(?:\\.|[^"\\])*"/g, ''); }
+
+// Wörter am Anweisungsanfang (für Schlüsselwörter)
+const OPEN = new Set(['for', 'while', 'if']), CLOSE = new Set(['done', 'fi']);
+function splitStatements(text) {
+  const out = []; let cur = '', depth = 0, i = 0, q = null, atStart = true, word = '';
+  const flushWord = () => {
+    if (!word) return;
+    if (atStart && OPEN.has(word)) depth++;
+    else if (CLOSE.has(word)) depth = Math.max(0, depth - 1);
+    atStart = ['then', 'do', 'else', 'elif', '|', '&&', '||'].includes(word) || (atStart && ['!'].includes(word));
+    word = '';
+  };
+  while (i < text.length) {
+    const c = text[i];
+    if (q) { cur += c; if (c === q) q = null; else if (c === '\\' && q === '"') { cur += text[i + 1] ?? ''; i++; } i++; continue; }
+    if (c === "'" || c === '"') { q = c; cur += c; word += 'x'; i++; continue; }
+    if (c === '#' && (i === 0 || /\s/.test(text[i - 1])) && !word) { while (i < text.length && text[i] !== '\n') i++; continue; }
+    if (c === ';' || c === '\n') {
+      flushWord();
+      if (depth === 0) { if (cur.trim()) out.push(cur.trim()); cur = ''; atStart = true; }
+      else { cur += c === '\n' ? ';' : c; atStart = true; }
+      i++; continue;
+    }
+    if (/\s/.test(c)) { flushWord(); cur += c; i++; continue; }
+    if (c === '|' || c === '&') { flushWord(); cur += c; atStart = true; i++; continue; }
+    word += c; cur += c; i++;
+  }
+  flushWord();
+  if (q) return { error: `Syntaxfehler: schließendes ${q} fehlt` };
+  if (depth > 0) return { error: 'Syntaxfehler: „done“ oder „fi“ fehlt' };
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
+
+// Position des passenden Abschlussworts (done/fi) auf oberster Ebene in text
+function findClose(text, close, opens = ['for', 'while']) {
+  const re = /'[^']*'|"(?:\\.|[^"\\])*"|[A-Za-z_]+/g; let m, depth = 0;
+  const openSet = new Set(close === 'fi' ? ['if'] : ['for', 'while']);
+  while ((m = re.exec(text))) {
+    const w = m[0]; const prev = text.slice(0, m.index).replace(/\s+$/, '');
+    const start = !prev || /[;|&\n]$/.test(prev) || /\b(then|do|else)$/.test(prev);
+    if (openSet.has(w) && start) depth++;
+    else if (w === close && start) { if (depth === 0) return m.index; depth--; }
+  }
+  return -1;
+}
+
+// "BED; then A; elif BED2; then B; else C" -> [{cond, body}, …, {cond:null, body}]
+function splitIf(inner) {
+  const toks = []; const re = /'[^']*'|"(?:\\.|[^"\\])*"|\b(then|elif|else|if|fi)\b/g; let m, depth = 0, last = 0;
+  while ((m = re.exec(inner))) {
+    if (!m[1]) continue;
+    const prev = inner.slice(0, m.index).replace(/\s+$/, '');
+    if (!(!prev || /[;\n]$/.test(prev) || /\b(then|else|do)$/.test(prev))) continue; // nur am Anweisungsanfang
+    if (m[1] === 'if') { depth++; continue; } if (m[1] === 'fi') { depth--; continue; }
+    if (depth === 0) { toks.push({ kw: m[1], at: m.index }); }
+  }
+  const parts = []; let cond = null, pos = 0, mode = 'cond';
+  for (const t of toks) {
+    const seg = inner.slice(pos, t.at).trim().replace(/;\s*$/, '');
+    if (t.kw === 'then') { if (mode !== 'cond') return null; cond = seg; mode = 'body'; }
+    else if (t.kw === 'elif' || t.kw === 'else') { if (mode !== 'body') return null; parts.push({ cond, body: seg }); cond = null; mode = t.kw === 'elif' ? 'cond' : 'else'; }
+    pos = t.at + t.kw.length;
+  }
+  const seg = inner.slice(pos).trim().replace(/;\s*$/, '');
+  if (mode === 'body') parts.push({ cond, body: seg }); else if (mode === 'else') parts.push({ cond: null, body: seg }); else return null;
+  return parts;
+}
+
 // ---------------------------------------------------------------- Shell
 
 const KNOWN = ['pwd', 'whoami', 'id', 'hostname', 'date', 'ls', 'cd', 'mkdir', 'rmdir', 'touch', 'echo', 'cat', 'cp', 'mv', 'rm',
   'chmod', 'stat', 'find', 'grep', 'wc', 'head', 'tail', 'sort', 'uniq', 'cut', 'ps', 'jobs', 'sleep', 'kill', 'curl', 'getent',
-  'clear', 'history', 'help', 'man', 'command', 'which', 'type', 'true', 'false', 'exit', 'uname', 'file'];
+  'clear', 'history', 'help', 'man', 'command', 'which', 'type', 'true', 'false', 'exit', 'uname', 'file',
+  'tr', 'sed', 'awk', 'seq', 'test', '[', 'bash', 'sh', 'export', 'read'];
 
 const MAN = {
   pwd: 'pwd – zeigt das aktuelle Arbeitsverzeichnis als absoluten Pfad.',
@@ -215,6 +297,7 @@ export class Shell {
     this.web = opts.web || {};     // { 'host:port': { routes: { '/path': {status, headers, body} } } }
     this.dns = opts.dns || {};     // zusätzliche simulierte Namen
     this.extra = opts.commands || {};
+    this.uvars = {};               // eigene Variablen (NAME=wert)
     this.log = [];                 // [{line, cmd, args, code, out}]
     this.now = opts.now || (() => Date.now());
   }
@@ -225,8 +308,153 @@ export class Shell {
     const trimmed = line.trim();
     if (!trimmed) return { out: '', code: 0 };
     this.history.push(trimmed);
+    this._depth = 0;
+    const r = this._script(trimmed);
+    this._reap();
+    return this._done(trimmed, r);
+  }
+
+  // ------------------------------------------------ Mini-Bash: Variablen, $(…), $((…)), for, while read, if, Skripte
+  // Ein Text wird in Anweisungen zerlegt (; oder Zeilenumbruch auf oberster Ebene). Schlüsselwörter for/while/if
+  // öffnen eine Ebene, done/fi schließen sie. Einfache Zeilen ohne diese Konstrukte laufen unverändert durch _plain.
+  _script(text) {
+    if ((this._depth = (this._depth || 0) + 1) > 40) return { out: '', err: 'bash: zu tief verschachtelt (Endlosschleife?)\n', code: 1 };
+    try {
+      const stmts = splitStatements(text);
+      if (stmts.error) return { out: '', err: 'bash: ' + stmts.error + '\n', code: 2 };
+      let out = '', err = '', code = 0, clear = false;
+      for (const st of stmts) {
+        const r = this._statement(st);
+        if (r.clear) { clear = true; out = ''; err = ''; }
+        out += r.out || ''; err += r.err || ''; code = r.code ?? 0; this.lastCode = code;
+        if (r.exit) return { out, err, code, clear, exit: true };
+      }
+      return { out, err, code, clear };
+    } finally { this._depth--; }
+  }
+
+  _statement(st) {
+    st = st.trim();
+    if (!st || st.startsWith('#')) return { out: '', code: this.lastCode };
+    let m;
+    if (/^for\s/.test(st)) return this._for(st);
+    if (/^while\s/.test(st) || /\|\s*while\s+read\b/.test(st)) return this._while(st);
+    if (/^if\s/.test(st)) return this._if(st);
+    if ((m = st.match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s)) && !/\s/.test(unquotedPart(stripSubs(m[2])))) {
+      this.uvars[m[1]] = this._expandValue(m[2]);
+      return { out: '', code: 0 };
+    }
+    return this._plain(this._substitute(st));
+  }
+
+  // $(…) und $((…)) vorab ersetzen (nicht in '…')
+  _substitute(st) {
+    let res = '', i = 0, inS = false;
+    while (i < st.length) {
+      const c = st[i];
+      if (c === "'" ) { inS = !inS; res += c; i++; continue; }
+      if (!inS && c === '$' && st[i + 1] === '(') {
+        const arith = st[i + 2] === '(';
+        let depth = 0, j = i + 1;
+        for (; j < st.length; j++) { if (st[j] === '(') depth++; else if (st[j] === ')') { depth--; if (depth === 0) break; } }
+        if (j >= st.length) { res += st.slice(i); break; }
+        const inner = st.slice(i + (arith ? 3 : 2), arith ? j - 1 : j);
+        res += arith ? String(this._arith(inner)) : (this._script(inner).out || '').replace(/\n+$/, '').replace(/\n/g, ' ');
+        i = j + 1; continue;
+      }
+      res += c; i++;
+    }
+    return res;
+  }
+
+  _arith(expr) {
+    const e = this._substitute(expr).replace(/\$?\{?([A-Za-z_][A-Za-z0-9_]*)\}?/g, (_, n) => String(parseInt(this._var(n), 10) || 0));
+    if (!/^[\d\s+\-*/%()]+$/.test(e)) return 0;
+    try { const v = Function('"use strict";return (' + e + ')')(); return Number.isFinite(v) ? Math.trunc(v) : 0; } catch { return 0; }
+  }
+
+  _var(n) {
+    const vars = { HOME, USER, PWD: this.cwd, '?': String(this.lastCode), SHELL: '/bin/bash', OLDPWD: this.oldpwd };
+    return this.uvars[n] ?? vars[n] ?? '';
+  }
+
+  _expandValue(raw) {
+    raw = this._substitute(raw);
+    if (/^'.*'$/s.test(raw)) return raw.slice(1, -1);
+    if (/^".*"$/s.test(raw)) raw = raw.slice(1, -1);
+    return raw.replace(/\$(\?|#|\d|[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})/g, (_, n) => this._var(n.replace(/[{}]/g, '')));
+  }
+
+  // Ausgabe einer Schleife weiterreichen: "done | sort", "done > datei"
+  _after(rest, out, err, code) {
+    rest = rest.trim();
+    if (!rest) return { out, err, code };
+    if (!/^(\||>|>>|2>)/.test(rest)) return { out, err: err + `bash: Syntaxfehler nach done/fi: ${rest}\n`, code: 2 };
+    this.extra.__block = () => ({ out, code: 0 });
+    const r = this._plain('__block ' + this._substitute(rest));
+    delete this.extra.__block;
+    return { out: r.out, err: err + (r.err || ''), code: r.code };
+  }
+
+  _for(st) {
+    const m = st.match(/^for\s+([A-Za-z_][A-Za-z0-9_]*)\s+in\s+([\s\S]*?)\s*(?:;|\n)\s*do\b([\s\S]*)$/);
+    if (!m) return { out: '', err: 'bash: for-Syntax: for VAR in LISTE; do BEFEHLE; done\n', code: 2 };
+    const end = findClose(m[3], 'done');
+    if (end < 0) return { out: '', err: 'bash: Syntaxfehler: „done“ fehlt\n', code: 2 };
+    const body = m[3].slice(0, end), rest = m[3].slice(end + 4);
+    const words = [];
+    for (const t of tokenize(this._substitute(m[2]))) if (t.w !== undefined) words.push(...this._expandWord(t));
+    let out = '', err = '', code = 0;
+    for (const w of words.slice(0, 5000)) {
+      this.uvars[m[1]] = w;
+      const r = this._script(body); out += r.out || ''; err += r.err || ''; code = r.code;
+      if (r.exit) break;
+    }
+    return this._after(rest, out, err, code);
+  }
+
+  _while(st) {
+    const m = st.match(/^(?:([\s\S]*?)\|\s*)?while\s+read\s+(?:-r\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*(?:;|\n)\s*do\b([\s\S]*)$/);
+    if (!m) return { out: '', err: 'bash: In der Sandbox geht: while read ZEILE; do …; done < DATEI  oder  … | while read ZEILE; do …; done\n', code: 2 };
+    const end = findClose(m[3], 'done');
+    if (end < 0) return { out: '', err: 'bash: Syntaxfehler: „done“ fehlt\n', code: 2 };
+    const body = m[3].slice(0, end); let rest = m[3].slice(end + 4).trim();
+    let input = '', err = '';
+    if (m[1]) { const r = this._script(m[1]); input = r.out || ''; err += r.err || ''; }
+    const red = rest.match(/^<\s*(\S+)\s*([\s\S]*)$/);
+    if (red) { const f = this._readable(this._expandValue(red[1]), 'bash'); if (f.err) return { out: '', err: f.err, code: 1 }; input = f.data; rest = red[2]; }
+    let out = '', code = 0;
+    for (const line of input.replace(/\n$/, '').split('\n').slice(0, 5000)) {
+      if (!input) break;
+      this.uvars[m[2]] = line;
+      const r = this._script(body); out += r.out || ''; err += r.err || ''; code = r.code;
+      if (r.exit) break;
+    }
+    return this._after(rest, out, err, code);
+  }
+
+  _if(st) {
+    // if BED; then A; [elif BED; then B;] [else C;] fi
+    const end = findClose(st.slice(2), 'fi', ['if']);
+    if (end < 0) return { out: '', err: 'bash: Syntaxfehler: „fi“ fehlt\n', code: 2 };
+    const inner = st.slice(2, 2 + end), rest = st.slice(2 + end + 2);
+    const parts = splitIf(inner);
+    if (!parts) return { out: '', err: 'bash: if-Syntax: if BEDINGUNG; then BEFEHLE; else BEFEHLE; fi\n', code: 2 };
+    let out = '', err = '', code = 0, done = false;
+    for (const p of parts) {
+      if (p.cond !== null) {
+        const c = this._script(p.cond); err += c.err || ''; out += c.out || '';
+        if (c.code !== 0) continue;
+      }
+      const r = this._script(p.body); out += r.out || ''; err += r.err || ''; code = r.code; done = true; break;
+    }
+    if (!done) code = 0;
+    return this._after(rest, out, err, code);
+  }
+
+  _plain(trimmed) {
     let toks;
-    try { toks = tokenize(trimmed); } catch (e) { return this._done(trimmed, { out: '', err: 'bash: ' + e.message, code: 2 }); }
+    try { toks = tokenize(trimmed); } catch (e) { return { out: '', err: 'bash: ' + e.message + '\n', code: 2 }; }
 
     // In Listen (; && ||) und Pipelines zerlegen
     const lists = []; let cur = []; let conn = null;
@@ -246,8 +474,7 @@ export class Shell {
       out += r.out || ''; err += r.err || ''; code = r.code;
       this.lastCode = code;
     }
-    this._reap();
-    return this._done(trimmed, { out, err, code, clear });
+    return { out, err, code, clear };
   }
 
   _done(line, r) {
@@ -280,18 +507,16 @@ export class Shell {
 
   _expandWord(t) {
     let w = t.w;
-    const vars = { HOME, USER, PWD: this.cwd, '?': String(this.lastCode), SHELL: '/bin/bash', OLDPWD: this.oldpwd };
-    const rep = (s) => s.replace(/\$(\?|[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})/g, (_, n) => {
-      n = n.replace(/[{}]/g, '');
-      return vars[n] ?? '';
-    });
+    const rep = (s) => s.replace(/\$(\?|#|\d|[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})/g, (_, n) => this._var(n.replace(/[{}]/g, '')));
     if (t.q) {
       // Nur in "…" markierte $ expandieren
       w = w.split('\u0000').map((seg, i) => (i === 0 ? seg : rep(seg))).join('');
       return [w];
     }
     if (w === '~' || w.startsWith('~/')) w = HOME + w.slice(1);
+    const hadVar = /\$/.test(w);
     w = rep(w);
+    if (hadVar) { const parts = w.split(/\s+/).filter(Boolean); if (parts.length !== 1) return parts; w = parts[0]; }
     if (/[*?]/.test(w)) {
       const abs = VFS.normalize(w, this.cwd);
       const { dir, name, path } = this.fs.parent(abs);
@@ -408,6 +633,13 @@ export class Shell {
 
   _call(name, args, stdin) {
     if (this.extra[name]) return this.extra[name](args, { sh: this, stdin }) || { out: '', code: 0 };
+    if (name.includes('/')) {
+      const n = this.node(name);
+      if (!n) return { out: '', err: `bash: ${name}: Datei oder Verzeichnis nicht gefunden\n`, code: 127 };
+      if (n.t === 'd') return { out: '', err: `bash: ${name}: Ist ein Verzeichnis\n`, code: 126 };
+      if (!canDo(n, 1) || !this._traversable(name)) return { out: '', err: `bash: ${name}: Keine Berechtigung\n`, code: 126 };
+      return this._runScript(name, args);
+    }
     if (args.includes('--help') && MAN[name]) return { out: MAN[name] + '\n', code: 0 };
     const fn = this['c_' + name];
     if (!fn) {
@@ -491,7 +723,9 @@ export class Shell {
   c_help() {
     return {
       out: 'SANDBOX-SIMULATION – verfügbare Befehle:\n' + KNOWN.join(' ') +
-        '\nMehr: man BEFEHL oder BEFEHL --help. Pipes |, Umleitungen > >> 2>, ; && || und & am Zeilenende werden unterstützt.\n',
+        (Object.keys(this.extra).filter(k => !k.startsWith('_')).length ? '\nIn diesem Raum zusätzlich: ' + Object.keys(this.extra).filter(k => !k.startsWith('_')).join(' ') : '') +
+        '\nMehr: man BEFEHL oder BEFEHL --help. Pipes |, Umleitungen > >> 2>, ; && || und & am Zeilenende werden unterstützt.' +
+        '\nSkripte: NAME=wert, $(…), $((…)), for … in …; do …; done, while read Z; do …; done < DATEI, if [ … ]; then …; else …; fi, ./skript.sh\n',
       code: 0,
     };
   }
@@ -626,6 +860,166 @@ export class Shell {
       if (w) { err += w.replace('bash:', 'touch:'); code = 1; }
     }
     return { out: '', err, code };
+  }
+
+  _runScript(path, args) {
+    const f = this._readable(path, 'bash'); if (f.err) return { out: '', err: f.err, code: 1 };
+    const saved = { ...this.uvars };
+    args.forEach((a, i) => { this.uvars[String(i + 1)] = a; });
+    this.uvars['#'] = String(args.length);
+    const r = this._script(f.data.replace(/^#!.*\n/, ''));
+    for (const k of Object.keys(this.uvars)) if (/^(\d+|#)$/.test(k)) delete this.uvars[k];
+    Object.assign(this.uvars, Object.fromEntries(Object.entries(saved).filter(([k]) => /^(\d+|#)$/.test(k))));
+    return { out: r.out, err: r.err, code: r.code };
+  }
+  c_bash(args) {
+    if (!args.length) return { out: '', err: 'bash: In der Sandbox: bash SKRIPT.sh (keine neue interaktive Shell)\n', code: 2 };
+    if (args[0] === '-c') return this._script(args.slice(1).join(' '));
+    return this._runScript(args[0], args.slice(1));
+  }
+  c_sh(args) { return this.c_bash(args); }
+  c_export(args) {
+    for (const a of args) { const m = a.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s); if (m) this.uvars[m[1]] = m[2]; }
+    return { out: '', code: 0 };
+  }
+  c_read() { return { out: '', err: 'read: In der Sandbox nur als  while read ZEILE; do …; done < DATEI\n', code: 1 }; }
+
+  c_seq(args) {
+    const n = args.map(Number);
+    if (!args.length || n.some(x => !Number.isFinite(x))) return { out: '', err: 'Aufruf: seq [START] ENDE  oder  seq START SCHRITT ENDE\n', code: 1 };
+    const [a, st, b] = n.length === 1 ? [1, 1, n[0]] : n.length === 2 ? [n[0], 1, n[1]] : n;
+    const out = []; for (let x = a; st > 0 ? x <= b : x >= b; x += st) { out.push(x); if (out.length > 10000) break; }
+    return { out: out.length ? out.join('\n') + '\n' : '', code: 0 };
+  }
+
+  c_test(args) {
+    const a = args[args.length - 1] === ']' ? args.slice(0, -1) : args;
+    let neg = false; if (a[0] === '!') { neg = true; a.shift(); }
+    let ok = false;
+    if (a.length === 0) ok = false;
+    else if (a.length === 1) ok = a[0] !== '';
+    else if (a.length === 2) {
+      const [op, v] = a; const n = this.node(v);
+      ok = op === '-f' ? !!n && n.t === 'f' && this._traversable(v) : op === '-d' ? !!n && n.t === 'd' : op === '-e' ? !!n : op === '-z' ? v === '' : op === '-n' ? v !== '' : op === '-r' ? !!n && canDo(n, 4) : op === '-x' ? !!n && canDo(n, 1) : false;
+    } else {
+      const [x, op, y] = a; const nx = parseInt(x, 10), ny = parseInt(y, 10);
+      ok = op === '=' || op === '==' ? x === y : op === '!=' ? x !== y : op === '-eq' ? nx === ny : op === '-ne' ? nx !== ny : op === '-gt' ? nx > ny : op === '-lt' ? nx < ny : op === '-ge' ? nx >= ny : op === '-le' ? nx <= ny : false;
+    }
+    return { out: '', code: (ok !== neg) ? 0 : 1 };
+  }
+  ['c_['](args) {
+    if (args[args.length - 1] !== ']') return { out: '', err: '[: fehlendes „]“ (Leerzeichen vor ] nicht vergessen)\n', code: 2 };
+    return this.c_test(args);
+  }
+
+  c_tr(args, stdin) {
+    let del = false, sq = false; const pos = [];
+    for (const a of args) { if (a === '-d') del = true; else if (a === '-s') sq = true; else if (/^-[ds]{2}$/.test(a)) { del = sq = true; } else pos.push(a); }
+    const expand = (set) => {
+      set = set.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\[:upper:\]/g, 'A-Z').replace(/\[:lower:\]/g, 'a-z').replace(/\[:digit:\]/g, '0-9').replace(/\[:space:\]/g, ' \t\n');
+      let out = '';
+      for (let i = 0; i < set.length; i++) {
+        if (set[i + 1] === '-' && i + 2 < set.length) { for (let c = set.charCodeAt(i); c <= set.charCodeAt(i + 2); c++) out += String.fromCharCode(c); i += 2; }
+        else out += set[i];
+      }
+      return out;
+    };
+    if (!pos.length) return { out: '', err: 'Aufruf: tr SATZ1 SATZ2  ·  tr -d SATZ  ·  tr -s SATZ\n', code: 1 };
+    const s1 = expand(pos[0]), s2 = pos[1] !== undefined ? expand(pos[1]) : '';
+    let text = stdin ?? '';
+    if (del) text = [...text].filter(c => !s1.includes(c)).join('');
+    else if (s2) text = [...text].map(c => { const i = s1.indexOf(c); return i < 0 ? c : s2[Math.min(i, s2.length - 1)]; }).join('');
+    if (sq) { const set = del ? s2 || s1 : s2 || s1; text = text.replace(/(.)\1+/g, (m, c) => (set.includes(c) ? c : m)); }
+    return { out: text, code: 0 };
+  }
+
+  c_sed(args, stdin) {
+    const pos = args.filter(a => a !== '-e'); let n = false;
+    if (pos[0] === '-n') { n = true; pos.shift(); }
+    const prog = pos.shift();
+    if (!prog) return { out: '', err: "Aufruf: sed 's/ALT/NEU/g' [DATEI]  ·  sed -n '5p' DATEI\n", code: 1 };
+    const { parts, err } = this._inputs(pos, stdin, 'sed'); if (err) return { out: '', err, code: 2 };
+    const lines = parts.map(p => p.data).join('').replace(/\n$/, '').split('\n');
+    let m;
+    if ((m = prog.match(/^s(.)(.*?)\1(.*?)\1([gi]*)$/s))) {
+      let re; try { re = new RegExp(m[2].replace(/\\([(){}|+?])/g, '$1'), (m[4].includes('g') ? 'g' : '') + (m[4].includes('i') ? 'i' : '')); } catch { return { out: '', err: 'sed: ungültiger Ausdruck\n', code: 1 }; }
+      const repl = m[3].replace(/\\n/g, '\n').replace(/&/g, '$$&').replace(/\\(\d)/g, '$$$1');
+      const out = lines.map(l => l.replace(re, repl));
+      return { out: n ? '' : out.join('\n') + '\n', code: 0 };
+    }
+    if ((m = prog.match(/^(\d+)(?:,(\d+))?([pd])$/))) {
+      const a = +m[1], b = m[2] ? +m[2] : a;
+      const out = lines.filter((l, i) => { const inR = i + 1 >= a && i + 1 <= b; return m[3] === 'p' ? (n ? inR : true) : !inR; });
+      const extra = m[3] === 'p' && !n ? lines.filter((l, i) => i + 1 >= a && i + 1 <= b) : [];
+      return { out: [...out, ...extra].join('\n') + (out.length || extra.length ? '\n' : ''), code: 0 };
+    }
+    if ((m = prog.match(/^\/(.*)\/d$/))) { const re = new RegExp(m[1]); const out = lines.filter(l => !re.test(l)); return { out: out.length ? out.join('\n') + '\n' : '', code: 0 }; }
+    return { out: '', err: "sed: Die Sandbox kennt s/ALT/NEU/[g], Np, N,Mp (mit -n), Nd und /MUSTER/d\n", code: 1 };
+  }
+
+  c_awk(args, stdin) {
+    let fs = null; const pos = [];
+    for (let i = 0; i < args.length; i++) {
+      if (args[i] === '-F') fs = args[++i]; else if (args[i].startsWith('-F')) fs = args[i].slice(2); else pos.push(args[i]);
+    }
+    const prog = pos.shift();
+    if (!prog) return { out: '', err: "Aufruf: awk -F';' '{print $2}' DATEI\n", code: 1 };
+    const { parts, err } = this._inputs(pos, stdin, 'awk'); if (err) return { out: '', err, code: 2 };
+    const text = parts.map(p => p.data).join('');
+    const lines = text ? text.replace(/\n$/, '').split('\n') : [];
+    if (fs === '\\t' || fs === '\t') fs = '\t';
+    // Programm: [MUSTER] { AKTION } [END { AKTION }]
+    const m = prog.trim().match(/^(?:(BEGIN\s*\{[^}]*\})\s*)?([^{]*?)\s*(?:\{([^}]*)\})?\s*(?:END\s*\{([^}]*)\})?$/);
+    if (!m) return { out: '', err: 'awk: Diese Form kennt die Sandbox nicht. Beispiele: {print $1} · /MUSTER/ {print $2} · $3>100 · {s+=$2} END {print s}\n', code: 2 };
+    const pattern = m[2].trim(), action = m[3] ?? (pattern ? 'print $0' : ''), endAction = m[4];
+    const vars = {}; let out = '';
+    const fields = (l) => { const f = fs === null ? l.trim().split(/\s+/) : l.split(fs); return f[0] === '' && fs === null ? [] : f; };
+    const val = (tok, f, l, nr) => {
+      tok = tok.trim();
+      if (/^\$\d+$/.test(tok)) { const k = +tok.slice(1); return k === 0 ? l : (f[k - 1] ?? ''); }
+      if (tok === '$NF') return f[f.length - 1] ?? '';
+      if (tok === 'NF') return f.length; if (tok === 'NR') return nr;
+      if (/^".*"$/.test(tok)) return tok.slice(1, -1);
+      if (/^-?\d+(\.\d+)?$/.test(tok)) return Number(tok);
+      if (/^[A-Za-z_]\w*$/.test(tok)) return vars[tok] ?? '';
+      if (/^length\((.*)\)$/.test(tok)) return String(val(tok.match(/^length\((.*)\)$/)[1] || '$0', f, l, nr)).length;
+      return '';
+    };
+    const cond = (pat, f, l, nr) => {
+      if (!pat) return true;
+      let mm;
+      if ((mm = pat.match(/^!?\/(.*)\/$/))) { const hit = new RegExp(mm[1]).test(l); return pat.startsWith('!') ? !hit : hit; }
+      if ((mm = pat.match(/^(\S+?)\s*(==|!=|>=|<=|>|<|~)\s*(.+)$/))) {
+        const a = val(mm[1], f, l, nr); let b = mm[3].trim();
+        if (mm[2] === '~') return new RegExp(b.replace(/^\/|\/$/g, '')).test(String(a));
+        b = val(b, f, l, nr);
+        const num = (x) => (x !== '' && !isNaN(x) ? Number(x) : x);
+        const A = num(a), B = num(b);
+        return mm[2] === '==' ? A == B : mm[2] === '!=' ? A != B : mm[2] === '>' ? A > B : mm[2] === '<' ? A < B : mm[2] === '>=' ? A >= B : A <= B;
+      }
+      return false;
+    };
+    const run = (act, f, l, nr) => {
+      for (const stmt of act.split(';').map(x => x.trim()).filter(Boolean)) {
+        let mm;
+        if ((mm = stmt.match(/^print\s*(.*)$/))) {
+          const expr = mm[1].trim() || '$0';
+          const items = []; let cur = '', q = false;
+          for (const ch of expr) { if (ch === '"') q = !q; if (ch === ',' && !q) { items.push(cur); cur = ''; } else cur += ch; }
+          items.push(cur);
+          out += items.map(it => it.trim().split(/\s+(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(t => val(t, f, l, nr)).join('')).join(' ') + '\n';
+        } else if ((mm = stmt.match(/^([A-Za-z_]\w*)\s*(\+=|-=|=)\s*(.+)$/))) {
+          const v = val(mm[3], f, l, nr);
+          if (mm[2] === '=') vars[mm[1]] = v; else vars[mm[1]] = (Number(vars[mm[1]]) || 0) + (mm[2] === '+=' ? 1 : -1) * (Number(v) || 0);
+        } else if ((mm = stmt.match(/^([A-Za-z_]\w*)\+\+$/))) vars[mm[1]] = (Number(vars[mm[1]]) || 0) + 1;
+        else throw new Error('Unbekannte Aktion: ' + stmt);
+      }
+    };
+    try {
+      lines.forEach((l, i) => { const f = fields(l); if (cond(pattern, f, l, i + 1)) run(action || 'print $0', f, l, i + 1); });
+      if (endAction !== undefined) run(endAction, [], '', lines.length);
+    } catch (e) { return { out, err: 'awk: ' + e.message + ' (Sandbox kennt print, VAR+=, VAR++, VAR=)\n', code: 2 }; }
+    return { out, code: 0 };
   }
 
   c_echo(args) {
@@ -826,7 +1220,7 @@ export class Shell {
       for (const s of starts) { const n = this.node(s); if (!n) err += `grep: ${s}: Datei oder Verzeichnis nicht gefunden\n`; else walk(s, n); }
       files = all;
     }
-    const multi = files.length > 1 || flags.has('r') || flags.has('R');
+    const multi = !flags.has('h') && (files.length > 1 || flags.has('r') || flags.has('R'));
     let out = '', found = false;
     const sources = files.length ? files : [{ p: null }];
     for (const f of sources) {
@@ -852,6 +1246,7 @@ export class Shell {
       if (flags.has('c')) out += (multi ? f.p + ':' : '') + count + '\n';
       if (flags.has('l') && count) out += f.p + '\n';
     }
+    if (flags.has('q')) out = '';
     return { out, err, code: err && !found ? 2 : found ? 0 : 1 };
   }
 
