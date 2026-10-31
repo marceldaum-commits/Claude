@@ -420,10 +420,14 @@ await at('N1 Netzwerk-Simulation lösbar', async () => {
   ok(s.exec('curl http://10.10.20.10:8081/').out.includes(F.devport));
   ok(s.exec('curl http://portal.stadtwerke.sim/').out.includes('Kundenportal'), 'Namen auflösbar');
   ok(s.exec('nmap 10.10.20.42').out.includes('23/tcp    open  telnet'));
-  ok(s.exec('nc 10.10.20.42 23').out.includes(F.kamera));
+  ok(!s.exec('nc 10.10.20.42 23').out.includes(F.kamera), 'Flag nur codiert im Banner');
+  eq(s.exec('nc 10.10.20.42 23 | grep Notiz | cut -d" " -f5 | base64 -d').out.trim(), F.kamera);
+  ok(s.exec('ls -a').out.includes('.uebergabe') && s.read('.uebergabe').includes('inventar.csv'));
+  eq(s.exec('grep 10.10.20.42 inventar.csv').code, 1);
   ok(s.exec('nmap -sU 10.10.20.50').out.includes('161/udp   open  snmp'));
   ok(s.exec('nmap 8.8.8.8').err.includes('SCOPE') && s.exec('nc 192.168.1.1 80').err.includes('SCOPE'), 'Scope-Schutz');
   s.exec('nmap -sV 10.10.20.1-50 -oN notizen/tcp.txt'); ok((s.read('notizen/tcp.txt') || '').includes('postgresql'), '-oN speichert');
+  ok(acc('t3', 'q4', s.exec('grep -c "/tcp *open" notizen/tcp.txt').out.trim()), 'offene Ports zählen: ' + s.exec('grep -c "/tcp *open" notizen/tcp.txt').out);
   ok(s.exec('nmap -A 10.10.20.10').out.includes('|_http-title: Stadtwerke Kundenportal'));
 });
 t('W2 Kellerserver: Codes und Scope', () => {

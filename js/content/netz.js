@@ -4,6 +4,9 @@
 // NETZ_PFAD: kostenlose Übungsmaschinen für echte Scans (ohne Abo).
 
 import { HOME } from '../shell.js';
+import { textTools } from './wargames.js';
+
+const b64 = (x) => (typeof btoa === 'function' ? btoa(unescape(encodeURIComponent(x))) : Buffer.from(x, 'utf8').toString('base64'));
 
 const T = (...lines) => lines.join('\n');
 const NET = '10.10.20';
@@ -15,7 +18,7 @@ function hosts(F) {
     { ip: `${NET}.10`, name: 'portal.stadtwerke.sim', mac: 'Dell (sim)', ports: [[80, 'tcp', 'http', 'nginx 1.18.0', true], [443, 'tcp', 'https', 'nginx 1.18.0', true], [8081, 'tcp', 'http', 'Python http.server 3.8', false]] },
     { ip: `${NET}.20`, name: 'files.stadtwerke.sim', mac: 'Dell (sim)', ports: [[139, 'tcp', 'netbios-ssn', 'Samba smbd 4.15', true], [445, 'tcp', 'microsoft-ds', 'Samba smbd 4.15', true]] },
     { ip: `${NET}.30`, name: 'db.stadtwerke.sim', mac: 'Dell (sim)', ports: [[5432, 'tcp', 'postgresql', 'PostgreSQL 13.4', true]] },
-    { ip: `${NET}.42`, name: null, mac: 'Shenzhen Vision Tech (sim)', ports: [[23, 'tcp', 'telnet', 'IPCam-2000 telnetd', true], [554, 'tcp', 'rtsp', 'IPCam-2000 rtspd', true]], banner: { 23: `IPCam-2000 Firmware v1.2 (2017)\nWartungszugang aktiv. Notiz des Installateurs: ${F.kamera}\nlogin: ` } },
+    { ip: `${NET}.42`, name: null, mac: 'Shenzhen Vision Tech (sim)', ports: [[23, 'tcp', 'telnet', 'IPCam-2000 telnetd', true], [554, 'tcp', 'rtsp', 'IPCam-2000 rtspd', true]], banner: { 23: `IPCam-2000 Firmware v1.2 (2017)\nWartungszugang aktiv.\nNotiz des Installateurs (base64): ${b64(F.kamera)}\nlogin: ` } },
     { ip: `${NET}.50`, name: 'drucker.stadtwerke.sim', mac: 'Brother (sim)', ports: [[80, 'tcp', 'http', 'Drucker-Webinterface', true], [9100, 'tcp', 'jetdirect', '', true], [161, 'udp', 'snmp', 'SNMPv1 (community public)', true]] },
   ];
 }
@@ -144,6 +147,12 @@ function netzSetup(sh, F) {
     '',
     'Hinweis: Das ist eine SIMULATION im Browser. nmap und nc sind nachgebaut,',
     'es wird kein echter Netzwerkverkehr erzeugt.', ''));
+  // Wiederholung (Nachtfalter): versteckte Übergabe-Notiz und Inventarliste zum Durchsuchen
+  p('.uebergabe', T('Übergabe vom Kollegen, der den Auftrag vorher hatte:',
+    '- Die Inventarliste der Stadtwerke liegt in inventar.csv (IP;Name;Gerät).',
+    '- Herr Kern sagt, die Liste sei „vollständig“. Ich glaube ihm nicht.',
+    '- Speichere deine Scans mit -oN in notizen/, dann kannst du sie später mit grep durchsuchen.', ''));
+  p('inventar.csv', T('ip;name;geraet', `${NET}.1;gw;Router`, `${NET}.10;portal;Webserver`, `${NET}.20;files;Dateiserver`, `${NET}.30;db;Datenbank`, `${NET}.50;drucker;Drucker`, ''));
   sh.fs.put(`${HOME}/auftrag/notizen`, null);
   sh.cwd = `${HOME}/auftrag`;
 }
@@ -153,7 +162,7 @@ const L = (...x) => x;
 export const NETZ_ROOMS = [
   {
     id: 'n1', title: 'Inventur bei den Stadtwerken', type: 'walkthrough', level: 'L2', minutes: 45,
-    tools: ['nmap -sn', 'nmap -p-', 'nmap -sV', 'nmap -sU', 'nc', 'curl', '-oN'],
+    tools: ['nmap -sn', 'nmap -p-', 'nmap -sV', 'nmap -sU', 'nc', 'curl', '-oN', '🔁 ls -a, grep, base64'],
     desc: 'Simuliertes Firmennetz mit sechs Geräten. Du machst die Inventur mit nmap: Wer ist da, was läuft, was ist gefährlich?',
     ziel: 'Ein Netz methodisch aufklären: erst Rechner finden, dann Ports, dann Versionen – und die Ergebnisse richtig deuten.',
     scope: 'Nur das simulierte Netz 10.10.20.0/24 im App-Terminal. Kein echter Netzwerkverkehr.',
@@ -163,12 +172,13 @@ export const NETZ_ROOMS = [
     welcome: 'Netzwerk-Simulation bereit. Start: cat AUFTRAG.txt · nmap --help',
     flags: ['devport', 'kamera'],
     setup: netzSetup,
-    commands: ({ F }) => ({ nmap: nmapCmd(F), nc: ncCmd(F), netcat: ncCmd(F) }),
+    commands: ({ F }) => ({ nmap: nmapCmd(F), nc: ncCmd(F), netcat: ncCmd(F), ...textTools() }),
     tasks: [
       {
         id: 't1', title: 'Der Auftrag', body: 'Lies zuerst den Auftrag. Ohne Auftrag kein Scan – das ist im echten Leben die wichtigste Regel.',
         questions: [
           { id: 'q1', type: 'text', q: 'Welches Netz darfst du untersuchen? (z. B. 192.168.1.0/24)', accept: [/^10\.10\.20\.0\/24$/], points: 5, hints: L('cat AUFTRAG.txt', 'Lösung: 10.10.20.0/24') },
+          { id: 'q3', type: 'text', repeat: 'Nachtfalter Stufe 1', q: 'Dein Vorgänger hat dir eine versteckte Notiz hinterlassen. In welcher Datei liegt die Inventarliste?', accept: [/^(\.\/)?inventar\.csv$/i], points: 5, hints: L('Versteckt heißt bei Linux: Der Name beginnt mit einem Punkt.', 'ls -a zeigt auch versteckte Dateien. Dann cat .uebergabe', 'Lösung: inventar.csv') },
           { id: 'q2', type: 'mc', q: 'Im Router siehst du ein Login-Formular. Darfst du dort Passwörter ausprobieren?', points: 10, options: ['Nein – der Auftrag erlaubt nur Aufklärung, kein Anmelden oder Raten.', 'Ja, solange nichts kaputtgeht.', 'Ja, aber nur drei Versuche.'], answer: 0, hints: L('Was steht unter „NICHT erlaubt“?') },
         ],
       },
@@ -185,6 +195,7 @@ export const NETZ_ROOMS = [
           { id: 'q1', type: 'text', q: 'Auf welchem Gerät läuft eine Datenbank? (IP)', accept: [/^10\.10\.20\.30$/], points: 10, hints: L('nmap ZIEL zeigt die offenen Ports. Du kannst auch mehrere Ziele angeben: nmap 10.10.20.1-50', 'Datenbanken erkennst du an Dienstnamen wie mysql, postgresql, mssql.', 'Lösung: nmap 10.10.20.30 → 5432/tcp postgresql') },
           { id: 'q2', type: 'text', q: 'Welche nginx-Version läuft auf dem Kundenportal?', accept: [/^(nginx\s*)?1\.18\.0$/i], points: 10, hints: L('Ohne Zusatzoption zeigt nmap nur den Dienstnamen, keine Version.', 'Die Option für Versionserkennung ist -sV.', 'Lösung: nmap -sV 10.10.20.10') },
           { id: 'q3', type: 'confirm', q: 'Ergebnisse gespeichert, z. B. nmap -sV 10.10.20.1-50 -oN notizen/tcp.txt', points: 5 },
+          { id: 'q4', type: 'text', repeat: 'Nachtfalter Stufe 3/4', q: 'Wie viele offene TCP-Ports stehen in deinem gespeicherten Scan (nmap -sV 10.10.20.1-50, ohne -p-)?', accept: [/^11$/], points: 10, hints: L('Jeder offene Port ist eine Zeile mit „/tcp“ und „open“. Zählen lassen statt zählen!', 'grep kann mit -c die Treffer zählen.', 'Lösung: grep -c "/tcp *open" notizen/tcp.txt → 11') },
         ],
       },
       {
@@ -197,8 +208,9 @@ export const NETZ_ROOMS = [
       {
         id: 't5', title: 'Das Gerät ohne Namen', body: 'Das namenlose Gerät steht in keiner Inventarliste. Finde heraus, was es ist.',
         questions: [
+          { id: 'q0', type: 'mc', repeat: 'Nachtfalter Stufe 3', q: 'Steht 10.10.20.42 in der Inventarliste der Stadtwerke?', points: 5, options: ['Nein – das Gerät ist der IT nicht bekannt.', 'Ja, als Drucker.', 'Ja, als Webserver.'], answer: 0, hints: L('grep 10.10.20.42 inventar.csv – keine Ausgabe heißt: nicht gefunden.') },
           { id: 'q1', type: 'text', q: 'Welcher alte, unverschlüsselte Fernzugang ist dort offen? (Dienstname)', accept: [/^telnet$/i], points: 10, hints: L('Scanne die IP aus Task 2.', 'Lösung: nmap 10.10.20.42 → 23/tcp telnet') },
-          { id: 'q2', type: 'flag', flag: 'kamera', q: 'Flag aus dem Banner', points: 15, hints: L('Viele Dienste begrüßen dich direkt nach dem Verbindungsaufbau mit einem Text (Banner).', 'Mit nc (netcat) baust du eine einfache Verbindung auf: nc ZIEL PORT', 'Lösung: nc 10.10.20.42 23') },
+          { id: 'q2', type: 'flag', flag: 'kamera', repeat: 'Nachtfalter Stufe 6/9', q: 'Flag aus der Notiz im Banner', points: 15, hints: L('Viele Dienste begrüßen dich direkt nach dem Verbindungsaufbau mit einem Text (Banner).', 'Mit nc (netcat) baust du eine einfache Verbindung auf: nc ZIEL PORT', 'Die Notiz ist base64-codiert. Wie in Nachtfalter: Zeile finden, Feld ausschneiden, dekodieren.', 'Lösung: nc 10.10.20.42 23 | grep Notiz | cut -d" " -f5 | base64 -d') },
           { id: 'q3', type: 'mc', q: 'Was ist das Gerät, und warum ist das ein Risiko?', points: 15, options: ['Eine alte Überwachungskamera (Firmware 2017) mit offenem Telnet-Wartungszugang – unverschlüsselt und vermutlich nie aktualisiert.', 'Ein normaler Webserver.', 'Ein Drucker – völlig harmlos.'], answer: 0, hints: L('Lies das Banner genau: Name, Version, Jahr.', 'Auch der Hersteller bei „MAC Address“ im Ping-Scan ist ein Hinweis.') },
         ],
       },

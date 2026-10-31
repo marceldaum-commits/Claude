@@ -161,7 +161,7 @@ function nachtfalterCommands({ F, solve }) {
 const flagQ = (n, hints, points = 10) => ({ id: 'q1', type: 'flag', flag: `l${n}`, q: `Code aus stufe${n}`, points, hints });
 const kq = (n, hints, points = 10) => ({ id: 'q1', type: 'flag', flag: `l${n}`, q: 'Code', points, hints });
 
-export const WARGAMES = [
+const WARGAMES_RAW = [
   // ================================================================ W1 – Handy
   {
     id: 'w1', title: 'Nachtfalter', type: 'wargame', level: 'L1', difficulty: 'leicht → mittel', minutes: 60,
@@ -217,3 +217,7 @@ export const WARGAMES = [
     nach: { beobachtung: 'Zehn Konten, jedes mit einer typischen Schwachstelle: Notizen, Verlauf, Datenlecks, Sicherungen, Prozessparameter, Gruppenrechte, Git-Historie, kopierte Schlüssel.', schluss: 'Genau so laufen echte Pentests nach dem ersten Zugang: Man sucht systematisch nach Zugangsdaten und Fehlkonfigurationen.', grenzen: 'Absichtlich verwundbares Übungsziel. Echte Systeme sind unordentlicher – die Denkweise ist dieselbe.', naechster: 'Level 2: Netzwerk & Aufklärung – wie man so einen Server überhaupt findet.' },
   },
 ];
+
+// 🔁 Wiederholungen: Was aus Nachtfalter im Kellerserver wieder gebraucht wird
+const REPEAT = { 'w2.k0': 'Nachtfalter Stufe 1 (ls -a)', 'w2.k2': 'Nachtfalter Stufe 3 (grep)', 'w2.k6': 'Nachtfalter Stufe 8 (find)', 'w2.k4': 'Nachtfalter Stufe 9 (Pipes)' };
+export const WARGAMES = WARGAMES_RAW.map(r => ({ ...r, tasks: r.tasks.map(t => REPEAT[`${r.id}.${t.id}`] ? { ...t, questions: t.questions.map(q => ({ ...q, repeat: REPEAT[`${r.id}.${t.id}`] })) } : t) }));

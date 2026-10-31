@@ -1247,6 +1247,7 @@ function questionHTML(r, t, q) {
     input = `<div class="row" style="flex-wrap:nowrap"><input type="text" id="in-${id}" data-k="${key}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${q.type === 'flag' ? 'KLY{…}' : 'Antwort'}" ${ok ? 'disabled value="✓ gelöst"' : ''}><button class="btn small primary" data-k="${key}" data-send ${ok ? 'disabled' : ''}>Senden</button></div>`;
   }
   return `<div class="q" id="q-${id}" style="margin:.7rem 0">
+    ${q.repeat ? `<span class="badge plain" title="Wiederholung">🔁 Wiederholung · ${esc(q.repeat)}</span>` : ''}
     <div class="row between"><b class="small">${ok ? '✓ ' : ''}${esc(q.q)}</b><span class="small muted" data-pts="${key}">${pointsLabel(r, t, q)}</span></div>
     ${input}<div class="qfb small" data-fb="${key}"></div><div class="tips" data-tips="${key}">${tipsHTML(r, q, key)}</div></div>`;
 }
