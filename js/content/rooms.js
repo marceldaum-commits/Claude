@@ -5,6 +5,7 @@
 
 import { HOME } from '../shell.js';
 import { WARGAMES } from './wargames.js';
+import { WEB_ROOMS } from './web.js';
 
 const T = (...lines) => lines.join('\n');
 
@@ -257,8 +258,8 @@ const BASE_ROOMS = [
 ];
 
 // Reihenfolge: erst Sandbox-Raum, dann die Wargames neben den Zielmaschinen-Räumen
-const byId = Object.fromEntries([...BASE_ROOMS, ...WARGAMES].map(r => [r.id, r]));
-export const ROOMS = ['r0', 'w1', 'r1', 'w2', 'r2', 'r3'].map(id => byId[id]);
+const byId = Object.fromEntries([...BASE_ROOMS, ...WARGAMES, ...WEB_ROOMS].map(r => [r.id, r]));
+export const ROOMS = ['r0', 'w1', 'r1', 'w2', 'r2', 'r3', 'h1', 'j1'].map(id => byId[id]);
 
 // Abzeichen (aus dem Lernstand abgeleitet – nicht speicherbar, nicht fälschbar über Merge)
 export const BADGES = [

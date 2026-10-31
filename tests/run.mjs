@@ -395,6 +395,17 @@ await at('W1 Nachtfalter komplett lösbar (Sandbox)', async () => {
   const s2 = new Shell({ fs: baseFS(), commands: r.commands({ F, solve() {} }) }); r.setup(s2, F, new Set(['l0', 'l1']));
   ok(s2.exec('ls stufe2').out.includes('fotos') && s2.exec('ls stufe3').err.includes('Keine Berechtigung'));
 });
+await at('H1 Web-Analyse lösbar (Sandbox)', async () => {
+  const r = ROOMS.find(x => x.id === 'h1'); const F = {};
+  for (const f of r.flags) F[f] = await flagFor(TOKEN, 'h1', f);
+  const s = new Shell({ fs: baseFS(), commands: r.commands() }); r.setup(s, F);
+  const dec = s.exec('grep Set-Cookie 1-login.txt | cut -d= -f2 | cut -d";" -f1 | base64 -d').out;
+  ok(dec.includes(F.cookie) && dec.includes('"rolle":"kunde"'), 'Cookie dekodierbar: ' + dec);
+  ok(!/HttpOnly/i.test(s.read('1-login.txt')), 'HttpOnly fehlt absichtlich');
+  ok(s.exec('grep notiz 2-produkte.json').out.includes(F.api));
+  ok(s.exec('grep 1042 3-bestellungen.log').out.includes('Petra Lang'));
+  const j1 = ROOMS.find(x => x.id === 'j1'); ok(j1.machine.kind === 'ext' && j1.cleanup.includes('docker stop'));
+});
 t('W2 Kellerserver: Codes und Scope', () => {
   const sh = readFileSync(join(ROOT, 'labs/kly-keller/setup.sh'), 'utf8');
   const df = readFileSync(join(ROOT, 'labs/kly-keller/Dockerfile'), 'utf8');

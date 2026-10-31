@@ -8,6 +8,7 @@ import {
 } from './state.js';
 import { flagFor, normFlag } from './flags.js';
 import { ROOMS, BADGES } from './content/rooms.js';
+import { PORTSWIGGER } from './content/web.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS } from './content/curriculum.js';
@@ -278,12 +279,14 @@ views.level = (id) => {
     return {
       html: `<a class="back" href="#/pfad">← Lernpfad</a>
       <h1>Level ${l.n} – ${esc(l.title)}</h1>
-      <div class="card"><b>In Vorbereitung</b> – neue Räume für dieses Level kommen nach und nach. Bis dahin: passende Räume auf den Plattformen unter „Heute → Außerhalb der App“.</div>
+      <div class="card">${ROOMS.some(r => r.level === l.id) ? '<b>Los geht’s</b> – die Räume unten sind spielbar, weitere folgen.' : '<b>In Vorbereitung</b> – neue Räume für dieses Level kommen nach und nach. Bis dahin: passende Räume auf den Plattformen unter „Heute → Außerhalb der App“.'}</div>
       <div class="card stack"><p>${esc(l.goal)}</p>
         <h3>Geplante Themen</h3><ul>${l.topics.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
         <h3>Werkzeuge</h3><ul>${l.tools.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
         ${ROOMS.some(r => r.level === l.id) ? `<h3>Räume (bereits verfügbar)</h3>${ROOMS.filter(r => r.level === l.id).map(roomCard).join('')}` : ''}
-        <p class="honest">Ehrlicher Stand: Für dieses Level steht der Lehrplan, Lektionen/Übungen/Prüfung sind noch nicht ausgearbeitet.</p></div>`,
+        ${l.id === 'L3' ? `<h3>Lernpfad: PortSwigger Web Security Academy</h3><p class="small muted">Kostenlos, mit Erklärungen und Online-Labs, die genau zum Üben gedacht sind. Kostenloses Konto nötig. Reihenfolge empfohlen:</p>
+          <ol class="small" style="padding-left:1.2rem">${PORTSWIGGER.map(x => `<li style="margin:.35rem 0"><a href="${x.url}" target="_blank" rel="noopener noreferrer"><b>${esc(x.t)}</b></a><br><span class="muted">${esc(x.why)}</span></li>`).join('')}</ol>` : ''}
+        <p class="honest">Ehrlicher Stand: ${ROOMS.some(r => r.level === l.id) ? 'Erste Räume sind da, weitere folgen.' : 'Für dieses Level steht der Lehrplan, Räume folgen.'}</p></div>`,
     };
   }
   const pre = examPrereqs();
@@ -1038,7 +1041,7 @@ function typeBadge(r) {
   return r.type === 'wargame' ? '<span class="badge real">Wargame</span>' : r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>';
 }
 function machineBadge(r) {
-  return r.machine.kind === 'ssh' ? '<span class="badge real">🖥️ Kali · echtes SSH</span>' : r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">📱 Sandbox</span>';
+  return r.machine.kind === 'ssh' ? '<span class="badge real">🖥️ Kali · echtes SSH</span>' : r.machine.kind === 'ext' ? '<span class="badge real">🖥️ Kali · Übungs-App</span>' : r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">📱 Sandbox</span>';
 }
 
 function roomCard(r) {
@@ -1111,9 +1114,31 @@ function sshMachineHTML(r) {
   </div>`;
 }
 
+function extMachineHTML(r) {
+  const m = r.machine;
+  return `<div class="card lime stack" id="machine">
+    <div class="row between"><h3 style="margin:0">Übungs-App ${esc(m.name)}</h3><span class="badge real">echt · nur 127.0.0.1</span></div>
+    <p class="small">Adresse: <code>http://127.0.0.1:${m.port}</code> · Nur am PC (Kali-VM mit Docker).</p>
+    ${state.location === 'phone' ? '<div class="feedback info small">Du bist gerade am Handy. Am Handy wartet „Was die Webseite verrät“.</div>' : ''}
+    ${roomState(r.id).startedAt ? '' : '<button class="btn go" id="startm">▶ App starten – Anleitung anzeigen</button>'}
+    <div id="mhow" ${roomState(r.id).startedAt ? '' : 'hidden'}>
+      <details><summary>Einmalig: Docker prüfen / einrichten</summary>
+        ${scriptBlock('Prüfen:', 'command -v docker && docker info --format "Docker {{.ServerVersion}} läuft"')}
+        ${scriptBlock('Einrichten (Kali):', 'sudo apt update && sudo apt install -y docker.io\nsudo systemctl enable --now docker\nsudo usermod -aG docker $USER')}
+      </details>
+      ${scriptBlock('1. Starten (beim ersten Mal wird das Abbild geladen, ca. 1–3 Minuten):', `docker run -d --rm --name ${m.name} -p 127.0.0.1:${m.port}:${m.inner} ${m.image}`)}
+      ${scriptBlock('2. Läuft er?', `docker ps --filter name=${m.name}\ncurl -s -o /dev/null -w "%{http_code}\\n" http://127.0.0.1:${m.port}/`)}
+      <p class="small">3. Im Browser der VM öffnen: <code>http://127.0.0.1:${m.port}</code></p>
+      ${scriptBlock('Stoppen:', `docker stop ${m.name}`)}
+    </div>
+    <p class="honest">${esc(m.name)} ist ein offizielles, absichtlich unsicheres Übungsprojekt der OWASP-Stiftung. Er läuft nur auf deinem PC. Die offiziellen Tipps und Lösungen: <a href="https://pwning.owasp-juice.shop/" target="_blank" rel="noopener noreferrer">pwning.owasp-juice.shop</a></p>
+  </div>`;
+}
+
 function machineHTML(r) {
   const m = r.machine;
   if (m.kind === 'ssh') return sshMachineHTML(r);
+  if (m.kind === 'ext') return extMachineHTML(r);
   if (m.kind !== 'target') return '';
   const name = `kly-${m.room}`;
   const ports = m.ports.map(p => `-p 127.0.0.1:${p}:${p}`).join(' ');

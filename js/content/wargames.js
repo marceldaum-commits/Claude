@@ -117,27 +117,13 @@ function nachtfalterSetup(sh, F, solved = new Set()) {
   sh.cwd = NF;
 }
 
-// Zusätzliche Befehle nur in diesem Spiel
-function nachtfalterCommands({ F, solve }) {
+// base64 und rev für Sandbox-Räume (die Grund-Shell kennt sie nicht)
+export function textTools() {
   const read = (sh, pos, stdin, name) => {
     const { parts, err } = sh._inputs(pos, stdin, name);
     return { text: parts.map(x => x.data).join(''), err };
   };
-  const entsperren = (args, { sh }) => {
-    const code = String(args[0] || '').trim();
-    if (!code) return { out: '', err: 'Aufruf: entsperren CODE   (z. B. entsperren KLY{…})\n', code: 2 };
-    for (let n = 0; n < STUFEN; n++) {
-      if (F[`l${n}`] === code) {
-        openStufe(sh, n + 1);
-        solve(`l${n}`, code);
-        return { out: n + 1 === STUFEN ? '🔓 Letzte Tür offen: stufe10. Lies das Finale.\n' : `🔓 Richtig! stufe${n + 1} ist jetzt offen.  →  cd ../stufe${n + 1}\n`, code: 0 };
-      }
-    }
-    return { out: '', err: /^KLY\{[0-9a-f]{16}\}$/.test(code) ? '🔒 Falscher Code.\n' : '🔒 Falscher Code. Format: KLY{16 Zeichen 0-9/a-f}\n', code: 1 };
-  };
   return {
-    entsperren,
-    unlock: entsperren,
     base64(args, { sh, stdin }) {
       const decode = args.includes('-d') || args.includes('--decode');
       const { text, err } = read(sh, args.filter(a => !a.startsWith('-')), stdin, 'base64');
@@ -152,6 +138,23 @@ function nachtfalterCommands({ F, solve }) {
       return { out: text.replace(/\n$/, '').split('\n').map(l => [...l].reverse().join('')).join('\n') + '\n', code: 0 };
     },
   };
+}
+
+// Zusätzliche Befehle nur in diesem Spiel
+function nachtfalterCommands({ F, solve }) {
+  const entsperren = (args, { sh }) => {
+    const code = String(args[0] || '').trim();
+    if (!code) return { out: '', err: 'Aufruf: entsperren CODE   (z. B. entsperren KLY{…})\n', code: 2 };
+    for (let n = 0; n < STUFEN; n++) {
+      if (F[`l${n}`] === code) {
+        openStufe(sh, n + 1);
+        solve(`l${n}`, code);
+        return { out: n + 1 === STUFEN ? '🔓 Letzte Tür offen: stufe10. Lies das Finale.\n' : `🔓 Richtig! stufe${n + 1} ist jetzt offen.  →  cd ../stufe${n + 1}\n`, code: 0 };
+      }
+    }
+    return { out: '', err: /^KLY\{[0-9a-f]{16}\}$/.test(code) ? '🔒 Falscher Code.\n' : '🔒 Falscher Code. Format: KLY{16 Zeichen 0-9/a-f}\n', code: 1 };
+  };
+  return { entsperren, unlock: entsperren, ...textTools() };
 }
 
 // hints: Tipp-Leiter vom Denkanstoß bis zur Lösung – jeder Tipp kostet Punkte

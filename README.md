@@ -21,6 +21,14 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Web-Hacking (ab 1.5.0, Level 3)
+
+- **h1 Was die Webseite verrät** (Handy/Sandbox): Mitschnitte eines erfundenen Shops lesen – Cookie mit Rolle,
+  geschwätzige API, fehlende Zugriffsprüfung. Reine Analyse, keine Angriffe.
+- **j1 Juice Shop – erste Schritte** (PC): offizielles OWASP-Übungsprojekt per Docker nur auf `127.0.0.1:3000`,
+  mit Burp Suite mitlesen, versteckte Punktetafel finden, erste Ein-Stern-Aufgaben. Lösungswege: offizielles Begleitbuch.
+- **PortSwigger-Lernpfad** auf der Level-3-Seite (kostenlose Online-Labs).
+
 ## Tipp-Leiter statt Schwierigkeitsgrad (ab 1.4.0)
 
 Zu jeder Frage gibt es 1–5 Tipps, vom Denkanstoß bis zur Lösung. Sie sind **sofort** abrufbar, Stufe für Stufe.
