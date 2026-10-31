@@ -1,0 +1,12 @@
+{
+  "name": "kali-level-up",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kali Level Up – vom Linux-Anfänger zum Purple Team (PWA, ohne Build-Schritt)",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "check": "for f in js/*.js js/content/*.js; do node --check $f || exit 1; done && node tests/run.mjs",
+    "start": "python3 -m http.server 8000 --bind 127.0.0.1"
+  }
+}

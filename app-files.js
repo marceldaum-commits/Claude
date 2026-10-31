@@ -1,0 +1,28 @@
+// Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
+self.KLY_VERSION = '1.0.0';
+self.KLY_FILES = [
+  'index.html',
+  'manifest.webmanifest',
+  'app-files.js',
+  'config.js',
+  'sw.js',
+  'css/app.css',
+  'js/main.js',
+  'js/shell.js',
+  'js/terminal-ui.js',
+  'js/verify.js',
+  'js/state.js',
+  'js/sync.js',
+  'js/export.js',
+  'js/content/curriculum.js',
+  'js/content/level1.js',
+  'js/content/story1.js',
+  'js/content/tools.js',
+  'icons/icon.svg',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
+  'icons/icon-maskable-512.png',
+  'icons/apple-touch-icon.png',
+];
+// Zusätzliche Dateien nur für den App-Download (nicht offline gecacht)
+self.KLY_EXTRA = ['README.md', 'supabase/schema.sql', 'docs/SUPABASE-SETUP.md'];
