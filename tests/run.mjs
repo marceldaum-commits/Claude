@@ -8,6 +8,7 @@ import { Shell, baseFS, HOME } from '../js/shell.js';
 import { verifyEvidence, scopeCheck, extractTargets } from '../js/verify.js';
 import { defaultState, mergeStates, scoreAttempt, examPassed, attemptValid } from '../js/state.js';
 import { LEVEL1 } from '../js/content/level1.js';
+import { LOESUNGEN, REAL_LOESUNGEN, uebungsTipps } from '../js/content/level1-tipps.js';
 import { STORY1 } from '../js/content/story1.js';
 import { LEVELS } from '../js/content/curriculum.js';
 import { ROOMS, BADGES } from '../js/content/rooms.js';
@@ -175,24 +176,7 @@ t('Unbestandene Sandbox-Übungen melden NICHT bestanden', () => {
 });
 
 // ------------------------------------------------ Lösbarkeit (Musterlösungen)
-const SOLUTIONS = {
-  'e1-01s': ['pwd', 'whoami'],
-  'e1-02s': ['cd ~/lab', 'ls', 'cd archiv/2026/oktober', 'ls'],
-  'd1-pfade': ['cd ../../c/d'],
-  'e1-03s': ['ls -la ~/lab/fall-01', 'mkdir -p ~/lab/fall-01/notizen ~/lab/fall-01/belege', 'touch ~/lab/fall-01/belege/README', 'ls ~/lab/fall-01/temp.tmp', 'rm ~/lab/fall-01/temp.tmp'],
-  'e1-04s': ['cd ~/lab/fall-01/notizen', 'echo "08:00 Alarm eingegangen" > zeitlinie.txt', 'echo "08:05 Scope geklärt" >> zeitlinie.txt', 'echo "08:10 Analyse gestartet" >> zeitlinie.txt'],
-  'e1-05s': ['cd ~/lab/config', 'cp -p app.conf app.conf.bak', 'echo "debug=false" >> app.conf'],
-  'w1-01': ['cd ~/lab/w1', 'mkdir sicherung', 'cp -p eingang/*.txt sicherung/', 'ls sicherung | wc -l > anzahl.txt', 'mv anzahl.txt sicherung/'],
-  'e1-06s': ['cd ~/lab/rechte', 'chmod 640 bericht.txt', 'chmod u+x skript.sh', 'chmod 700 privat'],
-  'd1-chmod': ['chmod 400 ~/lab/drill/a.txt', 'chmod 664 ~/lab/drill/b.txt', 'chmod 750 ~/lab/drill/c.sh'],
-  'e1-07s': ['ps -o pid,ppid,args', 'kill 3188', 'ps'],
-  'e1-08s': ['find ~/lab/sammlung -type f -name "*.conf"', 'grep -l "debug=true" ~/lab/sammlung/web/site.conf ~/lab/sammlung/api/dienst.conf ~/lab/sammlung/db/db.conf > ~/lab/fund.txt'],
-  'e1-09s': ['grep "Failed password" ~/lab/logs/auth.log | wc -l > ~/lab/antwort.txt'],
-  'd1-pipes': ['grep "Failed password" ~/lab/logs/auth.log | cut -d" " -f11 | sort | uniq -c | sort -nr | head -1', 'echo 10.13.37.21 > ~/lab/top.txt'],
-  'e1-10s': ['curl -I http://127.0.0.1:8080/admin', 'echo 403 > ~/lab/status.txt'],
-  'e1-11s': ['curl http://intranet.lab.sim:8080/', 'curl http://127.0.0.1:8080/', 'getent hosts intranet.lab.sim', 'grep intranet /etc/hosts > ~/lab/dns-befund.txt'],
-  'w1-02': ['find ~/lab/w2 -type f -perm -o=w', 'chmod 640 ~/lab/w2/a/b/token.cfg'],
-};
+const SOLUTIONS = LOESUNGEN;
 for (const e of LEVEL1.exercises.filter(x => x.sandbox)) {
   t(`Lösbar: ${e.id}`, () => {
     const cmds = SOLUTIONS[e.id]; ok(cmds, 'keine Musterlösung hinterlegt');
@@ -202,6 +186,12 @@ for (const e of LEVEL1.exercises.filter(x => x.sandbox)) {
     ok(r.ok, r.msg + ' | Ausgaben: ' + outs.map(o => (o.out + o.err).trim()).join(' / ').slice(0, 400));
   });
 }
+t('Spickzettel: jede Übung hat eine Tipp-Leiter bis zur Lösung', () => {
+  for (const e of LEVEL1.exercises) {
+    const tips = uebungsTipps(e, LEVEL1.lessons.find(l => l.id === e.lesson));
+    ok(tips.length >= 3 && /^Lösung/.test(tips.at(-1)), e.id + ': ' + tips.length);
+  }
+});
 t('Drill d1-pipes: Feld 11 ist die IP', () => {
   const e = LEVEL1.exercises.find(x => x.id === 'd1-pipes'); const s = sh(); e.sandbox.setup(s);
   eq(s.exec('grep "Failed password" ~/lab/logs/auth.log | cut -d" " -f11 | sort | uniq -c | sort -nr | head -1').out.trim(), '4 10.13.37.21');

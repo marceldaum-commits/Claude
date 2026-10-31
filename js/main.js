@@ -10,6 +10,7 @@ import { flagFor, normFlag } from './flags.js';
 import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
+import { uebungsTipps } from './content/level1-tipps.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -22,6 +23,8 @@ import { TOOLS } from './content/tools.js';
 const LESSONS = LEVEL1.lessons;
 const EXERCISES = LEVEL1.exercises;
 const EX = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
+// Tipp-Leitern der Spickzettel-Übungen (Anzahl für die Punkteberechnung)
+for (const e of Object.values(EX)) e.tipCount = uebungsTipps(e, LESSONS.find(l => l.id === e.lesson)).length;
 const LESSON = Object.fromEntries(LESSONS.map(l => [l.id, l]));
 const STORY = Object.fromEntries(STORIES.map(s => [s.id, s]));
 const EXAMS = { L1: LEVEL1.exam };
@@ -243,7 +246,7 @@ views.heute = () => {
 function exItem(id, showRepeat) {
   const e = EX[id]; if (!e) return '';
   const done = isPassed(id);
-  const locked = !lessonDone(e.lesson);
+  const locked = false; // Spickzettel: nichts gesperrt
   return `<li><a href="#/uebung/${id}">
     <span class="state ${done ? 'done' : locked ? 'lock' : ''}">${done ? '✓' : locked ? '🔒' : ''}</span>
     <span class="grow"><span class="t">${esc(e.title)}</span><span class="s">${kindLabel(e)}${done && showRepeat ? ' · Wiederholung ohne Punkte' : ''}${locked ? ' · erst Lektion lesen' : ''}</span></span>
@@ -348,8 +351,8 @@ views.lektion = (id) => {
         <div class="rule">${esc(c.regel)}</div>
       </div>`).join('')}
       <div class="card">
-        <p class="small muted">Probiere die Befehle gern frei im <a href="#/terminal">Sandbox-Terminal</a> aus, bevor du die Übungen startest.</p>
-        ${lessonDone(id) ? '<p class="small">✓ Gelesen</p>' : '<button class="btn primary block" id="read">Verstanden – Übungen freischalten</button>'}
+        <p class="small muted">Probier die Befehle frei im <a href="#/terminal">Terminal</a> aus – oder spring direkt in eine Übung. Jede Übung hat Tipps bis zur Lösung.</p>
+        ${lessonDone(id) ? '<p class="small">✓ Als gelesen markiert</p>' : '<button class="btn block" id="read">✓ Als gelesen markieren</button>'}
         <ul class="list">${l.exercises.map(eid => exItem(eid)).join('')}</ul>
       </div>
     </div>`,
@@ -402,14 +405,13 @@ views.uebung = (id) => {
   if (!e) return views.pfad();
   const st = exState(id);
   if (!state.archive[id]) { state.archive[id] = Date.now(); save(); }
-  if (!lessonDone(e.lesson)) {
-    return { html: `<a class="back" href="#/lektion/${e.lesson}">← Lektion</a><h1>${esc(e.title)}</h1><div class="card warn">🔒 Erst die Lektion „${esc(LESSON[e.lesson].title)}“ lesen – neue Konzepte werden vor der ersten Übung erklärt.</div><a class="btn primary" href="#/lektion/${e.lesson}">Zur Lektion</a>` };
-  }
   const repeat = !!st.passedAt;
-  const run = { taskOk: false, knobelOk: false, fails: 0, hintShown: false };
+  const run = { taskOk: false, knobelOk: false, fails: 0 };
+  const tips = uebungsTipps(e, LESSON[e.lesson]);
+  const tipCost = e.xp / tips.length;
   const isReal = e.kind === 'real';
   return {
-    html: `<a class="back" href="#/lektion/${e.lesson}">← ${esc(LESSON[e.lesson].title)}</a>
+    html: `<a class="back" href="#/lektion/${e.lesson}">← Spickzettel: ${esc(LESSON[e.lesson].title)}</a>
     <div class="row">${isReal ? '<span class="badge real">Echter Auftrag · deine Kali-VM / Termux</span>' : '<span class="badge sim">Sandbox-Simulation</span>'}<span class="badge plain">${esc(kindLabel(e))}</span>${repeat ? '<span class="badge ok">bestanden · Wiederholung ohne Punkte</span>' : `<span class="badge plain">${e.xp} Punkte</span>`}</div>
     <h1 style="margin-top:.5rem">${esc(e.title)}</h1>
     <div class="stack">
@@ -434,9 +436,8 @@ views.uebung = (id) => {
       <div class="row"><button class="btn go" id="check">Ergebnis prüfen</button><button class="btn ghost" id="reset">Übung neu starten</button></div>
       <div id="fb"></div>`}
       <div class="card" id="hintcard">
-        <div class="row between"><b>Hinweis</b><span class="small muted" id="hintstate"></span></div>
-        <button class="btn small" id="hint" disabled>Gestuften Hinweis anzeigen</button>
-        <div id="hinttext"></div>
+        <div class="row between"><b>💡 Tipps</b><span class="small muted" id="hintstate"></span></div>
+        <div class="tips" id="hinttext"></div>
       </div>
       <div id="knobel"></div>
       <div id="debrief"></div>
@@ -445,15 +446,22 @@ views.uebung = (id) => {
       let shell = null;
       let term = null;
       const fb = $('#fb', root);
+      // Tipp-Leiter wie in den Leitern: sofort abrufbar, jeder Tipp kostet Punkte (Wiederholungen kosten nichts)
+      let shownFree = 0;
+      const used = () => (repeat ? shownFree : Math.min(st.tips || 0, tips.length));
+      const left = (u) => Math.max(1, Math.round(e.xp - u * tipCost));
       const updateHint = () => {
-        const can = run.fails >= 2 && !run.hintShown;
-        $('#hint', root).disabled = !can;
-        $('#hintstate', root).textContent = run.hintShown ? 'genutzt' : run.fails >= 2 ? 'verfügbar (nur einer)' : `erst nach 2 eigenen Versuchen (${run.fails}/2)`;
-      };
-      $('#hint', root).onclick = () => {
-        run.hintShown = true; st.hintUsed = true; save();
-        $('#hinttext', root).innerHTML = `<div class="feedback info">${esc(e.hinweis)}</div>`;
-        updateHint();
+        const u = used();
+        const last = u === tips.length - 1 && /^Lösung/.test(tips[tips.length - 1]);
+        $('#hintstate', root).textContent = repeat ? 'Wiederholung – Tipps kostenlos' : u ? `noch ${left(u)} von ${e.xp} Punkten` : `${e.xp} Punkte`;
+        $('#hinttext', root).innerHTML = tips.slice(0, u).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${tips.length}:</b> ${esc(h)}</div>`).join('') +
+          (u < tips.length && !run.taskOk ? `<button class="btn small ghost" id="hint">💡 ${last ? 'Lösung zeigen' : (u ? 'Nächster Tipp' : 'Tipp') + ` ${u + 1}/${tips.length}`}${repeat ? '' : ` · danach noch ${left(u + 1)} P.`}</button>` : '');
+        const b = $('#hint', root);
+        if (b) b.onclick = () => {
+          if (last && !twoTap(b, 'Wirklich die Lösung zeigen?')) return;
+          if (repeat) shownFree++; else { st.tips = (st.tips || 0) + 1; st.hintUsed = true; save(); }
+          updateHint();
+        };
       };
       updateHint();
 
@@ -522,7 +530,7 @@ views.uebung = (id) => {
         $('#debrief', root).innerHTML = `<div class="card lime debrief"><h3>Nachbesprechung</h3><dl>
           <dt>Beobachtung</dt><dd>${esc(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${esc(n.schluss)}</dd>
           <dt>Grenzen</dt><dd>${esc(n.grenzen)}</dd><dt>Möglicher nächster Test</dt><dd>${esc(n.naechster)}</dd></dl>
-          <p class="small">${first ? `✓ Bestanden · +${e.xp} Punkte` : '✓ Wiederholung erfolgreich (ohne Punkte)'}${run.hintShown ? ' · mit Hinweis' : ''}</p>
+          <p class="small">${first ? `✓ Bestanden · +${(st.tips || 0) ? left(Math.min(st.tips, tips.length)) : e.xp} Punkte${st.tips ? ` (${st.tips} Tipp${st.tips > 1 ? 's' : ''} genutzt)` : ''}` : '✓ Wiederholung erfolgreich (ohne Punkte)'}</p>
           ${nextAfter(e)}</div>`;
         $('#debrief', root).scrollIntoView({ behavior: 'smooth', block: 'start' });
       };

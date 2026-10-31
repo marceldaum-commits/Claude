@@ -132,6 +132,7 @@ export function mergeStates(a, b) {
       repeats: Math.max(x.repeats || 0, y.repeats || 0),
       passedAt: minPos(x.passedAt, y.passedAt),
       hintUsed: !!(x.hintUsed || y.hintUsed),
+      tips: Math.max(x.tips || 0, y.tips || 0),
       knobelOk: !!(x.knobelOk || y.knobelOk),
       lastAt: Math.max(x.lastAt || 0, y.lastAt || 0),
     };
@@ -213,7 +214,9 @@ function mergeMax(x = {}, y = {}) {
 export function computeXp(state, exerciseIndex) {
   let xp = 0;
   for (const [id, e] of Object.entries(state.exercises)) {
-    if (e.passedAt && exerciseIndex[id]) xp += exerciseIndex[id].xp || 10;
+    if (!e.passedAt || !exerciseIndex[id]) continue;
+    const full = exerciseIndex[id].xp || 10, n = exerciseIndex[id].tipCount || 0, used = Math.min(e.tips || 0, n);
+    xp += n && used ? Math.max(1, Math.round(full - used * full / n)) : full;
   }
   return xp;
 }
