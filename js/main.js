@@ -98,19 +98,6 @@ function nextStep() {
   return { kind: 'done', title: 'Alle Räume geknackt – trainiere extern weiter, neue Räume folgen', href: '#/pfad' };
 }
 
-function dailyMissions() {
-  const d = today();
-  if (!state.daily[d]) {
-    const fresh = [];
-    for (const l of LESSONS) for (const eid of l.exercises) if (!isPassed(eid) && fresh.length < 2 && EX[eid].kind !== 'drill') fresh.push(eid);
-    const passed = EXERCISES.filter(e => isPassed(e.id)).map(e => e.id);
-    const seed = parseInt(d.replace(/-/g, ''), 10);
-    const reviews = shuffle(passed, seed).slice(0, 2);
-    state.daily[d] = [...new Set([...fresh, ...reviews])];
-    save();
-  }
-  return state.daily[d];
-}
 
 // Empfohlene externe Übungsplattformen (alle legal, ausdrücklich zum Üben gedacht)
 const EXTERNAL = [
@@ -133,8 +120,8 @@ function renderTop() {
 }
 
 function renderNav(route) {
-  const items = [['heute', '⌂', 'Heute'], ['pfad', '◆', 'Pfade'], ['raeume', '▣', 'Räume'], ['terminal', '>_', 'Terminal'], ['mehr', '≡', 'Mehr']];
-  const map = { lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'raeume', story: 'raeume' };
+  const items = [['heute', '⌂', 'Start'], ['pfad', '◆', 'Lernen'], ['terminal', '>_', 'Terminal'], ['mehr', '≡', 'Mehr']];
+  const map = { lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad' };
   const on = map[route] || route;
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
 }
@@ -177,68 +164,70 @@ function render() {
 }
 
 // ---------------------------------------------------------------- Heute
+// Gesamtpunkte: eine einzige Währung (Räume/Wargames + Übungen + Story)
+function totalPoints() { return roomPointsTotal() + computeXp(state, EX) + (state.story.s1?.done ? STORY.s1.points : 0); }
+// Wo spielbar? sandbox = überall (Browser), target = PC (Docker) oder Handy (Termux), ssh/ext = nur PC
+const onPhone = (r) => r.machine.kind === 'sandbox' || r.machine.kind === 'target';
+const onPC = (r) => r.machine.kind !== 'sandbox';
+function lastActivity(r) {
+  const rs = state.rooms[r.id]; if (!rs) return 0;
+  return Math.max(rs.startedAt || 0, ...Object.values(rs.answers || {}).map(a => a.at || 0), ...Object.values(rs.answers || {}).map(a => (a.attempts ? 1 : 0)));
+}
+function continueRoom() {
+  const open = ROOMS.filter(r => !roomDone(r.id) && lastActivity(r) > 0);
+  open.sort((a, b) => lastActivity(b) - lastActivity(a));
+  return open[0] || null;
+}
+function miniRoom(r) {
+  const pct = roomPct(r.id);
+  return `<li><a href="#/raum/${r.id}"><span class="state ${roomDone(r.id) ? 'done' : ''}">${roomDone(r.id) ? '✓' : pct ? pct + '%' : '▶'}</span>
+    <span class="grow"><span class="t">${esc(r.title)}</span><span class="s">${r.type === 'wargame' ? '🎮 Wargame' : 'Level ' + LEVELS.find(l => l.id === r.level).n + ' · ' + esc(LEVELS.find(l => l.id === r.level).title)}${r.machine.kind === 'target' ? ' · am Handy mit Termux' : ''}</span></span></a></li>`;
+}
+
 views.heute = () => {
-  const p = levelProgress();
+  const loc = state.location || 'both';
+  const cont = continueRoom();
   const nx = nextStep();
-  const daily = dailyMissions();
-  const xp = computeXp(state, EX);
-  const loc = LOCATIONS[state.location];
-  const pre = examPrereqs();
-  const s1 = state.story.s1;
+  const done = ROOMS.filter(r => roomDone(r.id)).length;
+  const rank = { sandbox: 0, ssh: 1, ext: 1, target: 2 }; // zuerst, was ohne Zusatz-Installation läuft
+  const pick = (pred, phone) => ROOMS.filter(r => pred(r) && !roomDone(r.id) && r !== cont)
+    .sort((x, y) => (phone ? rank[x.machine.kind] - rank[y.machine.kind] : (x.machine.kind === 'target') - (y.machine.kind === 'target')))
+    .slice(0, 3);
+  const phoneList = pick(onPhone, true), pcList = pick(onPC, false);
+  const section = (icon, title, list) => list.length ? `<div class="card"><h3 style="margin:0 0 .3rem">${icon} ${title}</h3><ul class="list">${list.map(miniRoom).join('')}</ul></div>` : '';
   return {
     html: `
     <section class="stack">
-      ${PREVIEW ? `<div class="card warn small"><b>Handy-Vorschau.</b> Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus. Zum Mitnehmen: Mehr → Daten → „Lernstand als Text kopieren“.</div>` : ''}
+      ${PREVIEW ? `<div class="card warn small"><b>Handy-Vorschau.</b> Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus.</div>` : ''}
       <div class="card violet">
-        <div class="row between">
-          <div><span class="badge real">Ziel: eJPT</span> <span class="badge plain">${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length} Räume geknackt</span></div>
-          <span class="small muted">${loc ? loc.icon + ' ' + esc(loc.label) : 'Lernort nicht gewählt'}</span>
-        </div>
-        <h1 style="margin-top:.5rem">Hallo ${esc(state.profile.name)} – auf dem Weg zum Pentester</h1>
-        <div class="bar" aria-label="Fortschritt ${p.pct}%"><i style="width:${p.pct}%"></i></div>
-        <p class="small muted">Linux-Grundlagen: ${p.done} von ${p.total} Schritten · Lektionen sind Nachschlagewerk – du musst nicht alles vorher lesen.</p>
-        <div class="kpis"><div class="kpi"><b>${xp}</b><span>Kurs-XP</span></div><div class="kpi"><b>${Object.values(state.exercises).filter(e => e.passedAt).length}</b><span>Übungen bestanden</span></div><div class="kpi"><b>${roomPointsTotal()}</b><span>Raum-Punkte</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>Tage-Serie</span></div><div class="kpi"><b>${earnedBadges().length}/${BADGES.length}</b><span>Abzeichen</span></div><div class="kpi"><b>${s1?.done ? STORY.s1.points : 0}</b><span>Story-Punkte</span></div></div>
+        <div class="row between"><span class="badge real">Ziel: eJPT</span><a class="small" href="#/profil" style="color:inherit">${earnedBadges().length} Abzeichen →</a></div>
+        <h1 style="margin:.5rem 0 .3rem">Hallo ${esc(state.profile.name)}!</h1>
+        <div class="bar" aria-label="${done} von ${ROOMS.length} geknackt"><i style="width:${Math.round(done / ROOMS.length * 100)}%"></i></div>
+        <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>Tage in Folge</span></div></div>
       </div>
 
-      <a class="card lime" href="${nx.href}" style="display:block;text-decoration:none;color:inherit">
-        <span class="badge real">Nächster Schritt</span>
+      ${cont ? `<a class="card lime" href="#/raum/${cont.id}" style="display:block;text-decoration:none;color:inherit">
+        <span class="badge real">Weitermachen</span>
+        <h2 style="margin:.4rem 0 .2rem">${esc(cont.title)}</h2>
+        <div class="bar"><i style="width:${roomPct(cont.id)}%"></i></div>
+        <span class="small muted">${roomPct(cont.id)} % geschafft · ${cont.machine.kind === 'sandbox' ? '📱 geht überall' : '🖥️ Kali-VM'} →</span>
+      </a>` : `<a class="card lime" href="${nx.href}" style="display:block;text-decoration:none;color:inherit">
+        <span class="badge real">Los geht’s</span>
         <h2 style="margin:.4rem 0 .2rem">${esc(nx.title)}</h2>
-        <span class="small muted">${nx.kind === 'lesson' ? 'Lektion – erst verstehen, dann üben' : nx.kind === 'ex' ? (nx.e.kind === 'real' ? 'Echter Auftrag in deiner Kali-Umgebung' : 'Übung in der Sandbox-Simulation') : nx.kind === 'story' ? 'Story-Mission' : nx.kind === 'room' ? 'Raum mit Flags – feststecken ist normal, Lektionen helfen' : ''} →</span>
-      </a>
+        <span class="small muted">Feststecken ist normal – jede Frage hat Tipps →</span>
+      </a>`}
 
-      <div class="card">
-        <h2>Tagesmission ${esc(new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }))}</h2>
-        <p class="small muted">Neue Aufgaben nach deinem Stand plus Wiederholungen aus dem Archiv (ohne neue XP).</p>
-        <ul class="list">${daily.map(id => exItem(id, true)).join('') || '<li class="item muted">Alles erledigt – wiederhole frei im Archiv.</li>'}</ul>
-      </div>
+      ${loc === 'pc' ? section('🖥️', 'Jetzt am PC', pcList) + section('📱', 'Für unterwegs', phoneList) : loc === 'phone' ? section('📱', 'Jetzt am Handy', phoneList) + section('🖥️', 'Wenn du am PC bist', pcList) : section('📱', 'Am Handy', phoneList) + section('🖥️', 'Am PC (Kali)', pcList)}
 
-      <a class="card" href="#/raeume" style="display:block;text-decoration:none;color:inherit">
-        <span class="badge plain">Räume</span> <span class="badge real">Flags · Zielmaschinen</span>
-        <h3 style="margin-top:.5rem">${ROOMS.filter(r => !roomLock(r).length).length} von ${ROOMS.length} Räumen offen · ${ROOMS.filter(r => roomDone(r.id)).length} gemeistert</h3>
-        <p class="small muted">Walkthroughs mit Erklärungen, Challenges ohne Anleitung – Flags findest du nur durch echte Arbeit.</p>
-      </a>
-      <div class="grid two">
-        <a class="card" href="#/story/s1" style="text-decoration:none;color:inherit;display:block">
-          <span class="badge sim">Story-Lab</span> <span class="badge real">+ echte Kali-Schritte</span>
-          <h3 style="margin-top:.5rem">${esc(STORY.s1.title)}</h3>
-          <p class="small muted">${esc(STORY.s1.teaser)}</p>
-          <span class="small">${s1?.done ? '✓ abgeschlossen' : s1 ? `Szene ${(s1.scene || 0) + 1} von ${STORY.s1.scenes.length}` : storyLocked(STORY.s1) ? '🔒 Voraussetzungen offen' : 'Bereit →'}</span>
-        </a>
-        <a class="card" href="#/pruefung/L1" style="text-decoration:none;color:inherit;display:block">
-          <span class="badge plain">Freiwillig</span>
-          <h3 style="margin-top:.5rem">Meisterprüfung Linux</h3>
-          <p class="small">${pre.ok ? '✓ Bereit – teste dich, wenn du Lust hast.' : `Noch offen: ${pre.missLessons.length} Lektion(en), ${pre.missEx.length} Pflichtübung(en).`}</p>
-          <p class="small muted">Bringt das Abzeichen „Linux-Grundlagen“. Sperrt nichts.</p>
-        </a>
-      </div>
+      <a class="card" href="#/pfad" style="display:block;text-decoration:none;color:inherit"><b>Alles ansehen →</b><br><span class="small muted">Alle Wargames, Räume und Level bis zum eJPT</span></a>
 
-      <div class="card">
-        <span class="badge plain">Außerhalb der App weitertrainieren</span>
+      <details class="card">
+        <summary><b>Außerhalb der App weitertrainieren</b></summary>
         <ul class="list" style="margin-top:.4rem">
           ${EXTERNAL.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener noreferrer"><span class="state">↗</span><span class="grow"><span class="t">${esc(x.name)}</span><span class="s">${esc(x.why)}</span></span><span class="badge ${x.free ? 'ok' : 'plain'}">${x.free ? 'gratis' : 'teils gratis'}</span></a></li>`).join('')}
         </ul>
         <p class="small muted">Alles legale Übungsumgebungen. Hacke nur Ziele, die dir gehören oder für die du ausdrücklich eine Erlaubnis hast.</p>
-      </div>
+      </details>
     </section>`,
   };
 };
@@ -249,7 +238,7 @@ function exItem(id, showRepeat) {
   const locked = !lessonDone(e.lesson);
   return `<li><a href="#/uebung/${id}">
     <span class="state ${done ? 'done' : locked ? 'lock' : ''}">${done ? '✓' : locked ? '🔒' : ''}</span>
-    <span class="grow"><span class="t">${esc(e.title)}</span><span class="s">${kindLabel(e)}${done && showRepeat ? ' · Wiederholung ohne XP' : ''}${locked ? ' · erst Lektion lesen' : ''}</span></span>
+    <span class="grow"><span class="t">${esc(e.title)}</span><span class="s">${kindLabel(e)}${done && showRepeat ? ' · Wiederholung ohne Punkte' : ''}${locked ? ' · erst Lektion lesen' : ''}</span></span>
     ${e.kind === 'real' ? '<span class="badge real">echt</span>' : '<span class="badge sim">sim</span>'}
   </a></li>`;
 }
@@ -258,26 +247,35 @@ function kindLabel(e) {
 }
 
 // ---------------------------------------------------------------- Lernpfad
-views.pfad = () => ({
-  html: `<h1>Lernpfad: vom Linux-Anfänger zum Pentester</h1>
-  <p class="muted">Endziel: bereit für das <b>eJPT</b> (praktische Einstiegsprüfung für Pentester). Alles ist offen – spring rein, wo du Lust hast. Linux lernst du unterwegs, weil du es brauchst.</p>
-  <ul class="list card">${LEVELS.map(l => {
-    const unlocked = levelUnlocked(l.id);
-    const passed = examPassed(state, l.id, EXAMS[l.id]?.items.length || 1);
-    return `<li><a href="#/level/${l.id}">
-      <span class="state ${passed ? 'done' : unlocked ? '' : 'lock'}">${passed ? '✓' : unlocked ? l.n : '🔒'}</span>
-      <span class="grow"><span class="t">Level ${l.n} – ${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span>
-      ${ROOMS.some(r => r.level === l.id) ? `<span class="badge plain">${ROOMS.filter(r => r.level === l.id).length} Räume</span>` : ''}${l.status === 'ready' ? '' : '<span class="badge plain">in Vorbereitung</span>'}
-    </a></li>`;
-  }).join('')}</ul>`,
-});
+views.pfad = () => {
+  const withRooms = LEVELS.filter(l => l.id === 'L1' || ROOMS.some(r => r.level === l.id && r.type !== 'wargame'));
+  const later = LEVELS.filter(l => !withRooms.includes(l));
+  return {
+    html: `<h1>Lernen</h1>
+    <p class="muted small">Vom Linux-Anfänger bis zum <b>eJPT</b>. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
+    <h2 style="margin-top:1rem">🎮 Wargames</h2>
+    <p class="small muted">Linux als Spiel: Jede Lösung öffnet das nächste Level.</p>
+    ${ROOMS.filter(r => r.type === 'wargame').map(roomCard).join('')}
+    ${withRooms.map(l => `<h2 style="margin-top:1.2rem">Level ${l.n} · ${esc(l.title)}</h2>
+      <p class="small muted" style="margin-top:-.2rem">${esc(l.goal)}</p>
+      ${ROOMS.filter(r => r.level === l.id && r.type !== 'wargame').map(roomCard).join('')}
+      ${l.id === 'L1' ? `<div class="grid two">
+        <a class="card tight" href="#/level/L1" style="display:block;text-decoration:none;color:inherit"><b>📖 Linux-Spickzettel</b><br><span class="small muted">${LESSONS.length} Kapitel zum Nachschlagen + Übungen</span></a>
+        <a class="card tight ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><b>🎬 ${esc(STORY.s1.title)}</b><br><span class="small muted">Story-Mission${storyLocked(STORY.s1).length ? ' · braucht ein paar Übungen' : ''}</span></a>
+      </div>` : ''}
+      ${l.id === 'L3' ? `<a class="card tight" href="#/level/L3" style="display:block;text-decoration:none;color:inherit"><b>🌐 Lernpfad PortSwigger</b><br><span class="small muted">Kostenlose Web-Hacking-Labs, in sinnvoller Reihenfolge</span></a>` : ''}`).join('')}
+    <h2 style="margin-top:1.2rem">Demnächst</h2>
+    <ul class="list card">${later.map(l => `<li><a href="#/level/${l.id}"><span class="state">${l.n}</span><span class="grow"><span class="t">${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span></a></li>`).join('')}</ul>`,
+  };
+};
+views.raeume = views.pfad;
 
 views.level = (id) => {
   const l = LEVELS.find(x => x.id === id) || LEVELS[0];
   const unlocked = levelUnlocked(l.id);
   if (l.id !== 'L1') {
     return {
-      html: `<a class="back" href="#/pfad">← Lernpfad</a>
+      html: `<a class="back" href="#/pfad">← Lernen</a>
       <h1>Level ${l.n} – ${esc(l.title)}</h1>
       <div class="card">${ROOMS.some(r => r.level === l.id) ? '<b>Los geht’s</b> – die Räume unten sind spielbar, weitere folgen.' : '<b>In Vorbereitung</b> – neue Räume für dieses Level kommen nach und nach. Bis dahin: passende Räume auf den Plattformen unter „Heute → Außerhalb der App“.'}</div>
       <div class="card stack"><p>${esc(l.goal)}</p>
@@ -291,8 +289,8 @@ views.level = (id) => {
   }
   const pre = examPrereqs();
   return {
-    html: `<a class="back" href="#/pfad">← Lernpfad</a>
-    <h1>Level 1 – Linux Grundlagen</h1>
+    html: `<a class="back" href="#/pfad">← Lernen</a>
+    <h1>📖 Linux-Spickzettel</h1>
     <p class="muted">${esc(l.goal)}</p>
     <div class="stack">${LESSONS.map((ls, i) => `
       <div class="card tight">
@@ -303,7 +301,7 @@ views.level = (id) => {
         <ul class="list" style="margin-left:2.2rem">${ls.exercises.map(id => exItem(id)).join('')}</ul>
       </div>`).join('')}
       ${ROOMS.filter(r => r.level === 'L1').map(roomCard).join('')}
-      <a class="card ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><span class="badge sim">Story</span> <b>${esc(STORY.s1.title)}</b><br><span class="small muted">Empfohlen vor der Prüfung · bringt Story-Punkte, keine Prüfungsfreigabe</span></a>
+      <a class="card ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><span class="badge sim">Story</span> <b>${esc(STORY.s1.title)}</b><br><span class="small muted">Story-Mission mit echten Kali-Schritten</span></a>
       <a class="card ${pre.ok ? 'violet' : ''}" href="#/pruefung/L1" style="display:block;text-decoration:none;color:inherit"><b>Meisterprüfung Linux (freiwillig)</b><br><span class="small muted">${pre.ok ? 'Bereit' : 'Möglich nach allen Lektionen und Pflichtübungen'} · bringt ein Abzeichen, sperrt nichts</span></a>
     </div>`,
   };
@@ -315,7 +313,7 @@ views.lektion = (id) => {
   if (!l) return views.pfad();
   const idx = LESSONS.indexOf(l);
   return {
-    html: `<a class="back" href="#/level/L1">← Level 1</a>
+    html: `<a class="back" href="#/level/L1">← Spickzettel</a>
     <span class="badge plain">Lektion ${idx + 1} / ${LESSONS.length}</span>
     <h1 style="margin-top:.4rem">${esc(l.title)}</h1>
     <p>${esc(l.intro)}</p>
@@ -391,7 +389,7 @@ views.uebung = (id) => {
   const isReal = e.kind === 'real';
   return {
     html: `<a class="back" href="#/lektion/${e.lesson}">← ${esc(LESSON[e.lesson].title)}</a>
-    <div class="row">${isReal ? '<span class="badge real">Echter Auftrag · deine Kali-VM / Termux</span>' : '<span class="badge sim">Sandbox-Simulation</span>'}<span class="badge plain">${esc(kindLabel(e))}</span>${repeat ? '<span class="badge ok">bestanden · Wiederholung ohne XP</span>' : `<span class="badge plain">${e.xp} XP</span>`}</div>
+    <div class="row">${isReal ? '<span class="badge real">Echter Auftrag · deine Kali-VM / Termux</span>' : '<span class="badge sim">Sandbox-Simulation</span>'}<span class="badge plain">${esc(kindLabel(e))}</span>${repeat ? '<span class="badge ok">bestanden · Wiederholung ohne Punkte</span>' : `<span class="badge plain">${e.xp} Punkte</span>`}</div>
     <h1 style="margin-top:.5rem">${esc(e.title)}</h1>
     <div class="stack">
       <div class="task-meta">
@@ -503,7 +501,7 @@ views.uebung = (id) => {
         $('#debrief', root).innerHTML = `<div class="card lime debrief"><h3>Nachbesprechung</h3><dl>
           <dt>Beobachtung</dt><dd>${esc(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${esc(n.schluss)}</dd>
           <dt>Grenzen</dt><dd>${esc(n.grenzen)}</dd><dt>Möglicher nächster Test</dt><dd>${esc(n.naechster)}</dd></dl>
-          <p class="small">${first ? `✓ Bestanden · +${e.xp} Kurs-XP` : '✓ Wiederholung erfolgreich (ohne XP)'}${run.hintShown ? ' · mit Hinweis' : ''}</p>
+          <p class="small">${first ? `✓ Bestanden · +${e.xp} Punkte` : '✓ Wiederholung erfolgreich (ohne Punkte)'}${run.hintShown ? ' · mit Hinweis' : ''}</p>
           ${nextAfter(e)}</div>`;
         $('#debrief', root).scrollIntoView({ behavior: 'smooth', block: 'start' });
       };
@@ -562,7 +560,7 @@ views.story = (id = 's1') => {
       <div id="tw"></div>
       <div class="card tight"><b class="small">Fallverlauf</b><ul class="timeline" id="tl"></ul></div>
     </div>
-    <p class="honest">Story-Punkte sind getrennt von Kurs-XP und schalten keine Prüfung frei. Die Fallakte im Terminal ist SIMULIERT; Szenen mit „echt“ führst du in deiner eigenen Kali-VM/Termux aus und belegst sie hier.</p>`,
+    <p class="honest">Die Fallakte im Terminal ist SIMULIERT; Szenen mit „echt“ führst du in deiner eigenen Kali-VM/Termux aus und belegst sie hier.</p>`,
     keepScroll: false,
     mount(root) {
       const sh = new Shell({ fs: baseFS() });
@@ -599,7 +597,7 @@ views.story = (id = 's1') => {
           if (ss.scene < s.scenes.length - 1) term.printHTML('<span class="good">Weiter mit: weiter</span>');
           else {
             if (!ss.done) { ss.done = true; ss.doneAt = Date.now(); }
-            term.printHTML(`<span class="good">★ Mission abgeschlossen · +${s.points} Story-Punkte (keine Kurs-XP)</span>`);
+            term.printHTML(`<span class="good">★ Mission abgeschlossen · +${s.points} Punkte</span>`);
             term.printHTML(`<span class="warn">${esc(tok(s.finalCleanup))}</span>`);
           }
           save(); renderCard(); renderTL();
@@ -748,7 +746,7 @@ views.story = (id = 's1') => {
 // ---------------------------------------------------------------- Prüfung
 views.pruefung = (lv = 'L1') => {
   const ex = EXAMS[lv];
-  if (!ex) return { html: `<a class="back" href="#/pfad">← Lernpfad</a><div class="card warn">Für dieses Level gibt es noch keine Prüfung.</div>` };
+  if (!ex) return { html: `<a class="back" href="#/pfad">← Lernen</a><div class="card warn">Für dieses Level gibt es noch keine Prüfung.</div>` };
   const pre = examPrereqs(lv);
   const attempts = state.exams[lv]?.attempts || [];
   const passed = examPassed(state, lv, ex.items.length);
@@ -830,7 +828,7 @@ views.archiv = () => {
   const seen = EXERCISES.filter(e => state.archive[e.id] || isPassed(e.id));
   return {
     html: `<a class="back" href="#/mehr">← Mehr</a><h1>Aufgabenarchiv</h1>
-    <p class="muted small">Jede begonnene Aufgabe bleibt hier dauerhaft und kann ohne neue XP wiederholt werden.</p>
+    <p class="muted small">Jede begonnene Aufgabe bleibt hier dauerhaft und kann ohne neue Punkte wiederholt werden.</p>
     ${LESSONS.map(l => {
       const xs = seen.filter(e => e.lesson === l.id);
       return xs.length ? `<div class="card tight" style="margin-bottom:.7rem"><b>${esc(l.title)}</b><ul class="list">${xs.map(e => exItem(e.id, true)).join('')}</ul></div>` : '';
@@ -878,7 +876,7 @@ views.mehr = () => {
     <div class="stack">
       <div class="card"><ul class="list">
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
-        <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne XP)</span></span></a></li>
+        <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
         <li><a href="#/werkzeuge"><span class="state">⚒</span><span class="grow"><span class="t">Werkzeuge</span><span class="s">Kali-Tools: Zweck, Scope, Beleg</span></span></a></li>
         <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen (freiwillig)</span><span class="s">Meisterprüfung Linux</span></span></a></li>
         <li><button class="item" id="loc" style="width:100%;background:none;border:0;text-align:left;cursor:pointer"><span class="state">📍</span><span class="grow"><span class="t">Lernort ändern</span><span class="s">${esc(LOCATIONS[state.location]?.label || 'nicht gewählt')}</span></span></button></li>
@@ -886,7 +884,7 @@ views.mehr = () => {
 
       <div class="card">
         <h2>Synchronisierung PC ↔ Handy</h2>
-        <p class="small"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}</p>
+        <p class="small" id="syncline">${syncLine(st)}</p>
         ${!syncConfigured() ? `<p class="small muted">Noch nicht eingerichtet. Anleitung: <code>docs/SUPABASE-SETUP.md</code> im Projekt. Bis dahin: Lernstand per Export/Import übertragen.</p>` :
         st.user ? `<p class="small">Angemeldet als <b>${esc(st.user.email)}</b></p><div class="row"><button class="btn small" id="syncnow">Jetzt synchronisieren</button><button class="btn small ghost" id="logout">Abmelden</button></div>` :
           `<label for="em">E-Mail</label><input type="email" id="em" autocomplete="username"><label for="pw">Passwort</label><input type="password" id="pw" autocomplete="current-password">
@@ -1076,17 +1074,6 @@ function earnedBadges() {
   return BADGES.filter(b => map[b.id]);
 }
 
-views.raeume = () => ({
-  html: `<h1>Räume</h1>
-  <p class="muted small">Wie auf einer CTF-Lernplattform: Jeder Raum hat Tasks mit Fragen und Flags. <b>Walkthroughs</b> erklären, <b>Challenges</b> prüfen deine Selbstständigkeit. Flags werden aus deinem persönlichen Token berechnet – du findest sie nur durch eigene Arbeit.</p>
-  <h2 style="margin-top:1rem">Wargames – Linux als Spiel</h2>
-  <p class="small muted">Jede Lösung öffnet das nächste Level. Zwei getrennte Geschichten: eine fürs Handy, eine für die Kali-VM.</p>
-  ${ROOMS.filter(r => r.type === 'wargame').map(roomCard).join('')}
-  ${LEVELS.filter(l => ROOMS.some(r => r.level === l.id) || l.id === 'L1').map(l => `<h2 style="margin-top:1rem">Level ${l.n} · ${esc(l.title)}</h2>
-    ${ROOMS.filter(r => r.level === l.id && r.type !== 'wargame').map(roomCard).join('')}
-    ${l.id === 'L1' ? `<a class="card tight ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><span class="badge sim">Story-Mission</span> <span class="badge real">+ echte Schritte</span><b style="display:block;margin-top:.4rem">${storyLocked(STORY.s1).length ? '🔒 ' : ''}${esc(STORY.s1.title)}</b><span class="small muted">${esc(STORY.s1.teaser)}</span></a>` : ''}`).join('')}`,
-});
-
 function sshMachineHTML(r) {
   const m = r.machine;
   const base = location.origin + location.pathname.replace(/[^/]*$/, '') + `labs/${m.lab}/`;
@@ -1213,7 +1200,7 @@ views.raum = (id) => {
   const r = ROOM[id];
   if (!r) return views.raeume();
   const lock = roomLock(r);
-  const head = `<a class="back" href="#/raeume">← Räume</a>
+  const head = `<a class="back" href="#/pfad">← Lernen</a>
     <div class="row">${typeBadge(r)}<span class="badge plain">Level ${LEVELS.find(l => l.id === r.level).n}</span><span class="badge plain">${esc(r.difficulty)}</span>${machineBadge(r)}</div>
     <h1 style="margin-top:.5rem">${esc(r.title)}</h1><p>${esc(r.desc)}</p>`;
   if (lock.length) return { html: head + `<div class="card warn"><b>🔒 Gesperrt</b><ul>${lock.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` };
@@ -1324,7 +1311,7 @@ views.profil = () => {
   const days = [...Array(28)].map((_, i) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - 27 + i); return today(d); });
   return {
     html: `<a class="back" href="#/mehr">← Mehr</a><h1>${esc(state.profile.name)}s Profil</h1>
-    <div class="kpis" style="grid-template-columns:repeat(2,1fr)"><div class="kpi"><b>${computeXp(state, EX)}</b><span>Kurs-XP</span></div><div class="kpi"><b>${roomPointsTotal()}</b><span>Raum-Punkte</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>Tage-Serie</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>Räume gemeistert</span></div></div>
+    <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>Tage in Folge</span></div></div>
     <div class="card" style="margin-top:.8rem"><h3>Letzte 4 Wochen</h3>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
     <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${esc(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
@@ -1334,7 +1321,8 @@ views.profil = () => {
 
 // ---------------------------------------------------------------- Start
 window.addEventListener('hashchange', render);
-onSyncStatus(() => renderTop());
+function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
+onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
 render();
 locationModal(false);
 initSync(getState, applyState);

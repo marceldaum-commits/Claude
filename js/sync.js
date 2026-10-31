@@ -43,7 +43,12 @@ export async function initSync(getState, applyState) {
     const c = await getClient();
     const { data } = await c.auth.getSession();
     user = data.session?.user || null;
-    c.auth.onAuthStateChange((_e, session) => { user = session?.user || null; if (user) syncNow(getState, applyState); else setStatus('warn', 'Nicht angemeldet'); });
+    // Wichtig: Supabase-Aufrufe NICHT direkt im Auth-Callback ausführen (kann sich gegenseitig blockieren) – kurz verschieben.
+    c.auth.onAuthStateChange((event, session) => {
+      user = session?.user || null;
+      if (!user) { setStatus('warn', 'Nicht angemeldet'); return; }
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') setTimeout(() => syncNow(getState, applyState), 0);
+    });
     if (user) await syncNow(getState, applyState);
     else setStatus('warn', 'Nicht angemeldet');
     window.addEventListener('online', () => syncNow(getState, applyState));
@@ -77,7 +82,8 @@ export async function syncNow(getState, applyState) {
   try {
     setStatus('busy', 'Synchronisiere …');
     const c = await getClient();
-    const { data, error } = await c.from('progress').select('state, updated_at').eq('user_id', user.id).maybeSingle();
+    const timeout = (pr) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error('Zeitüberschreitung')), 15000))]);
+    const { data, error } = await timeout(c.from('progress').select('state, updated_at').eq('user_id', user.id).maybeSingle());
     if (error) throw error;
     const local = getState();
     let merged = local;
@@ -88,7 +94,7 @@ export async function syncNow(getState, applyState) {
         applyState(merged);
       }
     }
-    const { error: e2 } = await c.from('progress').upsert({ user_id: user.id, state: merged, updated_at: new Date().toISOString() });
+    const { error: e2 } = await timeout(c.from('progress').upsert({ user_id: user.id, state: merged, updated_at: new Date().toISOString() }));
     if (e2) throw e2;
     setStatus('ok', 'Synchronisiert ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }));
   } catch (e) {
