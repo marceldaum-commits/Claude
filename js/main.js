@@ -122,7 +122,7 @@ function renderTop() {
 
 function renderNav(route) {
   const items = [['heute', '⌂', 'Start'], ['pfad', '◆', 'Lernen'], ['terminal', '>_', 'Terminal'], ['mehr', '≡', 'Mehr']];
-  const map = { lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad' };
+  const map = { 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad' };
   const on = map[route] || route;
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
 }
@@ -872,6 +872,68 @@ views.werkzeuge = () => ({
   </div>`).join('')}</div>`,
 });
 
+// ---------------------------------------------------------------- Labs vom Handy (Variante A: Tailscale + SSH in die Kali-VM)
+views['handy-labs'] = () => {
+  const ip = state.settings.tsip || '';
+  const host = ip || '100.x.y.z';
+  const user = state.settings.kaliUser || 'kali';
+  const step = (n, t, body) => `<div class="card stack"><h3 style="margin:0"><span class="state" style="display:inline-grid;margin-right:.4rem;vertical-align:middle">${n}</span>${t}</h3>${body}</div>`;
+  return {
+    html: `<a class="back" href="#/mehr">← Mehr</a>
+    <h1>📱 Labs vom Handy spielen</h1>
+    <p class="muted">Die Labs (Kellerserver, Juice Shop, Zielmaschinen) laufen weiter in deiner Kali-VM. Das Handy verbindet sich über ein privates VPN (<b>Tailscale</b>, kostenlos) mit der VM. Nichts davon ist im Internet offen.</p>
+    <div class="card warn small"><b>Voraussetzung:</b> Der PC mit der Kali-VM läuft (und geht nicht in den Ruhezustand).</div>
+    <div class="stack">
+    ${step(1, 'Kali-VM: Tailscale installieren', `
+      <p class="small">Einmalig im Kali-Terminal. Der zweite Befehl zeigt einen Link – im Browser öffnen und mit deinem Konto anmelden (Google, Microsoft oder E-Mail).</p>
+      ${scriptBlock('Installieren:', 'curl -fsSL https://tailscale.com/install.sh | sh')}
+      ${scriptBlock('Anmelden:', 'sudo tailscale up')}
+      ${scriptBlock('Deine Tailscale-Adresse anzeigen:', 'tailscale ip -4')}
+      <label class="small"><b>Adresse hier eintragen</b> (beginnt mit 100.) – dann stimmen alle Befehle unten:</label>
+      <div class="row" style="flex-wrap:nowrap"><input type="text" id="tsip" inputmode="decimal" placeholder="100.x.y.z" value="${esc(ip)}" autocapitalize="off"><button class="btn small primary" id="tssave">Speichern</button></div>`)}
+    ${step(2, 'Kali-VM: SSH einschalten und Passwort ändern', `
+      <p class="small">Damit das Handy sich anmelden kann. <b>Wichtig:</b> Wenn dein Kali noch das Standardpasswort <code>kali</code> hat, ändere es jetzt.</p>
+      ${scriptBlock('SSH-Dienst starten (auch nach Neustart):', 'sudo apt install -y openssh-server\nsudo systemctl enable --now ssh')}
+      ${scriptBlock('Eigenes Passwort setzen:', 'passwd')}
+      <label class="small">Dein Benutzername in Kali (meist <code>kali</code>):</label>
+      <div class="row" style="flex-wrap:nowrap"><input type="text" id="kuser" value="${esc(user)}" autocapitalize="off"><button class="btn small" id="kusave">Speichern</button></div>`)}
+    ${step(3, 'Handy: Tailscale-App', `
+      <p class="small">Im Play Store <b>„Tailscale“</b> installieren und mit <b>demselben Konto</b> anmelden. In der App siehst du danach deine Kali-VM in der Geräteliste.</p>`)}
+    ${step(4, 'Handy: Termux verbinden', `
+      <p class="small">Termux aus F-Droid (die Play-Store-Version ist veraltet). Einmalig SSH installieren, dann verbinden:</p>
+      ${scriptBlock('Einmalig:', 'pkg update && pkg install openssh')}
+      ${scriptBlock('Verbinden:', `ssh ${user}@${host}`)}
+      <p class="small muted">Beim ersten Mal fragt SSH „Are you sure…?“ → <code>yes</code>. Dann dein Kali-Passwort. Du bist jetzt im Kali-Terminal – vom Handy aus.</p>`)}
+    ${step(5, 'Spielen', `
+      <p class="small"><b>Kellerserver:</b> In der Handy-SSH-Sitzung den Server starten (Befehle aus dem Raum) und von dort anmelden:</p>
+      ${scriptBlock('In der Kali-Sitzung:', 'ssh azubi@127.0.0.1 -p 2220')}
+      <p class="small"><b>Webseiten (Juice Shop, Zielmaschinen r1/r3) im Handy-Browser:</b> Mit einem SSH-Tunnel leitest du den Port der VM aufs Handy um. Das läuft in einer eigenen Termux-Sitzung (vom linken Rand wischen → New session):</p>
+      ${scriptBlock('Tunnel für den Juice Shop:', `ssh -N -L 3000:127.0.0.1:3000 ${user}@${host}`)}
+      <p class="small">Dann im Handy-Browser: <code>http://127.0.0.1:3000</code>. Für andere Labs die Zahl tauschen (z. B. 10080 für r1).</p>`)}
+    ${step(6, 'Danach', `
+      <ul class="small" style="margin:0;padding-left:1.1rem">
+        <li>Labs stoppen: <code>docker stop kly-keller</code> bzw. <code>docker stop juice-shop</code></li>
+        <li>Unterwegs ohne Bedarf: Tailscale am Handy ausschalten.</li>
+        <li>Tipp für lange Sitzungen: <code>tmux</code> in Kali – die Sitzung läuft weiter, auch wenn das Handy die Verbindung verliert (<code>tmux attach</code>).</li>
+      </ul>`)}
+    </div>
+    <p class="honest">Warum ist das sicher? Die Labs lauschen nur auf 127.0.0.1 in der VM. Das Handy kommt nur über das verschlüsselte, private Tailscale-Netz an die VM – und nur mit deinem Kali-Passwort.</p>`,
+    mount(root) {
+      bindCopy(root);
+      $('#tssave', root).onclick = () => {
+        const v = $('#tsip', root).value.trim();
+        if (v && !/^100\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(v)) { toast('Tailscale-Adressen beginnen mit 100. – z. B. 100.101.102.103'); return; }
+        state.settings.tsip = v; save(); render(); toast('Gespeichert – die Befehle sind angepasst.');
+      };
+      $('#kusave', root).onclick = () => {
+        const v = $('#kuser', root).value.trim();
+        if (!/^[a-z_][a-z0-9_-]{0,31}$/.test(v)) { toast('Benutzernamen bestehen aus Kleinbuchstaben, Ziffern, - und _.'); return; }
+        state.settings.kaliUser = v; save(); render(); toast('Gespeichert.');
+      };
+    },
+  };
+};
+
 // ---------------------------------------------------------------- Mehr / Konto / Daten
 let deferredInstall = null;
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; });
@@ -886,6 +948,7 @@ views.mehr = () => {
       <div class="card"><ul class="list">
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
+        <li><a href="#/handy-labs"><span class="state">📱</span><span class="grow"><span class="t">Labs vom Handy spielen</span><span class="s">Kellerserver & Co. über deine Kali-VM – mit Tailscale, gratis</span></span></a></li>
         <li><a href="#/werkzeuge"><span class="state">⚒</span><span class="grow"><span class="t">Werkzeuge</span><span class="s">Kali-Tools: Zweck, Scope, Beleg</span></span></a></li>
         <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen (freiwillig)</span><span class="s">Meisterprüfung Linux</span></span></a></li>
         <li><button class="item" id="loc" style="width:100%;background:none;border:0;text-align:left;cursor:pointer"><span class="state">📍</span><span class="grow"><span class="t">Lernort ändern</span><span class="s">${esc(LOCATIONS[state.location]?.label || 'nicht gewählt')}</span></span></button></li>
@@ -1091,7 +1154,7 @@ function sshMachineHTML(r) {
   return `<div class="card lime stack" id="machine">
     <div class="row between"><h3 style="margin:0">Server ${esc(m.name)}</h3><span class="badge real">echt · nur 127.0.0.1</span></div>
     <p class="small">SSH-Port <code>127.0.0.1:${m.port}</code> · Token: <code>${esc(state.labToken)}</code> · Nur am PC (Kali-VM mit Docker).</p>
-    ${state.location === 'phone' ? '<div class="feedback info small">Du bist gerade am Handy. Dieses Spiel läuft in der Kali-VM – am Handy wartet „Nachtfalter“ auf dich.</div>' : ''}
+    <a class="btn small" href="#/handy-labs" style="align-self:flex-start">📱 Vom Handy spielen (über deine Kali-VM)</a>
     ${roomState(r.id).startedAt ? '' : '<button class="btn go" id="startm">▶ Server starten – Anleitung anzeigen</button>'}
     <div id="mhow" ${roomState(r.id).startedAt ? '' : 'hidden'}>
       <details><summary>Einmalig: Docker prüfen / einrichten</summary>
@@ -1115,7 +1178,7 @@ function extMachineHTML(r) {
   return `<div class="card lime stack" id="machine">
     <div class="row between"><h3 style="margin:0">Übungs-App ${esc(m.name)}</h3><span class="badge real">echt · nur 127.0.0.1</span></div>
     <p class="small">Adresse: <code>http://127.0.0.1:${m.port}</code> · Nur am PC (Kali-VM mit Docker).</p>
-    ${state.location === 'phone' ? '<div class="feedback info small">Du bist gerade am Handy. Am Handy wartet „Was die Webseite verrät“.</div>' : ''}
+    <a class="btn small" href="#/handy-labs" style="align-self:flex-start">📱 Vom Handy spielen (über deine Kali-VM)</a>
     ${roomState(r.id).startedAt ? '' : '<button class="btn go" id="startm">▶ App starten – Anleitung anzeigen</button>'}
     <div id="mhow" ${roomState(r.id).startedAt ? '' : 'hidden'}>
       <details><summary>Einmalig: Docker prüfen / einrichten</summary>

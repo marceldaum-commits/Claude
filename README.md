@@ -21,6 +21,13 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Labs vom Handy spielen (ab 1.8.0)
+
+Mehr → „Labs vom Handy spielen“: Schritt-für-Schritt-Anleitung, um Kellerserver, Juice Shop und Zielmaschinen
+vom Handy aus zu nutzen. Die Labs bleiben in der Kali-VM auf `127.0.0.1`; das Handy verbindet sich über **Tailscale**
+(privates VPN, kostenlos) per SSH mit der VM, Webseiten per SSH-Tunnel (`ssh -N -L PORT:127.0.0.1:PORT`).
+Tailscale-Adresse und Kali-Benutzer lassen sich eintragen, damit die Befehle direkt passen.
+
 ## Netzwerk-Aufklärung (ab 1.7.0, Level 2)
 
 - **n1 Inventur bei den Stadtwerken** (Handy + PC, Sandbox): erfundenes Firmennetz `10.10.20.0/24` mit sechs Geräten,
