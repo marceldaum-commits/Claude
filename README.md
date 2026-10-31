@@ -21,6 +21,19 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Purple-Team-Leitern für Level 5–8 und 10 (ab 2.3.0)
+
+Prüfer-/Purple-Team-Sicht: Fehlkonfigurationen finden, die ein Angreifer nutzen würde, bewerten und schließen –
+ohne Exploits oder Passwort-Knacken. Je 6–8 Stufen, erfundene Systeme, alle per Test durchgespielt.
+
+| Leiter | Level | Themen |
+|---|---|---|
+| p5 Audit im Rechenzentrum | 5 | zweite UID 0, leere Passwörter, fremde SUID-Programme, sudo NOPASSWD ALL, beschreibbare Cron-Skripte, PATH, SSH-root |
+| p6 Der Passwort-Tresor | 6 | Hash-Arten erkennen, fehlender Salt, Richtlinien, Geheimnisse im Code, Salt-Prüfung, Leak-Abgleich, bcrypt-Kostenfaktor |
+| p7 Schwachstellen-Sprechstunde | 7 | Inventar ↔ Datenbank, `suche` (wie searchsploit), CVSS, Fehlalarm per Gegenprobe, Patch-Kontrolle, Priorisierung |
+| p8 Das Firmennetz | 8 | SMB-Freigaben, Geheimnis-Dateien, AD-Konten, verschachtelte Admin-Gruppen, alte Konten, SMBv1, Ereignis 4625 |
+| p10 Die Abschlussprüfung | 10 | Scope, Header, Pfadsuche, Leck bewerten, Konten prüfen, Logs, Kodierung, Maßnahmen priorisieren |
+
 ## Fünf weitere Leitern (ab 2.2.0)
 
 Lernen → 🎮 Leitern, sortiert nach Art und Schwierigkeit (je 10 Stufen, Story, Tipp-Leiter, 🔁):

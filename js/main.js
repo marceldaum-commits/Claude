@@ -262,7 +262,7 @@ views.pfad = () => {
     <p class="muted small">Vom Linux-Anfänger bis zum <b>eJPT</b>. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
     <h2 style="margin-top:1rem">🎮 Leitern</h2>
     <p class="small muted">Rätsel-Ketten mit Story: Jede Lösung öffnet die nächste Stufe. Fang oben an und arbeite dich hoch.</p>
-    ${[['linux', '🐧 Linux-Leitern', ['Einstieg', 'mittel', 'Skripte', 'schwerer', 'schwer']], ['hacking', '🏴 Hacking-Leitern (CTF)', ['leicht', 'mittel', 'schwer']], ['kali', '🖥️ In deiner Kali-VM', ['echtes SSH']]].map(([tr, title, order]) => `
+    ${[['linux', '🐧 Linux-Leitern', ['Einstieg', 'mittel', 'Skripte', 'schwerer', 'schwer']], ['hacking', '🏴 Hacking-Leitern (CTF)', ['leicht', 'mittel', 'schwer']], ['purple', '🟣 Purple-Team-Leitern (prüfen, finden, absichern)', ['Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 10']], ['kali', '🖥️ In deiner Kali-VM', ['echtes SSH']]].map(([tr, title, order]) => `
       <h3 style="margin:.9rem 0 .4rem">${title}</h3>
       ${ROOMS.filter(r => r.track === tr).sort((a, b) => order.indexOf(a.stufe) - order.indexOf(b.stufe)).map(roomCard).join('')}`).join('')}
     ${withRooms.map(l => `<h2 style="margin-top:1.2rem">Level ${l.n} · ${esc(l.title)}</h2>
@@ -275,9 +275,9 @@ views.pfad = () => {
       </div>` : ''}
       ${l.id === 'L2' ? `<a class="card tight" href="#/level/L2" style="display:block;text-decoration:none;color:inherit"><b>🎯 Lernpfad: echte Scans ohne Abo</b><br><span class="small muted">Eigene Zielmaschine + kostenlose Hack-The-Box-Maschinen</span></a>` : ''}
       ${l.id === 'L3' ? `<a class="card tight" href="#/level/L3" style="display:block;text-decoration:none;color:inherit"><b>🌐 Lernpfad PortSwigger</b><br><span class="small muted">Kostenlose Web-Hacking-Labs, in sinnvoller Reihenfolge</span></a>` : ''}`).join('')}
-    <h2 style="margin-top:1.2rem">Demnächst</h2>
+    ${later.length ? `<h2 style="margin-top:1.2rem">Demnächst</h2>
     <p class="small muted">Für diese Level gibt es noch keine eigenen Räume – aber einen Lernpfad mit kostenlosen Übungsquellen.</p>
-    <ul class="list card">${later.map(l => `<li><a href="#/level/${l.id}"><span class="state">${l.n}</span><span class="grow"><span class="t">${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span>${PFADE[l.id] ? '<span class="badge plain">Lernpfad</span>' : ''}</a></li>`).join('')}</ul>`,
+    <ul class="list card">${later.map(l => `<li><a href="#/level/${l.id}"><span class="state">${l.n}</span><span class="grow"><span class="t">${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span>${PFADE[l.id] ? '<span class="badge plain">Lernpfad</span>' : ''}</a></li>`).join('')}</ul>` : ''}`,
   };
 };
 views.raeume = views.pfad;
@@ -1145,6 +1145,7 @@ function earnedBadges() {
     'funkturm': roomDone('w4'),
     'leitern-linux': roomDone('w5') && roomDone('w8'),
     'leitern-ctf': roomDone('w6') && roomDone('w7') && roomDone('w9'),
+    'purple': ['p5', 'p6', 'p7', 'p8', 'p10'].every(roomDone),
     'ermittler': roomDone('b1'),
     'erster-raum': done.length > 0,
     'ohne-hinweis': done.some(r => !Object.keys(state.rooms[r.id]?.hints || {}).length),

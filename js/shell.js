@@ -164,6 +164,8 @@ function breToJs(p) {
     const c = p[i];
     if (c === '\\' && i + 1 < p.length) { const n = p[i + 1]; out += '+?(){}|'.includes(n) ? n : '\\' + n; i++; }
     else if ('+?(){}|'.includes(c)) out += '\\' + c;
+    else if (c === '$' && i !== p.length - 1) out += '\\$';
+    else if (c === '^' && i !== 0 && p[i - 1] !== '[') out += '\\^';
     else out += c;
   }
   return out;
@@ -475,7 +477,7 @@ export class Shell {
   }
 
   _while(st) {
-    const m = st.match(/^(?:([\s\S]*?)\|\s*)?while\s+read\s+(?:-r\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*(?:;|\n)\s*do\b([\s\S]*)$/);
+    const m = st.match(/^(?:([\s\S]*?)\|\s*)?while\s+read\s+(?:-r\s+)?([A-Za-z_][A-Za-z0-9_]*(?:\s+[A-Za-z_][A-Za-z0-9_]*)*)\s*(?:;|\n)\s*do\b([\s\S]*)$/);
     if (!m) return { out: '', err: 'bash: In der Sandbox geht: while read ZEILE; do …; done < DATEI  oder  … | while read ZEILE; do …; done\n', code: 2 };
     const end = findClose(m[3], 'done');
     if (end < 0) return { out: '', err: 'bash: Syntaxfehler: „done“ fehlt\n', code: 2 };
@@ -487,7 +489,9 @@ export class Shell {
     let out = '', code = 0;
     for (const line of input.replace(/\n$/, '').split('\n').slice(0, 5000)) {
       if (!input) break;
-      this.uvars[m[2]] = line;
+      const names = m[2].split(/\s+/);
+      if (names.length === 1) this.uvars[names[0]] = line;
+      else { const w = line.trim().split(/\s+/); names.forEach((n, k) => { this.uvars[n] = k === names.length - 1 ? w.slice(k).join(' ') : (w[k] ?? ''); }); }
       const r = this._script(body); out += r.out || ''; err += r.err || ''; code = r.code;
       if (r.exit || this._exitReq) break;
     }
