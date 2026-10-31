@@ -69,9 +69,9 @@ veröffentlicht wird.
 
 ## Veröffentlichen
 
-Die App ist eine statische Seite. Sie kann auf jedem statischen Hosting laufen, das **https** bietet.
-Private Bereitstellung: Hosting mit Zugriffsschutz wählen (z. B. Cloudflare Pages + Cloudflare Access,
-Netlify mit Passwortschutz). `index.html` setzt `noindex`.
+Privat über **Cloudflare Pages + Cloudflare Access** – Schritt für Schritt in
+[docs/CLOUDFLARE-DEPLOY.md](docs/CLOUDFLARE-DEPLOY.md). Kein Build-Schritt nötig; `_headers` setzt
+Sicherheits-Header (CSP, noindex). Sync-Einrichtung: [docs/SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md).
 
 ## Projektstruktur
 

@@ -1,0 +1,16 @@
+# Cloudflare Pages: Sicherheits-Header für alle Seiten
+/*
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://unkmvjdvcehkweutzyqw.supabase.co wss://unkmvjdvcehkweutzyqw.supabase.co https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+
+# Immer frisch laden, damit Updates sofort ankommen
+/sw.js
+  Cache-Control: no-cache
+/config.js
+  Cache-Control: no-cache
+/app-files.js
+  Cache-Control: no-cache

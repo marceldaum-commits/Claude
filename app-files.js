@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '1.1.0';
+self.KLY_VERSION = '1.1.1';
 self.KLY_FILES = [
   'index.html',
   'manifest.webmanifest',
@@ -30,4 +30,4 @@ self.KLY_FILES = [
   'icons/apple-touch-icon.png',
 ];
 // Zusätzliche Dateien nur für den App-Download (nicht offline gecacht)
-self.KLY_EXTRA = ['README.md', 'supabase/schema.sql', 'docs/SUPABASE-SETUP.md'];
+self.KLY_EXTRA = ['README.md', 'supabase/schema.sql', 'docs/SUPABASE-SETUP.md', 'docs/CLOUDFLARE-DEPLOY.md'];
