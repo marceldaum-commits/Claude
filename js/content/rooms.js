@@ -65,7 +65,7 @@ const BASE_ROOMS = [
         id: 't4', title: 'Tief vergraben',
         body: 'Irgendwo unter ~/raum0/archiv liegt eine Datei mit der Endung .key. Finde sie, ohne dich durch alle Ordner zu klicken.',
         questions: [
-          { id: 'q1', type: 'text', q: 'Vollständiger Pfad ab ~ (z. B. ~/raum0/…)', accept: [/^(~|\/home\/seppi)\/raum0\/archiv\/2026\/q2\/tief\/drin\/zugang\.key$/], points: 5, hints: ["find mit -name und einem Muster in Anführungszeichen.", "Gesucht ist eine Datei mit Endung .key irgendwo unter archiv.", "Lösung: find ~/raum0/archiv -name \"*.key\""] },
+          { id: 'q1', type: 'text', q: 'Vollständiger Pfad ab ~ (z. B. ~/raum0/…)', accept: [/^(?:(?:~|\/home\/seppi)\/raum0\/|\.\/|raum0\/)?archiv\/2026\/q2\/tief\/drin\/zugang\.key$/], points: 5, hints: ["find mit -name und einem Muster in Anführungszeichen.", "Gesucht ist eine Datei mit Endung .key irgendwo unter archiv.", "Lösung: find ~/raum0/archiv -name \"*.key\""] },
           { id: 'q2', type: 'flag', flag: 'find', q: 'Flag aus der .key-Datei', points: 10, hints: ["cat auf den gefundenen Pfad.", "Lösung: cat ~/raum0/archiv/2026/q2/tief/drin/zugang.key"] },
         ],
       },
