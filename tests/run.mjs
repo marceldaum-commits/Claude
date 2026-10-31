@@ -11,6 +11,7 @@ import { LEVEL1 } from '../js/content/level1.js';
 import { STORY1 } from '../js/content/story1.js';
 import { LEVELS } from '../js/content/curriculum.js';
 import { ROOMS, BADGES } from '../js/content/rooms.js';
+import { EXTERN } from '../js/content/extern.js';
 import { flagFor } from '../js/flags.js';
 import { streak, markActivity } from '../js/state.js';
 import { spawn, execFileSync } from 'node:child_process';
@@ -561,6 +562,15 @@ await at('Leitern: Scope – fremde Ziele werden verweigert', async () => {
   ok(s.exec('curl http://8.8.8.8/').err.includes('SANDBOX-SCOPE')); ok(s.exec('curl http://example.com/').err.includes('resolve'));
 });
 
+t('Externe Lernpfade: vollständig, Vorbereitungen existieren, Sync behält Haken', () => {
+  const ids = new Set();
+  for (const pf of EXTERN) {
+    ok(/^https:\/\//.test(pf.url) && pf.was && pf.kosten && pf.start.length, pf.id);
+    for (const g of pf.gruppen) for (const x of g.schritte) { const k = `${pf.id}.${x.id}`; ok(!ids.has(k), 'doppelt ' + k); ids.add(k); ok(ROOMS.some(r => r.id === x.prep), `${k}: Vorbereitung ${x.prep} fehlt`); }
+  }
+  const a = defaultState(), b = defaultState(); a.extern = { 'htb.meow': 5 }; b.extern = { 'htb.meow': 3, 'htb.fawn': 9 };
+  eq(mergeStates(a, b).extern, { 'htb.meow': 3, 'htb.fawn': 9 });
+});
 t('W2 Kellerserver: Codes und Scope', () => {
   const sh = readFileSync(join(ROOT, 'labs/kly-keller/setup.sh'), 'utf8');
   const df = readFileSync(join(ROOT, 'labs/kly-keller/Dockerfile'), 'utf8');

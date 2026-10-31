@@ -29,6 +29,7 @@ export function defaultState() {
     daily: {},                // YYYY-MM-DD -> [exerciseIds]
     rooms: {},                // roomId -> { startedAt, answers:{ 'tX.qY': {ok, at, attempts} }, hints:{}, doneAt }
     activity: {},             // YYYY-MM-DD -> Anzahl erfolgreicher Lernaktionen (für Serien)
+    extern: {},               // Schritt-ID externer Lernpfade -> erledigt am (Zeitstempel)
     settings: { sound: false },
     updatedAt: 0,
   };
@@ -52,7 +53,7 @@ export function loadState(storage = globalThis.localStorage) {
 export function upgrade(s) {
   const d = defaultState();
   const out = { ...d, ...s };
-  for (const k of ['lessons', 'exercises', 'exams', 'story', 'archive', 'daily', 'settings', 'profile', 'rooms', 'activity']) out[k] = { ...d[k], ...(s?.[k] || {}) };
+  for (const k of ['lessons', 'exercises', 'exams', 'story', 'archive', 'daily', 'settings', 'profile', 'rooms', 'activity', 'extern']) out[k] = { ...d[k], ...(s?.[k] || {}) };
   if (!out.labToken) out.labToken = d.labToken;
   if (!out.deviceId) out.deviceId = d.deviceId;
   out.schema = SCHEMA;
@@ -145,6 +146,13 @@ export function mergeStates(a, b) {
       if (attemptValid(at)) map.set(at.id, at);
     }
     out.exams[lv] = { attempts: [...map.values()].sort((p, q) => p.at - q.at) };
+  }
+
+  // Externe Lernpfade: abgehakt bleibt abgehakt (frühestes Datum)
+  out.extern = {};
+  for (const id of new Set([...Object.keys(a.extern || {}), ...Object.keys(b.extern || {})])) {
+    const v = minPos(a.extern?.[id], b.extern?.[id]);
+    if (v) out.extern[id] = v;
   }
 
   // Story: weitester Fortschritt, Belege vereinigen

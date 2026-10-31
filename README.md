@@ -21,6 +21,13 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Externe Lernpfade (ab 2.4.0)
+
+Lernen → 🌍 Externe Lernpfade: Checklisten für Hack The Box Starting Point (Tier 0–2), OWASP Juice Shop
+(Meilensteine), PortSwigger Web Security Academy, OverTheWire Bandit, picoCTF und ein isoliertes
+Metasploitable-2-Labor. Jeder Schritt nennt die vorbereitende Leiter der App; Haken werden synchronisiert
+(Zusammenführen: frühestes Datum) und bringen je 10 Punkte. Die App verlinkt nur – Inhalte liefern die Anbieter.
+
 ## Purple-Team-Leitern für Level 5–8 und 10 (ab 2.3.0)
 
 Prüfer-/Purple-Team-Sicht: Fehlkonfigurationen finden, die ein Angreifer nutzen würde, bewerten und schließen –

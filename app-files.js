@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '2.3.0';
+self.KLY_VERSION = '2.4.0';
 self.KLY_FILES = [
   'index.html',
   'manifest.webmanifest',
@@ -29,6 +29,7 @@ self.KLY_FILES = [
   'js/content/leiter.js',
   'js/content/leitern.js',
   'js/content/leitern2.js',
+  'js/content/extern.js',
   'labs/kly-target/server.py',
   'labs/kly-target/Dockerfile',
   'labs/kly-target/README.md',

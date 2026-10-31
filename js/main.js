@@ -10,6 +10,7 @@ import { flagFor, normFlag } from './flags.js';
 import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
+import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
@@ -122,7 +123,7 @@ function renderTop() {
 
 function renderNav(route) {
   const items = [['heute', '⌂', 'Start'], ['pfad', '◆', 'Lernen'], ['terminal', '>_', 'Terminal'], ['mehr', '≡', 'Mehr']];
-  const map = { 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad' };
+  const map = { extern: 'pfad', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad' };
   const on = map[route] || route;
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
 }
@@ -167,7 +168,8 @@ function render() {
 
 // ---------------------------------------------------------------- Heute
 // Gesamtpunkte: eine einzige Währung (Räume/Wargames + Übungen + Story)
-function totalPoints() { return roomPointsTotal() + computeXp(state, EX) + (state.story.s1?.done ? STORY.s1.points : 0); }
+const EXTERN_POINTS = 10;
+function totalPoints() { return roomPointsTotal() + computeXp(state, EX) + (state.story.s1?.done ? STORY.s1.points : 0) + Object.keys(state.extern || {}).length * EXTERN_POINTS; }
 // Wo spielbar? sandbox = überall (Browser), target = PC (Docker) oder Handy (Termux), ssh/ext = nur PC
 const onPhone = (r) => r.machine.kind === 'sandbox' || r.machine.kind === 'target';
 const onPC = (r) => r.machine.kind !== 'sandbox';
@@ -260,6 +262,10 @@ views.pfad = () => {
   return {
     html: `<h1>Lernen</h1>
     <p class="muted small">Vom Linux-Anfänger bis zum <b>eJPT</b>. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
+    <a class="card lime" href="#/extern" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
+      <b>🌍 Externe Lernpfade</b> <span class="badge plain">${Object.keys(state.extern || {}).length} abgehakt</span><br>
+      <span class="small muted">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF, Metasploitable – hier lernst du das Ausnutzen, legal. Mit Checklisten.</span>
+    </a>
     <h2 style="margin-top:1rem">🎮 Leitern</h2>
     <p class="small muted">Rätsel-Ketten mit Story: Jede Lösung öffnet die nächste Stufe. Fang oben an und arbeite dich hoch.</p>
     ${[['linux', '🐧 Linux-Leitern', ['Einstieg', 'mittel', 'Skripte', 'schwerer', 'schwer']], ['hacking', '🏴 Hacking-Leitern (CTF)', ['leicht', 'mittel', 'schwer']], ['purple', '🟣 Purple-Team-Leitern (prüfen, finden, absichern)', ['Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 10']], ['kali', '🖥️ In deiner Kali-VM', ['echtes SSH']]].map(([tr, title, order]) => `
@@ -878,6 +884,49 @@ views.werkzeuge = () => ({
   </div>`).join('')}</div>`,
 });
 
+// ---------------------------------------------------------------- Externe Lernpfade (Checklisten)
+views.extern = () => {
+  const done = (id) => !!state.extern?.[id];
+  const allSteps = (pf) => pf.gruppen.flatMap(g => g.schritte);
+  return {
+    html: `<a class="back" href="#/pfad">← Lernen</a>
+    <h1>🌍 Externe Lernpfade</h1>
+    <p class="muted small">Legale Übungsplattformen, auf denen du auch das <b>Ausnutzen</b> von Schwachstellen übst – an Zielen, die genau dafür gebaut sind. Hak ab, was du geschafft hast (+${EXTERN_POINTS} Punkte je Schritt, auf Ehrenwort). Bei jedem Schritt steht, welche Leiter der App dich vorbereitet.</p>
+    <div class="stack">${EXTERN.map(pf => {
+      const st = allSteps(pf), n = st.filter(x => done(`${pf.id}.${x.id}`)).length;
+      return `<details class="card" ${n && n < st.length ? 'open' : ''}>
+        <summary><b>${pf.icon} ${esc(pf.title)}</b> <span class="badge ${n === st.length ? 'ok' : 'plain'}">${n}/${st.length}</span></summary>
+        <div class="bar" style="margin:.5rem 0"><i style="width:${Math.round(n / st.length * 100)}%"></i></div>
+        <p class="small">${esc(pf.was)}</p>
+        <p class="small muted">💶 ${esc(pf.kosten)}</p>
+        <p class="small"><a href="${pf.url}" target="_blank" rel="noopener noreferrer">↗ Zur Plattform</a></p>
+        <details class="small"><summary>So startest du</summary><ol style="padding-left:1.2rem;margin:.4rem 0">${pf.start.map(x => `<li>${esc(x)}</li>`).join('')}</ol></details>
+        ${pf.gruppen.map(g => `<h4 style="margin:.8rem 0 .3rem">${esc(g.name)}</h4>
+          <ul class="list">${g.schritte.map(x => {
+            const key = `${pf.id}.${x.id}`, ok = done(key), prep = ROOM[x.prep];
+            return `<li><a href="#" data-ext="${key}" role="checkbox" aria-checked="${ok}">
+              <span class="state ${ok ? 'done' : ''}">${ok ? '✓' : ''}</span>
+              <span class="grow"><span class="t">${esc(x.t)}</span><span class="s">${esc(x.thema)}${prep ? ` · Vorbereitung: ${esc(prep.title)}${roomDone(prep.id) ? ' ✓' : ''}` : ''}</span></span>
+            </a>${prep && !roomDone(prep.id) ? `<a class="small" href="#/raum/${prep.id}" style="display:block;margin:-.3rem 0 .5rem 2.6rem">→ erst ${esc(prep.title)} üben</a>` : ''}</li>`;
+          }).join('')}</ul>`).join('')}
+      </details>`;
+    }).join('')}</div>
+    <p class="honest">Die App verlinkt nur. Inhalte, Kosten und Namen bestimmen die Anbieter – Stand nach bestem Wissen, kann sich ändern. Übe nur auf diesen Plattformen bzw. in deinem eigenen, abgeschotteten Labor.</p>`,
+    keepScroll: false,
+    mount(root) {
+      root.addEventListener('click', (e) => {
+        const a = e.target.closest('[data-ext]'); if (!a) return;
+        e.preventDefault();
+        const key = a.dataset.ext;
+        state.extern = state.extern || {};
+        if (state.extern[key]) delete state.extern[key]; else { state.extern[key] = Date.now(); markActivity(state); }
+        save();
+        const y = window.scrollY; render(); window.scrollTo(0, y);
+      });
+    },
+  };
+};
+
 // ---------------------------------------------------------------- Labs vom Handy (Variante A: Tailscale + SSH in die Kali-VM)
 views['handy-labs'] = () => {
   const ip = state.settings.tsip || '';
@@ -954,6 +1003,7 @@ views.mehr = () => {
       <div class="card"><ul class="list">
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
+        <li><a href="#/extern"><span class="state">🌍</span><span class="grow"><span class="t">Externe Lernpfade</span><span class="s">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF – zum Abhaken</span></span></a></li>
         <li><a href="#/handy-labs"><span class="state">📱</span><span class="grow"><span class="t">Labs vom Handy spielen</span><span class="s">Kellerserver & Co. über deine Kali-VM – mit Tailscale, gratis</span></span></a></li>
         <li><a href="#/werkzeuge"><span class="state">⚒</span><span class="grow"><span class="t">Werkzeuge</span><span class="s">Kali-Tools: Zweck, Scope, Beleg</span></span></a></li>
         <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen (freiwillig)</span><span class="s">Meisterprüfung Linux</span></span></a></li>
