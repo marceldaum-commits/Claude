@@ -41,6 +41,15 @@ function toast(msg, ms = 2600) {
   setTimeout(() => t.remove(), ms);
 }
 
+// Bestätigung ohne confirm(): erster Tipp fragt nach, zweiter Tipp (innerhalb 6 s) führt aus.
+function twoTap(btn, msg) {
+  if (btn.dataset.armed === '1') { btn.dataset.armed = ''; btn.textContent = btn.dataset.label; return true; }
+  btn.dataset.label = btn.textContent; btn.dataset.armed = '1'; btn.textContent = msg + ' – nochmal tippen';
+  setTimeout(() => { if (btn.dataset.armed === '1') { btn.dataset.armed = ''; btn.textContent = btn.dataset.label; } }, 6000);
+  return false;
+}
+const PREVIEW = !!self.KLY_PREVIEW;
+
 function shuffle(arr, seed) {
   const a = arr.slice();
   let s = seed || (Date.now() & 0xffffffff);
@@ -173,6 +182,7 @@ views.heute = () => {
   return {
     html: `
     <section class="stack">
+      ${PREVIEW ? `<div class="card warn small"><b>Handy-Vorschau.</b> Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus. Zum Mitnehmen: Mehr → Daten → „Lernstand als Text kopieren“.</div>` : ''}
       <div class="card violet">
         <div class="row between">
           <div><span class="badge plain">Level 1</span> <span class="badge ${examPassed(state, 'L1', EXAMS.L1.items.length) ? 'ok' : 'plain'}">${examPassed(state, 'L1', EXAMS.L1.items.length) ? 'Prüfung bestanden' : 'Prüfung offen'}</span></div>
@@ -772,7 +782,7 @@ function runExam(root, lv, ex) {
   $('#submit', box).onclick = () => {
     $$('[data-in]', box).forEach(i => { answers[i.dataset.in] = i.value; });
     const unanswered = items.filter(it => it.type !== 'sandbox' && (answers[it.id] === undefined || answers[it.id] === ''));
-    if (unanswered.length && !confirm(`${unanswered.length} Aufgabe(n) unbeantwortet. Trotzdem abgeben? Unbeantwortet zählt als falsch.`)) return;
+    if (unanswered.length && !twoTap($('#submit', box), `${unanswered.length} unbeantwortet (zählt als falsch)`)) return;
     const results = items.map(it => {
       let ok = false;
       if (it.type === 'mc') ok = answers[it.id] === it.answer;
@@ -857,6 +867,12 @@ views.mehr = () => {
         <h2>Daten</h2>
         <div class="row"><button class="btn" id="exp">Lernstand sichern (JSON)</button><label class="btn" style="margin:0">Lernstand importieren<input type="file" id="imp" accept="application/json,.json" hidden></label></div>
         <p class="small muted">Import führt zusammen (nichts wird überschrieben). Vorher wird automatisch gesichert.</p>
+        <div class="row"><button class="btn" id="copystate">Lernstand als Text kopieren</button></div>
+        <details><summary>Lernstand aus Text übernehmen</summary>
+          <textarea id="pastestate" placeholder="Kopierten Lernstand hier einfügen"></textarea>
+          <button class="btn" id="importtext" style="margin-top:.5rem">Zusammenführen</button>
+        </details>
+        <p class="small muted">Damit nimmst du deinen Stand ohne Datei mit, z. B. von der Handy-Vorschau in die Cloudflare-Version: kopieren, dort einfügen.</p>
         ${backups.length ? `<details><summary>Lokale Sicherungen (${backups.length})</summary><ul class="list">${backups.map((b, i) => `<li class="item"><span class="grow small">${new Date(b.at).toLocaleString('de-DE')} – ${esc(b.reason)}</span><button class="btn small" data-restore="${i}">Wiederherstellen</button></li>`).join('')}</ul></details>` : ''}
       </div>
 
@@ -900,6 +916,20 @@ views.mehr = () => {
     mount(root) {
       $('#loc', root).onclick = () => locationModal(true);
       $('#exp', root).onclick = () => exportStateJSON(state);
+      $('#copystate', root).onclick = async () => {
+        const txt = JSON.stringify({ ...state, kind: 'kali-level-up-lernstand', exportedAt: Date.now() });
+        try { await navigator.clipboard.writeText(txt); toast('Lernstand kopiert. In der anderen Version unter „Lernstand aus Text übernehmen“ einfügen.', 4500); }
+        catch { const t = $('#pastestate', root); t.closest('details').open = true; t.value = txt; t.select(); toast('Kopieren blockiert – Text ist markiert, bitte manuell kopieren.', 4500); }
+      };
+      $('#importtext', root).onclick = () => {
+        try {
+          const obj = JSON.parse($('#pastestate', root).value);
+          if (!obj || !obj.schema || !obj.lessons || !obj.exercises) throw new Error('Das ist kein Kali-Level-Up-Lernstand.');
+          pushBackup(state, 'vor Text-Import');
+          applyState(mergeStates(state, obj));
+          toast('Lernstand zusammengeführt.');
+        } catch (e) { toast(e.message.startsWith('Das ist') ? e.message : 'Text ist kein gültiger Lernstand.', 4000); }
+      };
       $('#imp', root).onchange = async (ev) => {
         const f = ev.target.files[0]; if (!f) return;
         try {
@@ -911,7 +941,7 @@ views.mehr = () => {
       };
       $$('[data-restore]', root).forEach(b => b.onclick = () => {
         const bk = listBackups()[+b.dataset.restore];
-        if (!bk || !confirm('Diese Sicherung mit dem aktuellen Stand zusammenführen?')) return;
+        if (!bk || !twoTap(b, 'Zusammenführen?')) return;
         pushBackup(state, 'vor Wiederherstellung');
         applyState(mergeStates(state, bk.state));
         toast('Sicherung zusammengeführt.');
@@ -923,7 +953,7 @@ views.mehr = () => {
       };
       $('#zip', root).onclick = async () => {
         const withState = $('#withstate', root).checked;
-        if (withState && !confirm('Der Download enthält deinen persönlichen Lernstand. Fortfahren?')) return;
+        if (withState && !twoTap($('#zip', root), 'Enthält deinen Lernstand')) return;
         try { const r = await exportApp({ includeState: withState, state }); toast(r.missing.length ? 'ZIP erstellt (einige Dateien fehlten, siehe WEITERGABE.txt).' : 'ZIP erstellt.'); }
         catch (e) { toast(e.message, 4000); }
       };
@@ -1014,7 +1044,7 @@ function machineHTML(r) {
   const name = `kly-${m.room}`;
   const ports = m.ports.map(p => `-p 127.0.0.1:${p}:${p}`).join(' ');
   const base = location.origin + location.pathname.replace(/[^/]*$/, '') + 'labs/kly-target/';
-  const httpsApp = location.protocol === 'https:';
+  const httpsApp = location.protocol === 'https:' && !PREVIEW; // Vorschau-Seite ist privat: curl käme nicht durch
   const fetchCmd = `mkdir -p ~/kly-labs/kly-target && cd ~/kly-labs/kly-target\ncurl -fsSL -O ${base}server.py -O ${base}Dockerfile`;
   const loc = state.location || 'pc';
   const pc = `
@@ -1025,7 +1055,7 @@ function machineHTML(r) {
     </details>
     <p class="small"><b>1. Lab-Dateien holen</b> – ${httpsApp ? 'per curl direkt aus der App:' : 'Download-Links unten in der VM öffnen oder die App-ZIP (Mehr → App herunterladen) entpacken. Ordner: ~/kly-labs/kly-target'}</p>
     ${httpsApp ? scriptBlock('Holen:', fetchCmd) : ''}
-    <p class="small"><a href="labs/kly-target/server.py" download>server.py</a> · <a href="labs/kly-target/Dockerfile" download>Dockerfile</a> · <a href="labs/kly-target/README.md" download>README</a></p>
+    ${PREVIEW ? `<p class="small">In der Vorschau per Zwischenablage: <button class="btn small" data-copyfile="labs/kly-target/server.py">server.py kopieren</button> <button class="btn small" data-copyfile="labs/kly-target/Dockerfile">Dockerfile kopieren</button> – jeweils in der VM mit <code>cat &gt; DATEINAME</code> einfügen, Enter, Strg+D.</p>` : `<p class="small"><a href="labs/kly-target/server.py" download>server.py</a> · <a href="labs/kly-target/Dockerfile" download>Dockerfile</a> · <a href="labs/kly-target/README.md" download>README</a></p>`}
     ${scriptBlock('2. Einmalig bauen:', 'cd ~/kly-labs/kly-target && docker build -t kly-target .')}
     ${scriptBlock('3. Maschine starten:', `docker run -d --rm --name ${name} -e KLY_TOKEN={{TOKEN}} ${ports} kly-target ${m.room}`)}
     ${scriptBlock('4. Prüfen:', `docker ps --filter name=${name}\ndocker logs ${name}`)}
@@ -1034,6 +1064,7 @@ function machineHTML(r) {
     <h4>📱 Handy: Termux (ohne Docker, ohne Root)</h4>
     ${scriptBlock('Einmalig prüfen:', 'command -v python || pkg install python')}
     ${httpsApp ? scriptBlock('Lab-Datei holen:', `mkdir -p ~/kly-labs && cd ~/kly-labs\ncurl -fsSL -O ${base}server.py`) : '<p class="small">server.py herunterladen (<a href="labs/kly-target/server.py" download>Link</a>) und nach ~/kly-labs kopieren.</p>'}
+    ${httpsApp && !PREVIEW ? '' : `<p class="small">Oder ohne Download: <button class="btn small" data-copyfile="labs/kly-target/server.py">server.py-Inhalt kopieren</button>, dann in Termux:</p>${scriptBlock('Datei anlegen:', 'mkdir -p ~/kly-labs && cat > ~/kly-labs/server.py')}<p class="small muted">Nach dem Befehl den kopierten Inhalt einfügen, Enter, dann Strg+D (in Termux: Lautstärke-leiser + D).</p>`}
     ${scriptBlock('Maschine starten (läuft im Vordergrund):', `cd ~/kly-labs && KLY_TOKEN={{TOKEN}} python server.py ${m.room}`)}
     <p class="small muted">Für deine Befehle eine zweite Termux-Sitzung öffnen (vom linken Rand wischen → „New session“). Stoppen: Strg+C im Server-Fenster.</p>`;
   return `<div class="card lime stack" id="machine">
@@ -1091,6 +1122,10 @@ views.raum = (id) => {
     <div id="rdone"></div>`,
     mount(root) {
       bindCopy(root);
+      $$('[data-copyfile]', root).forEach(b => b.onclick = async () => {
+        try { const txt = await (await fetch(b.dataset.copyfile)).text(); await navigator.clipboard.writeText(txt); toast('server.py kopiert (' + txt.split('\n').length + ' Zeilen).'); }
+        catch { toast('Kopieren nicht möglich – bitte am PC holen.', 4000); }
+      });
       const sm = $('#startm', root);
       if (sm) sm.onclick = () => { rs.startedAt = Date.now(); save(); sm.remove(); $('#mhow', root).hidden = false; };
       let sh = null;
