@@ -11,15 +11,30 @@ Dauer: ca. 20 Minuten. Kosten: 0 € (Free-Pläne).
 
 - **Adresse:** <https://kali-level-up.pages.dev>
 - Pages-Projekt `kali-level-up` per *Direct Upload* (wrangler), Produktions-Branch `main`.
-  Hochgeladen werden nur die App-Dateien (`KLY_FILES` + `KLY_EXTRA` aus `app-files.js` plus `_headers`) –
-  **kein** automatisches Deploy bei `git push`. Neue Version: Ordner mit diesen Dateien bauen und
-  `npx wrangler@3 pages deploy <ordner> --project-name=kali-level-up --branch=main`.
+  Hochgeladen werden nur die App-Dateien (`KLY_FILES` + `KLY_EXTRA` aus `app-files.js` plus `_headers`),
+  gebaut von `tools/build-deploy.sh`.
+- **Automatisch veröffentlichen:** `.github/workflows/deploy.yml` prüft bei jedem Push auf `main` oder
+  `ccr-63912bdd-xpv8bk` die App (`npm run check`) und lädt sie nur bei Erfolg hoch. Manuell:
+  `tools/build-deploy.sh dist && npx wrangler@3 pages deploy dist --project-name=kali-level-up --branch=main`.
 - Access-App **„Kali Level Up“** (Teil B2) für `kali-level-up.pages.dev` und `*.kali-level-up.pages.dev`,
-  Sitzung 720 h, Policy „Nur ich“ (Allow, eine E-Mail-Adresse).
+  Sitzung 8760 h (1 Jahr), Policy „Nur ich“ (Allow, eine E-Mail-Adresse).
 - Access-App **„Kali Level Up – öffentliche Dateien“** (Teil B3): `kali-level-up.pages.dev/labs` und `/icons`,
   Policy „Öffentlich“ (Bypass, Everyone) – geprüft: `labs/kly-target/server.py` lädt ohne Anmeldung.
 - Login-Methode *One-time PIN* musste **im Dashboard** ergänzt werden
   (Integrations → Identity providers, bzw. Settings → Authentication → Login methods).
+
+### Automatisch veröffentlichen einrichten (einmalig)
+
+1. **Cloudflare-Schlüssel anlegen:** Dashboard → *Manage account → Account API tokens* → **Create Token** →
+   *Create Custom Token*. Name `GitHub Deploy`, Recht: **Account → Cloudflare Pages → Edit**,
+   Ablauf: 1 Jahr (Erinnerung in den Kalender eintragen!). Schlüssel kopieren – er wird nur einmal angezeigt.
+2. **In GitHub hinterlegen:** Repository → *Settings → Secrets and variables → Actions* →
+   **New repository secret**:
+   - `CLOUDFLARE_API_TOKEN` = der neue Schlüssel
+   - `CLOUDFLARE_ACCOUNT_ID` = die Konto-ID (steht in der Dashboard-Adresse nach `dash.cloudflare.com/`)
+3. Test: *Actions → Veröffentlichen → Run workflow*. Grüner Haken = online.
+
+Bei jeder App-Änderung `KLY_VERSION` in `app-files.js` erhöhen, damit der Offline-Speicher sauber ersetzt wird.
 
 ---
 
