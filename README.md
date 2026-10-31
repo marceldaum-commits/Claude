@@ -21,6 +21,15 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Wargame „Der Funkturm“ (ab 2.1.0)
+
+Deutsches Linux-Wargame mit 20 Etagen (w4), mobil und am PC spielbar: Jede Nacht sendet der alte Funkturm von
+Radio Talheim ein fremdes Signal – Etage für Etage geht es nach oben. Themen: Leerzeichen/Bindestriche in Namen,
+`sed -n`, `wc -l`, `find -size/-perm`, `grep -v`, `uniq -u`, `diff`, `sort -t -k`, `cut -c`, doppeltes Base64,
+`rev`+ROT13, Rechte, Schleifen, Skripte lesen, `grep -n`+Zeilenbereiche, Auswertung von Anmeldungen.
+Die Sandbox-Shell kann dafür zusätzlich `diff`, `uniq -u/-d`, `sort -t/-k`, `cut -c`, `find -size/-empty`;
+`wc` rückt wie GNU wc ein, `exit` beendet Skripte.
+
 ## Level 4 und 9, Lernpfade für alle Level (ab 2.0.0)
 
 - **Mini-Bash in der Sandbox:** Variablen, `$(…)`, `$((…))`, `for`, `while read … < DATEI`, `if/elif/else` mit `[ … ]`,

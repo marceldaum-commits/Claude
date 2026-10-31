@@ -494,6 +494,47 @@ await at('B1 Spurensuche lösbar', async () => {
   ok(s.exec(`grep gruss logs/verlauf.txt | cut -d'"' -f2 | base64 -d`).out.includes(F.spur));
 });
 
+await at('W4 Funkturm: alle 20 Etagen mit den Lösungswegen', async () => {
+  const r = ROOMS.find(x => x.id === 'w4'); const F = {};
+  for (const f of r.flags) F[f] = await flagFor(TOKEN, 'w4', f);
+  const solved = [];
+  const s = new Shell({ fs: baseFS(), commands: r.commands({ F, solve: (f) => solved.push(f) }) }); r.setup(s, F, new Set());
+  const code = (t) => (t.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
+  const go = (n) => s.exec(`cd ~/turm/etage${String(n).padStart(2, '0')}`);
+  const fin = (n, out) => { eq(code(out), F['l' + n], `Etage ${n}: ${out.slice(0, 120)}`); ok(/Tür offen|Dachluke/.test(s.exec('entsperren ' + F['l' + n]).out), `entsperren ${n}`); };
+  const run = (c) => { const x = s.exec(c); return x.out + (x.err || ''); };
+  ok(go(1).err && go(1).err.includes('Keine Berechtigung'), 'Etage 1 anfangs zu');
+  go(0); fin(0, run('cat "Willkommen im Turm.txt"'));
+  go(1); ok(run('cat -funkzettel').length && !code(run('cat -funkzettel'))); fin(1, run('cat ./-funkzettel'));
+  go(2); fin(2, run("sed -n '777p' sendeprotokoll.log")); eq(code(run('head -n 777 sendeprotokoll.log | tail -n 1')), F.l2);
+  go(3); const b = run('wc -l baender/* | grep " 42 "').trim().split(/\s+/)[1]; ok(b, 'Band mit 42 Zeilen'); fin(3, run('cat ' + b));
+  go(4); const f4 = run('find archiv -size 73c').trim(); ok(f4 && !f4.includes('\n'), 'genau eine 73-Byte-Datei'); fin(4, run('cat ' + f4));
+  go(5); fin(5, run('grep -v "Signal stabil" messung.log'));
+  go(6); const u = run('sort frequenzen.txt | uniq -u').trim(); ok(!u.includes('\n'), 'genau eine'); fin(6, run(`cat kanaele/${u}.txt`));
+  go(7); fin(7, run('diff sender-alt.cfg sender-neu.cfg'));
+  go(8); const raum = run("sort -t';' -k3 -nr temperaturen.csv | head -1").split(';')[0]; fin(8, run(`cat raeume/${raum}.txt`));
+  go(9); fin(9, run('grep "^TURM" zeichensalat.txt | cut -c20-40'));
+  go(10); fin(10, run('base64 -d nachricht.b64 | base64 -d'));
+  go(11); fin(11, run("rev spiegel.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'"));
+  go(12); ok(run('ls').trim() === 'hinweis.txt'); run('chmod u+rx .wartungsschacht'); run('chmod u+r .wartungsschacht/schalter.txt'); fin(12, run('cat .wartungsschacht/schalter.txt'));
+  go(13); const f13 = run('find .anlagen -perm 600').trim(); ok(f13 && !f13.includes('\n')); fin(13, run('cat ' + f13));
+  go(14); const sum = run("cat messungen/* | awk '{s+=$1} END {print s}'").trim();
+  eq(run('s=0; for f in messungen/*; do s=$((s + $(cat $f))); done; echo $s').trim(), sum, 'Schleife = awk'); fin(14, run(`cat schloss/${sum}.txt`));
+  go(15); fin(15, run('while read w; do [ -f $w ] && cat $w; done < wegbeschreibung.txt'));
+  go(16); ok(run('./tor.sh').includes('Aufruf') && !run('./tor.sh').includes('Falsche'), 'exit beendet Skript'); ok(run('./tor.sh 5').includes('Falsche')); fin(16, run('./tor.sh 43'));
+  go(17); const nums = run('grep -n GEHEIM tagebuch.txt').trim().split('\n').map(l => parseInt(l, 10));
+  fin(17, run(`sed -n '${nums[0] + 1},${nums[1] - 1}p' tagebuch.txt | tr -d "\\n"`));
+  go(18); const wer = run('grep "^0[23]:" anmeldungen.log | cut -d= -f2 | sort | uniq -c | sort -nr | head -1').trim().split(/\s+/)[1]; fin(18, run(`cat spinde/${wer}.txt`));
+  go(19); const k = run('for k in sender/*; do if [ "$(cat $k/status)" = "AKTIV" ] && [ $(cat $k/frequenz) -gt 1030 ]; then echo $k; fi; done').trim();
+  ok(k && !k.includes('\n'), 'genau ein Kanal: ' + k); fin(19, run(`cat ${k}/schluessel`));
+  ok(run('cat ~/turm/dach/sender.txt').includes('Albers'));
+  eq(solved, r.flags);
+  for (const t of r.tasks) ok(/^Lösung/.test(t.questions[0].hints.at(-1)), `${t.id}: Lösung als letzter Tipp`);
+  // Neustart mit Fortschritt
+  const s2 = new Shell({ fs: baseFS(), commands: r.commands({ F, solve() {} }) }); r.setup(s2, F, new Set(['l0', 'l1', 'l2']));
+  ok(!s2.exec('ls ~/turm/etage03').err && s2.exec('ls ~/turm/etage04').err.includes('Keine Berechtigung'));
+});
+
 t('W2 Kellerserver: Codes und Scope', () => {
   const sh = readFileSync(join(ROOT, 'labs/kly-keller/setup.sh'), 'utf8');
   const df = readFileSync(join(ROOT, 'labs/kly-keller/Dockerfile'), 'utf8');

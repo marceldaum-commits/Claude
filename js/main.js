@@ -1139,6 +1139,7 @@ function earnedBadges() {
     'nachtfalter': roomDone('w1'),
     'kellerserver': roomDone('w2'),
     'kollektiv': roomDone('w3'),
+    'funkturm': roomDone('w4'),
     'ermittler': roomDone('b1'),
     'erster-raum': done.length > 0,
     'ohne-hinweis': done.some(r => !Object.keys(state.rooms[r.id]?.hints || {}).length),

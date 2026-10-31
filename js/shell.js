@@ -242,7 +242,7 @@ function splitIf(inner) {
 const KNOWN = ['pwd', 'whoami', 'id', 'hostname', 'date', 'ls', 'cd', 'mkdir', 'rmdir', 'touch', 'echo', 'cat', 'cp', 'mv', 'rm',
   'chmod', 'stat', 'find', 'grep', 'wc', 'head', 'tail', 'sort', 'uniq', 'cut', 'ps', 'jobs', 'sleep', 'kill', 'curl', 'getent',
   'clear', 'history', 'help', 'man', 'command', 'which', 'type', 'true', 'false', 'exit', 'uname', 'file',
-  'tr', 'sed', 'awk', 'seq', 'test', '[', 'bash', 'sh', 'export', 'read'];
+  'tr', 'sed', 'awk', 'seq', 'test', '[', 'bash', 'sh', 'export', 'read', 'diff'];
 
 const MAN = {
   pwd: 'pwd – zeigt das aktuelle Arbeitsverzeichnis als absoluten Pfad.',
@@ -308,7 +308,7 @@ export class Shell {
     const trimmed = line.trim();
     if (!trimmed) return { out: '', code: 0 };
     this.history.push(trimmed);
-    this._depth = 0;
+    this._depth = 0; this._exitReq = false;
     const r = this._script(trimmed);
     this._reap();
     return this._done(trimmed, r);
@@ -327,7 +327,7 @@ export class Shell {
         const r = this._statement(st);
         if (r.clear) { clear = true; out = ''; err = ''; }
         out += r.out || ''; err += r.err || ''; code = r.code ?? 0; this.lastCode = code;
-        if (r.exit) return { out, err, code, clear, exit: true };
+        if (r.exit || this._exitReq) return { out, err, code, clear, exit: true };
       }
       return { out, err, code, clear };
     } finally { this._depth--; }
@@ -368,7 +368,7 @@ export class Shell {
   }
 
   _arith(expr) {
-    const e = this._substitute(expr).replace(/\$?\{?([A-Za-z_][A-Za-z0-9_]*)\}?/g, (_, n) => String(parseInt(this._var(n), 10) || 0));
+    const e = this._substitute(expr).replace(/\$(\d+|#)/g, (_, n) => String(parseInt(this._var(n), 10) || 0)).replace(/\$?\{?([A-Za-z_][A-Za-z0-9_]*)\}?/g, (_, n) => String(parseInt(this._var(n), 10) || 0));
     if (!/^[\d\s+\-*/%()]+$/.test(e)) return 0;
     try { const v = Function('"use strict";return (' + e + ')')(); return Number.isFinite(v) ? Math.trunc(v) : 0; } catch { return 0; }
   }
@@ -408,7 +408,7 @@ export class Shell {
     for (const w of words.slice(0, 5000)) {
       this.uvars[m[1]] = w;
       const r = this._script(body); out += r.out || ''; err += r.err || ''; code = r.code;
-      if (r.exit) break;
+      if (r.exit || this._exitReq) break;
     }
     return this._after(rest, out, err, code);
   }
@@ -428,7 +428,7 @@ export class Shell {
       if (!input) break;
       this.uvars[m[2]] = line;
       const r = this._script(body); out += r.out || ''; err += r.err || ''; code = r.code;
-      if (r.exit) break;
+      if (r.exit || this._exitReq) break;
     }
     return this._after(rest, out, err, code);
   }
@@ -713,7 +713,7 @@ export class Shell {
   c_date() { return { out: new Date(this.now()).toString() + '\n', code: 0 }; }
   c_true() { return { out: '', code: 0 }; }
   c_false() { return { out: '', code: 1 }; }
-  c_exit() { return { out: 'Die Sandbox-Shell läuft weiter – „exit“ hat hier keine Wirkung.\n', code: 0 }; }
+  c_exit() { if (this._depth > 1) this._exitReq = true; return this._depth > 1 ? { out: '', code: 0, exit: true } : { out: 'Die Sandbox-Shell läuft weiter – „exit“ hat hier keine Wirkung.\n', code: 0 }; }
   c_clear() { return { out: '', code: 0, clear: true }; }
 
   c_history() {
@@ -868,6 +868,7 @@ export class Shell {
     args.forEach((a, i) => { this.uvars[String(i + 1)] = a; });
     this.uvars['#'] = String(args.length);
     const r = this._script(f.data.replace(/^#!.*\n/, ''));
+    this._exitReq = false;
     for (const k of Object.keys(this.uvars)) if (/^(\d+|#)$/.test(k)) delete this.uvars[k];
     Object.assign(this.uvars, Object.fromEntries(Object.entries(saved).filter(([k]) => /^(\d+|#)$/.test(k))));
     return { out: r.out, err: r.err, code: r.code };
@@ -1178,8 +1179,17 @@ export class Shell {
       if (a === '-name' || a === '-iname') { if (v === undefined) return { out: '', err: `find: Fehlendes Argument für „${a}“\n`, code: 1 }; const re = globToRe(a === '-iname' ? v.toLowerCase() : v); tests.push((n, name) => re.test(a === '-iname' ? name.toLowerCase() : name)); i++; }
       else if (a === '-type') { if (!['f', 'd'].includes(v)) return { out: '', err: `find: Unbekanntes Argument für -type: ${v}\n`, code: 1 }; tests.push((n) => n.t === v); i++; }
       else if (a === '-maxdepth') { maxdepth = parseInt(v, 10); i++; }
+      else if (a === '-empty') tests.push((n) => (n.t === 'f' ? n.data.length === 0 : Object.keys(n.kids).length === 0));
+      else if (a === '-size') {
+        const m = String(v ?? '').match(/^([+-]?)(\d+)([ckM]?)$/);
+        if (!m) return { out: '', err: 'find: -size erwartet z. B. 33c (Bytes), +1k, -100c\n', code: 1 };
+        const unit = m[3] === 'c' ? 1 : m[3] === 'M' ? 1048576 : m[3] === 'k' ? 1024 : 512;
+        const want = +m[2] * unit;
+        tests.push((n) => { if (n.t !== 'f') return false; const sz = new TextEncoder().encode(n.data).length; const sizeU = m[3] === 'c' ? sz : Math.ceil(sz / unit); return m[1] === '+' ? sizeU > +m[2] : m[1] === '-' ? sizeU < +m[2] : (m[3] === 'c' ? sz === want : sizeU === +m[2]); });
+        i++;
+      }
       else if (a === '-perm') { const want = v.replace(/^[-/]/, ''); const m = Shell.applyMode(0, want); const any = v.startsWith('/'); const all = v.startsWith('-'); tests.push((n) => { const mm = n.mode & 0o777; return all ? (mm & m) === m : any ? (mm & m) !== 0 : mm === m; }); i++; }
-      else return { out: '', err: `find: Unbekannte Bedingung „${a}“ (Sandbox kennt -name, -iname, -type, -maxdepth, -perm)\n`, code: 1 };
+      else return { out: '', err: `find: Unbekannte Bedingung „${a}“ (Sandbox kennt -name, -iname, -type, -maxdepth, -perm, -size, -empty)\n`, code: 1 };
     }
     let out = '', err = '';
     const walk = (path, n, depth) => {
@@ -1261,10 +1271,13 @@ export class Shell {
       const w = p.data.split(/\s+/).filter(Boolean).length;
       const c = new TextEncoder().encode(p.data).length;
       tot[0] += l; tot[1] += w; tot[2] += c;
-      const cols = []; if (sel.has('l')) cols.push(l); if (sel.has('w')) cols.push(w); if (sel.has('c')) cols.push(c);
-      out += (p.name === null && cols.length === 1 ? String(cols[0]) : cols.map(x => String(x).padStart(sel.size > 1 ? 7 : 1)).join(' ')) + (p.name ? ' ' + p.name : '') + '\n';
+      p.cols = []; if (sel.has('l')) p.cols.push(l); if (sel.has('w')) p.cols.push(w); if (sel.has('c')) p.cols.push(c);
     }
-    if (parts.length > 1) { const cols = []; if (sel.has('l')) cols.push(tot[0]); if (sel.has('w')) cols.push(tot[1]); if (sel.has('c')) cols.push(tot[2]); out += cols.join(' ') + ' insgesamt\n'; }
+    // Wie GNU wc: bei mehreren Dateien rechtsbündig auf die Breite der Gesamtsumme
+    const totCols = []; if (sel.has('l')) totCols.push(tot[0]); if (sel.has('w')) totCols.push(tot[1]); if (sel.has('c')) totCols.push(tot[2]);
+    const width = parts.length > 1 ? Math.max(...totCols.map(x => String(x).length)) : sel.size > 1 ? 7 : 1;
+    for (const p of parts) out += (p.name === null && p.cols.length === 1 ? String(p.cols[0]) : p.cols.map(x => String(x).padStart(width)).join(' ')) + (p.name ? ' ' + p.name : '') + '\n';
+    if (parts.length > 1) out += totCols.map(x => String(x).padStart(width)).join(' ') + ' insgesamt\n';
     return { out, err, code: err ? 1 : 0 };
   }
 
@@ -1286,10 +1299,14 @@ export class Shell {
   c_tail(a, s) { return this._headTail(a, s, true); }
 
   c_sort(args, stdin) {
-    const { flags, pos } = this._opts(args);
+    const { flags, vals, pos } = this._opts(args, ['t', 'k']);
     const { parts, err } = this._inputs(pos, stdin, 'sort');
     let lines = parts.map(p => p.data).join('').replace(/\n$/, '').split('\n').filter((l, i, a) => !(a.length === 1 && l === ''));
-    lines.sort(flags.has('n') ? (a, b) => parseFloat(a) - parseFloat(b) : (a, b) => a.localeCompare(b));
+    const kn = vals.k ? parseInt(vals.k, 10) : 0;
+    const keyNum = vals.k && /n/.test(vals.k.replace(/^\d+(,\d+)?/, ''));
+    const key = (l) => { if (!kn) return l; const f = vals.t !== undefined ? l.split(vals.t) : l.trim().split(/\s+/); return f.slice(kn - 1).join(vals.t ?? ' '); };
+    const num = flags.has('n') || keyNum;
+    lines.sort(num ? (a, b) => (parseFloat(key(a)) || 0) - (parseFloat(key(b)) || 0) : (a, b) => key(a).localeCompare(key(b)));
     if (flags.has('r')) lines.reverse();
     if (flags.has('u')) lines = lines.filter((l, i) => i === 0 || l !== lines[i - 1]);
     return { out: lines.length ? lines.join('\n') + '\n' : '', err, code: err ? 2 : 0 };
@@ -1301,18 +1318,57 @@ export class Shell {
     const lines = parts.map(p => p.data).join('').replace(/\n$/, '').split('\n');
     const res = [];
     for (const l of lines) { if (res.length && res[res.length - 1][0] === l) res[res.length - 1][1]++; else res.push([l, 1]); }
-    const out = res.filter(([l]) => l !== '' || lines.length > 1).map(([l, c]) => flags.has('c') ? `${String(c).padStart(7)} ${l}` : l).join('\n');
+    const out = res.filter(([l]) => l !== '' || lines.length > 1).filter(([, c]) => (flags.has('u') ? c === 1 : flags.has('d') ? c > 1 : true)).map(([l, c]) => flags.has('c') ? `${String(c).padStart(7)} ${l}` : l).join('\n');
     return { out: out ? out + '\n' : '', err, code: err ? 1 : 0 };
   }
 
   c_cut(args, stdin) {
-    const { vals, pos } = this._opts(args, ['d', 'f']);
-    if (!vals.f) return { out: '', err: 'cut: Sie müssen eine Liste von Feldern angeben (-f)\n', code: 1 };
-    const d = vals.d ?? '\t';
-    const fields = vals.f.split(',').map(x => parseInt(x, 10) - 1);
+    const { vals, pos } = this._opts(args, ['d', 'f', 'c']);
+    if (!vals.f && !vals.c) return { out: '', err: 'cut: Sie müssen eine Liste von Feldern (-f) oder Zeichen (-c) angeben\n', code: 1 };
+    const sel = (spec, n) => { // "1-3,5,7-" -> Indizes (0-basiert)
+      const out = [];
+      for (const part of String(spec).split(',')) {
+        const m = part.match(/^(\d*)-(\d*)$/);
+        if (m) { const a = m[1] ? +m[1] : 1, b = m[2] ? +m[2] : n; for (let i = a; i <= b; i++) out.push(i - 1); }
+        else if (/^\d+$/.test(part)) out.push(+part - 1);
+      }
+      return out;
+    };
     const { parts, err } = this._inputs(pos, stdin, 'cut');
     const lines = parts.map(p => p.data).join('').replace(/\n$/, '').split('\n');
-    return { out: lines.map(l => { const s = l.split(d); return s.length === 1 ? l : fields.map(f => s[f] ?? '').join(d); }).join('\n') + '\n', err, code: 0 };
+    if (vals.c) return { out: lines.map(l => { const ch = [...l]; return sel(vals.c, ch.length).map(i => ch[i] ?? '').join(''); }).join('\n') + '\n', err, code: 0 };
+    const d = vals.d ?? '\t';
+    return { out: lines.map(l => { const s = l.split(d); return s.length === 1 ? l : sel(vals.f, s.length).map(f => s[f]).filter(x => x !== undefined).join(d); }).join('\n') + '\n', err, code: 0 };
+  }
+
+  c_diff(args) {
+    const pos = args.filter(a => !a.startsWith('-'));
+    if (pos.length !== 2) return { out: '', err: 'Aufruf: diff DATEI1 DATEI2\n', code: 2 };
+    const A = this._readable(pos[0], 'diff'), B = this._readable(pos[1], 'diff');
+    if (A.err || B.err) return { out: '', err: (A.err || '') + (B.err || ''), code: 2 };
+    const a = A.data.replace(/\n$/, '').split('\n'), b = B.data.replace(/\n$/, '').split('\n');
+    if (a.length * b.length > 4e6) return { out: '', err: 'diff: Dateien zu groß für die Sandbox\n', code: 2 };
+    // LCS-Tabelle, dann Änderungen im Normalformat (NcM, NdM, NaM)
+    const L = Array.from({ length: a.length + 1 }, () => new Uint16Array(b.length + 1));
+    for (let i = a.length - 1; i >= 0; i--) for (let j = b.length - 1; j >= 0; j--) L[i][j] = a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    const hunks = []; let i = 0, j = 0, cur = null;
+    const flush = () => { if (cur) { hunks.push(cur); cur = null; } };
+    while (i < a.length || j < b.length) {
+      if (i < a.length && j < b.length && a[i] === b[j]) { flush(); i++; j++; }
+      else if (j < b.length && (i >= a.length || L[i][j + 1] >= L[i + 1][j])) { (cur ||= { ai: i, bj: j, del: [], add: [] }).add.push(b[j++]); }
+      else { (cur ||= { ai: i, bj: j, del: [], add: [] }).del.push(a[i++]); }
+    }
+    flush();
+    const rng = (s, n) => (n <= 1 ? String(s + (n ? 1 : 0)) : `${s + 1},${s + n}`);
+    let out = '';
+    for (const h of hunks) {
+      const op = h.del.length && h.add.length ? 'c' : h.del.length ? 'd' : 'a';
+      out += `${h.del.length ? rng(h.ai, h.del.length) : h.ai}${op}${h.add.length ? rng(h.bj, h.add.length) : h.bj}\n`;
+      out += h.del.map(x => '< ' + x + '\n').join('');
+      if (op === 'c') out += '---\n';
+      out += h.add.map(x => '> ' + x + '\n').join('');
+    }
+    return { out, code: out ? 1 : 0 };
   }
 
   c_ps(args) {
