@@ -67,11 +67,8 @@ const isPassed = (id) => !!state.exercises[id]?.passedAt;
 const lessonDone = (id) => !!state.lessons[id]?.doneAt;
 const required = EXERCISES.filter(e => e.required);
 
-function levelUnlocked(lv) {
-  const idx = LEVELS.findIndex(l => l.id === lv);
-  if (idx <= 0) return true;
-  return examPassed(state, LEVELS[idx - 1].id, EXAMS[LEVELS[idx - 1].id]?.items.length || 1);
-}
+// Ab 1.2.0: Nichts ist hinter Prüfungen gesperrt. Lernen durch Tun – Prüfungen sind freiwillig (Abzeichen).
+function levelUnlocked() { return true; }
 
 function examPrereqs(lv = 'L1') {
   const missLessons = LESSONS.filter(l => !lessonDone(l.id));
@@ -86,6 +83,8 @@ function levelProgress() {
 }
 
 function nextStep() {
+  // Erst hacken: offene Räume zuerst. Lektionen sind Nachschlagewerk, wenn du feststeckst.
+  for (const r of ROOMS) if (!roomDone(r.id) && !roomLock(r).length) return { kind: 'room', title: 'Raum: ' + r.title, href: `#/raum/${r.id}` };
   for (const l of LESSONS) {
     if (!lessonDone(l.id)) return { kind: 'lesson', id: l.id, title: l.title, href: `#/lektion/${l.id}` };
     for (const eid of l.exercises) {
@@ -93,11 +92,9 @@ function nextStep() {
       if (e.required && !isPassed(eid)) return { kind: 'ex', id: eid, title: e.title, href: `#/uebung/${eid}`, e };
     }
   }
-  for (const rid of ['r0', 'r1']) if (!roomDone(rid) && !roomLock(ROOM[rid]).length) return { kind: 'room', title: 'Raum: ' + ROOM[rid].title, href: `#/raum/${rid}` };
   const s = STORY.s1;
   if (!state.story.s1?.done) return { kind: 'story', title: s.title, href: '#/story/s1' };
-  if (!examPassed(state, 'L1', EXAMS.L1.items.length)) return { kind: 'exam', title: EXAMS.L1.title, href: '#/pruefung/L1' };
-  return { kind: 'done', title: 'Level 1 abgeschlossen – Level 2 ist in Vorbereitung', href: '#/pfad' };
+  return { kind: 'done', title: 'Alle Räume geknackt – trainiere extern weiter, neue Räume folgen', href: '#/pfad' };
 }
 
 function dailyMissions() {
@@ -113,6 +110,14 @@ function dailyMissions() {
   }
   return state.daily[d];
 }
+
+// Empfohlene externe Übungsplattformen (alle legal, ausdrücklich zum Üben gedacht)
+const EXTERNAL = [
+  { name: 'OverTheWire – Bandit', url: 'https://overthewire.org/wargames/bandit/', why: 'Linux als Spiel: per SSH aus deinem Kali-Terminal von Level zu Level. Perfekter Start.', free: true },
+  { name: 'TryHackMe', url: 'https://tryhackme.com/', why: 'Geführte Räume im Browser oder per VPN aus Kali – z. B. „Pre Security“, dann „Jr Penetration Tester“.', free: false },
+  { name: 'PortSwigger Web Security Academy', url: 'https://portswigger.net/web-security', why: 'Die beste kostenlose Web-Hacking-Schule, mit Labs für Burp Suite (passt zu Level 3).', free: true },
+  { name: 'Hack The Box – Starting Point', url: 'https://www.hackthebox.com/', why: 'Echte Übungsmaschinen per VPN aus Kali – wenn TryHackMe zu leicht wird.', free: false },
+];
 
 // ---------------------------------------------------------------- Kopf & Navigation
 function renderTop() {
@@ -185,19 +190,19 @@ views.heute = () => {
       ${PREVIEW ? `<div class="card warn small"><b>Handy-Vorschau.</b> Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus. Zum Mitnehmen: Mehr → Daten → „Lernstand als Text kopieren“.</div>` : ''}
       <div class="card violet">
         <div class="row between">
-          <div><span class="badge plain">Level 1</span> <span class="badge ${examPassed(state, 'L1', EXAMS.L1.items.length) ? 'ok' : 'plain'}">${examPassed(state, 'L1', EXAMS.L1.items.length) ? 'Prüfung bestanden' : 'Prüfung offen'}</span></div>
+          <div><span class="badge real">Ziel: eJPT</span> <span class="badge plain">${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length} Räume geknackt</span></div>
           <span class="small muted">${loc ? loc.icon + ' ' + esc(loc.label) : 'Lernort nicht gewählt'}</span>
         </div>
-        <h1 style="margin-top:.5rem">Hallo ${esc(state.profile.name)} – Linux Grundlagen</h1>
+        <h1 style="margin-top:.5rem">Hallo ${esc(state.profile.name)} – auf dem Weg zum Pentester</h1>
         <div class="bar" aria-label="Fortschritt ${p.pct}%"><i style="width:${p.pct}%"></i></div>
-        <p class="small muted">${p.done} von ${p.total} Pflichtschritten (Lektionen + Pflichtübungen)</p>
+        <p class="small muted">Linux-Grundlagen: ${p.done} von ${p.total} Schritten · Lektionen sind Nachschlagewerk – du musst nicht alles vorher lesen.</p>
         <div class="kpis"><div class="kpi"><b>${xp}</b><span>Kurs-XP</span></div><div class="kpi"><b>${Object.values(state.exercises).filter(e => e.passedAt).length}</b><span>Übungen bestanden</span></div><div class="kpi"><b>${roomPointsTotal()}</b><span>Raum-Punkte</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>Tage-Serie</span></div><div class="kpi"><b>${earnedBadges().length}/${BADGES.length}</b><span>Abzeichen</span></div><div class="kpi"><b>${s1?.done ? STORY.s1.points : 0}</b><span>Story-Punkte</span></div></div>
       </div>
 
       <a class="card lime" href="${nx.href}" style="display:block;text-decoration:none;color:inherit">
         <span class="badge real">Nächster Schritt</span>
         <h2 style="margin:.4rem 0 .2rem">${esc(nx.title)}</h2>
-        <span class="small muted">${nx.kind === 'lesson' ? 'Lektion – erst verstehen, dann üben' : nx.kind === 'ex' ? (nx.e.kind === 'real' ? 'Echter Auftrag in deiner Kali-Umgebung' : 'Übung in der Sandbox-Simulation') : nx.kind === 'story' ? 'Story-Mission' : nx.kind === 'room' ? 'Raum mit Flags' : nx.kind === 'exam' ? 'Kumulative Prüfung' : ''} →</span>
+        <span class="small muted">${nx.kind === 'lesson' ? 'Lektion – erst verstehen, dann üben' : nx.kind === 'ex' ? (nx.e.kind === 'real' ? 'Echter Auftrag in deiner Kali-Umgebung' : 'Übung in der Sandbox-Simulation') : nx.kind === 'story' ? 'Story-Mission' : nx.kind === 'room' ? 'Raum mit Flags – feststecken ist normal, Lektionen helfen' : ''} →</span>
       </a>
 
       <div class="card">
@@ -219,11 +224,19 @@ views.heute = () => {
           <span class="small">${s1?.done ? '✓ abgeschlossen' : s1 ? `Szene ${(s1.scene || 0) + 1} von ${STORY.s1.scenes.length}` : storyLocked(STORY.s1) ? '🔒 Voraussetzungen offen' : 'Bereit →'}</span>
         </a>
         <a class="card" href="#/pruefung/L1" style="text-decoration:none;color:inherit;display:block">
-          <span class="badge plain">Prüfung Level 1</span>
-          <h3 style="margin-top:.5rem">Voraussetzungen</h3>
-          <p class="small">${pre.ok ? '✓ Alle Lektionen und Pflichtübungen erledigt – Prüfung freigeschaltet.' : `Noch offen: ${pre.missLessons.length} Lektion(en), ${pre.missEx.length} Pflichtübung(en).`}</p>
-          <p class="small muted">Bestehen: ≥ ${Math.round(PASS_RATIO * 100)} % und alle Pflichtaufgaben korrekt.</p>
+          <span class="badge plain">Freiwillig</span>
+          <h3 style="margin-top:.5rem">Meisterprüfung Linux</h3>
+          <p class="small">${pre.ok ? '✓ Bereit – teste dich, wenn du Lust hast.' : `Noch offen: ${pre.missLessons.length} Lektion(en), ${pre.missEx.length} Pflichtübung(en).`}</p>
+          <p class="small muted">Bringt das Abzeichen „Linux-Grundlagen“. Sperrt nichts.</p>
         </a>
+      </div>
+
+      <div class="card">
+        <span class="badge plain">Außerhalb der App weitertrainieren</span>
+        <ul class="list" style="margin-top:.4rem">
+          ${EXTERNAL.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener noreferrer"><span class="state">↗</span><span class="grow"><span class="t">${esc(x.name)}</span><span class="s">${esc(x.why)}</span></span><span class="badge ${x.free ? 'ok' : 'plain'}">${x.free ? 'gratis' : 'teils gratis'}</span></a></li>`).join('')}
+        </ul>
+        <p class="small muted">Alles legale Übungsumgebungen. Hacke nur Ziele, die dir gehören oder für die du ausdrücklich eine Erlaubnis hast.</p>
       </div>
     </section>`,
   };
@@ -245,8 +258,8 @@ function kindLabel(e) {
 
 // ---------------------------------------------------------------- Lernpfad
 views.pfad = () => ({
-  html: `<h1>Lernpfad: vom Linux-Anfänger zum Purple Team</h1>
-  <p class="muted">Jedes Level endet mit einer kumulativen Prüfung. Das nächste Level öffnet sich erst danach.</p>
+  html: `<h1>Lernpfad: vom Linux-Anfänger zum Pentester</h1>
+  <p class="muted">Endziel: bereit für das <b>eJPT</b> (praktische Einstiegsprüfung für Pentester). Alles ist offen – spring rein, wo du Lust hast. Linux lernst du unterwegs, weil du es brauchst.</p>
   <ul class="list card">${LEVELS.map(l => {
     const unlocked = levelUnlocked(l.id);
     const passed = examPassed(state, l.id, EXAMS[l.id]?.items.length || 1);
@@ -265,7 +278,7 @@ views.level = (id) => {
     return {
       html: `<a class="back" href="#/pfad">← Lernpfad</a>
       <h1>Level ${l.n} – ${esc(l.title)}</h1>
-      <div class="card ${unlocked ? '' : 'warn'}"><b>${unlocked ? 'Freigeschaltet' : '🔒 Gesperrt'}</b> – ${unlocked ? 'Die Inhalte dieses Levels sind noch in Vorbereitung.' : `Öffnet sich nach bestandener Prüfung von Level ${l.n - 1}.`}</div>
+      <div class="card"><b>In Vorbereitung</b> – neue Räume für dieses Level kommen nach und nach. Bis dahin: passende Räume auf den Plattformen unter „Heute → Außerhalb der App“.</div>
       <div class="card stack"><p>${esc(l.goal)}</p>
         <h3>Geplante Themen</h3><ul>${l.topics.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
         <h3>Werkzeuge</h3><ul>${l.tools.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
@@ -288,7 +301,7 @@ views.level = (id) => {
       </div>`).join('')}
       ${ROOMS.filter(r => r.level === 'L1').map(roomCard).join('')}
       <a class="card ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><span class="badge sim">Story</span> <b>${esc(STORY.s1.title)}</b><br><span class="small muted">Empfohlen vor der Prüfung · bringt Story-Punkte, keine Prüfungsfreigabe</span></a>
-      <a class="card ${pre.ok ? 'violet' : ''}" href="#/pruefung/L1" style="display:block;text-decoration:none;color:inherit"><b>Prüfung Level 1</b><br><span class="small muted">${pre.ok ? 'Freigeschaltet' : '🔒 erst nach allen Lektionen und Pflichtübungen'}</span></a>
+      <a class="card ${pre.ok ? 'violet' : ''}" href="#/pruefung/L1" style="display:block;text-decoration:none;color:inherit"><b>Meisterprüfung Linux (freiwillig)</b><br><span class="small muted">${pre.ok ? 'Bereit' : 'Möglich nach allen Lektionen und Pflichtübungen'} · bringt ein Abzeichen, sperrt nichts</span></a>
     </div>`,
   };
 };
@@ -824,8 +837,23 @@ views.archiv = () => {
 };
 
 // ---------------------------------------------------------------- Werkzeuge
+function myToolbox() {
+  const used = new Map();
+  for (const r of ROOMS) {
+    const solved = allQs(r).filter(x => qOk(r.id, x.key) && x.q.type !== 'confirm' && x.q.type !== 'mc').length;
+    if (!solved) continue;
+    for (const t of r.tools) { const e = used.get(t) || []; e.push(r); used.set(t, e); }
+  }
+  return [...used.entries()];
+}
+
 views.werkzeuge = () => ({
-  html: `<a class="back" href="#/mehr">← Mehr</a><h1>Kali-Werkzeuge im Lernpfad</h1>
+  html: `<a class="back" href="#/mehr">← Mehr</a><h1>Kali-Werkzeuge</h1>
+  <div class="card lime"><h3>Dein Werkzeugkasten</h3>
+    ${myToolbox().length ? `<p class="small muted">Diese Werkzeuge hast du schon wirklich benutzt, um Flags oder Antworten zu finden:</p><ul class="list">${myToolbox().map(([t, rs]) => `<li><span class="state done">✓</span><span class="grow"><span class="t"><code>${esc(t)}</code></span><span class="s">in ${rs.map(r => `<a href="#/raum/${r.id}">${esc(r.title)}</a>`).join(', ')}</span></span></li>`).join('')}</ul>` : '<p class="small">Noch leer – knack deinen ersten Raum, dann füllt sich der Kasten.</p>'}
+    <p class="small muted">Tipp: Lege dir in Kali eine eigene Notizdatei an (<code>nano ~/notizen/werkzeuge.md</code>) und schreib zu jedem Werkzeug den Befehl auf, der bei dir funktioniert hat. Eigene Notizen merkt man sich viel besser.</p>
+  </div>
+  <h2 style="margin-top:1rem">Alle Werkzeuge im Lernpfad</h2>
   <p class="muted small">Geordnet nach Level. Verfügbarkeit immer selbst prüfen: <code>command -v NAME</code>, <code>NAME --version</code>, <code>NAME --help</code>. Nichts unbedacht installieren.</p>
   <div class="stack">${TOOLS.map(t => `<div class="card">
     <div class="row between"><h3 style="margin:0">${esc(t.name)}</h3><span><span class="badge plain">${esc(t.level)}</span> <span class="badge ${t.status.startsWith('aktiv') ? 'ok' : 'plain'}">${esc(t.status)}</span></span></div>
@@ -849,7 +877,7 @@ views.mehr = () => {
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne XP)</span></span></a></li>
         <li><a href="#/werkzeuge"><span class="state">⚒</span><span class="grow"><span class="t">Werkzeuge</span><span class="s">Kali-Tools: Zweck, Scope, Beleg</span></span></a></li>
-        <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen</span><span class="s">Level 1</span></span></a></li>
+        <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen (freiwillig)</span><span class="s">Meisterprüfung Linux</span></span></a></li>
         <li><button class="item" id="loc" style="width:100%;background:none;border:0;text-align:left;cursor:pointer"><span class="state">📍</span><span class="grow"><span class="t">Lernort ändern</span><span class="s">${esc(LOCATIONS[state.location]?.label || 'nicht gewählt')}</span></span></button></li>
       </ul></div>
 
@@ -994,8 +1022,6 @@ function roomPointsTotal() { return ROOMS.reduce((n, r) => n + roomPoints(r.id),
 
 function roomLock(r) {
   const why = [];
-  if (!levelUnlocked(r.level)) { const n = LEVELS.find(l => l.id === r.level).n; why.push(`Prüfung Level ${n - 1} bestehen`); }
-  for (const l of r.requires?.lessons || []) if (!lessonDone(l)) why.push(`Lektion „${LESSON[l].title}“ lesen`);
   for (const x of r.requires?.rooms || []) if (!roomDone(x)) why.push(`Raum „${ROOM[x].title}“ abschließen`);
   return why;
 }

@@ -1,6 +1,6 @@
 # Kali Level Up
 
-Interaktive Lern-App **vom Linux-Anfänger bis zum Purple Team** – mobile-first (Galaxy S23) und am PC
+Interaktive Lern-App **vom Linux-Anfänger zum Pentester** (Endziel: bereit für das eJPT) – mobile-first (Galaxy S23) und am PC
 neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schritt.
 
 ## Was ist echt, was simuliert?
@@ -11,6 +11,15 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 | „Echte Aufträge“ (Übungen und Story-Szenen) | Du führst sie in **deiner Kali-VM oder Termux/NetHunter Rootless** aus und fügst Befehl + Ausgabe ein. Die App prüft die Ausgabe nach festen Kriterien (inkl. persönlichem Lab-Token und Scope-Prüfung). Sie startet **nichts** auf deinem Gerät. |
 | Sync PC ↔ Handy | Optional über Supabase (siehe [docs/SUPABASE-SETUP.md](docs/SUPABASE-SETUP.md)). Ohne Einrichtung: rein lokal + Export/Import. |
 | KI-Coach | Noch nicht angebunden. Es werden keine Daten an eine KI übertragen. |
+
+## Lernprinzip (ab 1.2.0): erst hacken, dann nachschlagen
+
+- **Keine Sperren mehr:** Level und Räume sind offen. Die Prüfung Level 1 ist freiwillig (Abzeichen).
+- **Räume sind der Hauptweg.** „Nächster Schritt“ führt zum nächsten offenen Raum; Lektionen dienen als Nachschlagewerk.
+- **Lernpfad auf Pentest ausgerichtet:** Netzwerk-Aufklärung → Web-Hacking → Skripte → Linux-Rechte & Root →
+  Passwörter → Exploits → Netzwerkdienste → Spuren & Verteidigung → eJPT-Vorbereitung.
+- **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
+- **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
 ## Räume nach dem TryHackMe-Prinzip (ab 1.1.0)
 

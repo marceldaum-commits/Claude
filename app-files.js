@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '1.1.1';
+self.KLY_VERSION = '1.2.0';
 self.KLY_FILES = [
   'index.html',
   'manifest.webmanifest',

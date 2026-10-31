@@ -39,7 +39,7 @@ export const TOOLS = [
     beleg: 'Zeile mit IP-Adresse und Namen.',
   },
   {
-    id: 'nmap', name: 'Nmap', level: 'L2', status: 'geplant',
+    id: 'nmap', name: 'Nmap', level: 'L2', status: 'aktiv',
     zweck: 'Offene Ports und Dienste auf eigenen Systemen feststellen – und verstehen, was ein Scan NICHT beweist.',
     voraus: 'Kali vorinstalliert. Termux: pkg install nmap; ohne Root nur Connect-Scan (-sT), kein SYN-Scan.',
     pc: 'ja', rootless: 'eingeschränkt (-sT)',
@@ -48,7 +48,7 @@ export const TOOLS = [
     beleg: 'PORT/STATE/SERVICE-Zeilen.',
   },
   {
-    id: 'tshark', name: 'Wireshark / TShark', level: 'L6', status: 'geplant',
+    id: 'tshark', name: 'Wireshark / TShark', level: 'L9', status: 'geplant',
     zweck: 'Pakete aufzeichnen und analysieren.',
     voraus: 'Kali vorinstalliert. Aufzeichnen braucht Rechte (Gruppe wireshark). Handy ohne Root: keine Aufzeichnung, nur Analyse bereitgestellter PCAPs (Paketverfügbarkeit mit pkg search prüfen).',
     pc: 'ja', rootless: 'nur Analyse',
@@ -57,7 +57,7 @@ export const TOOLS = [
     beleg: 'Paketzeilen mit Quelle, Ziel, Protokoll.',
   },
   {
-    id: 'burpzap', name: 'Burp Suite / OWASP ZAP', level: 'L5', status: 'geplant',
+    id: 'burpzap', name: 'Burp Suite / OWASP ZAP', level: 'L3', status: 'geplant',
     zweck: 'Webverkehr als Proxy mitschneiden, Anfragen gezielt verändern.',
     voraus: 'Nur PC (Kali). Burp Suite Community bzw. zaproxy.',
     pc: 'ja', rootless: 'nein',
@@ -66,7 +66,7 @@ export const TOOLS = [
     beleg: 'Exportierte Anfrage/Antwort aus der History.',
   },
   {
-    id: 'yara', name: 'YARA', level: 'L8', status: 'geplant',
+    id: 'yara', name: 'YARA', level: 'L9 (optional)', status: 'geplant',
     zweck: 'Muster-basierte Erkennung in Dateien.',
     voraus: 'Kali: apt-Paket yara (prüfen). Termux: pkg search yara.',
     pc: 'ja', rootless: 'wahrscheinlich (prüfen)',
@@ -75,7 +75,7 @@ export const TOOLS = [
     beleg: 'Treffer-Zeilen Regelname + Datei; Negativtest ohne Treffer.',
   },
   {
-    id: 'sigma', name: 'Sigma CLI', level: 'L8', status: 'geplant',
+    id: 'sigma', name: 'Sigma CLI', level: 'L9 (optional)', status: 'geplant',
     zweck: 'Herstellerneutrale Detection-Regeln schreiben und in Abfragen übersetzen.',
     voraus: 'PC: pipx install sigma-cli (Verfügbarkeit prüfen).',
     pc: 'ja', rootless: 'evtl. über Python',
@@ -84,7 +84,7 @@ export const TOOLS = [
     beleg: 'Validierungsausgabe und konvertierte Abfrage.',
   },
   {
-    id: 'navigator', name: 'MITRE ATT&CK Navigator', level: 'L9', status: 'geplant',
+    id: 'navigator', name: 'MITRE ATT&CK Navigator', level: 'L9 (optional)', status: 'geplant',
     zweck: 'Techniken planen, abdecken und Lücken visualisieren.',
     voraus: 'Webanwendung im Browser (PC empfohlen).',
     pc: 'ja', rootless: 'nur Ansicht',
@@ -93,7 +93,7 @@ export const TOOLS = [
     beleg: 'Exportierter Layer.',
   },
   {
-    id: 'redtools', name: 'SearchSploit, Metasploit, John, Hashcat', level: 'L7', status: 'geplant',
+    id: 'redtools', name: 'SearchSploit, Metasploit, John, Hashcat', level: 'L6–L7', status: 'geplant',
     zweck: 'Schwachstellenrecherche und Offline-Passworttests im kontrollierten Labor.',
     voraus: 'Nur PC/Kali; erst nach Level 1–6 und klarer Autorisierung.',
     pc: 'ja', rootless: 'nein',
