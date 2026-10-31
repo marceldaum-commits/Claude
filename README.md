@@ -21,6 +21,13 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Netzwerk-Aufklärung (ab 1.7.0, Level 2)
+
+- **n1 Inventur bei den Stadtwerken** (Handy + PC, Sandbox): erfundenes Firmennetz `10.10.20.0/24` mit sechs Geräten,
+  **simuliertes** `nmap` (`-sn`, `-p-`, `-p`, `-sV`, `-sU`, `-sC/-A`, `-oN`) und `nc`. Kein echter Netzwerkverkehr;
+  Ziele außerhalb des Auftrags werden verweigert.
+- **Lernpfad „echte Scans ohne Abo“** auf der Level-2-Seite: eigener Raum r2 und kostenlose Hack-The-Box-Starting-Point-Maschinen.
+
 ## Web-Hacking (ab 1.5.0, Level 3)
 
 - **h1 Was die Webseite verrät** (Handy/Sandbox): Mitschnitte eines erfundenen Shops lesen – Cookie mit Rolle,

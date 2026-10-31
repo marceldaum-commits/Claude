@@ -406,6 +406,26 @@ await at('H1 Web-Analyse lösbar (Sandbox)', async () => {
   ok(s.exec('grep 1042 3-bestellungen.log').out.includes('Petra Lang'));
   const j1 = ROOMS.find(x => x.id === 'j1'); ok(j1.machine.kind === 'ext' && j1.cleanup.includes('docker stop'));
 });
+await at('N1 Netzwerk-Simulation lösbar', async () => {
+  const r = ROOMS.find(x => x.id === 'n1'); const F = {};
+  for (const f of r.flags) F[f] = await flagFor(TOKEN, 'n1', f);
+  const s = new Shell({ fs: baseFS(), commands: r.commands({ F, solve() {} }) }); r.setup(s, F);
+  const acc = (tk, q, v) => r.tasks.find(x => x.id === tk).questions.find(x => x.id === q).accept.some(re => re.test(v));
+  ok(acc('t1', 'q1', s.read('AUFTRAG.txt').match(/10\.10\.20\.0\/24/)[0]));
+  const sn = s.exec('nmap -sn 10.10.20.0/24').out; ok(acc('t2', 'q1', sn.match(/\((\d+) hosts up\)/)[1]), sn);
+  ok(/Nmap scan report for 10\.10\.20\.42\n/.test(sn));
+  ok(s.exec('nmap 10.10.20.30').out.includes('5432/tcp  open  postgresql'));
+  ok(s.exec('nmap -sV 10.10.20.10').out.includes('nginx 1.18.0'));
+  ok(!s.exec('nmap 10.10.20.10').out.includes('8081')); ok(s.exec('nmap -p- 10.10.20.10').out.includes('8081/tcp'));
+  ok(s.exec('curl http://10.10.20.10:8081/').out.includes(F.devport));
+  ok(s.exec('curl http://portal.stadtwerke.sim/').out.includes('Kundenportal'), 'Namen auflösbar');
+  ok(s.exec('nmap 10.10.20.42').out.includes('23/tcp    open  telnet'));
+  ok(s.exec('nc 10.10.20.42 23').out.includes(F.kamera));
+  ok(s.exec('nmap -sU 10.10.20.50').out.includes('161/udp   open  snmp'));
+  ok(s.exec('nmap 8.8.8.8').err.includes('SCOPE') && s.exec('nc 192.168.1.1 80').err.includes('SCOPE'), 'Scope-Schutz');
+  s.exec('nmap -sV 10.10.20.1-50 -oN notizen/tcp.txt'); ok((s.read('notizen/tcp.txt') || '').includes('postgresql'), '-oN speichert');
+  ok(s.exec('nmap -A 10.10.20.10').out.includes('|_http-title: Stadtwerke Kundenportal'));
+});
 t('W2 Kellerserver: Codes und Scope', () => {
   const sh = readFileSync(join(ROOT, 'labs/kly-keller/setup.sh'), 'utf8');
   const df = readFileSync(join(ROOT, 'labs/kly-keller/Dockerfile'), 'utf8');

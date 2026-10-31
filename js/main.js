@@ -9,6 +9,7 @@ import {
 import { flagFor, normFlag } from './flags.js';
 import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
+import { NETZ_PFAD } from './content/netz.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS } from './content/curriculum.js';
@@ -268,6 +269,7 @@ views.pfad = () => {
         <a class="card tight" href="#/level/L1" style="display:block;text-decoration:none;color:inherit"><b>📖 Linux-Spickzettel</b><br><span class="small muted">${LESSONS.length} Kapitel zum Nachschlagen + Übungen</span></a>
         <a class="card tight ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><b>🎬 ${esc(STORY.s1.title)}</b><br><span class="small muted">Story-Mission${storyLocked(STORY.s1).length ? ' · braucht ein paar Übungen' : ''}</span></a>
       </div>` : ''}
+      ${l.id === 'L2' ? `<a class="card tight" href="#/level/L2" style="display:block;text-decoration:none;color:inherit"><b>🎯 Lernpfad: echte Scans ohne Abo</b><br><span class="small muted">Eigene Zielmaschine + kostenlose Hack-The-Box-Maschinen</span></a>` : ''}
       ${l.id === 'L3' ? `<a class="card tight" href="#/level/L3" style="display:block;text-decoration:none;color:inherit"><b>🌐 Lernpfad PortSwigger</b><br><span class="small muted">Kostenlose Web-Hacking-Labs, in sinnvoller Reihenfolge</span></a>` : ''}`).join('')}
     <h2 style="margin-top:1.2rem">Demnächst</h2>
     <ul class="list card">${later.map(l => `<li><a href="#/level/${l.id}"><span class="state">${l.n}</span><span class="grow"><span class="t">${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span></a></li>`).join('')}</ul>`,
@@ -287,6 +289,8 @@ views.level = (id) => {
         <h3>Geplante Themen</h3><ul>${l.topics.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
         <h3>Werkzeuge</h3><ul>${l.tools.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
         ${ROOMS.some(r => r.level === l.id) ? `<h3>Räume (bereits verfügbar)</h3>${ROOMS.filter(r => r.level === l.id).map(roomCard).join('')}` : ''}
+        ${l.id === 'L2' ? `<h3>Lernpfad: echte Scans ohne Abo</h3><p class="small muted">Erst die Simulation, dann echt: deine eigene Zielmaschine und kostenlose Übungsmaschinen (Gratis-Konto, kein Abo).</p>
+          <ol class="small" style="padding-left:1.2rem">${NETZ_PFAD.map(x => `<li style="margin:.35rem 0"><a href="${x.url}" ${x.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''}><b>${esc(x.t)}</b></a><br><span class="muted">${esc(x.why)}</span></li>`).join('')}</ol>` : ''}
         ${l.id === 'L3' ? `<h3>Lernpfad: PortSwigger Web Security Academy</h3><p class="small muted">Kostenlos, mit Erklärungen und Online-Labs, die genau zum Üben gedacht sind. Kostenloses Konto nötig. Reihenfolge empfohlen:</p>
           <ol class="small" style="padding-left:1.2rem">${PORTSWIGGER.map(x => `<li style="margin:.35rem 0"><a href="${x.url}" target="_blank" rel="noopener noreferrer"><b>${esc(x.t)}</b></a><br><span class="muted">${esc(x.why)}</span></li>`).join('')}</ol>` : ''}
         <p class="honest">Ehrlicher Stand: ${ROOMS.some(r => r.level === l.id) ? 'Erste Räume sind da, weitere folgen.' : 'Für dieses Level steht der Lehrplan, Räume folgen.'}</p></div>`,
