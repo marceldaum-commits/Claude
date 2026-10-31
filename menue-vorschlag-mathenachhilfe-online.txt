@@ -1,0 +1,347 @@
+================================================================================
+  MENÜ-ANALYSE UND NEUAUFBAU: www.mathenachhilfe-online.com
+  Stand der Prüfung: 31.10.2026
+================================================================================
+
+UMFANG DER PRÜFUNG
+------------------
+- Menü am Desktop (1440 px) und am Handy (390 px) geöffnet, alle Untermenüs
+  ausgeklappt und alle 30 Links ausgelesen.
+- Die Seiten, die nur im Menü verlinkt sind (nicht in der Sitemap), wurden
+  einzeln aufgerufen: /onboarding/, /lernprofil-check/, /kontaktdaten/,
+  /feedback-und-ideen/. Alle antworten mit 200 und stehen auf "noindex".
+
+
+================================================================================
+ 1. DAS AKTUELLE MENÜ
+================================================================================
+
+Desktop: Ein Button "Menü" oben rechts öffnet ein Panel mit zwei Spalten.
+Handy:   Ein Button "Menü" öffnet dieselben Punkte untereinander.
+
+Linke Spalte (für alle):
+
+  Nachhilfe +
+    - Fächer & Klassenstufen          /faecher-klassenstufen/
+    - Unsere Lehrkräfte               /team/#team
+    - Das ist dabei                   /das-ist-dabei/
+  Preise                              /stundenpakete-preise/
+  Angebote & Pakete +
+    - Alle Angebote im Shop           /shop/
+    - Für Neukunden                   /produkt/einzelnachhilfe-neukundenpaket/
+    - Für Bestandskunden              /produkt/einzelnachhilfe/
+    - Warenkorb                       /warenkorb/
+    - Zur Kasse                       /kasse/?bestellweg=aendern
+  So funktioniert's +
+    - Ablauf & wichtige Infos         /ablauf-und-wichtige-infos/
+    - Häufige Fragen                  /faq/
+    - Start & Technik                 /onboarding/
+  Über uns +
+    - Mathe mit Marcel /
+      Unsere Geschichte               /ueber-uns/
+    - Bewertungen                     /#bewertungen
+    - Kontakt                         /kontakt/
+  Lernwelt +
+    - Lernmaterialien                 /arbeitsblaetter/
+    - Kostenloser Mathe-Kompass       /textaufgaben-verstehen/
+    - Ratgeber & Wissen               /mathe-lerntipps/
+    - Lernstandscheck                 /lernstand-check/
+    - Lernprofil-Check                /lernprofil-check/
+  Mein Reader                         /lesestudio/
+
+Rechte Spalte "DEIN BEREICH":
+
+  Für Kunden +
+    - Termin buchen                   /buchung/
+    - Termine ändern oder absagen     /termine-aendern-absagen/
+    - Meine Lernberichte              /meine-lernberichte/
+    - Für Eltern                      /fuer-eltern/
+    - Kontaktdaten                    /kontaktdaten/
+    - Feedback & Ideen                /feedback-und-ideen/
+  Mein Konto +
+    - Anmelden                        /login/
+    - Konto erstellen                 /registrieren/
+  [ Kostenlose Probestunde ]          /probestunde/
+
+Summe: 9 Hauptpunkte, 30 Links.
+
+
+================================================================================
+ 2. WAS GUT IST (BEIBEHALTEN)
+================================================================================
+
++ Die Trennung in "für alle" und "Dein Bereich" für Kunden ist die richtige
+  Grundidee.
++ Der Button "Kostenlose Probestunde" steht im Menü und ist farbig
+  hervorgehoben.
++ Die Untermenüs klappen sauber auf und zu, am Handy und am Desktop.
++ Am Handy ist nichts abgeschnitten, und die Punkte sind groß genug zum
+  Tippen.
+
+
+================================================================================
+ 3. WAS NICHT GUT FUNKTIONIERT
+================================================================================
+
+M1. Die wichtigsten Angebotsseiten fehlen im Menü
+    Diese Seiten sind nur im Footer verlinkt:
+      /angebot/                              (Übersicht)
+      /angebot/online-nachhilfe/
+      /angebot/mathe-themen-aufarbeiten/     ("Lücken schließen")
+      /angebot/abschlusspruefungen/          ("Prüfungsvorbereitung")
+    Genau das sind die Gründe, warum Eltern Nachhilfe suchen. Auch für
+    Google zählen Seiten, die im Hauptmenü verlinkt sind, mehr.
+    Ebenfalls nicht im Menü: /ueber-uns/paedagogisches-konzept/,
+    /ueber-uns/was-uns-auszeichnet/, /ueber-uns/maximale-flexibilitaet/
+    und die Ratgeber-Artikel (außer /mathe-lerntipps/).
+
+M2. Am Desktop ist alles hinter "Menü" versteckt
+    Auf einem großen Bildschirm ist vor dem Klick kein einziger Menüpunkt
+    zu sehen. Am Desktop erwarten Besucher die Hauptpunkte direkt in der
+    Kopfzeile.
+
+M3. Interessenten und Kunden sind vermischt
+    - "Warenkorb" und "Zur Kasse" stehen im Hauptmenü unter "Angebote &
+      Pakete". Das sind Shop-Funktionen, keine Inhalte.
+    - "Für Eltern" ist eine Werbeseite für NEUE Eltern, steht aber unter
+      "Dein Bereich -> Für Kunden".
+    - "Für Bestandskunden" steht im öffentlichen Bereich statt im
+      Kundenbereich.
+
+M4. Doppelungen und Überschneidungen
+    - "Preise" und "Angebote & Pakete" sind zwei Hauptpunkte für fast
+      dasselbe.
+    - "Kontakt" (unter "Über uns") und "Kontaktdaten" (unter "Für Kunden")
+      sind zwei Kontaktseiten.
+    - "Lernstandscheck" und "Lernprofil-Check" heißen fast gleich, tun aber
+      Verschiedenes: Der eine ist ein Aufgabentest, der andere schaut auf
+      Lerngewohnheiten und braucht eine Anmeldung.
+
+M5. Unklare Namen
+    - "Mein Reader" ist ein Hauptpunkt, aber ein Neubesucher weiß nicht, was
+      das ist. Gemeint sind die Mathe-Bücher mit Leseproben.
+    - "Lernwelt" ist schwammig.
+    - "Mathe mit Marcel / Unsere Geschichte" hat einen Schrägstrich als
+      Notlösung.
+    - "Für Neukunden" und "Für Bestandskunden" führen direkt auf
+      Produktseiten, das erkennt man am Namen nicht.
+
+M6. Tote Enden
+    - "Termin buchen" führt auf /buchung/, die "noch im Aufbau" ist.
+    - "Bewertungen" springt nur auf die Startseite zurück.
+    - "Meine Lernberichte" und "Lernprofil-Check" leiten Gäste zum Login,
+      ohne vorher zu sagen, dass man ein Konto braucht.
+
+
+================================================================================
+ 4. NEUER AUFBAU – VORSCHLAG
+================================================================================
+
+Grundsatz: 5 Hauptpunkte und der Probestunden-Button. Jeder Hauptpunkt
+beantwortet eine Frage, die Eltern wirklich haben:
+
+  Nachhilfe         -> "Was bietet ihr?"
+  Preise            -> "Was kostet es?"
+  Team              -> "Wer unterrichtet mein Kind?"
+  Kostenlos lernen  -> "Kann ich erst mal etwas testen?"
+  Hilfe             -> "Wie läuft es ab? Wen frage ich?"
+
+Am Desktop stehen die 5 Punkte direkt sichtbar in der Kopfzeile, die
+Unterpunkte klappen beim Überfahren/Klicken auf. Am Handy bleibt alles wie
+bisher hinter "Menü".
+
+
+4.1 HAUPTMENÜ (für alle Besucher)
+---------------------------------
+
+  NACHHILFE
+    Online-Nachhilfe – so läuft's     /angebot/online-nachhilfe/
+    Lücken schließen                  /angebot/mathe-themen-aufarbeiten/
+    Prüfungsvorbereitung              /angebot/abschlusspruefungen/
+    Fächer & Klassenstufen            /faecher-klassenstufen/
+    Das ist dabei                     /das-ist-dabei/
+    Für Eltern                        /fuer-eltern/
+
+  PREISE
+    Stundenpakete & Preise            /stundenpakete-preise/
+    Erstes Paket buchen               /produkt/einzelnachhilfe-neukundenpaket/
+    Weitere Angebote                  /shop/
+                                      (Gruppen, Fragenpass, Geschenkkarte …)
+
+  TEAM
+    Unsere Lehrkräfte                 /team/
+    Marcel & unsere Geschichte        /ueber-uns/
+    So unterrichten wir               /ueber-uns/paedagogisches-konzept/
+    Was Familien sagen                /#bewertungen
+
+  KOSTENLOS LERNEN
+    Lernstand-Check                   /lernstand-check/
+    Textaufgaben-Kompass (PDF)        /textaufgaben-verstehen/
+    Arbeitsblätter                    /arbeitsblaetter/
+    Mathe-Bücher & Leseproben         /lesestudio/
+    Lerntipps & Ratgeber              /mathe-lerntipps/
+
+  HILFE
+    Ablauf & wichtige Infos           /ablauf-und-wichtige-infos/
+    Häufige Fragen                    /faq/
+    Kontakt                           /kontakt/
+
+  [ Kostenlose Probestunde ]          /probestunde/
+    -> orangefarbener Button, immer sichtbar in der Kopfzeile
+
+
+4.2 KUNDENBEREICH (Symbole rechts in der Kopfzeile)
+---------------------------------------------------
+
+  🛒 Warenkorb                         /warenkorb/
+     nur sichtbar, wenn etwas im Warenkorb liegt, mit Anzahl
+
+  👤 Anmelden                          /login/
+     Nach dem Login wird daraus "Mein Bereich" mit Untermenü:
+       Stunden nachkaufen             /produkt/einzelnachhilfe/
+       Termin ändern oder absagen     /termine-aendern-absagen/
+       Meine Lernberichte             /meine-lernberichte/
+       Mein Lernprofil                /lernprofil-check/
+       Mein Reader                    /lesestudio/
+       Start & Technik                /onboarding/
+       Feedback & Ideen               /feedback-und-ideen/
+       Abmelden
+
+
+4.3 HANDY-KOPFZEILE
+-------------------
+
+  [Logo]   Nachhilfe – Online        [Probestunde]  [☰ Menü]
+
+  Neben "Menü" kommt ein kleiner Button "Probestunde". Dann ist der
+  wichtigste Klick immer nur einen Fingertipp entfernt, auch ohne das Menü
+  zu öffnen.
+
+
+================================================================================
+ 5. WAS SICH ÄNDERT – ÜBERSICHT
+================================================================================
+
+Neu ins Menü:
+  + Online-Nachhilfe – so läuft's     /angebot/online-nachhilfe/
+  + Lücken schließen                  /angebot/mathe-themen-aufarbeiten/
+  + Prüfungsvorbereitung              /angebot/abschlusspruefungen/
+  + So unterrichten wir               /ueber-uns/paedagogisches-konzept/
+
+Umbenannt:
+  Lernwelt                       ->  Kostenlos lernen
+  So funktioniert's              ->  Hilfe
+  Über uns                       ->  Team
+  Mathe mit Marcel /
+  Unsere Geschichte              ->  Marcel & unsere Geschichte
+  Bewertungen                    ->  Was Familien sagen
+  Für Neukunden                  ->  Erstes Paket buchen
+  Für Bestandskunden             ->  Stunden nachkaufen (im Kundenbereich)
+  Alle Angebote im Shop          ->  Weitere Angebote
+  Lernmaterialien                ->  Arbeitsblätter
+  Kostenloser Mathe-Kompass      ->  Textaufgaben-Kompass (PDF)
+  Ratgeber & Wissen              ->  Lerntipps & Ratgeber
+  Mein Reader (Hauptmenü)        ->  Mathe-Bücher & Leseproben
+                                     (im Kundenbereich bleibt "Mein Reader")
+  Lernprofil-Check               ->  Mein Lernprofil (im Kundenbereich)
+
+Verschoben:
+  Für Eltern                     Kundenbereich  ->  Nachhilfe
+  Für Bestandskunden             Hauptmenü      ->  Kundenbereich
+  Warenkorb                      Hauptmenü      ->  Symbol in der Kopfzeile
+  Start & Technik                Hauptmenü      ->  Kundenbereich
+  Lernprofil-Check               Hauptmenü      ->  Kundenbereich
+  Preise + Angebote & Pakete     zwei Punkte    ->  ein Punkt "Preise"
+
+Entfernt:
+  - Zur Kasse                    Der Weg führt über den Warenkorb.
+  - Termin buchen                Bis /buchung/ fertig ist. Danach im
+                                 Kundenbereich wieder aufnehmen.
+  - Kontaktdaten                 Geht in "Kontakt" auf. /kontaktdaten/ per
+                                 301 auf /kontakt/ umleiten oder die Inhalte
+                                 (WhatsApp, Telefon, Zeiten) auf /kontakt/
+                                 übernehmen.
+  - Konto erstellen              Steht auf der Anmeldeseite.
+
+Ergebnis: 5 statt 9 Hauptpunkte, im Hauptmenü 21 statt 30 Links,
+Kunden-Funktionen gebündelt im Kundenbereich.
+
+
+================================================================================
+ 6. UMSETZUNG IN WORDPRESS – SCHRITT FÜR SCHRITT
+================================================================================
+
+Das Menü ist individuell programmiert (Elemente "nho-primary-menu",
+"nho-desktop-menu-toggle" und "nho-mobile-menu"). Die genaue Umsetzung hängt
+davon ab, ob die Einträge aus dem WordPress-Menü kommen oder fest im
+Theme-Code stehen.
+
+Schritt 1 – Herausfinden, woher die Einträge kommen
+  Design -> Menüs (oder Design -> Editor -> Navigation) öffnen.
+  - Stehen dort die 30 Links: Weiter mit Schritt 2.
+  - Stehen sie dort nicht: Sie sind im Theme-Code (z. B. header.php oder
+    ein eigenes Plugin). Dann die Struktur aus Kapitel 4 an den Entwickler
+    geben.
+
+Schritt 2 – Hauptmenü neu anlegen
+  1. Neues Menü "Hauptmenü 2026" anlegen (das alte als Sicherung behalten).
+  2. Die 5 Hauptpunkte als "Individueller Link" mit URL "#" anlegen:
+     Nachhilfe, Preise, Team, Kostenlos lernen, Hilfe.
+  3. Die Unterpunkte aus 4.1 hinzufügen und eingerückt unter den
+     jeweiligen Hauptpunkt ziehen.
+  4. "Kostenlose Probestunde" als letzten Punkt anlegen und unter
+     "Ansicht anpassen" -> "CSS-Klassen" eine Button-Klasse vergeben
+     (z. B. die Klasse, die der Probestunden-Button jetzt schon hat).
+  5. Menü der Position "Hauptmenü" zuweisen und speichern.
+
+Schritt 3 – Kundenbereich
+  1. Zweites Menü "Kundenbereich" mit den Punkten aus 4.2 anlegen.
+  2. Damit es nur für angemeldete Nutzer erscheint: Plugin "Nav Menu Roles"
+     (kostenlos) oder "If Menu" installieren und bei jedem Punkt
+     "angemeldete Nutzer" einstellen. "Anmelden" bekommt
+     "abgemeldete Nutzer".
+  3. Warenkorb-Symbol: WooCommerce bringt im Website-Editor einen Block
+     "Mini-Warenkorb" mit. Er zeigt die Anzahl und kann so eingestellt
+     werden, dass er bei leerem Warenkorb ausgeblendet wird.
+
+Schritt 4 – Desktop: Punkte sichtbar machen
+  Das braucht eine Anpassung im Theme-CSS: Ab einer Bildschirmbreite von
+  etwa 1024 px den Button "Menü" ausblenden und die 5 Hauptpunkte
+  nebeneinander in der Kopfzeile anzeigen. Darunter bleibt die jetzige
+  Handy-Ansicht unverändert. Das ist eine Aufgabe für den Entwickler.
+
+Schritt 5 – Aufräumen
+  - /kontaktdaten/ per 301 auf /kontakt/ umleiten (Plugin "Redirection"),
+    nachdem die Inhalte übernommen sind.
+  - Den Footer an das neue Menü anpassen, damit beide dieselben Namen
+    verwenden (z. B. "Prüfungsvorbereitung" statt "Abschlussprüfungen").
+
+Schritt 6 – Testen
+  - Am Handy und am Desktop jeden Link einmal anklicken.
+  - Einmal als Gast und einmal angemeldet prüfen, ob der Kundenbereich
+    richtig erscheint.
+  - Testbestellung bis zum Warenkorb durchspielen.
+
+
+================================================================================
+ CHECKLISTE ZUM ABHAKEN
+================================================================================
+
+[ ] Herausfinden, ob das Menü aus WordPress oder aus dem Theme-Code kommt
+[ ] Altes Menü sichern
+[ ] 5 Hauptpunkte anlegen (Nachhilfe, Preise, Team, Kostenlos lernen,
+    Hilfe)
+[ ] Angebotsseiten (/angebot/...) ins Menü aufnehmen
+[ ] Namen umbenennen (Liste in Kapitel 5)
+[ ] "Für Eltern" nach "Nachhilfe" verschieben
+[ ] Kundenbereich nur für angemeldete Nutzer anzeigen
+[ ] Warenkorb als Symbol mit Anzahl
+[ ] "Zur Kasse", "Termin buchen", "Kontaktdaten", "Konto erstellen"
+    entfernen
+[ ] /kontaktdaten/ -> /kontakt/ zusammenführen + 301
+[ ] Desktop: Hauptpunkte direkt sichtbar in der Kopfzeile
+[ ] Handy: Button "Probestunde" neben "Menü"
+[ ] Footer an die neuen Namen anpassen
+[ ] Alle Links als Gast und angemeldet testen
+
+================================================================================
