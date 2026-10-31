@@ -16,8 +16,10 @@ Dauer: ca. 20 Minuten. Kosten: 0 € (Free-Pläne).
   `npx wrangler@3 pages deploy <ordner> --project-name=kali-level-up --branch=main`.
 - Access-App **„Kali Level Up“** (Teil B2) für `kali-level-up.pages.dev` und `*.kali-level-up.pages.dev`,
   Sitzung 720 h, Policy „Nur ich“ (Allow, eine E-Mail-Adresse).
-- Noch **im Dashboard** zu erledigen: Login-Methode *One-time PIN* (Zero Trust → Settings → Authentication)
-  und ggf. die Ausnahme für `labs/` und `icons/` (Teil B3).
+- Access-App **„Kali Level Up – öffentliche Dateien“** (Teil B3): `kali-level-up.pages.dev/labs` und `/icons`,
+  Policy „Öffentlich“ (Bypass, Everyone) – geprüft: `labs/kly-target/server.py` lädt ohne Anmeldung.
+- Login-Methode *One-time PIN* musste **im Dashboard** ergänzt werden
+  (Integrations → Identity providers, bzw. Settings → Authentication → Login methods).
 
 ---
 
