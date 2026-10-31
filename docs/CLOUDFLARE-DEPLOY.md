@@ -7,6 +7,20 @@ Dauer: ca. 20 Minuten. Kosten: 0 € (Free-Pläne).
 
 ---
 
+## Per API eingerichtet (Stand 31.10.2026)
+
+- **Adresse:** <https://kali-level-up.pages.dev>
+- Pages-Projekt `kali-level-up` per *Direct Upload* (wrangler), Produktions-Branch `main`.
+  Hochgeladen werden nur die App-Dateien (`KLY_FILES` + `KLY_EXTRA` aus `app-files.js` plus `_headers`) –
+  **kein** automatisches Deploy bei `git push`. Neue Version: Ordner mit diesen Dateien bauen und
+  `npx wrangler@3 pages deploy <ordner> --project-name=kali-level-up --branch=main`.
+- Access-App **„Kali Level Up“** (Teil B2) für `kali-level-up.pages.dev` und `*.kali-level-up.pages.dev`,
+  Sitzung 720 h, Policy „Nur ich“ (Allow, eine E-Mail-Adresse).
+- Noch **im Dashboard** zu erledigen: Login-Methode *One-time PIN* (Zero Trust → Settings → Authentication)
+  und ggf. die Ausnahme für `labs/` und `icons/` (Teil B3).
+
+---
+
 ## Teil A – App veröffentlichen (Cloudflare Pages)
 
 1. Auf <https://dash.cloudflare.com> ein Konto anlegen bzw. anmelden.
