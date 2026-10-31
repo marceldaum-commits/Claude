@@ -76,6 +76,14 @@ export function listBackups(storage = globalThis.localStorage) {
   try { return JSON.parse(storage.getItem(BACKUP_KEY) || '[]'); } catch { return []; }
 }
 
+// Tipps: Zahl der aufgedeckten Tipps je Frage (alt: true = 1). Beim Zusammenführen gilt das Maximum.
+function mergeHints(a = {}, b = {}) {
+  const n = (v) => (v === true ? 1 : +v || 0);
+  const out = {};
+  for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) { const m = Math.max(n(a[k]), n(b[k])); if (m) out[k] = m; }
+  return out;
+}
+
 // ---------------------------------------------------------------- Prüfungen
 export function scoreAttempt(items) {
   const total = items.length;
@@ -171,7 +179,7 @@ export function mergeStates(a, b) {
       const p = x.answers?.[q] || {}, r = y.answers?.[q] || {};
       answers[q] = { ok: !!(p.ok || r.ok), at: minPos(p.ok ? p.at : 0, r.ok ? r.at : 0) || Math.max(p.at || 0, r.at || 0), attempts: Math.max(p.attempts || 0, r.attempts || 0) };
     }
-    out.rooms[id] = { startedAt: minPos(x.startedAt, y.startedAt), answers, hints: { ...(x.hints || {}), ...(y.hints || {}) }, doneAt: minPos(x.doneAt, y.doneAt) };
+    out.rooms[id] = { startedAt: minPos(x.startedAt, y.startedAt), answers, hints: mergeHints(x.hints, y.hints), doneAt: minPos(x.doneAt, y.doneAt) };
     if (!out.rooms[id].doneAt) delete out.rooms[id].doneAt;
   }
   out.activity = {};

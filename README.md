@@ -21,6 +21,12 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Tipp-Leiter statt Schwierigkeitsgrad (ab 1.4.0)
+
+Zu jeder Frage gibt es 1–5 Tipps, vom Denkanstoß bis zur Lösung. Sie sind **sofort** abrufbar, Stufe für Stufe.
+Jeder Tipp kostet einen gleichen Anteil der Punkte der Frage (mindestens 1 Punkt bleibt). Die Lösung kommt erst nach
+einer Rückfrage. Aufgedeckte Tipps werden synchronisiert (beim Zusammenführen gilt das Maximum).
+
 ## Wargames (ab 1.3.0) – Linux als Spiel
 
 Jedes Level ist ein Rätsel, die Lösung (Code `KLY{…}`) öffnet das nächste. Zwei getrennte Geschichten:

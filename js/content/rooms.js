@@ -39,15 +39,15 @@ const BASE_ROOMS = [
         id: 't1', title: 'Was du nicht siehst',
         body: T('Dateien, deren Name mit einem Punkt beginnt, zeigt ls standardmäßig nicht an. Angreifer und Admins verstecken so gern Dinge – ganz ohne Magie.',
           '', 'Wechsle nach ~/raum0/start und mach die versteckte Datei sichtbar. Die Flag steht darin.'),
-        questions: [{ id: 'q1', type: 'flag', flag: 'hidden', q: 'Flag aus der versteckten Datei', points: 10, hint: 'ls hat eine Option für „all“.' }],
+        questions: [{ id: 'q1', type: 'flag', flag: 'hidden', q: 'Flag aus der versteckten Datei', points: 10, hints: ["ls hat eine Option für „all“.", "Lösung: cd start → ls -a → cat .spur"] }],
       },
       {
         id: 't2', title: 'Die Nadel im Log',
         body: T('In ~/raum0/logs liegen mehrere Logdateien. Eine davon enthält eine Zeile mit dem Wort SECRET.',
           'Durchsuche alle Logs mit einem Befehl – nicht jede Datei einzeln öffnen.'),
         questions: [
-          { id: 'q1', type: 'text', q: 'In welcher Datei steht die Zeile? (nur Dateiname)', accept: [/^app-02\.log$/i], points: 5, hint: 'grep mit mehreren Dateien (Wildcard) zeigt den Dateinamen vor jedem Treffer.' },
-          { id: 'q2', type: 'flag', flag: 'grep', q: 'Flag aus der SECRET-Zeile', points: 10, hint: 'Die Flag steht hinter token=.' },
+          { id: 'q1', type: 'text', q: 'In welcher Datei steht die Zeile? (nur Dateiname)', accept: [/^app-02\.log$/i], points: 5, hints: ["grep mit mehreren Dateien (Wildcard) zeigt den Dateinamen vor jedem Treffer.", "Lösung: grep SECRET logs/*.log"] },
+          { id: 'q2', type: 'flag', flag: 'grep', q: 'Flag aus der SECRET-Zeile', points: 10, hints: ["Die Flag steht hinter token=.", "grep SECRET logs/*.log zeigt die Zeile.", "Lösung: alles hinter token= ist die Flag KLY{…}"] },
         ],
       },
       {
@@ -55,24 +55,24 @@ const BASE_ROOMS = [
         body: T('~/raum0/tresor/schloss.txt gehört dir – aber niemand darf sie lesen, nicht einmal du.',
           'Gib dir als Besitzer NUR Leserecht und lies die Datei.'),
         questions: [
-          { id: 'q1', type: 'text', q: 'Welche Rechte hatte die Datei ursprünglich? (oktal, dreistellig)', accept: [/^0?000$/], points: 5, hint: 'stat -c %a zeigt den oktalen Modus.' },
-          { id: 'q2', type: 'flag', flag: 'chmod', q: 'Flag aus schloss.txt', points: 10, hint: 'Symbolisch: u+r.' },
+          { id: 'q1', type: 'text', q: 'Welche Rechte hatte die Datei ursprünglich? (oktal, dreistellig)', accept: [/^0?000$/], points: 5, hints: ["stat -c %a zeigt den oktalen Modus.", "Alternativ: ls -l tresor zeigt ---------- (keine Rechte) – als Zahl ist das 000.", "Lösung: 000"] },
+          { id: 'q2', type: 'flag', flag: 'chmod', q: 'Flag aus schloss.txt', points: 10, hints: ["Symbolisch: u+r.", "chmod u+r DATEI gibt dem Besitzer (u) Leserecht (r).", "Lösung: chmod u+r tresor/schloss.txt → cat tresor/schloss.txt"] },
         ],
       },
       {
         id: 't4', title: 'Tief vergraben',
         body: 'Irgendwo unter ~/raum0/archiv liegt eine Datei mit der Endung .key. Finde sie, ohne dich durch alle Ordner zu klicken.',
         questions: [
-          { id: 'q1', type: 'text', q: 'Vollständiger Pfad ab ~ (z. B. ~/raum0/…)', accept: [/^(~|\/home\/seppi)\/raum0\/archiv\/2026\/q2\/tief\/drin\/zugang\.key$/], points: 5, hint: 'find mit -name und einem Muster in Anführungszeichen.' },
-          { id: 'q2', type: 'flag', flag: 'find', q: 'Flag aus der .key-Datei', points: 10, hint: 'cat auf den gefundenen Pfad.' },
+          { id: 'q1', type: 'text', q: 'Vollständiger Pfad ab ~ (z. B. ~/raum0/…)', accept: [/^(~|\/home\/seppi)\/raum0\/archiv\/2026\/q2\/tief\/drin\/zugang\.key$/], points: 5, hints: ["find mit -name und einem Muster in Anführungszeichen.", "Gesucht ist eine Datei mit Endung .key irgendwo unter archiv.", "Lösung: find ~/raum0/archiv -name \"*.key\""] },
+          { id: 'q2', type: 'flag', flag: 'find', q: 'Flag aus der .key-Datei', points: 10, hints: ["cat auf den gefundenen Pfad.", "Lösung: cat ~/raum0/archiv/2026/q2/tief/drin/zugang.key"] },
         ],
       },
       {
         id: 't5', title: 'Firewall zählen – und deuten',
         body: 'Die Datei ~/raum0/firewall.log enthält erlaubte und blockierte Verbindungen. Achte auf Groß-/Kleinschreibung.',
         questions: [
-          { id: 'q1', type: 'text', q: 'Wie viele Zeilen beginnen mit DENY?', accept: [/^7$/], points: 10, hint: 'Ein Anker ^ im grep-Muster und wc -l oder grep -c. Prüfe die „deny-list“-Zeile.' },
-          { id: 'q2', type: 'text', q: 'Welche IP wurde am häufigsten blockiert?', accept: [/^10\.13\.37\.21$/], points: 10, hint: 'grep … | sort | uniq -c | sort -nr' },
+          { id: 'q1', type: 'text', q: 'Wie viele Zeilen beginnen mit DENY?', accept: [/^7$/], points: 10, hints: ["Ein Anker ^ im grep-Muster und wc -l oder grep -c. Prüfe die „deny-list“-Zeile.", "Die Zeile „deny-list reloaded“ beginnt NICHT mit DENY (Groß-/Kleinschreibung!).", "Lösung: grep -c \"^DENY\" firewall.log"] },
+          { id: 'q2', type: 'text', q: 'Welche IP wurde am häufigsten blockiert?', accept: [/^10\.13\.37\.21$/], points: 10, hints: ["grep … | sort | uniq -c | sort -nr", "Erst nur die DENY-Zeilen, dann mit cut -d\" \" -f2 nur die IP herausschneiden.", "Lösung: grep \"^DENY\" firewall.log | cut -d\" \" -f2 | sort | uniq -c | sort -nr | head -1"] },
           {
             id: 'q3', type: 'mc', q: 'Was belegt die Zahl der DENY-Zeilen?', points: 10,
             options: ['Wie oft die Firewall laut diesem Log blockiert hat – nicht, ob ein Angriff stattfand.', 'Dass 7 Angreifer aktiv waren.', 'Dass die Firewall richtig konfiguriert ist.'], answer: 0,
@@ -101,22 +101,22 @@ const BASE_ROOMS = [
         body: T('Starte die Zielmaschine mit den Befehlen oben im Kasten „Zielmaschine“. Prüfe danach mit einer Header-Anfrage, ob sie antwortet.',
           '', 'Wichtig: Der Server läuft nur auf 127.0.0.1 – andere Geräte im Netz erreichen ihn nicht. So soll es sein.'),
         questions: [
-          { id: 'q1', type: 'text', q: 'Welchen Statuscode liefert http://127.0.0.1:10080/ ?', accept: [/^200$/], points: 5, hint: 'curl -I zeigt die Statuszeile.' },
-          { id: 'q2', type: 'text', q: 'Was steht im Server-Header?', accept: [/^KLY-httpd\/1\.4$/i], points: 5, hint: 'Zeile „Server:“ – den Wert exakt abschreiben.' },
+          { id: 'q1', type: 'text', q: 'Welchen Statuscode liefert http://127.0.0.1:10080/ ?', accept: [/^200$/], points: 5, hints: ["curl -I zeigt die Statuszeile.", "Die erste Zeile der Antwort sieht aus wie HTTP/1.0 ZAHL TEXT.", "Lösung: curl -I http://127.0.0.1:10080/ → die Zahl in der ersten Zeile"] },
+          { id: 'q2', type: 'text', q: 'Was steht im Server-Header?', accept: [/^KLY-httpd\/1\.4$/i], points: 5, hints: ["Zeile „Server:“ – den Wert exakt abschreiben.", "Lösung: curl -I http://127.0.0.1:10080/ | grep Server"] },
         ],
       },
       {
         id: 't2', title: 'Header verraten mehr',
         body: 'Webserver senden oft zusätzliche, selbst definierte Header (meist beginnend mit X-). Sie tauchen im Browser nicht auf – in curl schon.',
-        questions: [{ id: 'q1', type: 'flag', flag: 'header', q: 'Flag aus dem eigenen Header der Startseite', points: 10, hint: 'Lies alle Header der Startseite, nicht nur Status und Server.' }],
+        questions: [{ id: 'q1', type: 'flag', flag: 'header', q: 'Flag aus dem eigenen Header der Startseite', points: 10, hints: ["Lies alle Header der Startseite, nicht nur Status und Server.", "Eigene Header beginnen oft mit X-.", "Lösung: curl -I http://127.0.0.1:10080/ → Zeile X-KLY-Flag"] }],
       },
       {
         id: 't3', title: 'robots.txt',
         body: T('Viele Webseiten haben eine Datei /robots.txt. Sie bittet Suchmaschinen, bestimmte Pfade nicht zu indizieren.',
           'Für Analysten ist sie interessant: Sie listet oft genau die Pfade, die jemand verstecken wollte. Sie ist KEIN Zugriffsschutz.'),
         questions: [
-          { id: 'q1', type: 'text', q: 'Welcher Pfad ist in robots.txt gesperrt?', accept: [/^\/?intern\/?$/i], points: 5, hint: 'curl http://127.0.0.1:10080/robots.txt' },
-          { id: 'q2', type: 'flag', flag: 'robots', q: 'Flag aus der Datei in diesem Pfad', points: 10, hint: 'Ein Verzeichnis-Listing zeigt die enthaltene Datei.' },
+          { id: 'q1', type: 'text', q: 'Welcher Pfad ist in robots.txt gesperrt?', accept: [/^\/?intern\/?$/i], points: 5, hints: ["curl http://127.0.0.1:10080/robots.txt", "Lösung: Die Zeile Disallow: nennt den Pfad – /intern/"] },
+          { id: 'q2', type: 'flag', flag: 'robots', q: 'Flag aus der Datei in diesem Pfad', points: 10, hints: ["Ein Verzeichnis-Listing zeigt die enthaltene Datei.", "curl http://127.0.0.1:10080/intern/ listet notiz.txt.", "Lösung: curl http://127.0.0.1:10080/intern/notiz.txt"] },
           { id: 'q3', type: 'mc', q: 'Was bewirkt ein Eintrag in robots.txt technisch?', points: 10, options: ['Nichts erzwungen – es ist eine Bitte an Crawler, kein Schutz.', 'Der Pfad ist für alle gesperrt.', 'Der Server löscht den Pfad.'], answer: 0, hint: 'Konntest du den Pfad trotz Eintrag abrufen?' },
         ],
       },
@@ -124,8 +124,8 @@ const BASE_ROOMS = [
         id: 't4', title: 'Statuscodes deuten',
         body: 'Frage /admin und einen Pfad ab, den es sicher nicht gibt (z. B. /gibtsnicht). Vergleiche die Statuscodes.',
         questions: [
-          { id: 'q1', type: 'text', q: 'Statuscode von /admin', accept: [/^403$/], points: 5, hint: 'curl -I …/admin' },
-          { id: 'q2', type: 'text', q: 'Statuscode von /gibtsnicht', accept: [/^404$/], points: 5, hint: 'Gleicher Befehl, anderer Pfad.' },
+          { id: 'q1', type: 'text', q: 'Statuscode von /admin', accept: [/^403$/], points: 5, hints: ["curl -I …/admin", "Lösung: curl -I http://127.0.0.1:10080/admin → Zahl in der ersten Zeile"] },
+          { id: 'q2', type: 'text', q: 'Statuscode von /gibtsnicht', accept: [/^404$/], points: 5, hints: ["Gleicher Befehl, anderer Pfad.", "Lösung: curl -I http://127.0.0.1:10080/gibtsnicht"] },
           { id: 'q3', type: 'mc', q: 'Was ist die vorsichtigste Deutung von 403 bei /admin?', points: 10, options: ['Der Pfad reagiert, der Zugriff wird verweigert – dahinter existiert vermutlich etwas.', 'Der Server ist kaputt.', '/admin existiert sicher nicht.'], answer: 0, hint: '4xx = Client-Seite. Was unterscheidet 403 von 404?' },
         ],
       },
@@ -133,9 +133,9 @@ const BASE_ROOMS = [
         id: 't5', title: 'Weiterleitungen',
         body: 'Rufe /alt ab. curl folgt Weiterleitungen standardmäßig NICHT – das ist für Analysten gut, denn du siehst jeden Schritt einzeln.',
         questions: [
-          { id: 'q1', type: 'text', q: 'Statuscode von /alt', accept: [/^301$/], points: 5, hint: 'Header-Anfrage auf /alt.' },
-          { id: 'q2', type: 'text', q: 'Wohin leitet /alt weiter? (Pfad)', accept: [/^\/neu$/i, /^http:\/\/(127\.0\.0\.1|localhost):10080\/neu$/i], points: 5, hint: 'Header „Location:“' },
-          { id: 'q3', type: 'flag', flag: 'redirect', q: 'Flag am Ziel der Weiterleitung', points: 10, hint: 'Entweder das Ziel direkt abrufen oder curl die Weiterleitung folgen lassen (Option -L).' },
+          { id: 'q1', type: 'text', q: 'Statuscode von /alt', accept: [/^301$/], points: 5, hints: ["Header-Anfrage auf /alt.", "Lösung: curl -I http://127.0.0.1:10080/alt"] },
+          { id: 'q2', type: 'text', q: 'Wohin leitet /alt weiter? (Pfad)', accept: [/^\/neu$/i, /^http:\/\/(127\.0\.0\.1|localhost):10080\/neu$/i], points: 5, hints: ["Header „Location:“", "Lösung: curl -I http://127.0.0.1:10080/alt | grep Location"] },
+          { id: 'q3', type: 'flag', flag: 'redirect', q: 'Flag am Ziel der Weiterleitung', points: 10, hints: ["Entweder das Ziel direkt abrufen oder curl die Weiterleitung folgen lassen (Option -L).", "Lösung: curl -L http://127.0.0.1:10080/alt"] },
         ],
       },
       {
@@ -177,8 +177,8 @@ const BASE_ROOMS = [
         id: 't2', title: 'Ports finden',
         body: 'Scanne den Portbereich 10100–10199 auf 127.0.0.1.',
         questions: [
-          { id: 'q1', type: 'text', q: 'Wie viele Ports sind offen?', accept: [/^3$/], points: 10, hint: 'Zähle die Zeilen mit „open“.' },
-          { id: 'q2', type: 'text', q: 'Welcher offene Port ist der niedrigste?', accept: [/^10122$/], points: 5, hint: 'Nmap sortiert die Ausgabe aufsteigend.' },
+          { id: 'q1', type: 'text', q: 'Wie viele Ports sind offen?', accept: [/^3$/], points: 10, hints: ["Zähle die Zeilen mit „open“.", "Lösung: nmap -sT -p 10100-10199 127.0.0.1 → Zeilen mit open zählen"] },
+          { id: 'q2', type: 'text', q: 'Welcher offene Port ist der niedrigste?', accept: [/^10122$/], points: 5, hints: ["Nmap sortiert die Ausgabe aufsteigend.", "Lösung: die erste Zeile mit open in der Nmap-Ausgabe"] },
         ],
       },
       {
@@ -186,8 +186,8 @@ const BASE_ROOMS = [
         body: T('Manche Dienste senden direkt nach dem Verbindungsaufbau einen Text („Banner“). Mit netcat kannst du einfach eine Verbindung öffnen und lesen:',
           'nc 127.0.0.1 PORT   (beenden mit Strg+C)'),
         questions: [
-          { id: 'q1', type: 'text', q: 'Welcher der offenen Ports spricht KEIN HTTP?', accept: [/^10122$/], points: 5, hint: 'curl -I auf alle drei – einer antwortet nicht mit HTTP.' },
-          { id: 'q2', type: 'flag', flag: 'banner', q: 'Flag aus dem Banner', points: 10, hint: 'nc auf genau diesen Port.' },
+          { id: 'q1', type: 'text', q: 'Welcher der offenen Ports spricht KEIN HTTP?', accept: [/^10122$/], points: 5, hints: ["curl -I auf alle drei – einer antwortet nicht mit HTTP.", "Wer kein HTTP spricht, liefert bei curl einen Fehler statt Header.", "Lösung: curl -I http://127.0.0.1:PORT/ für jeden offenen Port – der Banner-Dienst ist 10122"] },
+          { id: 'q2', type: 'flag', flag: 'banner', q: 'Flag aus dem Banner', points: 10, hints: ["nc auf genau diesen Port.", "Lösung: nc 127.0.0.1 10122 (beenden mit Strg+C)"] },
         ],
       },
       {
@@ -195,9 +195,9 @@ const BASE_ROOMS = [
         body: T('Nmap kann mit -sV versuchen, Dienst und Version zu erkennen. Dafür nutzt es u. a. die Antworten der Dienste – also Selbstauskünfte.',
           'Prüfe Port 10188 mit curl -I und mit nmap -sV -p 10188 127.0.0.1.'),
         questions: [
-          { id: 'q1', type: 'text', q: 'Welche Software behauptet Port 10188 zu sein? (Server-Header exakt)', accept: [/^Apache\/2\.4\.58 \(Ubuntu\)$/i], points: 5, hint: 'Zeile „Server:“.' },
-          { id: 'q2', type: 'flag', flag: 'web2', q: 'Flag von http://127.0.0.1:10188/', points: 10, hint: 'Den Inhalt abrufen, nicht nur die Header.' },
-          { id: 'q3', type: 'text', q: 'Gegenprobe: Welches Programm läuft tatsächlich? (PC: docker top kly-r2 · Handy: ps -o pid,args)', accept: [/^python3?$/i, /^python3? .*server\.py/i], points: 10, hint: 'Die Prozessliste zeigt das Programm, nicht der Header.' },
+          { id: 'q1', type: 'text', q: 'Welche Software behauptet Port 10188 zu sein? (Server-Header exakt)', accept: [/^Apache\/2\.4\.58 \(Ubuntu\)$/i], points: 5, hints: ["Zeile „Server:“.", "Lösung: curl -I http://127.0.0.1:10188/ | grep Server"] },
+          { id: 'q2', type: 'flag', flag: 'web2', q: 'Flag von http://127.0.0.1:10188/', points: 10, hints: ["Den Inhalt abrufen, nicht nur die Header.", "Lösung: curl http://127.0.0.1:10188/"] },
+          { id: 'q3', type: 'text', q: 'Gegenprobe: Welches Programm läuft tatsächlich? (PC: docker top kly-r2 · Handy: ps -o pid,args)', accept: [/^python3?$/i, /^python3? .*server\.py/i], points: 10, hints: ["Die Prozessliste zeigt das Programm, nicht der Header.", "PC: docker top kly-r2 zeigt die Prozesse im Container.", "Lösung: python3 (der Prozess heißt python3 … server.py r2)"] },
           { id: 'q4', type: 'mc', q: 'Was folgt daraus für Scan-Ergebnisse wie „Apache 2.4.58“?', points: 10, options: ['Versionsangaben sind Hinweise und brauchen eine Gegenprobe, bevor man daraus Schwachstellen ableitet.', 'Nmap irrt sich nie.', 'Man sollte nur Banner glauben, nicht Prozesslisten.'], answer: 0, hint: 'Woher hat Nmap die Information?' },
         ],
       },
@@ -205,7 +205,7 @@ const BASE_ROOMS = [
         id: 't5', title: 'Blue-Team-Sicht',
         body: 'Der Server protokolliert jede Verbindung. PC: docker logs kly-r2 · Handy: Ausgabe im Server-Fenster.',
         questions: [
-          { id: 'q1', type: 'text', q: 'Von welcher Quell-IP kamen deine Scans laut Log? (bei Docker steht dort die Gateway-IP des Containernetzes, z. B. 172.17.0.1)', accept: [/^127\.0\.0\.1$/, /^172\.\d+\.\d+\.\d+$/], points: 10, hint: 'Die IP steht nach dem Raumkürzel in jeder Zeile.' },
+          { id: 'q1', type: 'text', q: 'Von welcher Quell-IP kamen deine Scans laut Log? (bei Docker steht dort die Gateway-IP des Containernetzes, z. B. 172.17.0.1)', accept: [/^127\.0\.0\.1$/, /^172\.\d+\.\d+\.\d+$/], points: 10, hints: ["Die IP steht nach dem Raumkürzel in jeder Zeile.", "PC: docker logs kly-r2 · Handy: Server-Fenster ansehen.", "Lösung: am Handy 127.0.0.1, bei Docker meist 172.17.0.1"] },
           { id: 'q2', type: 'mc', q: 'Warum sieht der Container bei Docker nicht 127.0.0.1?', points: 10, options: ['Docker leitet die Verbindung über ein eigenes Netz (NAT) weiter – der Container sieht die Gateway-Adresse.', 'Weil der Scan von außen kam.', 'Weil das Log falsch ist.'], answer: 0, hint: 'Wo genau läuft der Container – direkt auf dem Host oder in einem eigenen Netz?' },
           { id: 'q3', type: 'confirm', q: 'Maschine r2 gestoppt.', points: 5 },
         ],
@@ -229,23 +229,23 @@ const BASE_ROOMS = [
       {
         id: 't1', title: 'Rekognoszierung', body: 'Was läuft da, und welche Pfade gibt es? Wortliste auf Kali: /usr/share/wordlists/dirb/common.txt',
         questions: [
-          { id: 'q1', type: 'text', q: 'In welchem Verzeichnis liegt die Sicherung? (z. B. /name/)', accept: [/^\/?backup\/?$/i], points: 15, hint: 'Verzeichnissuche mit Wortliste – oder überlege, wie Entwickler Sicherungsordner nennen.' },
-          { id: 'q2', type: 'flag', flag: 'user', q: 'User-Flag', points: 20, hint: 'Die Sicherung ist eine Textdatei.' },
+          { id: 'q1', type: 'text', q: 'In welchem Verzeichnis liegt die Sicherung? (z. B. /name/)', accept: [/^\/?backup\/?$/i], points: 15, hints: ["Verzeichnissuche mit Wortliste – oder überlege, wie Entwickler Sicherungsordner nennen.", "Kali: gobuster dir -u http://127.0.0.1:10280 -w /usr/share/wordlists/dirb/common.txt", "Der Ordner heißt auf Englisch „Sicherung“.", "Lösung: /backup/"] },
+          { id: 'q2', type: 'flag', flag: 'user', q: 'User-Flag', points: 20, hints: ["Die Sicherung ist eine Textdatei.", "curl http://127.0.0.1:10280/backup/ zeigt den Dateinamen.", "Lösung: curl http://127.0.0.1:10280/backup/config.bak"] },
         ],
       },
       {
         id: 't2', title: 'Zugriff', body: 'Es gibt einen geschützten Bereich.',
         questions: [
-          { id: 'q1', type: 'text', q: 'Welcher Pfad verlangt eine Anmeldung?', accept: [/^\/?admin\/?$/i], points: 10, hint: 'Welcher Pfad antwortet mit 401?' },
-          { id: 'q2', type: 'text', q: 'Welches Authentifizierungsverfahren verlangt er? (Header WWW-Authenticate)', accept: [/^basic$/i], points: 10, hint: 'curl -I auf den Pfad.' },
-          { id: 'q3', type: 'flag', flag: 'admin', q: 'Admin-Flag', points: 25, hint: 'curl kann Benutzer:Passwort mit -u mitschicken.' },
+          { id: 'q1', type: 'text', q: 'Welcher Pfad verlangt eine Anmeldung?', accept: [/^\/?admin\/?$/i], points: 10, hints: ["Welcher Pfad antwortet mit 401?", "Die Wortliste aus Task 1 findet ihn auch. 401 heißt „Anmeldung nötig“.", "Lösung: /admin"] },
+          { id: 'q2', type: 'text', q: 'Welches Authentifizierungsverfahren verlangt er? (Header WWW-Authenticate)', accept: [/^basic$/i], points: 10, hints: ["curl -I auf den Pfad.", "Lösung: curl -I http://127.0.0.1:10280/admin → WWW-Authenticate: Basic"] },
+          { id: 'q3', type: 'flag', flag: 'admin', q: 'Admin-Flag', points: 25, hints: ["curl kann Benutzer:Passwort mit -u mitschicken.", "Benutzer und Passwort stehen in config.bak (admin_user, admin_pass).", "Lösung: curl -u wartung:PASSWORT http://127.0.0.1:10280/admin"] },
         ],
       },
       {
         id: 't3', title: 'Blue-Team-Gegenbeleg', body: 'Jetzt die andere Seite: Was hat der Server über dich protokolliert?',
         questions: [
-          { id: 'q1', type: 'text', q: 'Welcher Benutzername steht im Log bei der erfolgreichen Anmeldung?', accept: [/^wartung$/i], points: 10, hint: 'Suche im Log nach AUTH.' },
-          { id: 'q2', type: 'text', q: 'Mit welchem HTTP-Status antwortete /admin auf Anfragen ohne gültige Anmeldung?', accept: [/^401$/], points: 5, hint: 'Steht in jeder Zugriffszeile.' },
+          { id: 'q1', type: 'text', q: 'Welcher Benutzername steht im Log bei der erfolgreichen Anmeldung?', accept: [/^wartung$/i], points: 10, hints: ["Suche im Log nach AUTH.", "PC: docker logs kly-r3 | grep AUTH", "Lösung: wartung"] },
+          { id: 'q2', type: 'text', q: 'Mit welchem HTTP-Status antwortete /admin auf Anfragen ohne gültige Anmeldung?', accept: [/^401$/], points: 5, hints: ["Steht in jeder Zugriffszeile.", "Lösung: 401"] },
           { id: 'q3', type: 'mc', q: 'Welche Maßnahme schließt die Lücke ZUERST und am wirksamsten?', points: 15, options: ['Sicherung vom Webserver entfernen UND das Passwort ändern – es ist kompromittiert.', 'Nur /backup/ in robots.txt eintragen.', 'Den Server-Header ändern.'], answer: 0, hint: 'Was bleibt gefährlich, wenn die Datei weg ist, das Passwort aber gleich?' },
           { id: 'q4', type: 'mc', q: 'Welche Detection-Idee passt zu diesem Fall am besten?', points: 15, options: ['Alarm bei Abruf von Dateien unter /backup/ oder mit Endungen wie .bak – plus erfolgreiche Anmeldung kurz danach von derselben Quelle.', 'Alarm bei jedem 200-Status.', 'Alarm, wenn jemand robots.txt liest – das allein beweist einen Angriff.'], answer: 0, hint: 'Welche Kombination unterscheidet den Angriff von normalem Verkehr?' },
           { id: 'q5', type: 'confirm', q: 'Maschine r3 gestoppt.', points: 5 },

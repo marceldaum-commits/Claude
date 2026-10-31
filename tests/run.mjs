@@ -338,7 +338,8 @@ t('Räume vollständig', () => {
       if (q.type === 'flag') ok(r.machine.kind === 'sandbox' ? r.flags.includes(q.flag)
         : r.machine.kind === 'ssh' ? new RegExp(`\\$\\(code ${q.flag}\\)`).test(readFileSync(join(ROOT, 'labs', r.machine.lab, 'setup.sh'), 'utf8'))
         : src.includes(`flag("${r.id}", "${q.flag}")`) || src.includes(`flag('${r.id}', '${q.flag}')`), `${r.id}: Flag ${q.flag} fehlt im Ziel`);
-      if (q.type !== 'confirm') ok(q.hint, `${r.id}.${tk.id}.${q.id} Hinweis`);
+      if (q.type !== 'confirm') ok(q.hint || q.hints?.length, `${r.id}.${tk.id}.${q.id} Hinweis`);
+      if (r.type === 'wargame') ok(q.hints?.length >= 3 && /^Lösung/.test(q.hints.at(-1)), `${r.id}.${tk.id}: Tipp-Leiter bis zur Lösung`);
     }
     if (r.machine.kind === 'target') for (const p of r.machine.ports) ok(src.includes(String(p)), `Port ${p}`);
     if (r.machine.kind === 'ssh') for (const f of r.machine.files) ok(existsSync(join(ROOT, 'labs', r.machine.lab, f)), `${r.id}: ${f} fehlt`);
@@ -456,6 +457,9 @@ t('Merge: Räume und Aktivität', () => {
   const m = mergeStates(b, a);
   ok(m.rooms.r1.answers['t1.q1'].ok && m.rooms.r1.answers['t2.q1'].ok); eq(m.rooms.r1.answers['t1.q1'].attempts, 4);
   ok(m.rooms.r1.hints['t2.q1']); eq(Object.keys(m.activity).length, 2);
+  const c = defaultState(), d = defaultState();
+  c.rooms.w1 = { answers: {}, hints: { 's1.q1': 2, 's2.q1': true } }; d.rooms.w1 = { answers: {}, hints: { 's1.q1': 3 } };
+  eq(mergeStates(c, d).rooms.w1.hints, { 's1.q1': 3, 's2.q1': 1 }, 'Tipps: Maximum');
 });
 t('Serie (Streak)', () => {
   const s = defaultState(); const now = new Date(Date.UTC(2026, 9, 31, 12));

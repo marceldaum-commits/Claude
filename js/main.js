@@ -1017,7 +1017,15 @@ const roomState = (id) => state.rooms[id] || (state.rooms[id] = { answers: {}, h
 const qOk = (rid, key) => !!state.rooms[rid]?.answers?.[key]?.ok;
 function roomDone(id) { return allQs(ROOM[id]).every(x => qOk(id, x.key)); }
 function roomPct(id) { const qs = allQs(ROOM[id]); return Math.round(qs.filter(x => qOk(id, x.key)).length / qs.length * 100); }
-function roomPoints(id) { return allQs(ROOM[id]).filter(x => qOk(id, x.key)).reduce((n, x) => n + (x.q.points || 0), 0); }
+// Tipp-Leiter: Jeder Tipp ist sofort abrufbar und kostet einen gleichen Anteil der Punkte (mind. 1 Punkt bleibt).
+const hintsOf = (q) => q.hints || (q.hint ? [q.hint] : []);
+const hintsUsed = (rid, key) => { const h = state.rooms[rid]?.hints?.[key]; return h === true ? 1 : (+h || 0); };
+const hintCost = (q) => { const n = hintsOf(q).length; return n ? q.points / n : 0; };
+function earned(rid, x) {
+  if (!qOk(rid, x.key)) return 0;
+  return Math.max(1, Math.round(x.q.points - hintsUsed(rid, x.key) * hintCost(x.q)));
+}
+function roomPoints(id) { return allQs(ROOM[id]).reduce((n, x) => n + earned(id, x), 0); }
 function roomPointsTotal() { return ROOMS.reduce((n, r) => n + roomPoints(r.id), 0); }
 
 function roomLock(r) {
@@ -1155,8 +1163,25 @@ function questionHTML(r, t, q) {
     input = `<div class="row" style="flex-wrap:nowrap"><input type="text" id="in-${id}" data-k="${key}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${q.type === 'flag' ? 'KLY{…}' : 'Antwort'}" ${ok ? 'disabled value="✓ gelöst"' : ''}><button class="btn small primary" data-k="${key}" data-send ${ok ? 'disabled' : ''}>Senden</button></div>`;
   }
   return `<div class="q" id="q-${id}" style="margin:.7rem 0">
-    <div class="row between"><b class="small">${ok ? '✓ ' : ''}${esc(q.q)}</b><span class="small muted">${q.points} P.</span></div>
-    ${input}<div class="qfb small" data-fb="${key}"></div></div>`;
+    <div class="row between"><b class="small">${ok ? '✓ ' : ''}${esc(q.q)}</b><span class="small muted" data-pts="${key}">${pointsLabel(r, t, q)}</span></div>
+    ${input}<div class="qfb small" data-fb="${key}"></div><div class="tips" data-tips="${key}">${tipsHTML(r, q, key)}</div></div>`;
+}
+
+function pointsLabel(r, t, q) {
+  const key = qKey(t, q), used = hintsUsed(r.id, key);
+  if (qOk(r.id, key)) return `${earned(r.id, { q, key })} P.`;
+  return used ? `noch ${Math.max(1, Math.round(q.points - used * hintCost(q)))} von ${q.points} P.` : `${q.points} P.`;
+}
+
+function tipsHTML(r, q, key) {
+  const all = hintsOf(q); if (!all.length) return '';
+  const used = Math.min(hintsUsed(r.id, key), all.length);
+  const shown = all.slice(0, used).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${all.length}:</b> ${esc(h)}</div>`).join('');
+  const ok = qOk(r.id, key);
+  const after = Math.max(1, Math.round(q.points - (used + 1) * hintCost(q)));
+  const last = used === all.length - 1 && /^Lösung/i.test(all[all.length - 1]);
+  const btn = !ok && used < all.length ? `<button class="btn small ghost" data-tip="${key}">💡 ${last ? 'Lösung zeigen' : (used ? 'Nächster Tipp' : 'Tipp') + ` ${used + 1}/${all.length}`} · danach noch ${after} P.</button>` : '';
+  return shown + btn;
 }
 
 views.raum = (id) => {
@@ -1232,19 +1257,34 @@ views.raum = (id) => {
         if (ok) {
           ans.ok = true; ans.at = Date.now(); markActivity(state); save();
           if (r.onSolve && sh && q.type === 'flag') r.onSolve(sh, q.flag);
-          fb.innerHTML = `<span style="color:var(--lime)">✓ Richtig · +${q.points} Punkte</span>`;
+          const got = earned(r.id, { q, key });
+          fb.innerHTML = `<span style="color:var(--lime)">✓ Richtig · +${got} Punkte${got < q.points ? ` (von ${q.points}, Tipps genutzt)` : ''}</span>`;
+          refreshQ(key);
+          const det = fb.closest('details');
+          if (det && [...det.querySelectorAll('[data-fb]')].every(x => qOk(r.id, x.dataset.fb))) {
+            const next = det.nextElementSibling;
+            if (next && next.tagName === 'DETAILS') { next.open = true; setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300); }
+          }
           $$(`[data-k="${CSS.escape(key)}"]`, root).forEach(x => { x.disabled = true; if (x.tagName === 'BUTTON' && x.dataset.i == q.answer) x.classList.add('right'); });
           showDone();
         } else {
           save();
-          const limit = r.type === 'challenge' ? 3 : 2;
-          const canHint = q.hint && ans.attempts >= limit && !rs.hints[key];
-          fb.innerHTML = `<span style="color:var(--red)">✗ Nicht korrekt (${ans.attempts}. Versuch).</span> ${q.type === 'flag' && !/^KLY\{[0-9a-f]{16}\}$/.test(normFlag(value)) ? 'Flags haben das Format KLY{16 Hex-Zeichen}. ' : ''}${rs.hints[key] ? `<div class="feedback info">${esc(q.hint)}</div>` : canHint ? `<button class="btn small" data-hint="${key}">Hinweis anzeigen (einmalig)</button>` : q.hint ? `<span class="muted">Hinweis ab ${limit} eigenen Versuchen.</span>` : ''}`;
-          const hb = fb.querySelector('[data-hint]');
-          if (hb) hb.onclick = () => { rs.hints[key] = true; save(); hb.outerHTML = `<div class="feedback info">${esc(q.hint)}</div>`; };
+          fb.innerHTML = `<span style="color:var(--red)">✗ Nicht korrekt (${ans.attempts}. Versuch).</span> ${q.type === 'flag' && !/^KLY\{[0-9a-f]{16}\}$/.test(normFlag(value)) ? 'Flags haben das Format KLY{16 Hex-Zeichen}. ' : ''}${hintsOf(q).length && hintsUsed(r.id, key) < hintsOf(q).length ? '<span class="muted">Feststecken ist normal – hol dir unten einen Tipp.</span>' : ''}`;
           if (q.type === 'mc') { const b = root.querySelector(`[data-k="${CSS.escape(key)}"][data-i="${value}"]`); b && b.classList.add('wrong'); }
         }
       };
+      function refreshQ(key) {
+        const { t, q } = find(key);
+        const tips = root.querySelector(`[data-tips="${CSS.escape(key)}"]`); if (tips) tips.innerHTML = tipsHTML(r, q, key);
+        const pts = root.querySelector(`[data-pts="${CSS.escape(key)}"]`); if (pts) pts.textContent = pointsLabel(r, t, q);
+      }
+      root.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-tip]'); if (!b) return;
+        const key = b.dataset.tip, { q } = find(key), all = hintsOf(q), used = hintsUsed(r.id, key);
+        if (used >= all.length) return;
+        if (used === all.length - 1 && /^Lösung/i.test(all[used]) && !twoTap(b, 'Wirklich die Lösung zeigen?')) return;
+        rs.hints[key] = used + 1; save(); refreshQ(key);
+      });
       $$('[data-send]', root).forEach(b => b.onclick = () => verdict(b.dataset.k, root.querySelector(`input[data-k="${CSS.escape(b.dataset.k)}"]`).value));
       $$('input[data-k]', root).forEach(i => i.onkeydown = (e) => { if (e.key === 'Enter') verdict(i.dataset.k, i.value); });
       $$('.opt[data-k]', root).forEach(b => b.onclick = () => verdict(b.dataset.k, b.dataset.i));
