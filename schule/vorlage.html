@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--ARTIFACT-START-->
+<title>Christian-Schad-Grundschule Nilkheim</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Staatliche Grundschule in Aschaffenburg-Nilkheim: Termine, Krankmeldung, Ganztag, Eltern-ABC, Ansprechpartner und Schulleben.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600&display=swap">
+<style>
+/* Layout: eine kleine Galerie – viel Weißraum, Kinderbilder als gerahmte Exponate mit Museumsschild,
+   Königsblau wie Füllertinte, Buntstift-Punkte und Handschrift-Notizen als Charme. */
+:root{
+  --paper:#fbfbf8; --sheet:#ffffff; --ink:#1c2240; --ink-2:#596079; --line:#e6e5df; --hair:#efeee9;
+  --blue:#2b3cae; --blue-ink:#ffffff; --blue-soft:#eceefb;
+  --poppy:#d2412e; --poppy-soft:#fbe9e5;
+  --sun:#e9b01f; --sun-soft:#fcf3d9;
+  --leaf:#3c8a5a; --leaf-soft:#e6f2ea;
+  --sky:#3f7fd0; --sky-soft:#e7f0fb;
+  --frame:#2a2620;
+  --shadow:0 1px 1px rgb(28 34 64 / .04), 0 10px 30px -12px rgb(28 34 64 / .18);
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-hand:"Caveat", "Segoe Print", "Comic Sans MS", cursive;
+  --r:10px; --max:1120px;
+  --gut-l:max(20px, env(safe-area-inset-left, 0px));
+  --gut-r:max(20px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#12141f; --sheet:#191c2a; --ink:#eeeef3; --ink-2:#a3a8bd; --line:#2b2f42; --hair:#222536;
+  --blue:#9aa8ff; --blue-ink:#11142a; --blue-soft:#20264a;
+  --poppy:#ff8a73; --poppy-soft:#3a201c;
+  --sun:#f3c64e; --sun-soft:#352c12;
+  --leaf:#72c995; --leaf-soft:#18301f;
+  --sky:#8ab8ff; --sky-soft:#1b2a44;
+  --frame:#0a0b10;
+  --shadow:0 1px 1px rgb(0 0 0 / .3), 0 12px 30px -12px rgb(0 0 0 / .6);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#12141f; --sheet:#191c2a; --ink:#eeeef3; --ink-2:#a3a8bd; --line:#2b2f42; --hair:#222536;
+  --blue:#9aa8ff; --blue-ink:#11142a; --blue-soft:#20264a;
+  --poppy:#ff8a73; --poppy-soft:#3a201c;
+  --sun:#f3c64e; --sun-soft:#352c12;
+  --leaf:#72c995; --leaf-soft:#18301f;
+  --sky:#8ab8ff; --sky-soft:#1b2a44;
+  --frame:#0a0b10;
+  --shadow:0 1px 1px rgb(0 0 0 / .3), 0 12px 30px -12px rgb(0 0 0 / .6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important; transition:none!important} }
+body{margin:0; background:var(--paper); color:var(--ink); font:400 1.0625rem/1.65 var(--f-body)}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:60; background:var(--paper)}
+a{color:inherit}
+h1,h2,h3,h4{font-family:var(--f-display); font-weight:400; line-height:1.12; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.5rem, 5.6vw, 4.4rem); letter-spacing:-.015em; hyphens:auto; overflow-wrap:break-word}
+h2{font-size:clamp(1.7rem, 3.2vw, 2.4rem); letter-spacing:-.01em}
+h3{font-size:1.28rem}
+p{margin:0}
+.wrap{max-width:var(--max); margin:0 auto; padding-left:var(--gut-l); padding-right:var(--gut-r)}
+.eyebrow{font:700 .74rem/1.2 var(--f-body); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2)}
+.hand{font-family:var(--f-hand); font-weight:600; color:var(--blue); font-size:1.45rem; line-height:1.1}
+.muted{color:var(--ink-2)}
+:focus-visible{outline:2px solid var(--blue); outline-offset:3px; border-radius:6px}
+.skip{position:absolute; left:-999px; top:8px; background:var(--ink); color:var(--paper); padding:10px 14px; border-radius:8px; z-index:100}
+.skip:focus{left:16px}
+.dots{display:inline-flex; gap:5px; vertical-align:middle}
+.dots i{width:8px; height:8px; border-radius:50%; display:block}
+.dots i:nth-child(1){background:var(--poppy)} .dots i:nth-child(2){background:var(--sun)} .dots i:nth-child(3){background:var(--sky)} .dots i:nth-child(4){background:var(--leaf)}
+
+/* ---------- Kopfzeile mit Aufklapp-Menü ---------- */
+.top{position:sticky; top:env(safe-area-inset-top, 0px); z-index:50; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(12px); border-bottom:1px solid var(--line)}
+.top .wrap{display:flex; align-items:center; gap:18px; min-height:74px; max-width:1320px}
+.brand small{white-space:nowrap}
+.brand{flex:none} .brand b{white-space:nowrap}
+@media (max-width:420px){ .brand b{white-space:normal} }
+.brand{display:flex; align-items:center; gap:12px; text-decoration:none; min-width:0}
+.brand svg{flex:none}
+.brand b{display:block; font:400 1.12rem/1.1 var(--f-display)}
+.brand small{display:flex; align-items:center; gap:8px; font-size:.78rem; color:var(--ink-2); margin-top:3px; letter-spacing:.04em}
+.nav{display:flex; gap:2px; margin-left:auto; align-items:center}
+.nav > a, .dd > button{display:inline-flex; align-items:center; gap:6px; padding:9px 13px; border:0; background:none; border-radius:999px; text-decoration:none; font:700 .95rem var(--f-body); color:var(--ink-2); cursor:pointer; white-space:nowrap}
+.nav > a:hover, .dd > button:hover, .dd.open > button{color:var(--ink); background:var(--hair)}
+.nav [aria-current="page"]{color:var(--ink)}
+.nav [aria-current="page"]::after{content:""; width:5px; height:5px; border-radius:50%; background:var(--poppy); margin-left:2px}
+.dd{position:relative}
+.dd > button svg{transition:transform .2s}
+.dd.open > button svg{transform:rotate(180deg)}
+.panel{position:absolute; top:calc(100% + 10px); left:50%; transform:translateX(-50%); min-width:300px; background:var(--sheet); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:10px; display:none}
+.panel::before{content:""; position:absolute; inset:-12px 0 auto; height:12px}
+.dd.open .panel{display:grid; animation:drop .18s ease-out}
+@keyframes drop{from{transform:translate(-50%, -4px)} to{transform:translate(-50%, 0)}}
+.panel.two{grid-template-columns:1fr 1fr; min-width:540px}
+.panel a{display:block; padding:10px 12px; border-radius:10px; text-decoration:none}
+.panel a:hover, .panel a:focus-visible{background:var(--hair)}
+.panel a b{display:block; font-weight:700; font-size:.97rem}
+.panel a small{display:block; color:var(--ink-2); font-size:.84rem; line-height:1.35}
+.panel .note{grid-column:1/-1; display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px 4px; margin-top:4px; border-top:1px solid var(--line)}
+.tools{display:flex; gap:6px; align-items:center}
+.iconbtn{display:inline-grid; place-items:center; width:42px; height:42px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer}
+.iconbtn:hover{background:var(--hair)}
+.btn{display:inline-flex; align-items:center; gap:8px; justify-content:center; min-height:48px; padding:0 22px; border-radius:999px; font:700 1rem var(--f-body); text-decoration:none; border:1.5px solid transparent; cursor:pointer; transition:background .15s, color .15s}
+.btn-blue{background:var(--blue); color:var(--blue-ink)}
+.btn-blue:hover{filter:brightness(1.08)}
+.btn-line{border-color:var(--line); color:var(--ink); background:var(--sheet)}
+.btn-line:hover{border-color:var(--ink)}
+.top .btn{min-height:42px; padding:0 18px}
+.menubtn{display:none}
+@media (max-width:1240px){
+  .nav{display:none}
+  .menubtn{display:inline-grid}
+  .tools{margin-left:auto}
+}
+@media (max-width:560px){ #themeBtn{display:none} .top .wrap{gap:10px} .top .btn-blue span{display:none} .top .btn-blue{width:42px; padding:0} .brand small{display:none} .brand b{font-size:1rem} }
+
+.drawer{position:fixed; inset:0; z-index:70; background:rgb(10 12 25 / .4)}
+.drawer nav{position:absolute; right:0; top:0; bottom:0; width:min(380px, 90vw); background:var(--paper); padding:calc(16px + env(safe-area-inset-top,0px)) max(20px, env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) 20px; overflow:auto; display:flex; flex-direction:column}
+.drawer .dh{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.drawer details{border-bottom:1px solid var(--line)}
+.drawer summary{list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:15px 4px; font:400 1.25rem var(--f-display)}
+.drawer summary::-webkit-details-marker{display:none}
+.drawer summary svg{transition:transform .2s; color:var(--ink-2)}
+.drawer details[open] summary svg{transform:rotate(180deg)}
+.drawer details div{display:grid; padding:0 0 12px}
+.drawer details a, .drawer .solo{padding:9px 6px; text-decoration:none; font-weight:700; border-radius:8px}
+.drawer details a:hover{background:var(--hair)}
+.drawer .solo{display:block; padding:15px 4px; font:400 1.25rem var(--f-display); border-bottom:1px solid var(--line)}
+.drawer .btn{margin-top:20px}
+
+/* ---------- Startseite ---------- */
+.hero{padding-block:72px 40px}
+.hero .wrap{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center}
+.hero-copy{display:flex; flex-direction:column; gap:24px; min-width:0}
+.hero h1 em{font-style:normal; color:var(--poppy)}
+.hero .lead{font-size:1.18rem; max-width:30em; color:var(--ink-2)}
+.hero-actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+@media (max-width:900px){ .hero .wrap{grid-template-columns:1fr; gap:44px} .hero{padding-block:44px 28px} }
+
+/* Exponat: gerahmtes Kinderbild mit Museumsschild */
+.exhibit{position:relative; margin:0; justify-self:center; width:min(100%, 480px)}
+.frame{background:var(--sheet); padding:clamp(14px, 3vw, 26px); border:10px solid var(--frame); box-shadow:var(--shadow); transform:rotate(1.2deg)}
+.frame .ph{aspect-ratio:5/4}
+.label{position:absolute; left:-14px; bottom:-30px; background:var(--sheet); border:1px solid var(--line); padding:12px 16px; box-shadow:var(--shadow); max-width:250px; transform:rotate(-1.5deg)}
+.label b{display:block; font:400 1.05rem var(--f-display)}
+.label small{display:block; color:var(--ink-2); font-size:.82rem; line-height:1.4}
+.exhibit .hand{position:absolute; right:-6px; top:-34px; transform:rotate(4deg)}
+@media (max-width:560px){ .label{left:0; bottom:-36px} .exhibit .hand{right:0} }
+
+.ph{position:relative; max-width:100%; overflow:hidden; background:var(--c, var(--sky-soft))}
+.ph img{width:100%; height:100%; object-fit:cover; display:block}
+.ph .fb{position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:16px; font-family:var(--f-hand); font-size:1.7rem; color:var(--ink); opacity:.55}
+.ph img + .fb{display:none}
+
+/* Heute-Leiste */
+.today{padding-block:40px 8px}
+.today-bar{display:grid; grid-template-columns:auto 1fr auto; gap:24px; align-items:center; padding:18px 22px; background:var(--sheet); border:1px solid var(--line); border-radius:var(--r)}
+.today-bar .when{display:flex; flex-direction:column; gap:2px; padding-right:24px; border-right:1px solid var(--line)}
+.today-bar .when b{font:400 1.6rem/1 var(--f-display); font-variant-numeric:tabular-nums}
+.today-bar .msg{display:flex; gap:10px; align-items:baseline; min-width:0}
+.today-bar .msg .dot{flex:none; width:9px; height:9px; border-radius:50%; background:var(--leaf); transform:translateY(-1px)}
+.today-bar .msg.warn .dot{background:var(--sun)} .today-bar .msg.alert .dot{background:var(--poppy)}
+.today-bar > *{min-width:0}
+.today-bar a{font-weight:700; text-decoration:none}
+.today-bar a:hover{color:var(--blue)}
+@media (max-width:760px){ .today-bar{grid-template-columns:1fr; gap:12px} .today-bar .when{flex-direction:row; align-items:baseline; gap:10px; padding:0 0 12px; border-right:0; border-bottom:1px solid var(--line)} }
+
+/* Abschnitte */
+.sec{padding-block:88px}
+.sec-head{display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap; margin-bottom:36px}
+.sec-head > div{display:flex; flex-direction:column; gap:10px; max-width:36em}
+.link{font-weight:700; text-decoration:none; display:inline-flex; gap:6px; align-items:center; color:var(--blue)}
+.link:hover{text-decoration:underline; text-underline-offset:4px}
+
+/* Für Eltern: drei Wege */
+.ways{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:0; border-top:1px solid var(--line)}
+.way{display:flex; flex-direction:column; gap:10px; padding:28px 28px 30px 0; text-decoration:none; border-bottom:1px solid var(--line)}
+.way + .way{padding-left:28px; border-left:1px solid var(--line)}
+.way .num{font:400 2.4rem/1 var(--f-display); color:var(--c)}
+.way h3{display:flex; align-items:center; gap:8px}
+.way h3::after{content:"→"; font-family:var(--f-body); color:var(--ink-2); transition:transform .2s}
+.way:hover h3::after{transform:translateX(4px); color:var(--blue)}
+.way p{color:var(--ink-2)}
+@media (max-width:800px){ .ways{grid-template-columns:1fr} .way, .way + .way{padding:22px 0; border-left:0} }
+
+/* Über uns kurz */
+.intro{display:grid; grid-template-columns:.9fr 1.1fr; gap:72px; align-items:center}
+.intro .photo{position:relative}
+.intro .photo .ph{aspect-ratio:4/5; border-radius:4px}
+.intro .photo .tape{position:absolute; top:-12px; left:50%; width:110px; height:28px; transform:translateX(-50%) rotate(-3deg); background:color-mix(in srgb, var(--sun) 45%, transparent); opacity:.9}
+.intro .txt{display:flex; flex-direction:column; gap:20px; min-width:0}
+.figs{display:flex; flex-wrap:wrap; gap:14px 40px; padding-top:8px}
+.figs div{display:flex; flex-direction:column}
+.figs b{font:400 2.3rem/1 var(--f-display)}
+.figs span{font-size:.9rem; color:var(--ink-2)}
+@media (max-width:860px){ .intro{grid-template-columns:1fr; gap:40px} .intro .photo .ph{aspect-ratio:4/3} }
+
+/* Termine */
+.dates{display:grid; border-top:1px solid var(--line)}
+.date{display:grid; grid-template-columns:110px 1fr auto; gap:22px; align-items:baseline; padding:18px 2px; border-bottom:1px solid var(--line)}
+.date time{font:400 1.1rem var(--f-display); font-variant-numeric:tabular-nums}
+.date time small{display:block; font:400 .82rem var(--f-body); color:var(--ink-2)}
+.date p{min-width:0}
+.date .tag{font-size:.76rem; font-weight:700; padding:3px 10px; border-radius:999px; border:1px solid var(--line); color:var(--ink-2); white-space:nowrap}
+.date.is-next .tag{background:var(--blue); border-color:var(--blue); color:var(--blue-ink)}
+.date.is-past{opacity:.45}
+.date.is-free .tag{background:var(--leaf-soft); border-color:transparent; color:var(--leaf)}
+@media (max-width:620px){ .date{grid-template-columns:1fr; gap:4px} .date .tag{justify-self:start} }
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--sheet)}
+.seg button{border:0; background:transparent; font:700 .9rem var(--f-body); color:var(--ink-2); padding:7px 14px; border-radius:999px; cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+
+/* Lernen */
+.learn{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.learn a{background:var(--sheet); padding:24px 22px 26px; text-decoration:none; display:flex; flex-direction:column; gap:10px}
+.learn a:hover{background:var(--paper)}
+.learn .swatch{width:30px; height:30px; border-radius:50% 50% 50% 6px}
+.learn p{color:var(--ink-2); font-size:.95rem; line-height:1.45}
+@media (max-width:960px){ .learn{grid-template-columns:repeat(2, minmax(0,1fr))} }
+@media (max-width:520px){ .learn{grid-template-columns:1fr} }
+
+/* Schulleben */
+.life{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:32px}
+.story{display:flex; flex-direction:column; gap:10px; min-width:0}
+.story .ph{aspect-ratio:4/3; border-radius:4px}
+.story time{font-size:.76rem; color:var(--ink-2); font-weight:700; text-transform:uppercase; letter-spacing:.14em; margin-top:6px}
+.story h3{font-size:1.2rem}
+.story p{color:var(--ink-2); font-size:.96rem}
+@media (max-width:860px){ .life{grid-template-columns:repeat(2, minmax(0,1fr))} }
+@media (max-width:540px){ .life{grid-template-columns:1fr} }
+
+/* Kontakt (Unterseite) */
+.contact{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:32px}
+.contact > div{display:flex; flex-direction:column; gap:12px; min-width:0}
+.kv{display:grid}
+.kv div{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:11px 0; border-bottom:1px solid var(--line); flex-wrap:wrap}
+.kv span{color:var(--ink-2); font-size:.92rem}
+.kv b{font-variant-numeric:tabular-nums; word-break:break-word}
+.copy{border:1px solid var(--line); background:var(--sheet); color:var(--ink-2); font:700 .76rem var(--f-body); border-radius:999px; padding:4px 10px; cursor:pointer}
+.copy:hover{color:var(--ink); border-color:var(--ink-2)}
+@media (max-width:900px){ .contact{grid-template-columns:1fr} }
+
+/* Fußzeile */
+footer{background:var(--ink); color:var(--paper); padding-block:64px calc(36px + env(safe-area-inset-bottom,0px)); margin-top:40px}
+footer .wrap{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px}
+footer h4{font:700 .74rem var(--f-body); letter-spacing:.16em; text-transform:uppercase; opacity:.65; margin-bottom:12px}
+footer .big{font:400 1.6rem/1.2 var(--f-display); margin-bottom:14px}
+footer a{display:block; text-decoration:none; padding:3px 0; opacity:.88}
+footer a:hover{opacity:1; text-decoration:underline; text-underline-offset:3px}
+footer p{opacity:.8; font-size:.95rem}
+footer .legal{grid-column:1/-1; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-top:24px; margin-top:12px; border-top:1px solid color-mix(in srgb, var(--paper) 18%, transparent); font-size:.85rem; opacity:.75}
+footer .legal a{display:inline; margin-left:16px}
+@media (max-width:860px){ footer .wrap{grid-template-columns:1fr 1fr} }
+@media (max-width:480px){ footer .wrap{grid-template-columns:1fr} }
+
+/* ---------- Unterseiten ---------- */
+.page-head{padding-block:64px 36px; border-bottom:1px solid var(--line)}
+.page-head .wrap{display:flex; flex-direction:column; gap:14px}
+.crumbs{font-size:.9rem; color:var(--ink-2); display:flex; gap:8px; align-items:center}
+.crumbs a{text-decoration:none; font-weight:700}
+.crumbs a:hover{color:var(--blue)}
+.page-head .lead{font-size:1.18rem; color:var(--ink-2); max-width:40em}
+.page{display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:64px; padding-block:48px 72px}
+@media (max-width:960px){ .page{grid-template-columns:1fr; gap:36px} }
+.prose{display:flex; flex-direction:column; gap:18px; max-width:44em; min-width:0; overflow-wrap:anywhere}
+.prose h2{font-size:1.65rem; margin-top:18px}
+.prose h3{margin-top:6px}
+.prose ul, .prose ol{margin:0; padding-left:1.3em; display:grid; gap:6px}
+.prose li::marker{color:var(--poppy)}
+.prose .note{font-size:.93rem; color:var(--ink-2); border-left:2px solid var(--sun); padding:4px 0 4px 14px}
+.prose a{color:var(--blue); text-decoration-thickness:1px; text-underline-offset:3px}
+.tbl{overflow-x:auto; border:1px solid var(--line); border-radius:var(--r); background:var(--sheet)}
+.tbl table{border-collapse:collapse; width:100%; font-size:.95rem; min-width:520px}
+.tbl th, .tbl td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+.tbl th{font:700 .76rem var(--f-body); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); background:var(--paper)}
+.tbl tr:last-child td{border-bottom:0}
+.rule{display:grid; grid-template-columns:44px 1fr; gap:14px; align-items:start; padding:13px 0; border-bottom:1px solid var(--line)}
+.rule b{font:400 1.3rem var(--f-display); color:var(--poppy); font-variant-numeric:tabular-nums}
+.conseq{font-size:.92rem; color:var(--ink-2); margin-top:4px}
+.aside{display:flex; flex-direction:column; gap:14px; align-self:start; position:sticky; top:calc(96px + env(safe-area-inset-top,0px))}
+@media (max-width:960px){ .aside{position:static} }
+.box{border-top:1px solid var(--line); padding:16px 0 4px; display:flex; flex-direction:column; gap:6px}
+.box h4{font:700 .74rem var(--f-body); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2); margin-bottom:4px}
+.box a{text-decoration:none; font-weight:700; padding:3px 0}
+.box a:hover, .box a[aria-current="page"]{color:var(--blue)}
+.people{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap:10px}
+.person{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; display:flex; flex-direction:column; gap:2px}
+.person small{color:var(--ink-2); font-size:.85rem}
+.person b{font:400 1.08rem var(--f-display)}
+.compare{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.compare > div{border-radius:var(--r); padding:22px; display:flex; flex-direction:column; gap:10px}
+.compare .ogt{background:var(--sky-soft)} .compare .ggt{background:var(--leaf-soft)}
+.compare .big{font:400 1.8rem var(--f-display)}
+@media (max-width:620px){ .compare{grid-template-columns:1fr} }
+.steps{counter-reset:s; display:grid; gap:10px; list-style:none; padding:0!important}
+.steps li{counter-increment:s; display:grid; grid-template-columns:36px 1fr; gap:12px; align-items:start}
+.steps li::before{content:counter(s); width:30px; height:30px; border-radius:50%; border:1.5px solid var(--blue); color:var(--blue); display:grid; place-items:center; font:400 .95rem var(--f-display)}
+.pricelist{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,200px),1fr)); gap:10px}
+.price{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r); padding:16px; display:flex; justify-content:space-between; gap:10px; align-items:baseline}
+.price b{font:400 1.4rem var(--f-display); font-variant-numeric:tabular-nums}
+.price.out{opacity:.55}
+
+/* Tagesband (Ganztag-Seite) */
+.band{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r); padding:20px 20px 14px; position:relative}
+.band-rows{display:grid; gap:8px}
+.band-row{display:grid; grid-template-columns:110px 1fr; gap:12px; align-items:center; font-size:.86rem}
+.band-row span{color:var(--ink-2); white-space:nowrap}
+.track{position:relative; height:12px; background:var(--hair); border-radius:999px}
+.track i{position:absolute; top:0; bottom:0; border-radius:999px}
+.band-axis{display:grid; grid-template-columns:110px 1fr; gap:12px; font-size:.74rem; color:var(--ink-2); font-variant-numeric:tabular-nums; margin-top:6px}
+.band-axis div{position:relative; height:16px}
+.band-axis b{position:absolute; transform:translateX(-50%); font-weight:400}
+@media (max-width:480px){ .band-row, .band-axis{grid-template-columns:84px 1fr} .band-row{font-size:.78rem} }
+
+/* Eltern-ABC */
+.abc-tools{display:flex; flex-direction:column; gap:12px}
+.field{display:flex; align-items:center; gap:10px; background:var(--sheet); border:1.5px solid var(--line); border-radius:12px; padding:0 14px}
+.field:focus-within{border-color:var(--blue)}
+.field input{flex:1; min-width:0; border:0; background:transparent; font:inherit; color:var(--ink); padding:13px 0; outline:none}
+.letters{display:flex; flex-wrap:wrap; gap:4px}
+.letters a{width:34px; height:34px; display:grid; place-items:center; border-radius:8px; text-decoration:none; font:400 1rem var(--f-display); border:1px solid var(--line)}
+.letters a:hover{background:var(--ink); color:var(--paper)}
+.abc details{border-bottom:1px solid var(--line)}
+.abc summary{cursor:pointer; list-style:none; display:flex; justify-content:space-between; gap:12px; align-items:center; padding:16px 2px; font:400 1.15rem var(--f-display)}
+.abc summary::-webkit-details-marker{display:none}
+.abc summary::after{content:"+"; font:400 1.5rem var(--f-body); color:var(--blue); transition:transform .2s}
+.abc details[open] summary::after{transform:rotate(45deg)}
+.abc details > div{padding:0 2px 18px; color:var(--ink-2); max-width:44em}
+.abc .initial{font-family:var(--f-hand); font-size:1.8rem; color:var(--poppy); padding-top:18px; line-height:1}
+mark{background:var(--sun-soft); color:inherit; border-radius:3px; padding:0 2px}
+
+/* Suche */
+dialog{border:0; padding:0; background:transparent; width:min(660px, calc(100vw - 32px)); max-height:min(620px, 80vh); margin:12vh auto auto}
+dialog::backdrop{background:rgb(10 12 25 / .45); backdrop-filter:blur(2px)}
+.sbox{background:var(--sheet); color:var(--ink); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; max-height:inherit}
+.sbox .field{border:0; border-bottom:1px solid var(--line); border-radius:0; padding:4px 18px}
+.sres{overflow:auto; padding:8px}
+.sres a{display:block; padding:12px 14px; border-radius:10px; text-decoration:none}
+.sres a:hover, .sres a.on{background:var(--hair)}
+.sres b{display:block}
+.sres small{color:var(--ink-2); display:block; font-size:.88rem; line-height:1.4}
+.sres .empty{padding:18px; color:var(--ink-2)}
+
+.toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:999px; font-weight:700; z-index:90}
+.rise{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{transform:translateY(10px)} to{transform:none}}
+
+/* Startseite: Schnellzugriff, Bilderreihe, Aktuelles, Talente */
+.hero h1{font-size:clamp(2.2rem, 4.4vw, 3.5rem)}
+.hero .eyebrow{letter-spacing:.1em; line-height:1.5; max-width:34em}
+.zoom{all:unset; display:block; cursor:zoom-in; width:100%; height:100%}
+.zoom:focus-visible{outline:2px solid var(--blue); outline-offset:3px}
+.frame .zoom{height:auto}
+.quick{display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.quick .way{display:flex; flex-direction:column; gap:8px; padding:26px 22px 28px; text-decoration:none; border:0; border-left:1px solid var(--line)}
+.quick .way:first-child{border-left:0; padding-left:0}
+.quick .way .pin{width:12px; height:12px; border-radius:50%; background:var(--c); margin-bottom:6px}
+.quick .way h3{font-size:1.15rem}
+.quick .way p{color:var(--ink-2); font-size:.92rem; line-height:1.45}
+.quick .way:hover h3{color:var(--blue)}
+@media (max-width:980px){ .quick{grid-template-columns:repeat(2, minmax(0,1fr))} .quick .way{border-left:0; border-top:1px solid var(--line); padding:20px 16px 22px 0} .quick .way:nth-child(-n+2){border-top:0} }
+@media (max-width:520px){ .quick{grid-template-columns:1fr} .quick .way:nth-child(2){border-top:1px solid var(--line)} }
+.pic{margin:0; display:flex; flex-direction:column; gap:8px; min-width:0}
+.pic img{width:100%; height:100%; object-fit:cover; display:block; background:var(--hair)}
+.pic figcaption{font-size:.88rem; color:var(--ink-2); line-height:1.4}
+.intro .photo .pic{aspect-ratio:4/5}
+@media (max-width:860px){ .intro .photo .pic{aspect-ratio:4/3} }
+.strip{display:flex; gap:12px; overflow-x:auto; padding:40px 0 8px; scroll-snap-type:x mandatory}
+.strip .pic{flex:none; width:clamp(180px, 24vw, 260px); aspect-ratio:1; scroll-snap-align:start}
+.strip .pic img{border-radius:4px}
+.news{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:40px 32px}
+.post{display:flex; flex-direction:column; gap:14px; min-width:0}
+.post-imgs{display:grid; gap:8px}
+.post-imgs:empty{display:none}
+.post-imgs .pic img{aspect-ratio:4/3; border-radius:4px}
+.post-imgs .pic + .pic{display:none}
+.post.lead{grid-column:1/-1; display:grid; grid-template-columns:1fr; gap:16px}
+.post.lead .post-imgs{grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px}
+.post.lead .post-imgs .pic + .pic{display:flex}
+.post.lead h3{font-size:1.6rem}
+.post h3 a{text-decoration:none} .post h3 a:hover{color:var(--blue)}
+@media (max-width:860px){ .news{grid-template-columns:repeat(2, minmax(0,1fr))} .post.lead .post-imgs{grid-template-columns:1fr} }
+@media (max-width:540px){ .news{grid-template-columns:1fr} }
+.talente-sec{background:var(--sheet); border-block:1px solid var(--line)}
+.talente{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap:20px}
+.talente .pic{background:var(--paper); padding:10px 10px 26px; border:1px solid var(--line); box-shadow:var(--shadow)}
+.talente .pic:nth-child(3n+1){transform:rotate(-.8deg)} .talente .pic:nth-child(3n+2){transform:rotate(.6deg)}
+.talente .pic img{aspect-ratio:1; height:auto}
+.ukraine{display:grid; grid-template-columns:1fr 1fr; gap:24px; border-top:1px solid var(--line); padding-top:32px}
+.ukraine > div{display:flex; flex-direction:column; gap:8px}
+@media (max-width:620px){ .ukraine{grid-template-columns:1fr} }
+.today-bar .msg{text-decoration:none}
+.today-bar .msg:hover b{color:var(--blue)}
+/* Menü-Panels */
+.panel.cols{grid-template-columns:1fr 1fr; min-width:500px}
+.panel.groups{grid-template-columns:repeat(3, minmax(0,1fr)); min-width:680px; gap:4px 8px}
+.panel .grp{display:flex; flex-direction:column; padding-bottom:6px}
+.panel .gh{display:block; padding:10px 12px 4px; font:700 .74rem var(--f-body); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2); text-decoration:none}
+.panel a.gl{padding-top:12px}
+.panel a{font-weight:700; font-size:.96rem}
+.drawer details div{display:grid}
+.drawer .grp{display:grid}
+.drawer .gh{padding:10px 6px 2px; font:700 .72rem var(--f-body); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2); text-decoration:none}
+@media (max-width:1180px){ .nav > a, .dd > button{padding:9px 10px; font-size:.92rem} }
+/* Seiten */
+.draft{font-size:.88rem; color:var(--ink-2); background:var(--sun-soft); border-radius:8px; padding:10px 14px}
+.pics{display:grid; gap:16px; margin-top:12px}
+.pics.grid{grid-template-columns:repeat(auto-fill, minmax(min(100%, 200px), 1fr))}
+.pics.grid .pic img{aspect-ratio:1; border-radius:4px}
+.pics:not(.grid) .pic img{height:auto; max-width:640px; border-radius:4px}
+.album{padding-block:28px; border-top:1px solid var(--line)}
+.album:first-child{border-top:0; padding-top:0}
+.album-head{display:flex; flex-direction:column; gap:6px; margin-bottom:16px; max-width:48em}
+.album-head h2{font-size:1.5rem}
+/* Großansicht */
+#lightbox{width:min(1100px, calc(100vw - 24px)); max-height:none; margin:auto}
+#lightbox::backdrop{background:rgb(8 10 20 / .85)}
+.lbox{position:relative; display:flex; flex-direction:column; align-items:center; gap:12px; color:#fff}
+.lbox img{max-width:100%; max-height:80vh; object-fit:contain; border-radius:4px; background:#111}
+.lbox p{text-align:center; font-size:.95rem; max-width:50em}
+.lbox .muted{color:#bbb}
+.lbox .iconbtn{position:absolute; background:rgb(255 255 255 / .92); color:#111; border:0; font-size:1.6rem; line-height:1}
+.lb-close{top:8px; right:8px} .lb-prev{left:8px; top:40%} .lb-next{right:8px; top:40%}
+</style>
+<!--HEAD-END-->
+</head>
+<body>
+<!--BODY-START-->
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#start" aria-label="Christian-Schad-Grundschule, Startseite">
+      <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
+        <circle cx="23" cy="23" r="22" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+        <path d="M23 34V20" stroke="var(--leaf)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M23 26c-4-1-6-4-6-7 3 0 6 2 6 5" fill="var(--leaf)"/>
+        <circle cx="23" cy="15" r="6.5" fill="var(--poppy)"/>
+        <circle cx="23" cy="15" r="2" fill="var(--ink)"/>
+      </svg>
+      <span><b>Christian&#8209;Schad-Grundschule</b><small><span class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Aschaffenburg-Nilkheim</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Hauptnavigation"></nav>
+    <div class="tools">
+      <button class="iconbtn" id="openSearch" type="button" aria-label="Suche öffnen (Taste /)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </button>
+      <button class="iconbtn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <a class="btn btn-blue" href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener" aria-label="Krankmeldung (elternnachricht.de)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Krankmeldung</span>
+      </a>
+      <button class="iconbtn menubtn" id="menuBtn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="drawer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer" id="drawer" hidden>
+  <nav aria-label="Menü" id="drawerNav"></nav>
+</div>
+
+<main id="inhalt" tabindex="-1"></main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <p class="big">Christian-Schad-<br>Grundschule</p>
+      <p>Lindenweg 14, 63741 Aschaffenburg</p>
+      <p style="margin-top:10px">+49 (0)6021 4561090<br>info@christian-schad-schule.de</p>
+    </div>
+    <div>
+      <h4>Schule</h4>
+      <a href="#ansprechpartner">Ansprechpartner</a><a href="#team">Team Lehrkräfte</a><a href="#ueber-uns">Über uns</a><a href="#elternbeirat">Elternbeirat</a><a href="#vonabisz">Von A bis Z</a>
+    </div>
+    <div>
+      <h4>Bildungsangebote</h4>
+      <a href="#ganztag">Unsere Ganztagsangebote</a><a href="#kindergaerten">Zusammenarbeit mit den Kindergärten</a><a href="#singklasse">Singklasse</a><a href="#klassenrat">Klassenrat</a>
+    </div>
+    <div>
+      <h4>Termine</h4>
+      <a href="#termine">Termine</a><a href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener">Krankmeldung</a><a href="#galerie">Galerie</a><a href="#schulkleidung">Schulkleidung und mehr</a>
+    </div>
+    <div class="legal"><span>© 2026 Christian-Schad-Grundschule · Leben – Lernen – Wohlfühlen im Stadtteil Nilkheim</span><span><a href="#datenschutz">Datenschutz</a><a href="#impressum">Impressum</a></span></div>
+  </div>
+</footer>
+
+<dialog id="lightbox" aria-label="Bild">
+  <div class="lbox">
+    <button class="iconbtn lb-close" id="lbClose" type="button" aria-label="Schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <button class="iconbtn lb-prev" id="lbPrev" type="button" aria-label="Vorheriges Bild">‹</button>
+    <img id="lbImg" alt="">
+    <button class="iconbtn lb-next" id="lbNext" type="button" aria-label="Nächstes Bild">›</button>
+    <p><span id="lbCap"></span> <span class="muted" id="lbCount"></span></p>
+  </div>
+</dialog>
+
+<dialog id="search" aria-label="Suche">
+  <div class="sbox">
+    <label class="field" for="q">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Suchen: Hausschuhe, Ganztag, Sprechstunde …" autocomplete="off">
+    </label>
+    <div class="sres" id="sres"></div>
+  </div>
+</dialog>
+
+<script>
+"use strict";
+/* Alle Texte stammen von https://www.christian-schad-volksschule.de (gesichert in inhalte/).
+   Seiten, Von A bis Z und Galerie werden von build.py eingesetzt. */
+const DATA = /*__DATA__*/null;
+const S = {
+  tel:"+49 (0)6021 4561090", telPlain:"06021 4561090", telIntl:"+4960214561090",
+  mail:"info@christian-schad-schule.de",
+  addr:"Lindenweg 14, 63741 Aschaffenburg",
+  map:"https://goo.gl/maps/vwzMqMJZB4PycGnn8",
+  krank:"https://elternnachricht.de/fehlzeiten",
+  blog:"https://aschaffenburg.taskcards.app/#/board/dc0c51fb-669a-4e37-aba5-2b065768a05f",
+  elterninfo:"https://aschaffenburg.taskcards.app/#/board/b592fefe-93bb-42b5-89f6-bf27e9e445d8",
+  catering:"https://www.christian-schad-volksschule.de/wp-content/uploads/2022/07/2022_Elternbrief_Vorstellung.pdf",
+  ukraineDE:"https://www.aschaffenburg.de/Aktuelles/Ukraine-Hilfe/DE_index_6550.html",
+  ukraineRU:"https://www.aschaffenburg.de/RU_index_1000.html",
+};
+const UP = "https://www.christian-schad-volksschule.de/wp-content/uploads/";
+
+/* Termine – Wortlaut der Seite „Termine“ */
+const TERMINE = [
+  {d:"2026-09-15", t:"Erster Schultag im Schuljahr 2026/27", x:["Einschulungsfeier in den Klassen 1a, 1b, 1c, anschließend ökum. Schulanfangs-Gottesdienst in St. Kilian","Unterricht in den Jahrgängen 2 bis 4 von 8:00 Uhr bis 11:20 Uhr"]},
+  {d:"2026-09-16", h:"19:00 Uhr", t:"Jahrgang 1: Klassenelternabend mit Wahl der Klassenelternsprecher"},
+  {d:"2026-09-18", h:"19:00 Uhr", t:"Schulanfangsgottesdienst für die Jahrgänge 2, 3, 4"},
+  {d:"2026-09-22", h:"19:00 Uhr", t:"Jahrgang 2: Klassenelternabend mit Wahl der Klassenelternsprecher"},
+  {d:"2026-09-23", h:"19:00 Uhr", t:"Jahrgang 3: Klassenelternabend mit Wahl der Klassenelternsprecher"},
+  {d:"2026-09-24", h:"19:00 Uhr", t:"Jahrgang 4: Klassenelternabend mit Wahl der Klassenelternsprecher"},
+  {d:"2026-10-23", t:"Feier der Amtseinführung der Rektorin Wolf, Unterrichtsende: 11:00 Uhr"},
+  {d:"2026-11-16", t:"Jahrgang 4: Mathematik-Meisterschaft, Runde 1"},
+  {d:"2026-11-18", t:"Unterrichtsfrei an allen bayerischen Schulen. Kein OGT, kein GGT.", h:"evangelischer Feiertag", free:true},
+  {d:"2026-11-24", t:"Elternsprechabend in den Jahrgängen 2, 3, 4"},
+  {d:"2026-11-25", t:"Elternsprechabend im Jahrgang 1"},
+  {d:"2026-12-03", h:"19:00 Uhr", t:"Erster Informationsabend zur Einschulung 27/28", x:["Vorstellung der Bildungs- und Betreuungsangebote: Gebundener Ganztag, Offener Ganztag, Kurz- und Langgruppen, Hort"]},
+  {d:"2027-02-17", h:"19:00 Uhr", t:"Zweiter Informationsabend zur Einschulung 27/28", x:["Ausgabe der Anmeldeformulare und Erläuterung zum Screening"]},
+  {d:"2027-06-24", h:"19:00 Uhr", t:"Dritter Informationsabend zur Einschulung 27/28", x:["Hinweise zur Materialliste, zum 1. Schultag und zur 1. Schulwoche"]},
+];
+
+/* Startseite „Aktuelles aus dem Schulleben“ – Überschriften und Bildunterschriften der Startseite */
+const AKTUELL = [
+  {t:"⚽️ Fußballtag am 30.4.26", lines:["Turnierleitung: Andreas Weniger, Konrektor"], imgs:[
+    ["2026/04/VfR-Training-fuer-die-1.-und-2.-Klassen.jpeg","VfR -Training für die 1. und 2. Klassen"],
+    ["2026/04/Alle-3.-und-4.-Klassen-spielen-gegeneinander-und-ermitteln-die-Schul-Siegerklasse.jpeg","Alle 3. und 4. Klassen spielen gegeneinander und ermitteln die Schul-Siegerklasse: 1. Platz für 3aGT!"],
+    ["2026/04/3b-Torwart-in-Aktion.jpeg","3b-Torwart in Aktion"]]},
+  {t:"Unsere Schule singt und klingt", lines:["Quelle: StMUK / Tobias Hase"], imgs:[
+    ["2024/03/2024_03_06stmuk0394_-scaled.jpg",""],["2024/03/2024_03_06stmuk1020_-scaled.jpg",""],["2023/09/Unsere-Schule-singt-und-klingt.jpeg",""],["2023/10/Logo-musikbeg-GS.jpg",""]]},
+  {t:"Lesefest – Wir befragen Autoren", imgs:[["2023/09/Lesefest-Wir-befragen-Autoren.jpeg",""]]},
+  {t:"Dankeschön an die fleißigen Leser und großzügigen Sponsoren", imgs:[["2023/01/10.01.23-1418-Microsoft-Lens-scaled.jpeg",""]]},
+  {t:"Konzert der Singklassen", lines:["Quelle: Main Echo"], imgs:[["2022/07/Konzert-der-Singklassen.jpg",""]]},
+  {t:"Bürgerfest – Eröffnung Anwandeweg in Nilkheim –", href:"buergerfest", imgs:[]},
+];
+/* „Die Christian – Schad – Grundschule im Überblick“ – Bilderreihe der Startseite */
+const UEBERBLICK = ["2024/09/IMG_4212.jpg","2024/09/IMG_4239.jpg","2024/09/IMG_4264.jpg","2024/09/IMG_4262-scaled.jpg","2024/09/IMG_4585.jpg","2024/09/IMG_4806.jpg","2024/09/IMG_4957.jpg","2024/09/IMG_5128.jpg","2024/09/IMG_5129.jpg","2024/09/IMG_5173-scaled.jpg","2024/09/IMG_5253.jpg","2024/09/IMG_5254.jpg","2024/09/IMG_7843.jpg"];
+/* „Hier wachsen Talente“ – Bilder der Startseite */
+const TALENTE = ["2021/06/Mohnbild_2-scaled.jpg","2021/02/cropped-Wassermannbild2-scaled-2.jpg","2021/09/Herbst_1-scaled.jpg","2021/06/Mohnbild_1-scaled.jpg","2023/01/Feuerwerk-scaled.jpg","2021/09/Artikel-Judo-im-GT.jpeg","2020/12/cropped-IMG_3955-scaled-1.jpg","2020/12/cropped-IMG_3963-scaled-1.jpg","2021/01/cropped-DSC09627-scaled-1.jpg","2021/10/Talente_2210216.jpg","2022/02/PHOTO-2022-02-04-11-14-44.jpg","2020/12/Piano-1.png","2021/02/Judo.png"];
+
+/* Menü – Bezeichnungen wie auf der alten Website */
+const MENU = [
+  {label:"Startseite", href:"start"},
+  {label:"Schule", area:"schule", items:["ansprechpartner","team","ueber-uns","kooperation","elternbeirat","schulhausordnung","schulsozialpaedagogin","leitbild","pausenordnung","vonabisz","russisch","informationen"]},
+  {label:"Bildungsangebote", area:"bildung", groups:[
+    ["Unsere Ganztagsangebote","ganztag",[]],
+    ["Zusammenarbeit mit den Kindergärten","kindergaerten",[]],
+    ["Leseförderung",null,["filby"]],
+    ["Gemeinschaftsbildung",null,["pausenhelfer","klassenrat"]],
+    ["Musikalische Bildung",null,["singklasse","schulchor"]],
+    ["Medienbildung",null,["medienkonzept"]],
+    ["Umweltbildung",null,["gruene-meilen"]]]},
+  {label:"Termine", href:"termine", area:"termine"},
+  {label:"Galerie", href:"galerie", area:"galerie"},
+  {label:"Schulkleidung und mehr", href:"schulkleidung", area:"schulkleidung"},
+];
+const AREA_LABEL = {schule:"Schule", bildung:"Bildungsangebote", schulleben:"Aktuelles aus dem Schulleben", schulkleidung:"Schulkleidung und mehr", recht:"Rechtliches"};
+const AREA_PAGES = a => a==="bildung" ? ["ganztag","kindergaerten","filby","pausenhelfer","klassenrat","singklasse","schulchor","medienkonzept","gruene-meilen"]
+  : (MENU.find(m=>m.area===a)?.items || Object.keys(DATA.pages).filter(k=>DATA.pages[k].area===a));
+
+/* ================= Helfer ================= */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const strip = h => h.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const MON = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+const WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const WDL = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+const parseD = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+function berlinNow(){
+  try{
+    const p = Object.fromEntries(new Intl.DateTimeFormat("de-DE",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+    return new Date(+p.year, +p.month-1, +p.day, +p.hour % 24, +p.minute);
+  }catch(e){ return new Date(); }
+}
+const dayStart = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+function toast(msg){ const t = document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 1800); }
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-copy]"); if(!b) return;
+  const v = b.getAttribute("data-copy"), done = () => toast("Kopiert: " + v);
+  try{ navigator.clipboard.writeText(v).then(done, () => fallbackCopy(v, done)); }catch(err){ fallbackCopy(v, done); }
+});
+function fallbackCopy(v, done){ const ta=document.createElement("textarea"); ta.value=v; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(e){ toast(v); } ta.remove(); }
+const fig = (src, cap="", cls="", set="", eager=false) => `<figure class="pic ${cls}"><button type="button" class="zoom" data-src="${esc(src)}" data-cap="${esc(cap)}" data-set="${esc(set)}" aria-label="Bild vergrößern${cap?": "+esc(cap):""}"><img src="${esc(src)}" alt="${esc(cap)}" ${eager?"":'loading="lazy"'} onerror="this.closest('figure').remove()"></button>${cap?`<figcaption>${esc(cap)}</figcaption>`:""}</figure>`;
+
+/* ================= Bausteine ================= */
+function dateRow(e, cls=""){
+  const d = parseD(e.d);
+  return `<div class="date ${cls} ${e.free?"is-free":""}"><time datetime="${e.d}">${WD[d.getDay()]}, ${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getFullYear()).slice(2)}<small>${e.h||""}</small></time><div><b>${esc(e.t)}</b>${(e.x||[]).map(x=>`<br><span class="muted">${esc(x)}</span>`).join("")}</div>${cls.includes("is-next")?`<span class="tag">Als Nächstes</span>`:"<span></span>"}</div>`;
+}
+function datesHTML(mode, max){
+  const today = dayStart(berlinNow());
+  const upcoming = TERMINE.filter(e => parseD(e.d) >= today);
+  let list = mode==="all" ? TERMINE : upcoming;
+  if(max) list = list.slice(0, max);
+  const nextD = upcoming[0]?.d;
+  return `<div class="dates">${list.map(e => dateRow(e, (e.d===nextD?"is-next ":"") + (parseD(e.d)<today?"is-past":""))).join("")}</div>`;
+}
+function todayHTML(){
+  const now = berlinNow();
+  const hhmm = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
+  const next = TERMINE.find(e => parseD(e.d) >= dayStart(now));
+  const nd = next ? parseD(next.d) : null;
+  return `<div class="today-bar">
+    <div class="when"><span class="eyebrow">${WDL[now.getDay()]}, ${now.getDate()}. ${MON[now.getMonth()]}</span><b>${hhmm}</b></div>
+    ${next?`<a class="msg" href="#termine"><span class="dot"></span><span><span class="eyebrow">Termine · ${String(nd.getDate()).padStart(2,"0")}.${String(nd.getMonth()+1).padStart(2,"0")}.</span><br><b>${esc(next.t)}</b></span></a>`:"<span></span>"}
+    <a class="btn btn-line" href="${S.krank}" target="_blank" rel="noopener">Krankmeldung</a>
+  </div>`;
+}
+
+/* ================= Ansichten ================= */
+function viewStart(){
+  return `
+<section class="hero"><div class="wrap">
+  <div class="hero-copy rise">
+    <span class="eyebrow">Herzlich Willkommen auf der Website der Christian - Schad - Grundschule in Aschaffenburg - Nilkheim</span>
+    <h1>Leben&nbsp;– Lernen&nbsp;– <em>Wohlfühlen</em> im Stadtteil Nilkheim</h1>
+    <div class="hero-actions">
+      <a class="btn btn-blue" href="#ueber-uns">Über uns</a>
+      <a class="btn btn-line" href="#vonabisz">Von A bis Z</a>
+    </div>
+  </div>
+  <figure class="exhibit rise">
+    <div class="frame"><button type="button" class="zoom" data-src="${UP}2021/06/Mohnbild_2-scaled.jpg" data-cap="Hier wachsen Talente" data-set="talente" aria-label="Bild vergrößern"><div class="ph" style="--c:var(--leaf-soft)"><img src="${UP}2021/06/Mohnbild_2-scaled.jpg" alt="Hier wachsen Talente" onerror="this.remove()"></div></button></div>
+    <figcaption class="label"><b>Hier wachsen Talente</b></figcaption>
+  </figure>
+</div></section>
+
+<section class="today" aria-label="Heute"><div class="wrap" id="todayBar">${todayHTML()}</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="quick">
+    ${[["#ansprechpartner","Ansprechpartner","Hier finden Sie Namen und Kontaktdaten","var(--poppy)"],
+       ["#vonabisz","Schulalltag","Alles, was es zu wissen gilt","var(--sun)"],
+       [S.catering,"Schulcatering","Mosaik Mehrgenerationenhaus Bachgau gGmbH, Großostheim","var(--leaf)"],
+       ["#elternbeirat","Elternbeirat","Hier finden Sie Informationen des Elternbeirats","var(--sky)"],
+       ["#informationen","Informationen","Hier finden Sie Angebote für Beratung und Hilfe","var(--blue)"]]
+      .map(([h,t,x,c]) => `<a class="way" href="${h}" ${h.startsWith("http")?'target="_blank" rel="noopener"':""} style="--c:${c}"><span class="pin"></span><h3>${t}</h3><p>${x}</p></a>`).join("")}
+  </div>
+</div></section>
+
+<section class="sec" style="padding-top:0"><div class="wrap intro">
+  <div class="photo"><span class="tape" aria-hidden="true"></span>${fig(UP+"2024/09/IMG_5253.jpg","","","ueberblick")}</div>
+  <div class="txt">
+    <span class="eyebrow">Über uns</span>
+    <h2>Die Christian – Schad – Grundschule im Überblick</h2>
+    <p>Die Christian-Schad-Grundschule ist eine staatliche Schule in Aschaffenburg-Nilkheim mit insgesamt 12 Klassen (10 Regelklassen und 2 gebundenen Ganztagsklassen im 3. und 4. Jahrgang).</p>
+    <p class="muted">Unser Schulhaus ist über die Jahre hinweg mehrfach erweitert worden. Es hat große Klassenzimmer im Altbau und moderne helle Klassenräume im Neubau. Alle Klassenzimmer sind mit Digitalen Tafeln oder Beamer und Laptops ausgestattet. Arbeits- und Lernecken sind im ganzen Haus verteilt.</p>
+    <p><a class="link" href="#ueber-uns">mehr erfahren →</a></p>
+  </div>
+</div>
+<div class="wrap"><div class="strip">${UEBERBLICK.map(u=>fig(UP+u,"","","ueberblick")).join("")}</div></div>
+</section>
+
+<section class="sec" style="padding-top:0"><div class="wrap">
+  <div class="sec-head"><div><h2>Termine</h2></div><a class="link" href="#termine">Termine →</a></div>
+  <div id="startDates"></div>
+</div></section>
+
+<section class="sec" style="padding-top:0"><div class="wrap">
+  <div class="sec-head"><div><h2>Aktuelles aus dem Schulleben</h2></div><a class="link" href="#galerie">Galerie →</a></div>
+  <div class="news">${AKTUELL.map((a,i) => `<article class="post ${i===0?"lead":""}">
+    <div class="post-imgs">${a.imgs.map(([u,c])=>fig(UP+u,c,"","akt"+i)).join("")}</div>
+    <div class="post-txt"><h3>${a.href?`<a href="#${a.href}">${esc(a.t)}</a>`:esc(a.t)}</h3>${(a.lines||[]).map(l=>`<p class="muted">${esc(l)}</p>`).join("")}</div>
+  </article>`).join("")}</div>
+  <p style="margin-top:28px"><a class="link" href="${S.blog}" target="_blank" rel="noopener">Unser Blog – Aktuelles →</a> &nbsp; <a class="link" href="${S.elterninfo}" target="_blank" rel="noopener">Informationen für Eltern →</a></p>
+</div></section>
+
+<section class="sec talente-sec"><div class="wrap">
+  <div class="sec-head"><div><h2>Hier wachsen Talente</h2></div></div>
+  <div class="talente">${TALENTE.map(u=>fig(UP+u,"","","talente",true)).join("")}</div>
+</div></section>
+
+<section class="sec" style="padding-block:56px"><div class="wrap ukraine">
+  <div><h3>Допомога біженцям з України</h3><a class="link" href="${S.ukraineRU}" target="_blank" rel="noopener">Слідувати за посиланням →</a></div>
+  <div><h3>Hilfen für geflüchtete aus der Ukraine</h3><a class="link" href="${S.ukraineDE}" target="_blank" rel="noopener">hier entlang →</a></div>
+</div></section>`;
+}
+
+function pageBody(id){
+  const p = DATA.pages[id];
+  let h = p.html;
+  if(id === "vonabisz") h = `<div class="abc-tools"><label class="field" for="abcq"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="abcq" type="search" placeholder="Suchen …"></label><div class="letters" id="letters"></div></div><div class="abc" id="abcList"></div>`;
+  if(id === "russisch") h += `<p><a href="https://www.christian-schad-volksschule.de/colibri-wp/wichtige-informationen-russisch/" target="_blank" rel="noopener">от А до Я (русский) →</a></p>`;
+  if(p.imgs.length) h += `<div class="pics ${p.imgs.length>2?"grid":""}">${p.imgs.map(i=>fig(i.src, i.cap, "", id)).join("")}</div>`;
+  return h;
+}
+function viewPage(id){
+  const p = DATA.pages[id];
+  const sib = AREA_PAGES(p.area).filter(x => DATA.pages[x]);
+  return `
+<section class="page-head"><div class="wrap">
+  <div class="crumbs"><a href="#start">Startseite</a><span aria-hidden="true">/</span>${AREA_LABEL[p.area]||""}</div>
+  <h1 style="font-size:clamp(2.2rem,4.6vw,3.4rem)">${esc(p.title)}</h1>
+</div></section>
+<div class="wrap"><div class="page">
+  <article class="prose">${p.exact?"":`<p class="draft">Entwurf: Dieser Text ist sinngemäß von der bisherigen Website übernommen. Der Originalwortlaut wird noch eingesetzt.</p>`}${pageBody(id)}</article>
+  <aside class="aside">
+    ${sib.length>1?`<div class="box"><h4>${AREA_LABEL[p.area]}</h4>${sib.map(x=>`<a href="#${x}" ${x===id?'aria-current="page"':""}>${esc(DATA.pages[x].title)}</a>`).join("")}</div>`:""}
+    <div class="box"><h4>Christian-Schad-Grundschule</h4><p>${S.addr}<br>${S.tel}<br>${S.mail}</p><a href="${S.krank}" target="_blank" rel="noopener">Krankmeldung</a><a href="#termine">Termine</a></div>
+  </aside>
+</div></div>`;
+}
+function viewSimple(title, body){
+  return `<section class="page-head"><div class="wrap"><div class="crumbs"><a href="#start">Startseite</a></div><h1 style="font-size:clamp(2.2rem,4.6vw,3.4rem)">${title}</h1></div></section><div class="wrap" style="padding-block:44px 72px">${body}</div>`;
+}
+const viewTermine = () => viewSimple("Termine", `<div style="max-width:52em" id="allDates"></div>`);
+const viewGalerie = () => viewSimple("Galerie", DATA.gal.map((a,i) => `<section class="album"><div class="album-head"><h2>${esc(a.t)}</h2>${a.caps.map(c=>`<p class="muted">${esc(c)}</p>`).join("")}</div><div class="pics grid">${a.imgs.map(u=>fig(u, "", "", "gal"+i)).join("")}</div></section>`).join(""));
+
+/* ================= Router ================= */
+let dateMode = "upcoming";
+const SPECIAL = {termine:viewTermine, galerie:viewGalerie};
+function render(){
+  const id = (location.hash || "#start").slice(1);
+  const main = $("#inhalt");
+  const page = DATA.pages[id], special = SPECIAL[id];
+  main.innerHTML = page ? viewPage(id) : special ? special() : viewStart();
+  document.title = page ? `${page.title} – Christian-Schad-Grundschule` : special ? `${id[0].toUpperCase()+id.slice(1)} – Christian-Schad-Grundschule` : "Christian-Schad-Grundschule";
+  const area = page ? page.area : special ? id : (id==="start"||!location.hash ? "start" : null);
+  document.querySelectorAll(".nav > a, .dd > button").forEach(a => { if(a.dataset.area===area) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  if($("#startDates")) $("#startDates").innerHTML = datesHTML("upcoming", 4);
+  if($("#allDates")) renderAllDates();
+  if($("#abcList")) renderABC("");
+  window.scrollTo(0,0);
+}
+function renderAllDates(){
+  $("#allDates").innerHTML = `<div class="seg" role="group" aria-label="Termine" style="margin-bottom:18px"><button type="button" data-mode="upcoming" aria-pressed="${dateMode==="upcoming"}">Kommende</button><button type="button" data-mode="all" aria-pressed="${dateMode==="all"}">Schuljahr 2026/27</button></div>` + datesHTML(dateMode);
+  $("#allDates").querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { dateMode = b.dataset.mode; renderAllDates(); });
+}
+function renderABC(q){
+  const nq = norm(q.trim());
+  const items = DATA.abc.filter(([t,x]) => !nq || norm(t + " " + strip(x)).includes(nq));
+  const hi = s => { if(!nq) return s; const re = new RegExp("(" + q.trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")","gi"); return s.replace(/(<[^>]+>)|([^<]+)/g, (m, tag, txt) => tag ? tag : txt.replace(re, "<mark>$1</mark>")); };
+  let last = "", out = "";
+  items.forEach(([t,x]) => {
+    const L = t[0].toUpperCase();
+    if(L !== last){ out += `<div class="initial" id="abc-${L}">${L}</div>`; last = L; }
+    out += `<details ${nq?"open":""}><summary>${hi(esc(t))}</summary><div>${hi(x)}</div></details>`;
+  });
+  $("#abcList").innerHTML = out || `<p class="muted" style="padding:18px 0">–</p>`;
+  const letters = [...new Set(DATA.abc.map(([t]) => t[0].toUpperCase()))];
+  $("#letters").innerHTML = letters.map(L => `<a href="#vonabisz" data-letter="${L}">${L}</a>`).join("");
+  $("#letters").querySelectorAll("a").forEach(a => a.onclick = ev => { ev.preventDefault(); document.getElementById("abc-"+a.dataset.letter)?.scrollIntoView({behavior:"smooth", block:"start"}); });
+  const inp = $("#abcq"); if(inp && !inp.dataset.bound){ inp.dataset.bound = "1"; inp.addEventListener("input", () => renderABC(inp.value)); }
+}
+window.addEventListener("hashchange", render);
+
+/* ================= Bild-Großansicht ================= */
+const lb = $("#lightbox"); let lbSet = [], lbIdx = 0;
+function lbShow(){ const b = lbSet[lbIdx]; $("#lbImg").src = b.dataset.src; $("#lbImg").alt = b.dataset.cap; $("#lbCap").textContent = b.dataset.cap; $("#lbCount").textContent = lbSet.length>1 ? `${lbIdx+1} / ${lbSet.length}` : ""; $("#lbPrev").hidden = $("#lbNext").hidden = lbSet.length < 2; }
+document.addEventListener("click", e => {
+  const z = e.target.closest(".zoom"); if(!z) return;
+  const set = z.dataset.set;
+  lbSet = set ? [...document.querySelectorAll(`.zoom[data-set="${CSS.escape(set)}"]`)] : [z];
+  lbIdx = Math.max(0, lbSet.indexOf(z)); lbShow();
+  if(typeof lb.showModal === "function") lb.showModal(); else lb.setAttribute("open","");
+});
+$("#lbPrev").onclick = () => { lbIdx = (lbIdx - 1 + lbSet.length) % lbSet.length; lbShow(); };
+$("#lbNext").onclick = () => { lbIdx = (lbIdx + 1) % lbSet.length; lbShow(); };
+$("#lbClose").onclick = () => lb.close();
+lb.addEventListener("click", e => { if(e.target === lb) lb.close(); });
+lb.addEventListener("keydown", e => { if(e.key==="ArrowLeft") $("#lbPrev").click(); if(e.key==="ArrowRight") $("#lbNext").click(); });
+
+/* ================= Suche ================= */
+const INDEX = [
+  ...Object.entries(DATA.pages).map(([id,p]) => ({h:"#"+id, t:p.title, body:strip(p.html)})),
+  ...DATA.abc.map(([t,x]) => ({h:"#vonabisz", t:"Von A bis Z: " + t, body:strip(x)})),
+  ...TERMINE.map(e => ({h:"#termine", t:e.t, body:e.d.split("-").reverse().join(".") + " " + (e.x||[]).join(" ")})),
+  ...DATA.gal.map(a => ({h:"#galerie", t:"Galerie: " + a.t, body:a.caps.join(" ")})),
+];
+const dlg = $("#search"), q = $("#q"), sres = $("#sres");
+let sel = 0;
+function search(){
+  const terms = norm(q.value.trim()).split(/\s+/).filter(Boolean);
+  const hits = !terms.length ? INDEX.filter(i => ["#ansprechpartner","#vonabisz","#termine","#ganztag","#informationen"].includes(i.h) && !i.t.includes(":")) :
+    INDEX.map(i => { const T = norm(i.t), B = norm(i.body); let sc = 0; for(const w of terms){ if(T.includes(w)) sc += 3; else if(B.includes(w)) sc += 1; else return null; } return {...i, sc}; }).filter(Boolean).sort((a,b) => b.sc - a.sc).slice(0, 12);
+  sel = 0;
+  sres.innerHTML = hits.length ? hits.map((i,k) => `<a href="${i.h}" class="${k===0?"on":""}"><b>${esc(i.t)}</b><small>${esc(i.body.slice(0,130))}${i.body.length>130?" …":""}</small></a>`).join("") : `<div class="empty">–</div>`;
+}
+function openSearch(){ if(typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open",""); q.value=""; search(); setTimeout(()=>q.focus(), 10); }
+$("#openSearch").onclick = openSearch;
+q.addEventListener("input", search);
+q.addEventListener("keydown", e => {
+  const links = [...sres.querySelectorAll("a")];
+  if(e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); if(!links.length) return; sel = (sel + (e.key==="ArrowDown"?1:-1) + links.length) % links.length; links.forEach((l,k)=>l.classList.toggle("on", k===sel)); links[sel].scrollIntoView({block:"nearest"}); }
+  if(e.key === "Enter" && links[sel]){ e.preventDefault(); links[sel].click(); }
+});
+sres.addEventListener("click", e => { if(e.target.closest("a")) dlg.close(); });
+dlg.addEventListener("click", e => { if(e.target === dlg) dlg.close(); });
+document.addEventListener("keydown", e => {
+  const typing = /INPUT|TEXTAREA/.test(document.activeElement?.tagName || "");
+  if((e.key === "/" && !typing) || (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey))){ e.preventDefault(); openSearch(); }
+});
+
+/* ================= Menü ================= */
+const chev = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+const T = id => esc(DATA.pages[id].title);
+function panelHTML(m){
+  if(m.items) return m.items.map(id => `<a href="#${id}">${T(id)}</a>`).join("");
+  return m.groups.map(([label, id, kids]) => `<div class="grp">${id?`<a class="gl" href="#${id}">${esc(label)}</a>`:`<span class="gh">${esc(label)}</span>`}${kids.map(k=>`<a href="#${k}">${T(k)}</a>`).join("")}</div>`).join("");
+}
+function buildMenus(){
+  $("#nav").innerHTML = MENU.filter(m => m.href !== "start").map((m,i) => m.href
+    ? `<a href="#${m.href}" data-area="${m.area||m.href}">${m.label}</a>`
+    : `<div class="dd"><button type="button" aria-expanded="false" aria-controls="dd${i}" data-area="${m.area}">${m.label}${chev}</button><div class="panel ${m.groups?"groups":"cols"}" id="dd${i}">${panelHTML(m)}</div></div>`).join("");
+  $("#drawerNav").innerHTML = `<div class="dh"><span class="eyebrow">Menü</span><button class="iconbtn" type="button" id="closeMenu" aria-label="Menü schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`
+    + MENU.map(m => m.href ? `<a class="solo" href="#${m.href}">${m.label}</a>` : `<details><summary>${m.label}${chev}</summary><div>${panelHTML(m)}</div></details>`).join("")
+    + `<a class="btn btn-blue" href="${S.krank}" target="_blank" rel="noopener">Krankmeldung</a><button class="btn btn-line" type="button" id="themeBtn2" style="margin-top:10px" aria-label="Hell oder dunkel umschalten">◐</button>`;
+  const dds = [...document.querySelectorAll(".dd")];
+  const close = (except) => dds.forEach(d => { if(d !== except){ d.classList.remove("open"); d.querySelector("button").setAttribute("aria-expanded","false"); } });
+  const hover = matchMedia("(hover: hover) and (pointer: fine)");
+  dds.forEach(d => {
+    const b = d.querySelector("button");
+    const open = () => { close(d); d.classList.add("open"); b.setAttribute("aria-expanded","true"); };
+    b.addEventListener("click", () => d.classList.contains("open") ? close() : open());
+    let t;
+    d.addEventListener("mouseenter", () => { if(hover.matches){ clearTimeout(t); open(); } });
+    d.addEventListener("mouseleave", () => { if(hover.matches){ t = setTimeout(() => close(), 180); } });
+    d.addEventListener("keydown", e => {
+      const links = [...d.querySelectorAll(".panel a")];
+      if(e.key === "ArrowDown"){ e.preventDefault(); if(!d.classList.contains("open")) open(); const k = links.indexOf(document.activeElement); links[Math.min(k+1, links.length-1)].focus(); }
+      if(e.key === "ArrowUp"){ e.preventDefault(); const k = links.indexOf(document.activeElement); if(k <= 0) b.focus(); else links[k-1].focus(); }
+      if(e.key === "Escape"){ close(); b.focus(); }
+    });
+    d.addEventListener("focusout", e => { if(!d.contains(e.relatedTarget)) close(); });
+    d.querySelectorAll(".panel a").forEach(a => a.addEventListener("click", () => close()));
+  });
+  document.addEventListener("click", e => { if(!e.target.closest(".dd")) close(); });
+  window.addEventListener("hashchange", () => close());
+}
+buildMenus();
+const drawer = $("#drawer"), menuBtn = $("#menuBtn");
+const closeDrawer = () => { drawer.hidden = true; menuBtn.setAttribute("aria-expanded","false"); };
+menuBtn.onclick = () => { drawer.hidden = false; menuBtn.setAttribute("aria-expanded","true"); $("#closeMenu").focus(); };
+drawer.addEventListener("click", e => { if(e.target === drawer || e.target.closest("a") || e.target.closest("#closeMenu")) closeDrawer(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !drawer.hidden){ closeDrawer(); menuBtn.focus(); } });
+
+/* ================= Hell / Dunkel ================= */
+const root = document.documentElement;
+try{ const t = localStorage.getItem("csgs-theme"); if(t) root.dataset.theme = t; }catch(e){}
+const toggleTheme = () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try{ localStorage.setItem("csgs-theme", root.dataset.theme); }catch(e){}
+};
+$("#themeBtn").onclick = toggleTheme;
+$("#themeBtn2").onclick = toggleTheme;
+
+render();
+setInterval(() => { const t = $("#todayBar"); if(t) t.innerHTML = todayHTML(); }, 30000);
+</script>
+<!--BODY-END-->
+</body>
+</html>

@@ -58,7 +58,7 @@ body{margin:0; background:var(--paper); color:var(--ink); font:400 1.0625rem/1.6
 body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:60; background:var(--paper)}
 a{color:inherit}
 h1,h2,h3,h4{font-family:var(--f-display); font-weight:400; line-height:1.12; text-wrap:balance; margin:0}
-h1{font-size:clamp(2.5rem, 5.6vw, 4.4rem); letter-spacing:-.015em}
+h1{font-size:clamp(2.5rem, 5.6vw, 4.4rem); letter-spacing:-.015em; hyphens:auto; overflow-wrap:break-word}
 h2{font-size:clamp(1.7rem, 3.2vw, 2.4rem); letter-spacing:-.01em}
 h3{font-size:1.28rem}
 p{margin:0}
@@ -75,7 +75,10 @@ p{margin:0}
 
 /* ---------- Kopfzeile mit Aufklapp-Menü ---------- */
 .top{position:sticky; top:env(safe-area-inset-top, 0px); z-index:50; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(12px); border-bottom:1px solid var(--line)}
-.top .wrap{display:flex; align-items:center; gap:18px; min-height:74px}
+.top .wrap{display:flex; align-items:center; gap:18px; min-height:74px; max-width:1320px}
+.brand small{white-space:nowrap}
+.brand{flex:none} .brand b{white-space:nowrap}
+@media (max-width:420px){ .brand b{white-space:normal} }
 .brand{display:flex; align-items:center; gap:12px; text-decoration:none; min-width:0}
 .brand svg{flex:none}
 .brand b{display:block; font:400 1.12rem/1.1 var(--f-display)}
@@ -108,7 +111,7 @@ p{margin:0}
 .btn-line:hover{border-color:var(--ink)}
 .top .btn{min-height:42px; padding:0 18px}
 .menubtn{display:none}
-@media (max-width:1060px){
+@media (max-width:1240px){
   .nav{display:none}
   .menubtn{display:inline-grid}
   .tools{margin-left:auto}
@@ -263,7 +266,7 @@ footer .legal a{display:inline; margin-left:16px}
 .page-head .lead{font-size:1.18rem; color:var(--ink-2); max-width:40em}
 .page{display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:64px; padding-block:48px 72px}
 @media (max-width:960px){ .page{grid-template-columns:1fr; gap:36px} }
-.prose{display:flex; flex-direction:column; gap:18px; max-width:44em; min-width:0}
+.prose{display:flex; flex-direction:column; gap:18px; max-width:44em; min-width:0; overflow-wrap:anywhere}
 .prose h2{font-size:1.65rem; margin-top:18px}
 .prose h3{margin-top:6px}
 .prose ul, .prose ol{margin:0; padding-left:1.3em; display:grid; gap:6px}
@@ -345,6 +348,83 @@ dialog::backdrop{background:rgb(10 12 25 / .45); backdrop-filter:blur(2px)}
 .toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:999px; font-weight:700; z-index:90}
 .rise{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
 @keyframes rise{from{transform:translateY(10px)} to{transform:none}}
+
+/* Startseite: Schnellzugriff, Bilderreihe, Aktuelles, Talente */
+.hero h1{font-size:clamp(2.2rem, 4.4vw, 3.5rem)}
+.hero .eyebrow{letter-spacing:.1em; line-height:1.5; max-width:34em}
+.zoom{all:unset; display:block; cursor:zoom-in; width:100%; height:100%}
+.zoom:focus-visible{outline:2px solid var(--blue); outline-offset:3px}
+.frame .zoom{height:auto}
+.quick{display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.quick .way{display:flex; flex-direction:column; gap:8px; padding:26px 22px 28px; text-decoration:none; border:0; border-left:1px solid var(--line)}
+.quick .way:first-child{border-left:0; padding-left:0}
+.quick .way .pin{width:12px; height:12px; border-radius:50%; background:var(--c); margin-bottom:6px}
+.quick .way h3{font-size:1.15rem}
+.quick .way p{color:var(--ink-2); font-size:.92rem; line-height:1.45}
+.quick .way:hover h3{color:var(--blue)}
+@media (max-width:980px){ .quick{grid-template-columns:repeat(2, minmax(0,1fr))} .quick .way{border-left:0; border-top:1px solid var(--line); padding:20px 16px 22px 0} .quick .way:nth-child(-n+2){border-top:0} }
+@media (max-width:520px){ .quick{grid-template-columns:1fr} .quick .way:nth-child(2){border-top:1px solid var(--line)} }
+.pic{margin:0; display:flex; flex-direction:column; gap:8px; min-width:0}
+.pic img{width:100%; height:100%; object-fit:cover; display:block; background:var(--hair)}
+.pic figcaption{font-size:.88rem; color:var(--ink-2); line-height:1.4}
+.intro .photo .pic{aspect-ratio:4/5}
+@media (max-width:860px){ .intro .photo .pic{aspect-ratio:4/3} }
+.strip{display:flex; gap:12px; overflow-x:auto; padding:40px 0 8px; scroll-snap-type:x mandatory}
+.strip .pic{flex:none; width:clamp(180px, 24vw, 260px); aspect-ratio:1; scroll-snap-align:start}
+.strip .pic img{border-radius:4px}
+.news{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:40px 32px}
+.post{display:flex; flex-direction:column; gap:14px; min-width:0}
+.post-imgs{display:grid; gap:8px}
+.post-imgs:empty{display:none}
+.post-imgs .pic img{aspect-ratio:4/3; border-radius:4px}
+.post-imgs .pic + .pic{display:none}
+.post.lead{grid-column:1/-1; display:grid; grid-template-columns:1fr; gap:16px}
+.post.lead .post-imgs{grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px}
+.post.lead .post-imgs .pic + .pic{display:flex}
+.post.lead h3{font-size:1.6rem}
+.post h3 a{text-decoration:none} .post h3 a:hover{color:var(--blue)}
+@media (max-width:860px){ .news{grid-template-columns:repeat(2, minmax(0,1fr))} .post.lead .post-imgs{grid-template-columns:1fr} }
+@media (max-width:540px){ .news{grid-template-columns:1fr} }
+.talente-sec{background:var(--sheet); border-block:1px solid var(--line)}
+.talente{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap:20px}
+.talente .pic{background:var(--paper); padding:10px 10px 26px; border:1px solid var(--line); box-shadow:var(--shadow)}
+.talente .pic:nth-child(3n+1){transform:rotate(-.8deg)} .talente .pic:nth-child(3n+2){transform:rotate(.6deg)}
+.talente .pic img{aspect-ratio:1; height:auto}
+.ukraine{display:grid; grid-template-columns:1fr 1fr; gap:24px; border-top:1px solid var(--line); padding-top:32px}
+.ukraine > div{display:flex; flex-direction:column; gap:8px}
+@media (max-width:620px){ .ukraine{grid-template-columns:1fr} }
+.today-bar .msg{text-decoration:none}
+.today-bar .msg:hover b{color:var(--blue)}
+/* Menü-Panels */
+.panel.cols{grid-template-columns:1fr 1fr; min-width:500px}
+.panel.groups{grid-template-columns:repeat(3, minmax(0,1fr)); min-width:680px; gap:4px 8px}
+.panel .grp{display:flex; flex-direction:column; padding-bottom:6px}
+.panel .gh{display:block; padding:10px 12px 4px; font:700 .74rem var(--f-body); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2); text-decoration:none}
+.panel a.gl{padding-top:12px}
+.panel a{font-weight:700; font-size:.96rem}
+.drawer details div{display:grid}
+.drawer .grp{display:grid}
+.drawer .gh{padding:10px 6px 2px; font:700 .72rem var(--f-body); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2); text-decoration:none}
+@media (max-width:1180px){ .nav > a, .dd > button{padding:9px 10px; font-size:.92rem} }
+/* Seiten */
+.draft{font-size:.88rem; color:var(--ink-2); background:var(--sun-soft); border-radius:8px; padding:10px 14px}
+.pics{display:grid; gap:16px; margin-top:12px}
+.pics.grid{grid-template-columns:repeat(auto-fill, minmax(min(100%, 200px), 1fr))}
+.pics.grid .pic img{aspect-ratio:1; border-radius:4px}
+.pics:not(.grid) .pic img{height:auto; max-width:640px; border-radius:4px}
+.album{padding-block:28px; border-top:1px solid var(--line)}
+.album:first-child{border-top:0; padding-top:0}
+.album-head{display:flex; flex-direction:column; gap:6px; margin-bottom:16px; max-width:48em}
+.album-head h2{font-size:1.5rem}
+/* Großansicht */
+#lightbox{width:min(1100px, calc(100vw - 24px)); max-height:none; margin:auto}
+#lightbox::backdrop{background:rgb(8 10 20 / .85)}
+.lbox{position:relative; display:flex; flex-direction:column; align-items:center; gap:12px; color:#fff}
+.lbox img{max-width:100%; max-height:80vh; object-fit:contain; border-radius:4px; background:#111}
+.lbox p{text-align:center; font-size:.95rem; max-width:50em}
+.lbox .muted{color:#bbb}
+.lbox .iconbtn{position:absolute; background:rgb(255 255 255 / .92); color:#111; border:0; font-size:1.6rem; line-height:1}
+.lb-close{top:8px; right:8px} .lb-prev{left:8px; top:40%} .lb-next{right:8px; top:40%}
 </style>
 <!--HEAD-END-->
 </head>
@@ -372,9 +452,9 @@ dialog::backdrop{background:rgb(10 12 25 / .45); backdrop-filter:blur(2px)}
       <button class="iconbtn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       </button>
-      <a class="btn btn-blue" href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener" aria-label="Kind krankmelden (elternnachricht.de)">
+      <a class="btn btn-blue" href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener" aria-label="Krankmeldung (elternnachricht.de)">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-        <span>Krankmelden</span>
+        <span>Krankmeldung</span>
       </a>
       <button class="iconbtn menubtn" id="menuBtn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="drawer">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
@@ -393,24 +473,34 @@ dialog::backdrop{background:rgb(10 12 25 / .45); backdrop-filter:blur(2px)}
   <div class="wrap">
     <div>
       <p class="big">Christian-Schad-<br>Grundschule</p>
-      <p>Lindenweg 14<br>63741 Aschaffenburg-Nilkheim</p>
-      <p style="margin-top:10px">Telefon 06021 4561090<br>info@christian-schad-schule.de</p>
+      <p>Lindenweg 14, 63741 Aschaffenburg</p>
+      <p style="margin-top:10px">+49 (0)6021 4561090<br>info@christian-schad-schule.de</p>
     </div>
     <div>
       <h4>Schule</h4>
-      <a href="#ueber-uns">Über uns</a><a href="#team">Team</a><a href="#schulleben">Schulleben</a><a href="#elternbeirat">Elternbeirat</a><a href="#sozialarbeit">Schulsozialarbeit</a>
+      <a href="#ansprechpartner">Ansprechpartner</a><a href="#team">Team Lehrkräfte</a><a href="#ueber-uns">Über uns</a><a href="#elternbeirat">Elternbeirat</a><a href="#vonabisz">Von A bis Z</a>
     </div>
     <div>
-      <h4>Für Eltern</h4>
-      <a href="#abc">Eltern-ABC</a><a href="#termine">Termine</a><a href="#ganztag">Ganztag</a><a href="#beratung">Beratung &amp; Hilfe</a><a href="#russisch">По-русски / Українською</a>
+      <h4>Bildungsangebote</h4>
+      <a href="#ganztag">Unsere Ganztagsangebote</a><a href="#kindergaerten">Zusammenarbeit mit den Kindergärten</a><a href="#singklasse">Singklasse</a><a href="#klassenrat">Klassenrat</a>
     </div>
     <div>
-      <h4>Schnell erledigt</h4>
-      <a href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener">Kind krankmelden</a><a href="#kontakt">Kontakt &amp; Anfahrt</a><a href="#shop">Schulkleidung</a>
+      <h4>Termine</h4>
+      <a href="#termine">Termine</a><a href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener">Krankmeldung</a><a href="#galerie">Galerie</a><a href="#schulkleidung">Schulkleidung und mehr</a>
     </div>
-    <div class="legal"><span>© 2026 Christian-Schad-Grundschule · Hier wachsen Talente.</span><span><a href="#impressum">Impressum</a><a href="#datenschutz">Datenschutz</a></span></div>
+    <div class="legal"><span>© 2026 Christian-Schad-Grundschule · Leben – Lernen – Wohlfühlen im Stadtteil Nilkheim</span><span><a href="#datenschutz">Datenschutz</a><a href="#impressum">Impressum</a></span></div>
   </div>
 </footer>
+
+<dialog id="lightbox" aria-label="Bild">
+  <div class="lbox">
+    <button class="iconbtn lb-close" id="lbClose" type="button" aria-label="Schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <button class="iconbtn lb-prev" id="lbPrev" type="button" aria-label="Vorheriges Bild">‹</button>
+    <img id="lbImg" alt="">
+    <button class="iconbtn lb-next" id="lbNext" type="button" aria-label="Nächstes Bild">›</button>
+    <p><span id="lbCap"></span> <span class="muted" id="lbCount"></span></p>
+  </div>
+</dialog>
 
 <dialog id="search" aria-label="Suche">
   <div class="sbox">
@@ -424,436 +514,84 @@ dialog::backdrop{background:rgb(10 12 25 / .45); backdrop-filter:blur(2px)}
 
 <script>
 "use strict";
-/* ================= Daten ================= */
+/* Alle Texte stammen von https://www.christian-schad-volksschule.de (gesichert in inhalte/).
+   Seiten, Von A bis Z und Galerie werden von build.py eingesetzt. */
+const DATA = {"pages": {"ansprechpartner": {"title": "Ansprechpartner", "area": "schule", "html": "<p><b>Christian-Schad-Grundschule<\/b> Lindenweg 14, 63741 Aschaffenburg Telefon: +49 (0)6021 4561090 E-Mail: info(at)christian-schad-schule.de<\/p>\n<div class=\"tbl\"><table><thead><tr><th>Funktion<\/th><th>Name<\/th><th>Telefon<\/th><th>E-Mail<\/th><\/tr><\/thead><tbody><tr><td>Schulleiterin<\/td><td>Doris Wolf, Rektorin<\/td><td><\/td><td>rektor@christian-schad-schule.de<\/td><\/tr><tr><td>Stellv. Schulleiter<\/td><td>Andreas Weniger, Konrektor<\/td><td><\/td><td>info@christian-schad-schule.de<\/td><\/tr><tr><td>Sekretariat<\/td><td>Sandra Bilz, VAe<\/td><td>06021 456 109 0<\/td><td>info@christian-schad-schule.de<\/td><\/tr><tr><td>Hauswartin<\/td><td>Zsuzsanna Zehnder<\/td><td><\/td><td>zsuzsanna.zehnder@aschaffenburg.de<\/td><\/tr><tr><td>Elternbeirat<\/td><td><\/td><td><\/td><td>elternbeirat.christian-schad-schule@gmx.de<\/td><\/tr><\/tbody><\/table><\/div>", "exact": true, "imgs": []}, "team": {"title": "Team Lehrkräfte", "area": "schule", "html": "<h2>Lehrkräfte im Schuljahr 26/27<\/h2>\n<h3>Schulleitung<\/h3>\n<ul><li>Rektorin: Frau Wolf<\/li><li>Konrektor: Herr Weniger<\/li><\/ul>\n<h3>Lehrkräfte mit Klassenführung<\/h3>\n<div class=\"tbl\"><table><thead><tr><th>Klasse<\/th><th>Lehrkraft<\/th><\/tr><\/thead><tbody><tr><td>1a<\/td><td>Frau Busse<\/td><\/tr><tr><td>1b<\/td><td>Frau Fecher<\/td><\/tr><tr><td>1c<\/td><td>Frau Grose<\/td><\/tr><tr><td>2a<\/td><td>Frau Kuffel<\/td><\/tr><tr><td>2b<\/td><td>Frau Breid<\/td><\/tr><tr><td>2c<\/td><td>Frau Hufnagel<\/td><\/tr><tr><td>3aGT<\/td><td>Frau von Campenhausen<\/td><\/tr><tr><td>3b<\/td><td>Frau Bedenk<\/td><\/tr><tr><td>3c<\/td><td>Frau Eberlein<\/td><\/tr><tr><td>4aGT<\/td><td>Frau Schober<\/td><\/tr><tr><td>4b<\/td><td>Frau Müller<\/td><\/tr><tr><td>4c<\/td><td>Herr Weniger<\/td><\/tr><\/tbody><\/table><\/div>\n<h3>Lehrkräfte ohne Klassenführung<\/h3>\n<ul><li>Frau Brenz<\/li><li>Frau Bergmann<\/li><li>Frau Neuburger<\/li><li>Frau Hofmann<\/li><li>Frau Meier (Abordnung von GS Grünewald)<\/li><li>Frau Auer (Abordnung von GS Grünewald)<\/li><li>Frau Löffelmann (Abordnung von GS Johannesberg)<\/li><\/ul>\n<h3>Fachlehrkräfte für Werken und Gestalten<\/h3>\n<ul><li>Frau Wolf, Britta<\/li><li>Frau Zahn<\/li><\/ul>\n<h3>BFD – Bundesfreiwilligendienst-Leistende<\/h3>\n<ul><li>Frau Schymura<\/li><\/ul>", "exact": true, "imgs": []}, "ueber-uns": {"title": "Über uns", "area": "schule", "html": "<h2>Über uns<\/h2>\n<ul><li>Staatliche Schule in Aschaffenburg-Nilkheim mit ca. 250 Kindern<\/li><li>10 Regelklassen und bis zu 2 gebundene Ganztagsklassen<\/li><li>Schulhaus über die Jahre mehrfach erweitert: große Klassenzimmer im Altbau, helle, moderne Räume im Neubau<\/li><li>Alle Klassenzimmer mit Digitalen Tafeln oder Beamer sowie Laptops ausgestattet<\/li><li>Arbeits- und Lernecken im ganzen Haus verteilt<\/li><li>Große Mensa für das gemeinsame Mittagessen mit dem Hort sowie für Veranstaltungen, Elternabende und Projekte<\/li><li>Musiksaal, genutzt von allen Klassen, Singklasse, Chor, WIM („Wir musizieren“ – musikalische Grundbildung) und der Musikschule (Instrumentalunterricht)<\/li><li>Handarbeitsraum und Werkraum für kreatives Arbeiten<\/li><li>Turnhalle für Sport und Bewegung; Ganztagskinder zusätzlich in Judo und Handball<\/li><li>Schuleigener Sportplatz bei schönem Wetter<\/li><li>Spielzimmer, Gruppenraum und Horträume für die Betreuung außerhalb der Unterrichtszeit<\/li><li>Naturnah gestalteter Pausenhof mit Klettergerüst und Rutsche für Lernen im Freien, Pausen und Spielen im Ganztag<\/li><\/ul>\n<h2>Unsere Arbeit<\/h2>\n<ul><li>Unterrichtsgestaltung orientiert sich am <a href=\"http://www.isb.bayern.de/isb/index.asp?MNav=3&amp;QNav=4&amp;TNav=0&amp;INav=0&amp;Fach=&amp;LpSta=6&amp;STyp=1\" target=\"_blank\" rel=\"noopener\">LehrplanPlus für Grundschulen in Bayern<\/a><\/li><li>Lehrkräfte und pädagogisches Personal stimmen Schule und Betreuung eng aufeinander ab<\/li><li>Neben kompetenzorientiertem Unterricht: ein Haus für die Kinder des Stadtteils Nilkheim, in dem sie den ganzen Tag in einem kindgerechten Umfeld lernen und sich wohlfühlen können<\/li><\/ul>\n<h3>Der Unterricht ist geprägt von:<\/h3>\n<ul><li>Lernzielgerichtetem Einsatz vielfältiger Lernformen: schüler-, projekt- und materialorientierter Unterricht, Wochenplanarbeit, digitale Endgeräte<\/li><li>Elementen zur Stärkung des Miteinanders: verschiedene Sozialformen, Übernahme von Aufgaben für die Gemeinschaft, Klassenrat, jahrgangsübergreifende Projekte<\/li><li>Besuchen außerschulischer Lernorte: Museen, Theater, Stadtführungen, naturkundliche Exkursionen<\/li><\/ul>\n<h3>Das Kollegium steht für:<\/h3>\n<ul><li>Aufgeschlossenes, positiv gestimmtes Verhalten gegenüber den Schülern<\/li><li>Respektvollen, wertschätzenden Umgang mit allen Mitmenschen<\/li><li>Unterrichten und Erziehen nach gemeinsam erarbeiteten Lehrplänen, Zielen und Wertvorstellungen<\/li><li>Pädagogische Konferenzen und regelmäßige Arbeit im Jahrgangsstufenteam<\/li><li>Aufgeschlossenheit für Neuerungen und regelmäßige Weiterbildung<\/li><\/ul>\n<h3>Unsere Elternarbeit<\/h3>\n<ul><li>Enge, vertrauensvolle Zusammenarbeit im Rahmen einer Bildungs- und Erziehungspartnerschaft, mit hohem Stellenwert für das persönliche Elterngespräch<\/li><li>Reguläre Sprechzeiten, Elternsprechtage und Elternabende zu verschiedenen Themenschwerpunkten<\/li><li>Schnelle Kommunikation über „www.elternnachrichten.de“<\/li><li>Einbindung der Eltern ins Schulleben, z. B. Zubereiten des Schulobstes einmal wöchentlich in wechselnden Teams, Expertenvorträge, Vorleseabende, Frühstücksaktionen, Begleiten von Exkursionen, Hilfe bei Festen und Feiern<\/li><\/ul>", "exact": false, "imgs": []}, "kooperation": {"title": "Kooperation – Elternhaus – Schule", "area": "schule", "html": "<h2>Erziehungskooperation Elternhaus Schule an der Christian-Schad-Grundschule<\/h2>\n<ul><li>Erziehungskooperation zwischen Elternhaus und Christian-Schad-Grundschule ist ein zentraler Teil der Bildungsarbeit<\/li><li>Enge Zusammenarbeit und Austausch mit Eltern und Erziehungsberechtigten sind ausdrücklich gewünscht<\/li><li>Maßnahmen orientieren sich an Empfehlungen des Bayerischen Staatsministeriums für Unterricht und Kultus<\/li><\/ul>\n<h3>Erziehungspartnerschaft als Grundlage:<\/h3>\n<ul><li>Basis sind gegenseitiges Vertrauen und Respekt<\/li><li>Eltern und Schule verstehen sich als gemeinsame Erziehungsinstanzen zum Wohl des Kindes<\/li><li>Gemeinsame Ziele: individuelle Förderung und Entwicklung jedes Kindes<\/li><li>Elternperspektive und pädagogische Sicht der Lehrkräfte ergänzen sich<\/li><\/ul>\n<h3>Lernentwicklungsgespräche in den ersten, zweiten und dritten Klassen:<\/h3>\n<ul><li>In Jahrgangsstufen 1 bis 3 ersetzen Lernentwicklungsgespräche die Zwischenzeugnisse<\/li><li>Themen: Lernfortschritt, individuelle Stärken und Potenziale, mögliche Herausforderungen<\/li><li>Teilnehmende: Eltern, Lehrkräfte und Schülerinnen und Schüler<\/li><li>Ziel: gezielte Lernförderung und Eingehen auf individuelle Bedürfnisse<\/li><\/ul>\n<h3>Mitwirkung der Eltern und Erziehungsberechtigten im Schulleben:<\/h3>\n<ul><li>Engagement der Eltern wird begrüßt und geschätzt<\/li><li>Mögliche Beteiligung: Elternabende, Schulfeste, Projekttage und weitere Veranstaltungen<\/li><li>Ergebnis: intensivere Zusammenarbeit, Austausch untereinander und Gemeinschaftsgefühl<\/li><\/ul>\n<h3>Kommunikation und Transparenz:<\/h3>\n<ul><li>Offene, transparente Kommunikation ist wichtig<\/li><li>Tool „Elternnachrichten“ für zeitnahen Austausch zwischen Lehrkräften und Eltern<\/li><li>Inhalte: Informationen, Termine, Hausaufgaben, Lernmaterialien und individuelle Rückmeldungen<\/li><li>Eltern erhalten Einblick in den Schulalltag und können den Lernprozess ihres Kindes unterstützen<\/li><\/ul>", "exact": false, "imgs": []}, "elternbeirat": {"title": "Elternbeirat", "area": "schule", "html": "<h3>Mitglieder des Elternbeirats 2025/2027:<\/h3>\n<p><b>Vorsitzende:<\/b> Nina Wensauer-Grimm<\/p>\n<p><b>stellvertretende Vorsitzende:<\/b> Bettina Stürmer<\/p>\n<p><b>Kassenwart:<\/b> Jörg Fecher<\/p>\n<p><b>Kassenprüfer:<\/b> Daniela Krimm, Nicole Beckert<\/p>\n<p><b>Schriftführerin:<\/b> Beate Schmitt<\/p>\n<p><b>stellvertretende Schriftführerin:<\/b> –<\/p>\n<p><b>weitere Mitglieder des Elternbeirats:<\/b><\/p>\n<ul><li>Susanne Demuth<\/li><li>Dominika Hauber<\/li><li>Peter Maisa<\/li><li>Alice Völkl<\/li><\/ul>\n<p>Wir bedanken uns für das Vertrauen und freuen uns, das Bindeglied zwischen Elternschaft und Schule zu sein, um auch Ihre Interessen zu vertreten.<\/p>\n<p>Wann immer Sie Fragen haben, unterstützen oder sich einbringen möchten, wenden Sie sich gerne an uns. Sie erreichen uns persönlich oder unter folgender Email-Adresse: Elternbeirat.Christian-Schad-Schule@gmx.de<\/p>\n<p>Vielen herzlichen Dank und freundliche Grüße.<\/p>\n<p>Im Namen des Elternbeirats,<\/p>\n<p>Nina Wensauer – Grimm<\/p>", "exact": true, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2020/12/Elternbeirat.png", "cap": ""}]}, "schulhausordnung": {"title": "Schulhausordnung", "area": "schule", "html": "<h2>Regeln für unser Zusammenleben<\/h2>\n<ol><li>Ich bin freundlich, rücksichtsvoll und höflich!<\/li><li>Ich achte auf Pünktlichkeit und begebe mich um 7:45 Uhr ins Klassenzimmer!<\/li><li>Ich gehe im gesamten Schulhaus langsam und auf Treppen auf der rechten Seite!<\/li><\/ol>\n<p>Folge: … muss die Regeln für unser Zusammenleben abschreiben.<\/p>\n<ol><li>Im Schulhaus trage ich Hausschuhe!<\/li><li>Auf dem Pausenhof wird das Fahrrad oder der Roller geschoben!<\/li><li>Kaugummikauen ist verboten!<\/li><li>Wir wollen keine Gewalt! Auch Schimpfwörter können verletzen!<\/li><\/ol>\n<p>Folge: … muss eine ausführliche Entschuldigung schreiben.<\/p>\n<ol><li>Müll werfe ich in die Abfalleimer!<\/li><\/ol>\n<p>Folge: … muss für eine Woche den Ordnungsdienst übernehmen.<\/p>\n<h2>Regeln für den Umgang mit Sachen<\/h2>\n<ol><li>Ich halte meinen Arbeitsplatz sauber und hinterlasse jeden Schulraum ordentlich!<\/li><\/ol>\n<p>Folge: … muss für eine Woche den Ordnungsdienst übernehmen.<\/p>\n<ol><li>Ich achte auf fremdes Eigentum! Fundgegenstände gebe ich bei der Klassenlehrerin oder der Hausmeisterin ab!<\/li><\/ol>\n<p>Folge: … muss den entstandenen Schaden ersetzen.<\/p>\n<ol><li>Schulbücher müssen eingebunden und sorgsam behandelt werden!<\/li><li>Alle Einrichtungsgegenstände im Haus und Spielgeräte im Pausenhof behandle ich schonend und zweckmäßig!<\/li><li>Musikinstrumente, Sportgeräte und Computer dürfen daher nur mit Erlaubnis der Lehrkräfte benutzt werden!<\/li><\/ol>\n<p>Folge: … darf die Gegenstände nicht mehr benutzen.<\/p>\n<ol><li>Unterrichtsfremde Gegenstände lasse ich zuhause!<\/li><\/ol>\n<p>Folge: … bekommt den Gegenstand für eine Woche abgenommen.<\/p>", "exact": true, "imgs": []}, "schulsozialpaedagogin": {"title": "Schulsozialpädagogin", "area": "schule", "html": "<p><b>Michaela Gröpler-Braun<\/b>, Dipl. Sozialpädagogin (FH)<\/p>\n<ul><li>Telefon: 06021 4561092<\/li><li>E-Mail: schulsozialarbeit@christian-schad-schule.de<\/li><\/ul>\n<h2>Sprechzeiten<\/h2>\n<p><b>Christian-Schad-Grundschule<\/b><\/p>\n<ul><li>Dienstag 8:00–12:00 Uhr<\/li><li>Donnerstag 11:00–14:00 Uhr<\/li><li>Freitag 8:00–13:00 Uhr<\/li><\/ul>\n<p><b>Erthal-Grundschule (Aschaffenburg-Leider)<\/b><\/p>\n<ul><li>Montag 8:00–12:15 Uhr<\/li><li>Mittwoch 8:00–12:15 Uhr<\/li><\/ul>\n<h2>Vorstellung<\/h2>\n<ul><li>Seit September 2023 arbeitet sie im Programm „Schule öffnet sich“ an der Christian-Schad-Schule und der Erthal-Grundschule in Aschaffenburg-Leider.<\/li><li>Sie freut sich auf eine vertrauensvolle Zusammenarbeit und darauf, die Kinder während der Grundschulzeit zu begleiten.<\/li><\/ul>\n<h2>Was ist eine Schulsozialpädagogin?<\/h2>\n<ul><li>Eine Fachkraft für soziale Fragen aller Kinder in der Schule.<\/li><li>Arbeit vorbeugend in der Klasse, in Kleingruppen und bei Bedarf kurz in Einzelgesprächen.<\/li><li>Angebote mit Spielen und Projekten zu speziellen Themen.<\/li><\/ul>\n<h2>Aufgaben<\/h2>\n<ul><li>Orientierung im Schulalltag unterstützen<\/li><li>Soziale Fähigkeiten fördern<\/li><li>Wohlbefinden in der Klassengemeinschaft stärken<\/li><\/ul>\n<h2>Beispiele<\/h2>\n<ul><li>Konflikte gewaltfrei lösen<\/li><li>Ängste bewältigen helfen<\/li><li>Freundschaften knüpfen unterstützen<\/li><li>Die Klasse spielerisch zusammenführen, sodass niemand ausgeschlossen wird<\/li><li>Verschiedenheit erkennen und einander akzeptieren<\/li><\/ul>\n<h2>Ziele<\/h2>\n<ul><li>Vorbeugung von Gewalt und Mobbing<\/li><li>Förderung von Werten und Persönlichkeit<\/li><li>Stärkung von Sozialkompetenz und Konfliktlösung<\/li><li>Unterstützung von Klassenbildung und Integration<\/li><\/ul>", "exact": false, "imgs": []}, "leitbild": {"title": "Unser Leitbild", "area": "schule", "html": "", "exact": true, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2023/03/Leitbild-scaled.jpg", "cap": ""}]}, "pausenordnung": {"title": "Pausenordnung", "area": "schule", "html": "<h2>Diese Regeln gelten:<\/h2>\n<ol><li>Wir verbringen die Pause draußen auf dem Pausenhof. Jeder denkt an wettergemäße Kleidung<\/li><li>Bei schlechtem Wetter folgen wir der Durchsage. Die Regenpause findet in den Klassenzimmern statt<\/li><li>Die Toiletten sollen nur vor oder nach der Pause benutzt werden. Ausnahmen werden mit der Aufsicht besprochen.<\/li><li>Den Abfall werfen wir in den Mülleimer.<\/li><li>Keiner außer den Pausenhelfern betritt während der Pause den Fahrradplatz.<\/li><li>Ballspielen sowie das Werfen und Kicken von Gegenständen ist verboten. (Verletzungsgefahr!)<\/li><li>Konflikte werden miteinander besprochen. Wenn sich Kinder nicht einigen können, holen wir eine Pausenaufsicht.<\/li><li>Beim Gong stellen sich die Kinder am Sammelplatz ihrer Klasse in einer Zweierreihe auf. Jetzt ist auch das Tischtennisspiel zu Ende!<\/li><li>Wir verwenden mit Namen beschriftete Brotdosen. Am Ende der Pause nehmen wir sie wieder mit.<\/li><\/ol>\n<h2>Wer sich nicht dran hält, muss …<\/h2>\n<ol><li>… die Pausenordnung abschreiben<\/li><li>… die Pause vor dem Lehrerzimmer verbringen!<\/li><li>… bei Gebrauch von Schimpfwörtern oder Anwendung von Gewalt, eine ausführliche Entschuldigung schreiben<\/li><li>… seinen Schläger abgeben und hat eine Woche Tischtennisverbot.<\/li><li>… wissen, dass namenlose herumliegende Brotdosen entsorgt werden.<\/li><\/ol>\n<p><b>Bei groben oder wiederholten Regelverstößen erhalten die Eltern eine offizielle schriftliche Mitteilung.<\/b><\/p>", "exact": true, "imgs": []}, "vonabisz": {"title": "Von A bis Z", "area": "schule", "html": "<h2>Ankommen und Betreten des Schulhauses<\/h2>\n<p>Die Lehrkraft holt die Kinder um 7.45 Uhr im Pausenhof ab. Ab 7.30 Uhr gibt es dort eine Frühbetreuung. Eltern sollen ihre Kinder nicht bis ins Schulhaus begleiten und auch beim Abholen draußen warten. Der Schulweg soll möglichst bald selbstständig zu Fuß, am besten mit Nachbarskindern, zurückgelegt werden.<\/p>\n<h2>Copyright<\/h2>\n<p>Arbeitsblätter, Proben und Lernzielkontrollen sind geistiges Eigentum der jeweiligen Lehrkraft. Kopieren, Fotografieren und Verbreiten, auch per WhatsApp, sind untersagt. Fragen zu einer Probe richten Sie direkt an die Lehrkraft.<\/p>\n<h2>Datenschutz<\/h2>\n<p>Auf dem Schulgelände und im Schulhaus ist das Fotografieren von Schülern untersagt. Fotos von Schulveranstaltungen, auf denen andere Personen zu sehen sind, dürfen nicht im Internet, per WhatsApp oder auf Plattformen wie Facebook veröffentlicht werden.<\/p>\n<h2>Elternhausaufgabe<\/h2>\n<p>Das Kind bringt eine Mitteilung für die Eltern mit. Diese soll sorgfältig gelesen werden, oft wird eine Rückmeldung erbeten.<\/p>\n<h2>Entschuldigung bei Krankheit<\/h2>\n<p>Erkrankte Kinder müssen vor 7.40 Uhr telefonisch unter 06021 4561090 oder online über elternnachricht.de (<a href=\"https://elternnachricht.de/fehlzeiten\" target=\"_blank\" rel=\"noopener\">https://elternnachricht.de/fehlzeiten<\/a>) entschuldigt werden. Eine ärztliche Bescheinigung ist erst ab dem dritten Krankheitstag nötig.<\/p>\n<h2>Feier von Geburtstagen<\/h2>\n<p>In der Klasse wird ein Ständchen gesungen und das Geburtstagskind hochgelebt. Mitgebrachte Süßigkeiten zum Verteilen sind nicht erwünscht. Erlaubt ist ein kleines Spiel für das Klassenzimmer.<\/p>\n<h2>Ferienordnung<\/h2>\n<p>Urlaub muss sich an die Ferienzeiten halten. Eine Unterrichtsbefreiung ist nur in begründeten Ausnahmefällen möglich und muss schriftlich bei der Schulleitung beantragt werden.<\/p>\n<h2>Handy und Smartwatch<\/h2>\n<p>Digitale Geräte dürfen nur auf Aufforderung der Lehrkraft zu Unterrichtszwecken genutzt werden. Ausgeschaltet dürfen sie in der Büchertasche bleiben; besser ist, sie gar nicht mitzubringen. Die Regelung entspricht dem Bayerischen Erziehungs- und Unterrichtsgesetz und wurde mit dem Datenschutzbeauftragten und dem medienpädagogischen Berater am Schulamt Aschaffenburg abgestimmt.<\/p>\n<h2>Hausaufgaben<\/h2>\n<p>Sie dienen der Wiederholung des Stoffs und der Vorbereitung auf den nächsten Tag. Eltern müssen kontrollieren, ob sie vollständig erledigt wurden. Die Kinder der Ganztagsklasse haben auch am Wochenende Aufgaben.<\/p>\n<h2>Hausschuhe<\/h2>\n<p>Im Klassenzimmer werden Hausschuhe getragen. Sie halten Schmutz von der Straße und dem Pausenhof fern und sorgen besonders im Winter für ein angenehmes Raumklima.<\/p>\n<h2>Informationen und Nachrichten an die Lehrkraft<\/h2>\n<p>Dringende Mitteilungen werden am besten in das Hausaufgabenheft geschrieben; das Kind zeigt sie vor Unterrichtsbeginn vor. E-Mails werden meist erst nach dem Unterricht gelesen.<\/p>\n<h2>Kleidung<\/h2>\n<p>Die Pausen finden meist im Freien statt, auch bei leichtem Regen. Wetterangepasste Kleidung ist daher wichtig.<\/p>\n<h2>Lernzielkontrollen / Proben<\/h2>\n<p>Die Arbeiten werden mit nach Hause gegeben und müssen unterschrieben zurückgebracht werden. In der Schule werden sie aufbewahrt. Das Copyright gilt auch hier.<\/p>\n<h2>Mitarbeit der Eltern<\/h2>\n<p>Eltern sind zu Elternabenden, Schulfesten, Projekttagen und anderen Veranstaltungen eingeladen. Das stärkt den Austausch und das Gemeinschaftsgefühl.<\/p>\n<h2>Mittagessen<\/h2>\n<p>Nur Kinder im Ganztag oder Hort essen in der Mensa, betreut vom Personal. Das Essen wird bis Mittwoch 11 Uhr der Vorwoche online bei der Firma Bantschow Kids (<a href=\"https://www.bantschow-kids.de\" target=\"_blank\" rel=\"noopener\">https://www.bantschow-kids.de<\/a>) bestellt.<\/p>\n<h2>Nachrichten und Informationen<\/h2>\n<h2>Pausenbrot<\/h2>\n<p>Süßigkeiten und süße Brotaufstriche sind nicht erwünscht. Mittwochs gibt es Obst aus dem Schulfruchtprogramm. Gesunde Ernährung ist ein Unterrichtsprinzip.<\/p>\n<h2>Smartwatch und Handy<\/h2>\n<h2>Sportunterricht<\/h2>\n<p>Turnbeutel können Montag bis Freitag in der Schule bleiben und am Wochenende mitgenommen werden. An Sporttagen darf kein Schmuck getragen werden, besonders kein Ohrschmuck. Lange Haare müssen zusammengebunden werden.<\/p>\n<h2>Sprechstunde<\/h2>\n<p>Einmal pro Woche vormittags gibt es eine Sprechstunde. Berufstätige Eltern können einmal im Jahr eine Sprechstunde am frühen Abend nutzen. Eine Anmeldung ist nötig. Während des Unterrichts sind keine Gespräche möglich. Auf Wunsch sind auch Termine außerhalb der Sprechstunde möglich.<\/p>\n<h2>Trinken und Getränke<\/h2>\n<p>Im Schulhaus gibt es einen Trinkwasserspender, an dem Trinkflaschen aufgefüllt werden dürfen. Aromatisierte oder gesüßte Getränke sind nicht erwünscht. Air-up-Flaschen mit künstlichen Duftstoffen werden abgelehnt.<\/p>\n<h2>Unterrichtsausfall<\/h2>\n<p>Verlässliche Unterrichtszeiten sind ein Anliegen der Schule. Eltern werden bei Ausfällen in der Regel rechtzeitig informiert. Kann ein Kind nicht früher nach Hause, wird es dem Klassenlehrer gemeldet und bis zum regulären Unterrichtsende betreut.<\/p>\n<h2>Vergleichsarbeiten und Orientierungsarbeiten<\/h2>\n<p>Bayernweite, standardisierte Tests. Alle Schüler der 2. Jahrgangsstufe schreiben die Orientierungsarbeit OA-2 in Deutsch. In der 3. Jahrgangsstufe wird VERA-3 in Deutsch und Mathematik geschrieben.<\/p>\n<h2>Zeugnis<\/h2>\n<p>Am Schuljahresende gibt es ein Jahreszeugnis. In den Klassen 1 bis 3 finden zum Halbjahr Lernentwicklungsgespräche statt, die Zwischenzeugnisse ersetzen. In der 4. Klasse gibt es im Januar eine Notenstandsmitteilung und im Mai ein Übertrittszeugnis.<\/p>", "exact": false, "imgs": []}, "russisch": {"title": "от А до Я (русский)", "area": "schule", "html": "<ul><li>Вход в здание школы<\/li><li>Авторское право<\/li><li>Защита данных<\/li><li>Задание для родительского дома<\/li><li>Извинение при болезни<\/li><li>Празднование дней рождений<\/li><li>Правило для каникул<\/li><li>Домашние задания<\/li><li>Сменная обувь<\/li><li>Одежда<\/li><li>Контрольные / Проверочные работы<\/li><li>Сотрудничество родителей<\/li><li>Перекус во время перемены<\/li><li>Физкультура<\/li><li>Личная беседа<\/li><li>Отмена уроков<\/li><\/ul>", "exact": false, "imgs": []}, "informationen": {"title": "Informationen", "area": "schule", "html": "<h2>Beratung und Unterstützung an der Schule<\/h2>\n<ul><li><b>Beratungslehrerin:<\/b> Regina Kauer-Quast – Termine nach Vereinbarung – E-Mail: kauerquast-beratung(at)web.de<\/li><li><b>Schulpsychologin:<\/b> Barbara Hufner – Telefonsprechstunde mittwochs 10:30–11:30 Uhr – Tel. 06021-394222 – E-Mail: Barbara.Hufner(at)lra-ab.bayern.de – persönliche Gespräche nur nach Terminvereinbarung<\/li><li>Die Seite verlinkt außerdem auf Informationen zum bayerischen Schulsystem.<\/li><\/ul>\n<h2>Hilfe vor Ort (Stadt und Landkreis Aschaffenburg)<\/h2>\n<div class=\"tbl\"><table><thead><tr><th>Stelle<\/th><th>Telefon<\/th><\/tr><\/thead><tbody><tr><td>Klinikum Aschaffenburg, Kinder- und Jugendpsychiatrie<\/td><td>06021-32-0<\/td><\/tr><tr><td>Beratungsstelle für Kinder, Jugendliche und Eltern (Stadt)<\/td><td>06021-392220<\/td><\/tr><tr><td>Beratungsstelle für Kinder, Jugendliche und Eltern (Landkreis)<\/td><td>06021-392301<\/td><\/tr><tr><td>Sefra e.V. (für Frauen)<\/td><td>06021-24728<\/td><\/tr><tr><td>AWO Sozialpsychiatrischer Dienst (für Erwachsene)<\/td><td>06021-90 25 00<\/td><\/tr><tr><td>Jugendamt Stadt Aschaffenburg<\/td><td>06021-3301324<\/td><\/tr><tr><td>Jugendamt Landkreis Aschaffenburg<\/td><td>06021-394553<\/td><\/tr><tr><td>Allgemeiner Sozialer Dienst<\/td><td>06021-394375<\/td><\/tr><tr><td>Gesundheitsamt<\/td><td>06021-394184 (ärztlicher Dienst), 06021-394100 (Zentrale)<\/td><\/tr><tr><td>Staatliche Schulberatungsstelle für Unterfranken<\/td><td>0931-7945410, mail@schulberatung-unterfranken.de<\/td><\/tr><\/tbody><\/table><\/div>\n<h2>Bundesweite und Online-Hilfe<\/h2>\n<ul><li>Nummer gegen Kummer: 116 111 oder 0800-1110888, Mo–Sa 14:00–20:00 Uhr<\/li><li>jugend.bke-beratung.de – Online-Jugendberatung<\/li><li>telefonseelsorge.de – Mail- und Chatberatung<\/li><li>youth-life-line.de – Online-Peerberatung für Jugendliche<\/li><li>nummergegenkummer.de – Beratung für Kinder, Jugendliche und Eltern<\/li><\/ul>", "exact": false, "imgs": []}, "ganztag": {"title": "Unsere Ganztagsangebote", "area": "bildung", "html": "<p>In der Christian-Schad-Grundschule gibt es zwei Formen von Ganztagsangeboten: den <b>offenen Ganztag<\/b> und den <b>gebundenen Ganztag<\/b>. Beide Modelle bieten Betreuung und Lernangebote über den regulären Unterricht hinaus an, unterscheiden sich jedoch in Struktur, Verbindlichkeit und Organisation.<\/p>\n<h2>1. Offener Ganztag – OGT genannt<\/h2>\n<p>Der offene Ganztag bietet eine Betreuung nach dem regulären Unterricht und ist für die Schüler erst verpflichtend, wenn sie von den Eltern zum OGT angemeldet wurden. Die Teilnahme kann an mindestens 2 festgelegten Tagen in der Woche erfolgen. Hierbei gibt es ein Nachmittagsangebot, das aus Freizeitaktivitäten und Lernangeboten besteht. Die Kinder verbringen die Zeit im OGT in einer Gruppe, die aus Kindern aus mehreren Klassen zusammengesetzt ist. Wir bieten für alle Schultage Kurzgruppen bis 14:00 Uhr sowie Langgruppen bis 16:00 Uhr an. Unser Koorperationspartner ist die Arbeiterwohlfahrt AWO Kreisverband Aschaffenburg e.V.<\/p>\n<h2>2. Gebundener Ganztag – GGT genannt<\/h2>\n<p>Im gebundenen Ganztag sind Unterricht im Klassenverband und Betreuung fest in den Tagesablauf integriert. Die Schüler bleiben Montag bis Donnerstag in der Woche ganztägig an der Schule. Unterricht und Freizeit wechseln sich dabei über den ganzen Tag ab. Die Teilnahme an allen 4 Tagen ist verpflichtend.<\/p>\n<h2>Gegenüberstellung: Offener Ganztag OGT vs. Gebundener Ganztag GGT<\/h2>\n<div class=\"tbl\"><table><thead><tr><th>Aspekt<\/th><th>Offener Ganztag<\/th><th>Gebundener Ganztag<\/th><\/tr><\/thead><tbody><tr><td>Teilnahme<\/td><td>Freiwillig, Wahl an einzelnen Tagen möglich, jedoch mindestens an 2 Tagen. Begrenzte Anzahl an Plätzen.<\/td><td>Verpflichtend für die teilnehmenden Schüler. Begrenzte Anzahl der Plätze pro Jahrgang.<\/td><\/tr><tr><td>Zeitrahmen<\/td><td>Betreuung nach dem regulären Unterricht in der Kurzgruppe bis 14 Uhr<\/td><td>Unterricht und Betreuung im Wechsel Montag bis Donnerstag von 7:30 Uhr bis 15:30 Uhr<\/td><\/tr><tr><td>Tagesstruktur<\/td><td>Nachmittagsangebote nach dem Unterricht am Vormittag, organisiert von der Betreuung im OGT in extra eingerichteten Spielzimmern<\/td><td>Unterricht und Freizeit in Spiel- und Klassenzimmer wechseln sich ab. Feste Struktur, gebunden an den bayerischen Lehrplan. Hier wechselt sich Klassenunterricht mit musischen/sportlichen Angeboten und Spiel in der Mittagspause ab<\/td><\/tr><tr><td>Inhalt<\/td><td>Betreuung und Freizeitaktivitäten<\/td><td>Verzahnung von Unterricht, Lern- und Freizeitangeboten<\/td><\/tr><tr><td>Verpflegung<\/td><td>Optionales Mittagessen in der Mensa<\/td><td>Gemeinsames verpflichtendes warmes Mittagessen in der Mensa<\/td><\/tr><tr><td>Organisation<\/td><td>Durch die Arbeiter-Wohlfahrt Kreisverband Aschaffenburg und die Schulleitung<\/td><td>Vollständig durch die Schule, die Betreuung erfolgt in Kooperation mit der Arbeiter-Wohlfahrt Kreisverband Aschaffenburg<\/td><\/tr><tr><td>Kosten<\/td><td>In der Regel kostenlos, jedoch können Kosten für Mittagessen oder besondere Aktivitäten anfallen<\/td><td>Kostenlose Teilnahme am Angbot, das warme Essen muss kostenpflichtig beim Caterer der Schule bestellt werden<\/td><\/tr><tr><td>Zielgruppe<\/td><td>Schülerinnen und Schüler, die an festen einzelnen Tagen eine Betreuung bis 14 Uhr benötigen<\/td><td>Alle Schülerinnen und Schüler, die sich für dieses ganzheitliche Modell entscheiden<\/td><\/tr><tr><td>Elternbeteiligung<\/td><td>Mindestteilnahme an 2 Tagen, Auswahl der Tage muss zu Schuljahresbeginn festgelegt werden. Fernbleiben muss schriftlich bei der Schulleitung entschuldigt werden.<\/td><td>Geringere Flexibilität, fester Tagesablauf durch Schule bestimmt. Bei Anmeldung zum GGT besteht Schulpflicht für die gesamte Teilnahme an allen 4 Tagen bis 15:30 Uhr.<\/td><\/tr><tr><td>Ferienbetreuung<\/td><td>Nicht im Programm enthalten<\/td><td>Nicht im Programm enthalten<\/td><\/tr><\/tbody><\/table><\/div>\n<h2>Fazit<\/h2>\n<p>Der <b>offene Ganztag<\/b> bietet Flexibilität und richtet sich an Familien, die eine Betreuung nach dem Unterricht wünschen, jedoch nicht jeden Tag bis in den Nachmittag benötigen. Der <b>gebundene Ganztag<\/b> ist stärker strukturiert, an den Klassenunterricht gebunden und integriert den Unterricht in den gesamten Schultag, was für Kinder von Vorteil sein kann, die von einer festen Tagesstruktur profitieren.<\/p>", "exact": true, "imgs": []}, "kindergaerten": {"title": "Zusammenarbeit mit den Kindergärten", "area": "bildung", "html": "<h2>Kooperation Kindergarten – Grundschule<\/h2>\n<h3>Der Übergang vom Kindergarten zur Grundschule ist ein wichtiger Schritt im Leben eines jeden Kindes<\/h3>\n<ul><li><b>Partner:<\/b> Enge, zielführende Zusammenarbeit mit der KiTa St. Jakobus (Haus für Kinder) und der KiTa Zauberwald St. Kilian<\/li><li><b>Ziel:<\/b> Den Übergang von der Kita in die Grundschule für die Kinder bestmöglich gestalten<\/li><li><b>Wunsch:<\/b> „Die Kinder sollen sich darauf freuen, bald ein Schulkind zu sein!\"<\/li><li>Im Schuljahr treffen sich Schüler der 1. und 2. Klassen mit den Vorschülern zu verschiedenen Aktionen<\/li><li>Zwei Informationsveranstaltungen für Eltern künftiger Schulkinder im Schuljahr<\/li><\/ul>\n<h3>Herbst/Winter<\/h3>\n<ul><li><b>Wir lesen vor:<\/b> Schüler der 4. Klassen lesen Vorschülern im Rahmen des bundesweiten Vorlesetages ihre Lieblingsgeschichte vor, in der Kita bzw. in den Horträumen<\/li><li><b>Es weihnachtet sehr:<\/b> Vorschüler besuchen die Schule zu einem adventlichen Tagesstart mit Liedern und einem Bilderbuchkino<\/li><\/ul>\n<h3>Frühling /Sommer<\/h3>\n<ul><li><b>Schulstunde / Schulhausrallye:<\/b> Vorschüler erleben gemeinsam mit den 1. und 2. Klassen eine Schulstunde, lösen Rätsel und lernen das Schulhaus kennen<\/li><li><b>Singtag:<\/b> Vorschüler besuchen die 1. Klassen; der Tag startet musikalisch in der Pausenhalle<\/li><li><b>Ein gemeinsamer Ausflug:<\/b> Im Rahmen des Kinderkulturtages geht es mit den 1. Klassen und Vorschülern meist zu einem Mitmachkonzert in den Schönbusch<\/li><li><b>Vorkurs (D240):<\/b> Lehrkräfte besuchen regelmäßig die Kindertagesstätten und fördern ausgewählte Kinder sprachlich durch Spielen, Basteln, Singen, Bilderbücher und Geschichten<\/li><\/ul>", "exact": false, "imgs": []}, "filby": {"title": "Filby", "area": "bildung", "html": "<ul><li>„Unsere Schule nimmt nun schon im dritten Jahr mit zwei Klassen als Erprobungsschule am Leseförderprojekt FiLBy\" teil (FiLBy = Fachintegrierte Leseförderung Bayern).<\/li><li>Auch alle folgenden Klassen sollen vom Programm profitieren – durch die wissenschaftliche Begleitung der Universität Regensburg sowie durch umfangreiche Lese- und Arbeitsmaterialien der Projektleiter.<\/li><li>Das Angebot reicht von Kinder- und Jugendbüchern, deren Anspruch mit dem Alter steigt, bis zu „lehrplanbezogene und wissenschaftlich valide Sachtexte\".<\/li><li>„Die Kinder konnten in den drei Jahren nacheinander die Leseflüssigkeit verbessern\", das Leseverstehen trainieren und die Selbstregulierung beim Lesen stärken.<\/li><li>Gleichzeitig lernten die Kinder spannende Geschichten kennen und erfuhren viel über die Welt.<\/li><li>Interessierte Eltern finden weitere Informationen unter folgenden Links.<\/li><\/ul>", "exact": false, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2020/12/cropped-Logo-1.png", "cap": ""}]}, "pausenhelfer": {"title": "Pausenhelfer", "area": "bildung", "html": "<h2>Unsere Pausenhelfer<\/h2>\n<ul><li>Insgesamt 5–6 Pausenhelfer, erkennbar an einem Erkennungsband, sind für die Pausenzeit eingeteilt.<\/li><li>Drei Schüler/innen beaufsichtigen die drei Gänge vor den Klassenzimmern, damit alle Kinder zügig nach draußen gehen.<\/li><li>Weitere Helfer öffnen die Tür zum Pausenhof und halten sie offen.<\/li><li>„Während der Pause bleiben 2 Helfer vor dem Eingang stehen, da niemand einfach ins Schulhaus gehen soll.\" „Ausnahmen regeln die Lehrerinnen.\"<\/li><li>Der Fahrradplatz ist für Kinder tabu, und die Helfer weisen darauf hin.<\/li><li>Helfer dürfen sich frei bewegen und sind für kleine Anliegen ihrer Mitschüler/innen ansprechbar. Bei ernsten Streitigkeiten oder Verletzungen informieren sie sofort die Pausenaufsicht.<\/li><li>Am Pausenende halten zwei Helfer die Tür auf.<\/li><li>Die übrigen Helfer säubern nach dem Gong den Hof und kehren spätestens mit der letzten Klasse in den Unterricht zurück.<\/li><\/ul>", "exact": false, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2020/12/Pausenhelfer-4-1.png", "cap": ""}]}, "klassenrat": {"title": "Klassenrat", "area": "bildung", "html": "<h2>Der Klassenrat an der Christian-Schad-Grundschule<\/h2>\n<h3>Gemeinschaft fördern – Kompetenzen bilden – Demokratie lernen<\/h3>\n<h3>Klassenrat – was ist das eigentlich?<\/h3>\n<ul><li>„Die Sitzungen des Klassenrats finden einmal in der Woche statt\" und dauern etwa eine Schulstunde.<\/li><li>Schüler*innen beraten, diskutieren und entscheiden über selbstgewählte Themen.<\/li><li>Themen werden im Laufe der Woche an einer Zettelwand gesammelt.<\/li><\/ul>\n<h3>Was bringt uns die Arbeit im Klassenrat?<\/h3>\n<ul><li>Streitigkeiten verringern und ein positives Klassenklima schaffen.<\/li><li>Ein demokratisches Miteinander fördern.<\/li><li>Schüler*innen lernen, Verantwortung zu übernehmen.<\/li><li>Sie können sich an schulischen Prozessen beteiligen.<\/li><\/ul>\n<h3>Wie ist eine Sitzung des Klassenrats gestaltet?<\/h3>\n<ul><li>Die Sitzung hat einen klar strukturierten Ablauf und feste Rollen (Ämter).<\/li><li>Dadurch können sich die Schüler*innen auf die Inhalte konzentrieren und üben, die Sitzung selbstständig durchzuführen.<\/li><li>Die Lehrkraft zieht sich dabei zunehmend zurück.<\/li><\/ul>\n<h3>Welche Ämter und Rollen gibt es?<\/h3>\n<ul><li>Zeitwächter<\/li><li>Regelwächter<\/li><li>Leitung<\/li><li>Schreiber<\/li><li>Ratsmitglieder<\/li><\/ul>\n<h3>Wie ist eine Sitzung des Klassenrats gestaltet?<\/h3>\n<ul><li>Ab der 1. Klasse werden die Kinder schrittweise von den Lehrkräften an den Klassenrat herangeführt.<\/li><li>Ab Mitte der 2. Klasse folgen die Sitzungen einem festen Ablauf.<\/li><li>Die Schule arbeitet dabei mit In Via Aschaffenburg zusammen.<\/li><\/ul>\n<h3>Ablauf<\/h3>\n<ol><li>Vorbereitung: Wünsche und Themen werden im Laufe der Woche an der Zettelwand oder in einem Klassenbriefkasten gesammelt.<\/li><li>Eröffnung und Positive Runde: Begrüßung und Wiederholung der Regeln (Ich-Botschaften, keine Beleidigungen); Schüler*innen berichten Positives aus der Vorwoche.<\/li><li>Klärung, was aus den Ergebnissen der letzten Sitzung geworden ist.<\/li><li>Abfrage, welche Anliegen oder Probleme es heute gibt.<\/li><li>Besprechung des Problems oder Anliegens.<\/li><li>Suche nach einer Lösung und Einigung.<\/li><li>Eintragung der Ergebnisse als Beschlüsse im Klassenratsbuch.<\/li><\/ol>", "exact": false, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/cropped-Klassenrat-1.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/Klassenrat-2-134x300.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/Klassenrat-3-199x300.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/Klassenrat-4-199x300.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/Klassenrat-5-242x300.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/Klassenrat-6-1.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/Klassenrat-7-768x481.jpg", "cap": ""}]}, "singklasse": {"title": "Singklasse", "area": "bildung", "html": "<h2>AG Singklasse an der Christian-Schad-Grundschule<\/h2>\n<h3>in Kooperation mit der Städtischen Musikschule Aschaffenburg<\/h3>\n<ul><li>„Für Kinder ist ihre Singstimme ein natürliches (Musik-) Instrument\", mit dem sie gern singen.<\/li><li>Für Erstklässler gibt es die freiwillige Arbeitsgemeinschaft „Singklasse\", um den richtigen Gebrauch der Singstimme besser zu erlernen.<\/li><\/ul>\n<ul><li>Herr Oberhofer – Gesangspädagoge, Pianist und Leiter der Städtischen Musikschule Aschaffenburg – bietet einmal pro Woche interessierten kleinen Sänger*innen eine professionell angeleitete Musikstunde an.<\/li><li>Zentrales Thema ist die Entdeckung der eigenen Singstimme; die Stimme wird spielerisch erprobt und entwickelt.<\/li><li>Lieder werden mit Gesten und Körperinstrumenten begleitet.<\/li><li>Klangrätsel und Bewegung zur Klaviermusik schulen den Zugang zur Musik.<\/li><li>Musikalische Grundbegriffe werden behutsam eingeführt.<\/li><\/ul>\n<ul><li>Im Laufe des Schuljahres gibt es mehrere Auftritte, bei denen die Singklasse ihr Können der Schulgemeinschaft präsentiert.<\/li><\/ul>\n<ul><li>Die Singklasse ist ein Kooperationsprojekt mit der Städtischen Musikschule Aschaffenburg und Teil der „Aschaffenburger Singakademie\", die vor allem Kinder im Singen fördern will.<\/li><li>Freude am Singen in der Gruppe und später im Chor soll von Anfang an, kontinuierlich aufbauend, vermittelt werden.<\/li><li>Das Singen kann im Schulchor der Christian-Schad-Schule fortgesetzt werden; in weiterführenden Schulen und an der Städtischen Musikschule ist Singen auf höherem Niveau möglich.<\/li><li>Eine Lehrkraft der Schule ist bei den Unterrichtsstunden und allen Aufführungen aktiv dabei.<\/li><\/ul>", "exact": false, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/kisspng-childrens-choir-singing-illustration-vector-free-children-chorus-5aa5476cadbb14.9349138915207811647116-300x152.png", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/Ohne-Titel-2-300x151.png", "cap": ""}]}, "schulchor": {"title": "Schulchor", "area": "bildung", "html": "<h2>AG Schulchor der Christian-Schad-Grundschule<\/h2>\n<ul><li>Der Chor richtet sich an Kinder, die gern singen.<\/li><li>Teilnehmen können alle Zweit-, Dritt- und Viertklässler der Schule.<\/li><li>Der Chor trifft sich einmal pro Woche.<\/li><li>Die Singklasse legt die Grundlagen, die im Chor erweitert werden.<\/li><li>Auch Kinder, die ihre Freude am Singen erst später entdecken, sind willkommen.<\/li><\/ul>\n<h3>Hast du Lust zu singen?<\/h3>\n<h3>Dann komm zum Chor!<\/h3>\n<h3>Ablauf einer Chorstunde<\/h3>\n<ul><li>Jede Stunde beginnt mit Stimmspielen, die die eigene Stimme besser kennenlernen lassen und einen klangvollen Einsatz fördern.<\/li><li>Rhythmus und Körpereinsatz spielen eine wichtige Rolle.<\/li><li>Danach werden neue Lieder und Songs gelernt, die Spaß machen und sich für Schulaufführungen eignen.<\/li><li>Mit Kanons wird mehrstimmiges Singen geübt.<\/li><li>Begleitet wird am Klavier oder an der Gitarre.<\/li><li>Die Kinder können ihren Gesang mit Körper- oder Rhythmusinstrumenten unterstreichen.<\/li><\/ul>\n<h3>Auftritte im Schuljahr<\/h3>\n<ul><li>Der Chor singt im Verlauf des Schuljahres immer wieder vor Publikum: bei gemeinsamen Singtagen, Schulfesten sowie Singspielen oder musikalisch gestalteten Theateraufführungen.<\/li><\/ul>\n<h3>Sommerkonzert<\/h3>\n<ul><li>Am Ende des Schuljahres findet ein gemeinsames Sommerkonzert statt, bei dem Schüler der Städtischen Musikschule, die im Haus ein Instrument lernen, die Singklasse und der Schulchor auftreten.<\/li><\/ul>", "exact": false, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/kisspng-clip-art-karaoke-image-singing-illustration-5cd070fe55b836.1400935615571642863511-300x276.png", "cap": ""}]}, "medienkonzept": {"title": "Medienkonzept", "area": "bildung", "html": "<h2>1. Schulische Schwerpunkte zur Medienbildung<\/h2>\n<h3>1.1 Zielsetzungen<\/h3>\n<ul><li>Digitalisierung gelingt laut Masterplan Bayern Digital II nur, wenn die gesamte Schulfamilie sie im Rahmen der Schulentwicklung gestaltet.<\/li><li>Ziel: Lernen mit digitalen Medien konsequent in die Lernprozesse integrieren.<\/li><li>Schülerinnen und Schüler sollen Kenntnisse, Fähigkeiten und Fertigkeiten für eine medienbeeinflusste Welt erwerben.<\/li><li>Kreative und produktive Möglichkeiten digitaler Medien kennenlernen.<\/li><li>Kritisches Bewusstsein für Werte und Regeln im virtuellen Raum schaffen.<\/li><li>Schreiben, Lesen und Rechnen bleiben grundlegende Aufgaben der Grundschule; Handschrift, Buchlektüre und schriftliche Rechenverfahren bleiben die Basis des Unterrichts.<\/li><li>Digitalisierung wird als „vierte Kulturtechnik\" in den Unterrichtsalltag einbezogen.<\/li><\/ul>\n<p><b>Unser Medienkonzept basiert auf fünf Handlungsfeldern:<\/b><\/p>\n<ul><li>Basiskompetenzen<\/li><li>Suchen und Verarbeiten<\/li><li>Kommunizieren und Kooperieren<\/li><li>Produzieren und Präsentieren<\/li><li>Analysieren und Reflektieren<\/li><\/ul>\n<h3>1.2 Konzeption Schulnetz<\/h3>\n<ul><li>Schulnetz und technische Ausstattung befinden sich im Digitalisierungsprozess in Entwicklung; Änderungen werden zeitnah an dieser Stelle mitgeteilt.<\/li><li>Das Schulnetz besteht aktuell aus Verwaltungsnetz und Pädagogischem Netz.<\/li><li>Das Pädagogische Netz ist in allen Klassen- und Fachräumen per LAN verfügbar, im Neubau teilweise auch per WLAN.<\/li><li>Digitaler Lehrerarbeitsplatz: Laptop, Dokumentenkamera und Beamer im Klassenzimmer.<\/li><li>15 Schülerlaptops für den Unterricht oder als Leihgeräte<\/li><li>8 feste Schülerarbeitsplätze<\/li><li>40 iPads als Leihgeräte der Stadt<\/li><li>40 schuleigene iPads<\/li><\/ul>\n<h2>2. Medienkonzept<\/h2>\n<h2>4. Übersicht über verwendete Software/Apps<\/h2>\n<h3>3.1 Kostenpflichtige Apps (in Planung)<\/h3>\n<ul><li>Blitzlesen<\/li><li>Book Creator<\/li><li>Einmaleins Einsdurcheins<\/li><li>Fingerzahlen<\/li><li>Good Notes<\/li><li>GreenScreen by Do Ink<\/li><li>Hunderterfeld<\/li><li>iStopMotion<\/li><li>Knard<\/li><li>Math Fight (Vollversion), 2 Spieler Mathe<\/li><li>Mathe mit dem Känguru<\/li><li>Mein Rechentrainer<\/li><li>Microsoft Excel<\/li><li>Microsoft Powerpoint<\/li><li>Microsoft Word<\/li><li>Multidingsda Topics Vollversion<\/li><li>Popplet<\/li><li>Puppet Pals HD Director's Pass<\/li><li>Rechendreieck<\/li><li>Symmetrie Übungen für Kinder<\/li><li>Verknüpfung: Antolin<\/li><li>Wortarten Weltreise<\/li><li>Zahlenjagd – finde die Zahl<\/li><li>Zahlenstrahl Erste Zahlen<\/li><li>Zahlensucher<\/li><li>Zwanzigerfeld<\/li><\/ul>\n<h3>3.2 Internet-Verknüpfungen (Links durch klicken hinterlegt)<\/h3>\n<ul><li>Verknüpfung: Anton (anton.app/de)<\/li><li>Verknüpfung: Antolin (antolin.westermann.de)<\/li><li>Verknüpfung: Bayernatlas (geoportal.bayern.de)<\/li><li>Verknüpfung: Classromscreen (classroomscreen.com)<\/li><li>Verknüpfung: Kahoot! (kahoot.com)<\/li><li>Verknüpfung: Klexikon (klexikon.zum.de)<\/li><li>Verknüpfung: Learningapps (learningapps.org)<\/li><li>Verknüpfung: Learningsnacks (learningsnacks.de)<\/li><li>Verknüpfung: mebis (mebis.bayern.de)<\/li><li>Verknüpfung: Mentimeter (mentimeter.com)<\/li><li>Verknüpfung: Oncoo (oncoo.de)<\/li><li>Verknüpfung: OpenStreetmap.org (openstreetmap.org)<\/li><li>Verknüpfung: QRCodeMonkey (qrcode-monkey.com/de)<\/li><li>Verknüpfung: Scratch (scratch.mit.edu)<\/li><li>Verknüpfung: Sofatutor (sofatutor.com)<\/li><li>Verknüpfung: VAB Fahrpläne (vab-info.de, Fahrpläne Buslinien)<\/li><li>Verknüpfung: Yopad (yopad.eu)<\/li><\/ul>\n<h3>3.3 Kostenfreie Apps<\/h3>\n<ul><li>Actionbound<\/li><li>Adobe Acrobat Reader<\/li><li>Ankommen-App<\/li><li>Anydesk<\/li><li>Azubiwelt<\/li><li>Bayern in historischen Karten<\/li><li>BR24<\/li><li>Check das Netz<\/li><li>Chrome Browser<\/li><li>Cisco Webex Meetings<\/li><li>DB Navigator<\/li><li>Die Waldfiebel<\/li><li>Die Maus<\/li><li>DuckDuckGo Privacy Browser<\/li><li>Fake-News-Check<\/li><li>fragFinn<\/li><li>GarageBand<\/li><li>Geoboard by MLC<\/li><li>Geogebra Geometrie<\/li><li>Google Earth<\/li><li>Google Maps<\/li><li>Google Street View<\/li><li>Google Übersetzer<\/li><li>Here WeGo<\/li><li>Icoon (Amberpress)<\/li><li>iMovie<\/li><li>Insektenwelt Nabu<\/li><li>Integreat (Aschaffenburg)<\/li><li>Keynote<\/li><li>Kindernotfall-App<\/li><li>Klicksafe Cybermobbing<\/li><li>Klipp Klapp<\/li><li>Knietzsches Werkstatt<\/li><li>Launchpad<\/li><li>Lego EV3 Programmer<\/li><li>Lego WeDo<\/li><li>Lehrstellenradar der Handwerkskammer<\/li><li>Maßband<\/li><li>Media Converter Flex<\/li><li>Notizen Apple<\/li><li>Number Pieces by MLC<\/li><li>Numbers Apple<\/li><li>Onlyoffice<\/li><li>Overviewer<\/li><li>Pages<\/li><li>Photobooth<\/li><li>Photoshop Express<\/li><li>Pilzatlas<\/li><li>Popplet Lite<\/li><li>Qrafter<\/li><li>Schlaumäuse – im Land der Sprache<\/li><li>Schreibreise<\/li><li>ScratchJr<\/li><li>Skitch<\/li><li>Snapseed<\/li><li>Sprachmemos Apple<\/li><li>Stadtwerke Aschaffenburg<\/li><li>Staedler Schreiblern-App<\/li><li>Stop Motion Studio<\/li><li>Vogelwelt Nabu<\/li><li>WillkommensABC iBook<\/li><li>Worksheet Go!<\/li><\/ul>\n<h2>5. Fortbildungskonzept<\/h2>\n<ul><li>Ziel: Handlungskompetenzen zur routinierten Nutzung der schulischen IT-Infrastruktur für alle Lehrkräfte (Masterplan Bayern Digital II).<\/li><li>Die Fortbildungswünsche des Kollegiums wurden ermittelt. Fortbildungsbedarf besteht bei:<ul><li>fachspezifischer Software und Präsentationssoftware<\/li><li>Bild- und Fotobearbeitung<\/li><li>Learning-Apps im Unterricht<\/li><li>Interaktiven Kommunikations- und Kooperationstools<\/li><li>Didaktischer Nutzung digitaler Medien im Fachunterricht<\/li><li>Einsatz von mebis-Angeboten<\/li><li>Digitaler Noten- und Schülerverwaltung<\/li><li>Urheberrecht und Datenschutz<\/li><li>Gefahren im Internet<\/li><\/ul><\/li><li>Umsetzungswege:<ul><li>Schulinterne Fortbildungsplanung<\/li><li>Mini- und Micro-SchiLFs durch interne Lehrkräfte mit IT-Kompetenzen<\/li><li>Weitergabe von Fortbildungserfahrungen, z. B. aus Dillingen oder lokalen Angeboten<\/li><li>Teambesprechungen<\/li><li>Jahrgangsbesprechungen<\/li><li>Fortbildungsinitiative Dillingen (5 Onlinemodule) als verpflichtende Maßnahme<\/li><li>Externe Fachleute zu verschiedenen Themen, z. B. Hr. Behl, Hr. Maisa, Referentennetzwerk Unterfranken<\/li><\/ul><\/li><li>Zusätzlicher Schwerpunkt: digitale Fortbildung der Eltern bei Elternabenden.<\/li><\/ul>", "exact": false, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/cropped-Medienkonzept1-1.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/cropped-Medienkonzept2.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/cropped-Medienkonzept3.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2021/01/Medienkonzept4.jpg", "cap": ""}]}, "gruene-meilen": {"title": "Grüne Meilen", "area": "bildung", "html": "<ul><li>Im November 2020 zogen die Kinder der Christian-Schad-Grundschule die „Grünen Meilen Stiefel\" an.<\/li><li>Ziel war es, möglichst viele Wege ohne Auto zurückzulegen.<\/li><li>Für jeden Weg ohne Auto durfte eine grüne Meile ins Sammelheft geklebt werden.<\/li><li>Alle Klassen sammelten fleißig Meilen.<\/li><li>Eltern unterstützten mit Fahrradausflügen am Wochenende und holten Erstklässler zu Fuß statt mit dem Auto ab.<\/li><li>Erkenntnis: Jeder kann ganz einfach Klimaschützer werden.<\/li><li>Ergebnisse und weitere Informationen auf der Homepage der Kindermeilen-Kampagne: <a href=\"http://www.kindermeilen.de\" target=\"_blank\" rel=\"noopener\">http://www.kindermeilen.de<\/a><\/li><\/ul>", "exact": false, "imgs": []}, "buergerfest": {"title": "Bürgerfest", "area": "schulleben", "html": "<p>Die Christian-Schad-Grundschule trat beim Bürgerfest zur Eröffnung des Baugebiets Anwandeweg in Nilkheim auf. Die Schülerinnen und Schüler hatten vorher ein Schullied und eine Choreografie eingeübt und traten am 16. Juli auf. Zuerst sangen die ersten Klassen ein Lied, dann zeigten Kinder der 3. und 4. Klassen eine Akrobatik-Vorführung. Anschließend sangen alle gemeinsam auf der Bühne das aktuelle Schullied.<\/p>\n<p>Text und Fotos: Peter Maisa<\/p>", "exact": false, "imgs": []}, "schulkleidung": {"title": "Schulkleidung und mehr", "area": "schulkleidung", "html": "<p>Neue Schulartikel können an Schultagen von 8:00 bis 12:00 Uhr im Sekretariat bei Frau Bilz gekauft und direkt mitgenommen werden. Der Erlös unterstützt den Förderverein der Schule, der Schulveranstaltungen, besondere Möbel und Fahrtkosten einzelner Schülerinnen und Schüler mitfinanziert.<\/p>\n<h2>Artikel und Preise<\/h2>\n<div class=\"tbl\"><table><thead><tr><th>Artikel<\/th><th>Preis<\/th><\/tr><\/thead><tbody><tr><td>Dokumentenmappe mit Gummi<\/td><td>2 €<\/td><\/tr><tr><td>Bandana-Tücher<\/td><td>3 €<\/td><\/tr><tr><td>Trinkflasche<\/td><td>9 € (ausverkauft)<\/td><\/tr><tr><td>Hoodie<\/td><td>15 €<\/td><\/tr><\/tbody><\/table><\/div>", "exact": false, "imgs": [{"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2024/03/IMG_7684-scaled.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2024/03/IMG_7685-scaled.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2024/03/IMG_7686-scaled.jpg", "cap": ""}, {"src": "https://www.christian-schad-volksschule.de/wp-content/uploads/2024/03/IMG_7687-scaled.jpg", "cap": ""}]}, "impressum": {"title": "Impressum", "area": "recht", "html": "<h2>Herausgeber<\/h2>\n<ul><li>Christian-Schad-Grundschule Nilkheim<\/li><li>Lindenweg 14, 63741 Aschaffenburg<\/li><li>Telefon: 06021/4561090<\/li><li>Fax: 06021/4561099<\/li><li>E-Mail: info@christian-schad-schule.de<\/li><li>Vertretungsberechtigte Person: Doris Wolf<\/li><\/ul>\n<h2>Verantwortlich für den Inhalt<\/h2>\n<p>Doris Wolf (Anschrift wie oben)<\/p>\n<ul><li><b>Nutzungsbedingungen:<\/b> Texte, Bilder, Grafiken und Design können urheberrechtlich geschützt sein (ausgenommen Gesetze und amtliche Bekanntmachungen). Private Nutzung im Rahmen des Urheberrechts erlaubt; andere Veröffentlichungen nur mit Einwilligung der Verantwortlichen.<\/li><li><b>Haftungsausschluss:<\/b> Keine Gewähr für Aktualität, Richtigkeit, Vollständigkeit und Verfügbarkeit; Haftung für Schäden aus der Nutzung ausgeschlossen, soweit gesetzlich zulässig (§ 839 BGB bleibt unberührt).<\/li><li><b>Links:<\/b> Für Inhalte verlinkter externer Seiten sind allein deren Betreiber verantwortlich.<\/li><li><b>Cookies:<\/b> Die Website nutzt Cookies; mit weiterer Nutzung stimmt man zu.<\/li><\/ul>", "exact": false, "imgs": []}, "datenschutz": {"title": "Datenschutz", "area": "recht", "html": "<h2>Verantwortlicher<\/h2>\n<ul><li>Christian-Schad-Grundschule Nilkheim<\/li><li>Ansprechpartnerin: Doris Wolf<\/li><li>Lindenweg 14, 63741 Aschaffenburg<\/li><li>Telefon: 06021 4561090<\/li><li>Telefax: 06021/448049<\/li><li>E-Mail: info@christian-schad-schule.de<\/li><\/ul>\n<h2>Behördlicher Datenschutzbeauftragter<\/h2>\n<ul><li>Nicolai Fleischmann<\/li><li>Auhofstraße 21, 63741 Aschaffenburg<\/li><li>E-Mail: dsb-abs@schulamt-aschaffenburg<\/li><\/ul>\n<ul><li><b>Zweck:<\/b> Verarbeitung personenbezogener Daten zur Erfüllung des Bildungs- und Erziehungsauftrags nach BayEUG.<\/li><li><b>Rechtsgrundlage:<\/b> v. a. Art. 85 BayEUG i. V. m. Art. 6 Abs. 1 UAbs. 1 Buchst. e DSGVO; für Jahresberichte mit Fotos ggf. Einwilligung.<\/li><li><b>Systembetrieb:<\/b> JCM Computer GmbH im Auftrag der Schule; für einzelne Verfahren weitere Auftragsverarbeiter.<\/li><li><b>Webserver:<\/b> STRATO AG als Auftragsverarbeiter.<\/li><li><b>Protokollierung:<\/b> IP-Adresse, Datum, Zugriffsstatus u. a.; IP nach spätestens sieben Tagen auf Domain-Ebene gekürzt.<\/li><li><b>Cookies:<\/b> nur Session-Cookies; Reichweitenmessung nur statistisch ohne Personenbezug.<\/li><li><b>Speicherdauer:<\/b> nach gesetzlichen Aufbewahrungsfristen (BaySchO § 40).<\/li><li><b>Betroffene Gruppen:<\/b> Schüler/innen, Erziehungsberechtigte, Lehrkräfte, nicht unterrichtendes Personal, Geschäftskontakte.<\/li><li><b>Empfänger:<\/b> u. a. Schulaufsicht, Jugendamt, Gesundheitsamt, Landesamt für Statistik und weitere gesetzlich vorgesehene Stellen.<\/li><li><b>Rechte:<\/b> Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerruf von Einwilligungen, Widerspruch.<\/li><li><b>Beschwerde:<\/b> Bayerischer Landesbeauftragter für den Datenschutz (<a href=\"https://www.datenschutz-bayern.de/,\" target=\"_blank\" rel=\"noopener\">https://www.datenschutz-bayern.de/,<\/a> poststelle@datenschutz-bayern.de).<\/li><\/ul>", "exact": false, "imgs": []}}, "abc": [["Ankommen und Betreten des Schulhauses", "<p>Die Lehrkraft holt die Kinder um 7.45 Uhr im Pausenhof ab. Ab 7.30 Uhr gibt es dort eine Frühbetreuung. Eltern sollen ihre Kinder nicht bis ins Schulhaus begleiten und auch beim Abholen draußen warten. Der Schulweg soll möglichst bald selbstständig zu Fuß, am besten mit Nachbarskindern, zurückgelegt werden.<\/p>"], ["Copyright", "<p>Arbeitsblätter, Proben und Lernzielkontrollen sind geistiges Eigentum der jeweiligen Lehrkraft. Kopieren, Fotografieren und Verbreiten, auch per WhatsApp, sind untersagt. Fragen zu einer Probe richten Sie direkt an die Lehrkraft.<\/p>"], ["Datenschutz", "<p>Auf dem Schulgelände und im Schulhaus ist das Fotografieren von Schülern untersagt. Fotos von Schulveranstaltungen, auf denen andere Personen zu sehen sind, dürfen nicht im Internet, per WhatsApp oder auf Plattformen wie Facebook veröffentlicht werden.<\/p>"], ["Elternhausaufgabe", "<p>Das Kind bringt eine Mitteilung für die Eltern mit. Diese soll sorgfältig gelesen werden, oft wird eine Rückmeldung erbeten.<\/p>"], ["Entschuldigung bei Krankheit", "<p>Erkrankte Kinder müssen vor 7.40 Uhr telefonisch unter 06021 4561090 oder online über elternnachricht.de (<a href=\"https://elternnachricht.de/fehlzeiten\" target=\"_blank\" rel=\"noopener\">https://elternnachricht.de/fehlzeiten<\/a>) entschuldigt werden. Eine ärztliche Bescheinigung ist erst ab dem dritten Krankheitstag nötig.<\/p>"], ["Feier von Geburtstagen", "<p>In der Klasse wird ein Ständchen gesungen und das Geburtstagskind hochgelebt. Mitgebrachte Süßigkeiten zum Verteilen sind nicht erwünscht. Erlaubt ist ein kleines Spiel für das Klassenzimmer.<\/p>"], ["Ferienordnung", "<p>Urlaub muss sich an die Ferienzeiten halten. Eine Unterrichtsbefreiung ist nur in begründeten Ausnahmefällen möglich und muss schriftlich bei der Schulleitung beantragt werden.<\/p>"], ["Handy und Smartwatch", "<p>Digitale Geräte dürfen nur auf Aufforderung der Lehrkraft zu Unterrichtszwecken genutzt werden. Ausgeschaltet dürfen sie in der Büchertasche bleiben; besser ist, sie gar nicht mitzubringen. Die Regelung entspricht dem Bayerischen Erziehungs- und Unterrichtsgesetz und wurde mit dem Datenschutzbeauftragten und dem medienpädagogischen Berater am Schulamt Aschaffenburg abgestimmt.<\/p>"], ["Hausaufgaben", "<p>Sie dienen der Wiederholung des Stoffs und der Vorbereitung auf den nächsten Tag. Eltern müssen kontrollieren, ob sie vollständig erledigt wurden. Die Kinder der Ganztagsklasse haben auch am Wochenende Aufgaben.<\/p>"], ["Hausschuhe", "<p>Im Klassenzimmer werden Hausschuhe getragen. Sie halten Schmutz von der Straße und dem Pausenhof fern und sorgen besonders im Winter für ein angenehmes Raumklima.<\/p>"], ["Informationen und Nachrichten an die Lehrkraft", "<p>Dringende Mitteilungen werden am besten in das Hausaufgabenheft geschrieben; das Kind zeigt sie vor Unterrichtsbeginn vor. E-Mails werden meist erst nach dem Unterricht gelesen.<\/p>"], ["Kleidung", "<p>Die Pausen finden meist im Freien statt, auch bei leichtem Regen. Wetterangepasste Kleidung ist daher wichtig.<\/p>"], ["Lernzielkontrollen / Proben", "<p>Die Arbeiten werden mit nach Hause gegeben und müssen unterschrieben zurückgebracht werden. In der Schule werden sie aufbewahrt. Das Copyright gilt auch hier.<\/p>"], ["Mitarbeit der Eltern", "<p>Eltern sind zu Elternabenden, Schulfesten, Projekttagen und anderen Veranstaltungen eingeladen. Das stärkt den Austausch und das Gemeinschaftsgefühl.<\/p>"], ["Mittagessen", "<p>Nur Kinder im Ganztag oder Hort essen in der Mensa, betreut vom Personal. Das Essen wird bis Mittwoch 11 Uhr der Vorwoche online bei der Firma Bantschow Kids (<a href=\"https://www.bantschow-kids.de\" target=\"_blank\" rel=\"noopener\">https://www.bantschow-kids.de<\/a>) bestellt.<\/p>"], ["Pausenbrot", "<p>Süßigkeiten und süße Brotaufstriche sind nicht erwünscht. Mittwochs gibt es Obst aus dem Schulfruchtprogramm. Gesunde Ernährung ist ein Unterrichtsprinzip.<\/p>"], ["Sportunterricht", "<p>Turnbeutel können Montag bis Freitag in der Schule bleiben und am Wochenende mitgenommen werden. An Sporttagen darf kein Schmuck getragen werden, besonders kein Ohrschmuck. Lange Haare müssen zusammengebunden werden.<\/p>"], ["Sprechstunde", "<p>Einmal pro Woche vormittags gibt es eine Sprechstunde. Berufstätige Eltern können einmal im Jahr eine Sprechstunde am frühen Abend nutzen. Eine Anmeldung ist nötig. Während des Unterrichts sind keine Gespräche möglich. Auf Wunsch sind auch Termine außerhalb der Sprechstunde möglich.<\/p>"], ["Trinken und Getränke", "<p>Im Schulhaus gibt es einen Trinkwasserspender, an dem Trinkflaschen aufgefüllt werden dürfen. Aromatisierte oder gesüßte Getränke sind nicht erwünscht. Air-up-Flaschen mit künstlichen Duftstoffen werden abgelehnt.<\/p>"], ["Unterrichtsausfall", "<p>Verlässliche Unterrichtszeiten sind ein Anliegen der Schule. Eltern werden bei Ausfällen in der Regel rechtzeitig informiert. Kann ein Kind nicht früher nach Hause, wird es dem Klassenlehrer gemeldet und bis zum regulären Unterrichtsende betreut.<\/p>"], ["Vergleichsarbeiten und Orientierungsarbeiten", "<p>Bayernweite, standardisierte Tests. Alle Schüler der 2. Jahrgangsstufe schreiben die Orientierungsarbeit OA-2 in Deutsch. In der 3. Jahrgangsstufe wird VERA-3 in Deutsch und Mathematik geschrieben.<\/p>"], ["Zeugnis", "<p>Am Schuljahresende gibt es ein Jahreszeugnis. In den Klassen 1 bis 3 finden zum Halbjahr Lernentwicklungsgespräche statt, die Zwischenzeugnisse ersetzen. In der 4. Klasse gibt es im Januar eine Notenstandsmitteilung und im Mai ein Übertrittszeugnis.<\/p>"]], "gal": [{"t": "Sammelwoche für den Bund Naturschutz im April 2026", "caps": ["Unsere 2. Klassen beteiligen sich an der Sammelwoche.", "Bereits im Herbst 2025 hatte eine Mitarbeiterin des BN beim Unterrichtsgang Hecke den Kinder vieles erklärt und gezeigt."], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/04/cropped-Sammelwoche_Bayern_Natur.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-38.jpeg"]}, {"t": "Mathewettbewerb 2025/26", "caps": ["Die stolzen Schulsieger Jannik und Noemi"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/03/Ostern_2026_1.jpeg"]}, {"t": "Schulschließung am 12.1.26", "caps": ["Die Kinder in der Betreuung bauen einen Schneemann"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-39.jpeg"]}, {"t": "Adventsandacht kurz vor Weihnachten 2025", "caps": ["Adventsandacht kurz vor Weihnachten 2025, Leitung: Studienrätin Frau Breid, mit Chorauftritt unter der Leitung von Studienrätin Frau Grose"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-25.jpeg"]}, {"t": "Judokurs kurz vor den Weihnachtsferien", "caps": ["Im Judokurs kurz vor den Weihnachtsferien 2025, Kursleiter: Detlev Staffa"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-27.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/WhatsApp-Image-2026-01-08-at-21.26.10.jpeg"]}, {"t": "Päckchen-Aktion", "caps": ["Spendenpäckchen- Aktion für das Diakonie- Sozialkaufhaus Aschaffenburg im Dezember 2025"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-23.jpeg"]}, {"t": "EU Schulobstprogramm", "caps": ["Regelmäßiges Schulobst für alle Klassen! Danke an das Schnibbelteam des Elternbeirats! Oktober 2025"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-4.jpeg"]}, {"t": "Adventssingen im Dezember 2025", "caps": ["Adventssingen im Dezember 2025: Unsere Erstklässler und die Vorschulkinder unserer Nilkheimer Kitas, Leitung: Studienrätin Frau Grose und Musiklehrer Herr Oberhofer"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-19.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-20.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-21.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-22.jpeg"]}, {"t": "Nikolaus in den 1. Klassen, Dezember 2025", "caps": [], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-28.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-26.jpeg"]}, {"t": "Vorweihnachtszeit & Nikolaus", "caps": ["Im Kunstunterricht gestalten die Kinder in allen Klassen Weihnachtskarten für die Kooperationspartner unserer Schule, November 2025"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-14.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-13.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-12.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-11.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-10.jpeg"]}, {"t": "Naturerfahrung für die 2. Klassen", "caps": ["Oktober 2025"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-35.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-36.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-37.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-38.jpeg"]}, {"t": "AG Jugend und Technik", "caps": ["AG Jugend und Technik, Sponsoring durch Fa. Hörnig Bau, Kursleitung: Sebastian Kunkel, November 2025"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-15.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-16.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-17.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-18.jpeg"]}, {"t": "Auffrischungskurs in Erste-Hilfe", "caps": ["Unser Lehrkräfte-Team macht am Buß- und Bettag einen Auffrischungskurs in Erste-Hilfe, November 2025"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-5.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-6.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-7.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-8.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-9.jpeg"]}, {"t": "Vorlesetag im November 2025", "caps": [], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-29.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-30.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-31.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-32.jpeg"]}, {"t": "ADAC Aktion für die Erstklässler", "caps": ["November 2025"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-33.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-34.jpeg"]}, {"t": "Einschulungsfeier September 2025", "caps": ["Der Elternbeirat bietet Kaffee, Kuchen und Getränke an.", "Bild Mitte: Beate Schmitt (links) und Nina Wensauer- Grimm (rechts)"], "imgs": ["https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-3.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-2.jpeg", "https://www.christian-schad-volksschule.de/wp-content/uploads/2026/01/Bild-1.jpeg"]}]};
 const S = {
-  tel:"06021 4561090", telIntl:"+4960214561090", fax:"06021 4561099",
-  mail:"info@christian-schad-schule.de", rektor:"rektor@christian-schad-schule.de",
+  tel:"+49 (0)6021 4561090", telPlain:"06021 4561090", telIntl:"+4960214561090",
+  mail:"info@christian-schad-schule.de",
   addr:"Lindenweg 14, 63741 Aschaffenburg",
   map:"https://goo.gl/maps/vwzMqMJZB4PycGnn8",
   krank:"https://elternnachricht.de/fehlzeiten",
   blog:"https://aschaffenburg.taskcards.app/#/board/dc0c51fb-669a-4e37-aba5-2b065768a05f",
   elterninfo:"https://aschaffenburg.taskcards.app/#/board/b592fefe-93bb-42b5-89f6-bf27e9e445d8",
-  old:"https://www.christian-schad-volksschule.de",
+  catering:"https://www.christian-schad-volksschule.de/wp-content/uploads/2022/07/2022_Elternbrief_Vorstellung.pdf",
+  ukraineDE:"https://www.aschaffenburg.de/Aktuelles/Ukraine-Hilfe/DE_index_6550.html",
+  ukraineRU:"https://www.aschaffenburg.de/RU_index_1000.html",
 };
-const IMG = S.old + "/wp-content/uploads/";
+const UP = "https://www.christian-schad-volksschule.de/wp-content/uploads/";
 
-/* Termine Schuljahr 2026/27 */
+/* Termine – Wortlaut der Seite „Termine“ */
 const TERMINE = [
-  {d:"2026-09-15", t:"Erster Schultag im Schuljahr 2026/27", x:"Einschulungsfeier in den Klassen 1a, 1b, 1c, anschließend ökumenischer Schulanfangs-Gottesdienst in St. Kilian. Jahrgänge 2 bis 4: Unterricht von 8:00 bis 11:20 Uhr.", tag:"Schulstart"},
-  {d:"2026-09-16", h:"19:00", t:"Klassenelternabend Jahrgang 1", x:"mit Wahl der Klassenelternsprecher", tag:"Elternabend"},
-  {d:"2026-09-18", h:"19:00", t:"Schulanfangsgottesdienst für die Jahrgänge 2, 3 und 4", tag:"Gottesdienst"},
-  {d:"2026-09-22", h:"19:00", t:"Klassenelternabend Jahrgang 2", x:"mit Wahl der Klassenelternsprecher", tag:"Elternabend"},
-  {d:"2026-09-23", h:"19:00", t:"Klassenelternabend Jahrgang 3", x:"mit Wahl der Klassenelternsprecher", tag:"Elternabend"},
-  {d:"2026-09-24", h:"19:00", t:"Klassenelternabend Jahrgang 4", x:"mit Wahl der Klassenelternsprecher", tag:"Elternabend"},
-  {d:"2026-10-23", t:"Feier der Amtseinführung von Rektorin Wolf", x:"Unterrichtsende 11:00 Uhr", tag:"Fest"},
-  {d:"2026-11-16", t:"Mathematik-Meisterschaft, Runde 1", x:"Jahrgang 4", tag:"Wettbewerb"},
-  {d:"2026-11-18", t:"Buß- und Bettag: unterrichtsfrei", x:"An allen bayerischen Schulen unterrichtsfrei. Kein offener und kein gebundener Ganztag.", tag:"frei", free:true},
-  {d:"2026-11-24", t:"Elternsprechabend Jahrgänge 2, 3 und 4", tag:"Sprechabend"},
-  {d:"2026-11-25", t:"Elternsprechabend Jahrgang 1", tag:"Sprechabend"},
-  {d:"2026-12-03", h:"19:00", t:"1. Informationsabend zur Einschulung 2027/28", x:"Vorstellung der Bildungs- und Betreuungsangebote: gebundener Ganztag, offener Ganztag, Kurz- und Langgruppen, Hort.", tag:"Einschulung"},
-  {d:"2027-02-17", h:"19:00", t:"2. Informationsabend zur Einschulung 2027/28", x:"Ausgabe der Anmeldeformulare und Erläuterungen zum Screening.", tag:"Einschulung"},
-  {d:"2027-06-24", h:"19:00", t:"3. Informationsabend zur Einschulung 2027/28", x:"Hinweise zur Materialliste, zum ersten Schultag und zur ersten Schulwoche.", tag:"Einschulung"},
+  {d:"2026-09-15", t:"Erster Schultag im Schuljahr 2026/27", x:["Einschulungsfeier in den Klassen 1a, 1b, 1c, anschließend ökum. Schulanfangs-Gottesdienst in St. Kilian","Unterricht in den Jahrgängen 2 bis 4 von 8:00 Uhr bis 11:20 Uhr"]},
+  {d:"2026-09-16", h:"19:00 Uhr", t:"Jahrgang 1: Klassenelternabend mit Wahl der Klassenelternsprecher"},
+  {d:"2026-09-18", h:"19:00 Uhr", t:"Schulanfangsgottesdienst für die Jahrgänge 2, 3, 4"},
+  {d:"2026-09-22", h:"19:00 Uhr", t:"Jahrgang 2: Klassenelternabend mit Wahl der Klassenelternsprecher"},
+  {d:"2026-09-23", h:"19:00 Uhr", t:"Jahrgang 3: Klassenelternabend mit Wahl der Klassenelternsprecher"},
+  {d:"2026-09-24", h:"19:00 Uhr", t:"Jahrgang 4: Klassenelternabend mit Wahl der Klassenelternsprecher"},
+  {d:"2026-10-23", t:"Feier der Amtseinführung der Rektorin Wolf, Unterrichtsende: 11:00 Uhr"},
+  {d:"2026-11-16", t:"Jahrgang 4: Mathematik-Meisterschaft, Runde 1"},
+  {d:"2026-11-18", t:"Unterrichtsfrei an allen bayerischen Schulen. Kein OGT, kein GGT.", h:"evangelischer Feiertag", free:true},
+  {d:"2026-11-24", t:"Elternsprechabend in den Jahrgängen 2, 3, 4"},
+  {d:"2026-11-25", t:"Elternsprechabend im Jahrgang 1"},
+  {d:"2026-12-03", h:"19:00 Uhr", t:"Erster Informationsabend zur Einschulung 27/28", x:["Vorstellung der Bildungs- und Betreuungsangebote: Gebundener Ganztag, Offener Ganztag, Kurz- und Langgruppen, Hort"]},
+  {d:"2027-02-17", h:"19:00 Uhr", t:"Zweiter Informationsabend zur Einschulung 27/28", x:["Ausgabe der Anmeldeformulare und Erläuterung zum Screening"]},
+  {d:"2027-06-24", h:"19:00 Uhr", t:"Dritter Informationsabend zur Einschulung 27/28", x:["Hinweise zur Materialliste, zum 1. Schultag und zur 1. Schulwoche"]},
 ];
 
-/* Eltern-ABC */
-const ABC = [
-  ["Ankommen und Betreten des Schulhauses","Die Lehrkraft holt die Kinder um 7:45 Uhr im Pausenhof ab. Ab 7:30 Uhr gibt es dort eine Frühbetreuung. Bitte begleiten Sie Ihr Kind nicht bis ins Schulhaus und warten Sie auch beim Abholen draußen. Den Schulweg sollte Ihr Kind möglichst bald selbstständig zu Fuß gehen, am besten mit Nachbarskindern."],
-  ["Copyright","Arbeitsblätter, Proben und Lernzielkontrollen sind geistiges Eigentum der jeweiligen Lehrkraft. Kopieren, Fotografieren und Weitergeben, auch per WhatsApp, ist nicht erlaubt. Fragen zu einer Probe richten Sie bitte direkt an die Lehrkraft."],
-  ["Datenschutz","Auf dem Schulgelände und im Schulhaus ist das Fotografieren von Kindern nicht erlaubt. Fotos von Schulveranstaltungen, auf denen andere Personen zu sehen sind, dürfen nicht im Internet, per WhatsApp oder auf Plattformen wie Facebook veröffentlicht werden."],
-  ["Elternhausaufgabe","Ihr Kind bringt eine Mitteilung für Sie mit. Bitte lesen Sie sie sorgfältig; oft wird eine Rückmeldung erbeten."],
-  ["Entschuldigung bei Krankheit","Kranke Kinder bitte <b>vor 7:40 Uhr</b> telefonisch unter <b>06021 4561090</b> oder online über <a href=\"https://elternnachricht.de/fehlzeiten\" target=\"_blank\" rel=\"noopener\">elternnachricht.de</a> entschuldigen. Eine ärztliche Bescheinigung ist erst ab dem dritten Krankheitstag nötig."],
-  ["Feier von Geburtstagen","In der Klasse wird ein Ständchen gesungen und das Geburtstagskind hochgelebt. Mitgebrachte Süßigkeiten zum Verteilen sind nicht erwünscht. Erlaubt ist ein kleines Spiel für das Klassenzimmer."],
-  ["Ferienordnung","Urlaube müssen in den Ferien liegen. Eine Befreiung vom Unterricht ist nur in begründeten Ausnahmefällen möglich und muss schriftlich bei der Schulleitung beantragt werden."],
-  ["Handy und Smartwatch","Digitale Geräte dürfen nur auf Aufforderung der Lehrkraft für den Unterricht genutzt werden. Ausgeschaltet dürfen sie in der Schultasche bleiben; besser ist es, sie gar nicht mitzubringen. Die Regel folgt dem Bayerischen Erziehungs- und Unterrichtsgesetz und ist mit dem Datenschutzbeauftragten und dem medienpädagogischen Berater am Schulamt Aschaffenburg abgestimmt."],
-  ["Hausaufgaben","Hausaufgaben wiederholen den Stoff und bereiten auf den nächsten Tag vor. Bitte kontrollieren Sie, ob sie vollständig erledigt sind. Kinder der Ganztagsklassen haben auch am Wochenende Aufgaben."],
-  ["Hausschuhe","Im Klassenzimmer tragen alle Hausschuhe. Das hält den Schmutz von Straße und Pausenhof draußen und sorgt besonders im Winter für ein angenehmes Raumklima."],
-  ["Informationen an die Lehrkraft","Dringende Mitteilungen schreiben Sie am besten ins Hausaufgabenheft; Ihr Kind zeigt sie vor Unterrichtsbeginn vor. E-Mails werden meist erst nach dem Unterricht gelesen."],
-  ["Kleidung","Die Pausen finden meist im Freien statt, auch bei leichtem Regen. Bitte achten Sie auf wetterfeste Kleidung."],
-  ["Lernzielkontrollen und Proben","Proben werden mit nach Hause gegeben und kommen unterschrieben zurück. Die Schule bewahrt sie auf. Auch hier gilt das Copyright der Lehrkraft."],
-  ["Mitarbeit der Eltern","Eltern sind zu Elternabenden, Schulfesten, Projekttagen und weiteren Veranstaltungen eingeladen. Das stärkt den Austausch und die Gemeinschaft."],
-  ["Mittagessen","Nur Kinder im Ganztag oder Hort essen in der Mensa, betreut vom Personal. Das Essen wird bis Mittwoch, 11 Uhr, der Vorwoche online bei <a href=\"https://www.bantschow-kids.de\" target=\"_blank\" rel=\"noopener\">Bantschow Kids</a> bestellt."],
-  ["Pausenbrot","Süßigkeiten und süße Brotaufstriche sind nicht erwünscht. Mittwochs gibt es Obst aus dem Schulobstprogramm. Gesunde Ernährung ist ein Unterrichtsprinzip."],
-  ["Sportunterricht","Turnbeutel können von Montag bis Freitag in der Schule bleiben und gehen am Wochenende mit nach Hause. An Sporttagen bitte keinen Schmuck tragen, vor allem keinen Ohrschmuck. Lange Haare werden zusammengebunden."],
-  ["Sprechstunde","Jede Lehrkraft bietet einmal pro Woche vormittags eine Sprechstunde an. Berufstätige Eltern können einmal im Jahr eine Sprechstunde am frühen Abend nutzen. Bitte melden Sie sich vorher an, zum Beispiel über das Hausaufgabenheft, per E-Mail oder telefonisch. Während des Unterrichts sind keine Gespräche möglich. Auf Wunsch gibt es auch Termine außerhalb der Sprechstunde."],
-  ["Trinken","Im Schulhaus gibt es einen Trinkwasserspender zum Auffüllen der Trinkflaschen. Aromatisierte oder gesüßte Getränke sind nicht erwünscht, ebenso Air-up-Flaschen mit künstlichen Duftstoffen."],
-  ["Unterrichtsausfall","Verlässliche Unterrichtszeiten sind der Schule wichtig. Bei Ausfällen werden Sie in der Regel rechtzeitig informiert. Kann Ihr Kind nicht früher nach Hause, melden Sie es der Klassenlehrkraft; es wird dann bis zum regulären Unterrichtsende betreut."],
-  ["Vergleichs- und Orientierungsarbeiten","Bayernweite, standardisierte Tests: In der 2. Klasse schreiben alle die Orientierungsarbeit OA-2 in Deutsch, in der 3. Klasse VERA-3 in Deutsch und Mathematik."],
-  ["Zeugnis","Am Schuljahresende gibt es ein Jahreszeugnis. In den Klassen 1 bis 3 ersetzen Lernentwicklungsgespräche zum Halbjahr das Zwischenzeugnis. In der 4. Klasse gibt es im Januar eine Notenstandsmitteilung und im Mai das Übertrittszeugnis."],
+/* Startseite „Aktuelles aus dem Schulleben“ – Überschriften und Bildunterschriften der Startseite */
+const AKTUELL = [
+  {t:"⚽️ Fußballtag am 30.4.26", lines:["Turnierleitung: Andreas Weniger, Konrektor"], imgs:[
+    ["2026/04/VfR-Training-fuer-die-1.-und-2.-Klassen.jpeg","VfR -Training für die 1. und 2. Klassen"],
+    ["2026/04/Alle-3.-und-4.-Klassen-spielen-gegeneinander-und-ermitteln-die-Schul-Siegerklasse.jpeg","Alle 3. und 4. Klassen spielen gegeneinander und ermitteln die Schul-Siegerklasse: 1. Platz für 3aGT!"],
+    ["2026/04/3b-Torwart-in-Aktion.jpeg","3b-Torwart in Aktion"]]},
+  {t:"Unsere Schule singt und klingt", lines:["Quelle: StMUK / Tobias Hase"], imgs:[
+    ["2024/03/2024_03_06stmuk0394_-scaled.jpg",""],["2024/03/2024_03_06stmuk1020_-scaled.jpg",""],["2023/09/Unsere-Schule-singt-und-klingt.jpeg",""],["2023/10/Logo-musikbeg-GS.jpg",""]]},
+  {t:"Lesefest – Wir befragen Autoren", imgs:[["2023/09/Lesefest-Wir-befragen-Autoren.jpeg",""]]},
+  {t:"Dankeschön an die fleißigen Leser und großzügigen Sponsoren", imgs:[["2023/01/10.01.23-1418-Microsoft-Lens-scaled.jpeg",""]]},
+  {t:"Konzert der Singklassen", lines:["Quelle: Main Echo"], imgs:[["2022/07/Konzert-der-Singklassen.jpg",""]]},
+  {t:"Bürgerfest – Eröffnung Anwandeweg in Nilkheim –", href:"buergerfest", imgs:[]},
 ];
+/* „Die Christian – Schad – Grundschule im Überblick“ – Bilderreihe der Startseite */
+const UEBERBLICK = ["2024/09/IMG_4212.jpg","2024/09/IMG_4239.jpg","2024/09/IMG_4264.jpg","2024/09/IMG_4262-scaled.jpg","2024/09/IMG_4585.jpg","2024/09/IMG_4806.jpg","2024/09/IMG_4957.jpg","2024/09/IMG_5128.jpg","2024/09/IMG_5129.jpg","2024/09/IMG_5173-scaled.jpg","2024/09/IMG_5253.jpg","2024/09/IMG_5254.jpg","2024/09/IMG_7843.jpg"];
+/* „Hier wachsen Talente“ – Bilder der Startseite */
+const TALENTE = ["2021/06/Mohnbild_2-scaled.jpg","2021/02/cropped-Wassermannbild2-scaled-2.jpg","2021/09/Herbst_1-scaled.jpg","2021/06/Mohnbild_1-scaled.jpg","2023/01/Feuerwerk-scaled.jpg","2021/09/Artikel-Judo-im-GT.jpeg","2020/12/cropped-IMG_3955-scaled-1.jpg","2020/12/cropped-IMG_3963-scaled-1.jpg","2021/01/cropped-DSC09627-scaled-1.jpg","2021/10/Talente_2210216.jpg","2022/02/PHOTO-2022-02-04-11-14-44.jpg","2020/12/Piano-1.png","2021/02/Judo.png"];
 
-/* Schulleben (aus der Galerie) */
-const LEBEN = [
-  {m:"April 2026", t:"Fußballtag mit dem VfR", x:"Training mit dem VfR für die 1. und 2. Klassen, Turnier aller 3. und 4. Klassen. Schul-Siegerklasse: die 3aGT.", img:"2026/04/Alle-3.-und-4.-Klassen-spielen-gegeneinander-und-ermitteln-die-Schul-Siegerklasse.jpeg", c:"var(--leaf-soft)", k:"Tor!"},
-  {m:"April 2026", t:"Sammelwoche für den Bund Naturschutz", x:"Die 2. Klassen sammeln für den BN. Schon im Herbst 2025 hat eine BN-Mitarbeiterin beim Unterrichtsgang zur Hecke vieles erklärt.", c:"var(--leaf-soft)", k:"Natur"},
-  {m:"Schuljahr 2025/26", t:"Mathewettbewerb: unsere Schulsieger", x:"Die stolzen Schulsieger heißen Jannik und Noemi.", c:"var(--sun-soft)", k:"1 + 1 = 2"},
-  {m:"Januar 2026", t:"Schneetag", x:"Bei der Schulschließung am 12.1.26 bauen die Kinder in der Betreuung einen Schneemann.", c:"var(--sky-soft)", k:"Schnee!"},
-  {m:"Dezember 2025", t:"Adventssingen mit den Kitas", x:"Unsere Erstklässler singen mit den Vorschulkindern der Nilkheimer Kitas. Leitung: Frau Grose und Musiklehrer Herr Oberhofer.", c:"var(--poppy-soft)", k:"la la la"},
-  {m:"Dezember 2025", t:"Päckchen für das Sozialkaufhaus", x:"Spendenpäckchen-Aktion für das Diakonie-Sozialkaufhaus Aschaffenburg.", c:"var(--poppy-soft)", k:"Danke!"},
-  {m:"Dezember 2025", t:"Judokurs vor den Weihnachtsferien", x:"Kursleiter: Detlev Staffa.", c:"var(--sky-soft)", k:"Judo"},
-  {m:"November 2025", t:"AG Jugend und Technik", x:"Gesponsert von der Firma Hörnig Bau, Kursleitung: Sebastian Kunkel.", c:"var(--sun-soft)", k:"Technik"},
-  {m:"Oktober 2025", t:"Schulobst für alle Klassen", x:"Regelmäßig frisches Obst aus dem EU-Schulobstprogramm. Danke an das Schnibbelteam des Elternbeirats!", c:"var(--leaf-soft)", k:"Obst"},
-  {m:"März 2024", t:"Ausgezeichnet: „Unsere Schule singt und klingt“", x:"Das Kultusministerium zeichnet unsere Schule als musikbegeisterte Grundschule aus.", img:"2024/03/2024_03_06stmuk0394_-scaled.jpg", c:"var(--sun-soft)", k:"la la la"},
+/* Menü – Bezeichnungen wie auf der alten Website */
+const MENU = [
+  {label:"Startseite", href:"start"},
+  {label:"Schule", area:"schule", items:["ansprechpartner","team","ueber-uns","kooperation","elternbeirat","schulhausordnung","schulsozialpaedagogin","leitbild","pausenordnung","vonabisz","russisch","informationen"]},
+  {label:"Bildungsangebote", area:"bildung", groups:[
+    ["Unsere Ganztagsangebote","ganztag",[]],
+    ["Zusammenarbeit mit den Kindergärten","kindergaerten",[]],
+    ["Leseförderung",null,["filby"]],
+    ["Gemeinschaftsbildung",null,["pausenhelfer","klassenrat"]],
+    ["Musikalische Bildung",null,["singklasse","schulchor"]],
+    ["Medienbildung",null,["medienkonzept"]],
+    ["Umweltbildung",null,["gruene-meilen"]]]},
+  {label:"Termine", href:"termine", area:"termine"},
+  {label:"Galerie", href:"galerie", area:"galerie"},
+  {label:"Schulkleidung und mehr", href:"schulkleidung", area:"schulkleidung"},
 ];
-
-/* Unterseiten */
-const P = {};
-const tbl = (head, rows) => `<div class="tbl"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
-const ext = (url, txt) => `<a href="${url}" target="_blank" rel="noopener">${txt}</a>`;
-const rules = (list) => list.map((r,i)=>`<div class="rule"><b>${String(r.n ?? i+1).padStart(2,"0")}</b><div>${r.t}${r.f?`<div class="conseq">Folge bei Verstoß: … ${r.f}</div>`:""}</div></div>`).join("");
-
-P["ueber-uns"] = {area:"schule", title:"Über uns", lead:"Eine staatliche Grundschule für den Stadtteil Nilkheim: rund 250 Kinder, zehn Regelklassen und bis zu zwei gebundene Ganztagsklassen.", body:`
-<h2>Unser Haus</h2>
-<p>Das Schulhaus wurde über die Jahre mehrfach erweitert. Im Altbau liegen große Klassenzimmer, im Neubau helle, moderne Räume. Alle Klassenzimmer haben digitale Tafeln oder Beamer und Laptops. Im ganzen Haus gibt es Arbeits- und Lernecken.</p>
-<ul>
-<li><b>Mensa</b> für das gemeinsame Mittagessen mit dem Hort, für Veranstaltungen, Elternabende und Projekte</li>
-<li><b>Musiksaal</b> für alle Klassen, Singklasse, Chor, WIM („Wir musizieren“) und den Instrumentalunterricht der Musikschule</li>
-<li><b>Handarbeits- und Werkraum</b> für kreatives Arbeiten</li>
-<li><b>Turnhalle</b> und eigener <b>Sportplatz</b>; Ganztagskinder haben zusätzlich Judo und Handball</li>
-<li><b>Spielzimmer, Gruppenraum und Horträume</b> für die Betreuung außerhalb des Unterrichts</li>
-<li><b>Naturnaher Pausenhof</b> mit Klettergerüst und Rutsche, auch zum Lernen im Freien</li>
-</ul>
-<h2>Unsere Arbeit</h2>
-<p>Der Unterricht folgt dem ${ext("https://www.lehrplanplus.bayern.de/","LehrplanPlus für die Grundschule in Bayern")}. Lehrkräfte und pädagogisches Personal stimmen Unterricht und Betreuung eng aufeinander ab, damit die Kinder den ganzen Tag in einem kindgerechten Umfeld lernen und sich wohlfühlen.</p>
-<h3>Der Unterricht ist geprägt von</h3>
-<ul>
-<li>vielfältigen Lernformen: schüler-, projekt- und materialorientierter Unterricht, Wochenplanarbeit, digitale Geräte</li>
-<li>Elementen, die das Miteinander stärken: wechselnde Sozialformen, Aufgaben für die Gemeinschaft, Klassenrat, jahrgangsübergreifende Projekte</li>
-<li>Besuchen außerschulischer Lernorte: Museen, Theater, Stadtführungen, naturkundliche Exkursionen</li>
-</ul>
-<h3>Das Kollegium steht für</h3>
-<ul>
-<li>ein aufgeschlossenes, positives Verhältnis zu den Kindern</li>
-<li>einen respektvollen, wertschätzenden Umgang mit allen</li>
-<li>Unterricht und Erziehung nach gemeinsam erarbeiteten Zielen und Werten</li>
-<li>pädagogische Konferenzen und regelmäßige Arbeit im Jahrgangsteam</li>
-<li>Offenheit für Neues und regelmäßige Fortbildung</li>
-</ul>
-<h3>Zusammenarbeit mit Eltern</h3>
-<p>Wir verstehen uns als Bildungs- und Erziehungspartner der Familien. Das persönliche Gespräch hat einen hohen Stellenwert: in Sprechstunden, an Elternsprechtagen und Elternabenden. Für schnelle Nachrichten nutzen wir Elternnachricht. Eltern bringen sich ein, etwa beim wöchentlichen Schulobst-Schnibbeln, mit Expertenvorträgen, Vorleseabenden, Frühstücksaktionen, als Begleitung bei Ausflügen und bei Festen.</p>
-<h2>Unser Namensgeber</h2>
-<p>Christian Schad (1894–1982) war ein Maler der Neuen Sachlichkeit. Ab 1942 lebte und arbeitete er in Aschaffenburg.</p>
-<p><a href="#leitbild">Unser Leitbild ansehen →</a></p>`};
-
-P["team"] = {area:"schule", title:"Unser Team", lead:"Lehrkräfte im Schuljahr 2026/27.", body:`
-<h2>Schulleitung</h2>
-<div class="people"><div class="person"><small>Rektorin</small><b>Doris Wolf</b></div><div class="person"><small>Konrektor</small><b>Andreas Weniger</b></div></div>
-<h2>Klassenleitungen</h2>
-<div class="people">${[["1a","Frau Busse"],["1b","Frau Fecher"],["1c","Frau Grose"],["2a","Frau Kuffel"],["2b","Frau Breid"],["2c","Frau Hufnagel"],["3aGT","Frau von Campenhausen"],["3b","Frau Bedenk"],["3c","Frau Eberlein"],["4aGT","Frau Schober"],["4b","Frau Müller"],["4c","Herr Weniger"]].map(([k,n])=>`<div class="person"><small>Klasse ${k}${k.includes("GT")?" · Ganztag":""}</small><b>${n}</b></div>`).join("")}</div>
-<h2>Lehrkräfte ohne Klassenleitung</h2>
-<div class="people">${["Frau Brenz","Frau Bergmann","Frau Neuburger","Frau Hofmann","Frau Meier|abgeordnet von der GS Grünewald","Frau Auer|abgeordnet von der GS Grünewald","Frau Löffelmann|abgeordnet von der GS Johannesberg"].map(s=>{const [n,z]=s.split("|");return `<div class="person"><small>${z||"Lehrkraft"}</small><b>${n}</b></div>`}).join("")}</div>
-<h2>Werken und Gestalten</h2>
-<div class="people"><div class="person"><small>Fachlehrkraft</small><b>Frau Britta Wolf</b></div><div class="person"><small>Fachlehrkraft</small><b>Frau Zahn</b></div></div>
-<h2>Bundesfreiwilligendienst</h2>
-<div class="people"><div class="person"><small>BFD</small><b>Frau Schymura</b></div></div>
-<h2>Weitere Ansprechpersonen</h2>
-<div class="people">
-<div class="person"><small>Sekretariat</small><b>Sandra Bilz</b></div>
-<div class="person"><small>Hauswartin</small><b>Zsuzsanna Zehnder</b></div>
-<div class="person"><small>Schulsozialpädagogin</small><b>Michaela Gröpler-Braun</b></div>
-<div class="person"><small>Beratungslehrerin</small><b>Regina Kauer-Quast</b></div>
-<div class="person"><small>Schulpsychologin</small><b>Barbara Hufner</b></div>
-</div>`};
-
-P["elternbeirat"] = {area:"schule", title:"Elternbeirat", lead:"Das Bindeglied zwischen Elternschaft und Schule. Amtszeit 2025 bis 2027.", body:`
-<div class="people">
-<div class="person"><small>Vorsitzende</small><b>Nina Wensauer-Grimm</b></div>
-<div class="person"><small>Stellv. Vorsitzende</small><b>Bettina Stürmer</b></div>
-<div class="person"><small>Kassenwart</small><b>Jörg Fecher</b></div>
-<div class="person"><small>Kassenprüferinnen</small><b>Daniela Krimm, Nicole Beckert</b></div>
-<div class="person"><small>Schriftführerin</small><b>Beate Schmitt</b></div>
-<div class="person"><small>Weitere Mitglieder</small><b>Susanne Demuth, Dominika Hauber, Peter Maisa, Alice Völkl</b></div>
-</div>
-<p>„Wir bedanken uns für das Vertrauen und freuen uns, das Bindeglied zwischen Elternschaft und Schule zu sein, um auch Ihre Interessen zu vertreten. Wann immer Sie Fragen haben, unterstützen oder sich einbringen möchten, wenden Sie sich gerne an uns.“</p>
-<p>Sie erreichen den Elternbeirat persönlich oder per E-Mail: <b>elternbeirat.christian-schad-schule@gmx.de</b> <button class="copy" data-copy="elternbeirat.christian-schad-schule@gmx.de" type="button">Kopieren</button></p>
-<p class="note">Der Elternbeirat organisiert unter anderem das Schulobst-Schnibbelteam und die Bewirtung bei der Einschulungsfeier.</p>`};
-
-P["partnerschaft"] = {area:"schule", title:"Elternhaus und Schule", lead:"Erziehungspartnerschaft zum Wohl des Kindes, nach den Empfehlungen des Bayerischen Kultusministeriums.", body:`
-<h2>Partnerschaft als Grundlage</h2>
-<p>Grundlage sind gegenseitiges Vertrauen und Respekt. Eltern und Schule verstehen sich als gemeinsame Erziehungspartner. Das gemeinsame Ziel ist die individuelle Förderung jedes Kindes; die Sicht der Eltern und die pädagogische Sicht der Lehrkräfte ergänzen sich.</p>
-<h2>Lernentwicklungsgespräche in den Klassen 1 bis 3</h2>
-<p>In den Jahrgangsstufen 1 bis 3 ersetzen Lernentwicklungsgespräche das Zwischenzeugnis. Eltern, Lehrkraft und Kind sprechen gemeinsam über Lernfortschritte, Stärken und mögliche Herausforderungen, um das Lernen gezielt zu fördern.</p>
-<h2>Mitwirkung im Schulleben</h2>
-<p>Das Engagement der Eltern ist ausdrücklich willkommen: bei Elternabenden, Schulfesten, Projekttagen und weiteren Veranstaltungen.</p>
-<h2>Kommunikation</h2>
-<p>Über Elternnachricht tauschen sich Lehrkräfte und Eltern zeitnah aus: Informationen, Termine, Hausaufgaben, Lernmaterial und persönliche Rückmeldungen.</p>`};
-
-P["hausordnung"] = {area:"schule", title:"Schulhausordnung", lead:"Regeln für unser Zusammenleben und den Umgang mit Sachen.", body:`
-<h2>Regeln für unser Zusammenleben</h2>
-${rules([
-{t:"Ich bin freundlich, rücksichtsvoll und höflich!"},
-{t:"Ich achte auf Pünktlichkeit und gehe um 7:45 Uhr ins Klassenzimmer!"},
-{t:"Ich gehe im ganzen Schulhaus langsam und auf Treppen auf der rechten Seite!", f:"muss die Regeln für unser Zusammenleben abschreiben."},
-{t:"Im Schulhaus trage ich Hausschuhe!"},
-{t:"Auf dem Pausenhof wird das Fahrrad oder der Roller geschoben!"},
-{t:"Kaugummikauen ist verboten!"},
-{t:"Wir wollen keine Gewalt! Auch Schimpfwörter können verletzen!", f:"muss eine ausführliche Entschuldigung schreiben."},
-{t:"Müll werfe ich in die Abfalleimer!", f:"übernimmt eine Woche lang den Ordnungsdienst."},
-])}
-<h2>Regeln für den Umgang mit Sachen</h2>
-${rules([
-{n:9, t:"Ich halte meinen Arbeitsplatz sauber und hinterlasse jeden Raum ordentlich!", f:"übernimmt eine Woche lang den Ordnungsdienst."},
-{n:10, t:"Ich achte auf fremdes Eigentum! Fundsachen gebe ich bei der Klassenlehrerin oder der Hausmeisterin ab!", f:"muss den Schaden ersetzen."},
-{n:11, t:"Schulbücher werden eingebunden und sorgsam behandelt!"},
-{n:12, t:"Möbel im Haus und Spielgeräte im Pausenhof behandle ich schonend!"},
-{n:13, t:"Musikinstrumente, Sportgeräte und Computer benutze ich nur mit Erlaubnis der Lehrkräfte!", f:"darf die Gegenstände nicht mehr benutzen."},
-{n:14, t:"Unterrichtsfremde Gegenstände lasse ich zu Hause!", f:"bekommt den Gegenstand für eine Woche abgenommen."},
-])}
-<p><a href="#pausenordnung">Zur Pausenordnung →</a></p>`};
-
-P["pausenordnung"] = {area:"schule", title:"Pausenordnung", lead:"Damit die Pause für alle schön und sicher ist.", body:`
-<h2>Diese Regeln gelten</h2>
-${rules([
-{t:"Wir verbringen die Pause draußen auf dem Pausenhof. Jeder denkt an wettergerechte Kleidung."},
-{t:"Bei schlechtem Wetter folgen wir der Durchsage. Die Regenpause findet in den Klassenzimmern statt."},
-{t:"Die Toiletten benutzen wir vor oder nach der Pause. Ausnahmen besprechen wir mit der Aufsicht."},
-{t:"Den Abfall werfen wir in den Mülleimer."},
-{t:"Außer den Pausenhelfern betritt niemand während der Pause den Fahrradplatz."},
-{t:"Ballspielen sowie das Werfen und Kicken von Gegenständen ist verboten (Verletzungsgefahr!)."},
-{t:"Konflikte besprechen wir miteinander. Wenn wir uns nicht einigen können, holen wir eine Pausenaufsicht."},
-{t:"Beim Gong stellen wir uns am Sammelplatz unserer Klasse in einer Zweierreihe auf. Jetzt ist auch das Tischtennisspiel zu Ende!"},
-{t:"Wir benutzen Brotdosen mit Namen und nehmen sie am Ende der Pause wieder mit."},
-])}
-<h2>Wer sich nicht daran hält, muss …</h2>
-<ul>
-<li>… die Pausenordnung abschreiben,</li>
-<li>… die Pause vor dem Lehrerzimmer verbringen,</li>
-<li>… bei Schimpfwörtern oder Gewalt eine ausführliche Entschuldigung schreiben,</li>
-<li>… seinen Schläger abgeben und hat eine Woche Tischtennisverbot,</li>
-<li>… wissen, dass namenlose, herumliegende Brotdosen entsorgt werden.</li>
-</ul>
-<p class="note">Bei groben oder wiederholten Regelverstößen erhalten die Eltern eine offizielle schriftliche Mitteilung.</p>`};
-
-P["sozialarbeit"] = {area:"schule", title:"Schulsozialarbeit", lead:"Michaela Gröpler-Braun, Diplom-Sozialpädagogin (FH), im Programm „Schule öffnet sich“.", body:`
-<div class="tbl"><table><thead><tr><th>Tag</th><th>Christian-Schad-Grundschule</th></tr></thead><tbody>
-<tr><td>Dienstag</td><td>8:00 – 12:00 Uhr</td></tr><tr><td>Donnerstag</td><td>11:00 – 14:00 Uhr</td></tr><tr><td>Freitag</td><td>8:00 – 13:00 Uhr</td></tr></tbody></table></div>
-<p class="note">Montags und mittwochs (8:00 – 12:15 Uhr) arbeitet Frau Gröpler-Braun an der Erthal-Grundschule in Aschaffenburg-Leider.</p>
-<p>Telefon <b>06021 4561092</b> · E-Mail <b>schulsozialarbeit@christian-schad-schule.de</b> <button class="copy" data-copy="schulsozialarbeit@christian-schad-schule.de" type="button">Kopieren</button></p>
-<h2>Was macht eine Schulsozialpädagogin?</h2>
-<p>Sie ist Fachkraft für soziale Fragen aller Kinder in der Schule. Sie arbeitet vorbeugend in der Klasse, in Kleingruppen und bei Bedarf in kurzen Einzelgesprächen, mit Spielen und Projekten zu bestimmten Themen. Seit September 2023 ist sie an unserer Schule.</p>
-<h3>Zum Beispiel</h3>
-<ul><li>Konflikte gewaltfrei lösen</li><li>Ängste bewältigen</li><li>Freundschaften knüpfen</li><li>die Klasse spielerisch zusammenführen, sodass niemand ausgeschlossen wird</li><li>Verschiedenheit erkennen und einander akzeptieren</li></ul>
-<h3>Ziele</h3>
-<ul><li>Gewalt und Mobbing vorbeugen</li><li>Werte und Persönlichkeit fördern</li><li>Sozialkompetenz und Konfliktlösung stärken</li><li>Klassengemeinschaft und Integration unterstützen</li></ul>`};
-
-P["beratung"] = {area:"eltern", title:"Beratung und Hilfe", lead:"Wenn es schwierig wird: Ansprechpersonen an der Schule und Hilfe in Stadt und Landkreis Aschaffenburg.", body:`
-<h2>An der Schule</h2>
-<div class="people">
-<div class="person"><small>Schulsozialpädagogin</small><b>Michaela Gröpler-Braun</b><small>06021 4561092 · <a href="#sozialarbeit">Sprechzeiten</a></small></div>
-<div class="person"><small>Beratungslehrerin</small><b>Regina Kauer-Quast</b><small>Termine nach Vereinbarung<br>kauerquast-beratung@web.de</small></div>
-<div class="person"><small>Schulpsychologin</small><b>Barbara Hufner</b><small>Telefonsprechstunde Mi 10:30–11:30 Uhr<br>06021 394222 · Barbara.Hufner@lra-ab.bayern.de</small></div>
-</div>
-<h2>Hilfe vor Ort</h2>
-${tbl(["Stelle","Telefon"],[
-["Klinikum Aschaffenburg, Kinder- und Jugendpsychiatrie","06021 32-0"],
-["Beratungsstelle für Kinder, Jugendliche und Eltern (Stadt)","06021 392220"],
-["Beratungsstelle für Kinder, Jugendliche und Eltern (Landkreis)","06021 392301"],
-["Sefra e.V. (für Frauen)","06021 24728"],
-["AWO Sozialpsychiatrischer Dienst (für Erwachsene)","06021 902500"],
-["Jugendamt Stadt Aschaffenburg","06021 3301324"],
-["Jugendamt Landkreis Aschaffenburg","06021 394553"],
-["Allgemeiner Sozialer Dienst","06021 394375"],
-["Gesundheitsamt","06021 394100 (Zentrale), 06021 394184 (ärztlicher Dienst)"],
-["Staatliche Schulberatungsstelle Unterfranken","0931 7945410 · mail@schulberatung-unterfranken.de"],
-])}
-<h2>Bundesweit und online</h2>
-<ul>
-<li><b>Nummer gegen Kummer:</b> 116 111 oder 0800 1110888, Mo–Sa 14–20 Uhr · ${ext("https://www.nummergegenkummer.de","nummergegenkummer.de")}</li>
-<li>${ext("https://jugend.bke-beratung.de","jugend.bke-beratung.de")}: Online-Jugendberatung</li>
-<li>${ext("https://www.telefonseelsorge.de","telefonseelsorge.de")}: Mail- und Chatberatung</li>
-<li>${ext("https://www.youth-life-line.de","youth-life-line.de")}: Online-Beratung von Jugendlichen für Jugendliche</li>
-</ul>
-<h2>Hilfe für Geflüchtete aus der Ukraine</h2>
-<p>Die Stadt Aschaffenburg bündelt Informationen: ${ext("https://www.aschaffenburg.de/Aktuelles/Ukraine-Hilfe/DE_index_6550.html","Ukraine-Hilfe (Deutsch)")} · ${ext("https://www.aschaffenburg.de/RU_index_1000.html","Информация на русском")}</p>`};
-
-P["ganztag"] = {area:"ganztag", title:"Ganztag", lead:"Zwei Modelle für Betreuung und Lernen über den Vormittag hinaus: der offene Ganztag (OGT) und der gebundene Ganztag (GGT).", body:`
-<div class="compare">
-<div class="ogt"><span class="eyebrow">Offener Ganztag · OGT</span><span class="big">bis 14 oder 16 Uhr</span><p>Freiwillig, an mindestens 2 festen Tagen pro Woche. Kurzgruppe bis 14:00 Uhr, Langgruppe bis 16:00 Uhr. Gruppen aus mehreren Klassen. Partner: AWO Kreisverband Aschaffenburg e.V.</p></div>
-<div class="ggt"><span class="eyebrow">Gebundener Ganztag · GGT</span><span class="big">Mo–Do bis 15:30 Uhr</span><p>Eine ganze Klasse lernt den ganzen Tag zusammen. Unterricht, Bewegung, Musik und Spiel wechseln sich ab. Die Teilnahme an allen 4 Tagen ist verpflichtend. Derzeit die Klassen 3aGT und 4aGT.</p></div>
-</div>
-<h2>Im Vergleich</h2>
-${tbl(["","Offener Ganztag","Gebundener Ganztag"],[
-["Teilnahme","Freiwillig, mindestens 2 Tage pro Woche, begrenzte Plätze","Verpflichtend für die angemeldeten Kinder, begrenzte Plätze pro Jahrgang"],
-["Zeiten","Nach dem Unterricht, Kurzgruppe bis 14 Uhr, Langgruppe bis 16 Uhr","Montag bis Donnerstag 7:30 bis 15:30 Uhr"],
-["Tagesablauf","Vormittags Unterricht, danach Betreuung in eigenen Spielzimmern","Klassenunterricht wechselt mit musischen und sportlichen Angeboten und Spiel in der Mittagspause"],
-["Inhalt","Betreuung und Freizeitangebote","Unterricht, Lern- und Freizeitangebote greifen ineinander"],
-["Mittagessen","Optional in der Mensa","Gemeinsames warmes Mittagessen in der Mensa, verpflichtend"],
-["Organisation","AWO Kreisverband Aschaffenburg und Schulleitung","Schule, Betreuung in Kooperation mit der AWO"],
-["Kosten","In der Regel kostenlos; Kosten für Essen oder besondere Aktivitäten möglich","Teilnahme kostenlos; das warme Essen wird kostenpflichtig beim Caterer bestellt"],
-["Für wen?","Familien, die an festen Tagen Betreuung bis 14 Uhr brauchen","Familien, die sich für das ganzheitliche Modell entscheiden"],
-["Pflichten","Tage werden zu Schuljahresbeginn festgelegt; Fehlen schriftlich bei der Schulleitung entschuldigen","Schulpflicht an allen 4 Tagen bis 15:30 Uhr"],
-["Ferien","Keine Ferienbetreuung","Keine Ferienbetreuung"],
-])}
-<h2>Der Tag im Überblick</h2>
-<div id="dayband"></div>
-<h2>Welches Modell passt?</h2>
-<p>Der <b>offene Ganztag</b> ist flexibel und passt zu Familien, die Betreuung nach dem Unterricht brauchen, aber nicht jeden Tag bis zum Nachmittag. Der <b>gebundene Ganztag</b> ist fester strukturiert, an den Klassenunterricht gebunden und hilft besonders Kindern, die von einem klaren Tagesrhythmus profitieren.</p>
-<p class="note">Mittagessen bestellen: bis Mittwoch, 11 Uhr, der Vorwoche online bei ${ext("https://www.bantschow-kids.de","Bantschow Kids")}. Alle Modelle stellt die Schule auch beim Informationsabend zur Einschulung vor (<a href="#termine">Termine</a>).</p>`};
-
-P["kita"] = {area:"lernen", title:"Von der Kita in die Schule", lead:"„Die Kinder sollen sich darauf freuen, bald ein Schulkind zu sein!“", body:`
-<p>Wir arbeiten eng mit der <b>KiTa St. Jakobus</b> (Haus für Kinder) und der <b>KiTa Zauberwald St. Kilian</b> zusammen. Im Laufe des Schuljahres treffen sich die 1. und 2. Klassen mehrmals mit den Vorschulkindern. Für Eltern künftiger Schulkinder gibt es Informationsabende.</p>
-<h2>Herbst und Winter</h2>
-<ul>
-<li><b>Wir lesen vor:</b> Zum bundesweiten Vorlesetag lesen Kinder der 4. Klassen den Vorschulkindern ihre Lieblingsgeschichte vor.</li>
-<li><b>Es weihnachtet sehr:</b> Die Vorschulkinder kommen zu einem adventlichen Tagesstart mit Liedern und Bilderbuchkino.</li>
-</ul>
-<h2>Frühling und Sommer</h2>
-<ul>
-<li><b>Schulstunde und Schulhausrallye:</b> Die Vorschulkinder erleben eine Schulstunde mit den 1. und 2. Klassen, lösen Rätsel und lernen das Schulhaus kennen.</li>
-<li><b>Singtag:</b> Die Vorschulkinder besuchen die 1. Klassen; der Tag beginnt musikalisch in der Pausenhalle.</li>
-<li><b>Gemeinsamer Ausflug:</b> Zum Kinderkulturtag geht es mit den 1. Klassen meist zu einem Mitmachkonzert in den Schönbusch.</li>
-<li><b>Vorkurs Deutsch 240:</b> Lehrkräfte besuchen regelmäßig die Kitas und fördern ausgewählte Kinder sprachlich, mit Spielen, Basteln, Singen, Bilderbüchern und Geschichten.</li>
-</ul>
-<p><a href="#termine">Termine der Informationsabende zur Einschulung 2027/28 →</a></p>`};
-
-P["lesen"] = {area:"lernen", title:"Leseförderung mit FiLBy", lead:"Fachintegrierte Leseförderung Bayern, wissenschaftlich begleitet von der Universität Regensburg.", body:`
-<p>Unsere Schule hat als Erprobungsschule mit zwei Klassen drei Jahre lang am Leseförderprojekt FiLBy teilgenommen. Davon profitieren auch alle folgenden Klassen: durch die wissenschaftliche Begleitung und umfangreiche Lese- und Arbeitsmaterialien.</p>
-<p>Das Material reicht von Kinder- und Jugendbüchern, deren Anspruch mit dem Alter steigt, bis zu lehrplanbezogenen, wissenschaftlich geprüften Sachtexten. Die Kinder haben ihre Leseflüssigkeit verbessert, das Leseverstehen trainiert und gelernt, ihr Lesen selbst zu steuern. Nebenbei lernten sie spannende Geschichten kennen und erfuhren viel über die Welt.</p>
-<h3>Mehr erfahren</h3>
-<ul><li>${ext("https://filby.alp.dillingen.de/","FiLBy an der Akademie Dillingen")}</li><li>${ext("https://www.uni-regensburg.de/sprache-literatur-kultur/germanistik-did/filby/index.html","FiLBy an der Universität Regensburg")}</li></ul>
-<p class="note">Auch der Vorlesetag im November und das Lesefest „Wir befragen Autoren“ gehören zur Leseförderung.</p>`};
-
-P["gemeinschaft"] = {area:"lernen", title:"Gemeinschaft lernen", lead:"Klassenrat und Pausenhelfer: Kinder übernehmen Verantwortung und lernen Demokratie.", body:`
-<h2>Der Klassenrat</h2>
-<p>Einmal pro Woche, etwa eine Schulstunde lang, beraten, diskutieren und entscheiden die Kinder über Themen, die sie selbst gesammelt haben. Das verringert Streit, schafft ein gutes Klassenklima und lehrt Verantwortung. Ab der 1. Klasse führen die Lehrkräfte schrittweise heran, ab Mitte der 2. Klasse folgt jede Sitzung einem festen Ablauf. Wir arbeiten dabei mit In Via Aschaffenburg zusammen.</p>
-<h3>Ämter</h3>
-<p>Leitung · Zeitwächter · Regelwächter · Schreiber · Ratsmitglieder</p>
-<h3>So läuft eine Sitzung ab</h3>
-<ol class="steps">
-<li>Eröffnung und positive Runde: Begrüßung, Regeln (Ich-Botschaften, keine Beleidigungen), Schönes aus der letzten Woche</li>
-<li>Was ist aus den Beschlüssen der letzten Sitzung geworden?</li>
-<li>Welche Anliegen gibt es heute? (gesammelt an der Zettelwand oder im Klassenbriefkasten)</li>
-<li>Das Anliegen wird besprochen.</li>
-<li>Gemeinsam eine Lösung finden und sich einigen.</li>
-<li>Beschlüsse ins Klassenratsbuch eintragen.</li>
-</ol>
-<h2>Die Pausenhelfer</h2>
-<p>Fünf bis sechs Pausenhelfer, erkennbar an ihrem Band, sind in jeder Pause im Einsatz:</p>
-<ul>
-<li>Drei Helfer achten in den Gängen darauf, dass alle zügig nach draußen gehen; andere halten die Tür zum Pausenhof auf.</li>
-<li>Zwei Helfer bleiben am Eingang, denn niemand soll einfach ins Schulhaus gehen. Ausnahmen regeln die Lehrerinnen.</li>
-<li>Sie erinnern daran, dass der Fahrradplatz tabu ist.</li>
-<li>Bei kleinen Anliegen helfen sie, bei ernstem Streit oder Verletzungen holen sie sofort die Pausenaufsicht.</li>
-<li>Nach dem Gong säubern die übrigen Helfer den Hof.</li>
-</ul>`};
-
-P["musik"] = {area:"lernen", title:"Musik", lead:"Singklasse, Schulchor und Instrumentalunterricht der Städtischen Musikschule im eigenen Haus. Ausgezeichnet als musikbegeisterte Grundschule: „Unsere Schule singt und klingt“.", body:`
-<h2>Singklasse für Erstklässler</h2>
-<p>„Für Kinder ist ihre Singstimme ein natürliches Instrument.“ In der freiwilligen AG Singklasse lernen Erstklässler, ihre Stimme richtig zu gebrauchen. Einmal pro Woche leitet Herr Oberhofer, Gesangspädagoge, Pianist und Leiter der ${ext("https://www.musikschule-aschaffenburg.eu/","Städtischen Musikschule Aschaffenburg")}, eine professionelle Musikstunde.</p>
-<ul><li>Die eigene Singstimme spielerisch entdecken</li><li>Lieder mit Gesten und Körperinstrumenten begleiten</li><li>Klangrätsel und Bewegung zur Klaviermusik</li><li>Erste musikalische Grundbegriffe</li><li>Mehrere Auftritte im Schuljahr vor der Schulgemeinschaft</li></ul>
-<p>Die Singklasse ist Teil der Aschaffenburger Singakademie. Eine Lehrkraft der Schule ist bei allen Stunden und Auftritten dabei.</p>
-<h2>Schulchor für die Klassen 2 bis 4</h2>
-<p><b>Hast du Lust zu singen? Dann komm zum Chor!</b> Der Chor trifft sich einmal pro Woche und baut auf der Singklasse auf. Kinder, die ihre Freude am Singen erst später entdecken, sind genauso willkommen.</p>
-<ol class="steps"><li>Stimmspiele zum Einsingen</li><li>Rhythmus und Bewegung</li><li>Neue Lieder und Songs für Aufführungen</li><li>Kanons für mehrstimmiges Singen, begleitet von Klavier oder Gitarre</li></ol>
-<p>Der Chor tritt bei Singtagen, Schulfesten, Singspielen und musikalischen Theaterstücken auf. Zum Schuljahresende gibt es ein <b>Sommerkonzert</b> mit Singklasse, Chor und den Kindern, die im Haus ein Instrument lernen.</p>
-<h2>WIM: Wir musizieren</h2>
-<p>Musikalische Grundbildung im Musiksaal, gemeinsam mit der Musikschule.</p>`};
-
-P["medien"] = {area:"lernen", title:"Medienbildung", lead:"Digitale Medien gehören dazu. Lesen, Schreiben und Rechnen bleiben die Grundlage.", body:`
-<p>Handschrift, Bücher und schriftliches Rechnen bleiben die Basis. Digitales Lernen kommt als „vierte Kulturtechnik“ dazu. Die Kinder lernen, digitale Medien kreativ zu nutzen und kritisch mit Werten und Regeln im Netz umzugehen.</p>
-<h2>Fünf Handlungsfelder</h2>
-<ol class="steps"><li>Basiskompetenzen</li><li>Suchen und Verarbeiten</li><li>Kommunizieren und Kooperieren</li><li>Produzieren und Präsentieren</li><li>Analysieren und Reflektieren</li></ol>
-<h2>Ausstattung</h2>
-<ul>
-<li>In jedem Klassenzimmer: digitale Tafel oder Beamer, Laptop und Dokumentenkamera</li>
-<li>Pädagogisches Netz per LAN in allen Klassen- und Fachräumen, im Neubau teilweise WLAN</li>
-<li>15 Schülerlaptops (für den Unterricht oder zum Ausleihen) und 8 feste Schülerarbeitsplätze</li>
-<li>80 iPads: 40 Leihgeräte der Stadt und 40 schuleigene</li>
-</ul>
-<h2>Eingesetzte Apps (Auswahl)</h2>
-<p>Anton, Antolin, Book Creator, Blitzlesen, Mathe mit dem Känguru, Hunderterfeld, Zwanzigerfeld, Zahlenstrahl, Einmaleins, iStopMotion, GreenScreen by Do Ink, Puppet Pals, Wortarten Weltreise und weitere.</p>
-<p class="note">Stand des Medienkonzepts: Juni 2021. Die Regeln zu Handy und Smartwatch stehen im <a href="#abc">Eltern-ABC</a>.</p>`};
-
-P["umwelt"] = {area:"lernen", title:"Umwelt und Natur", lead:"Klimaschutz beginnt auf dem Schulweg.", body:`
-<h2>Grüne Meilen</h2>
-<p>Bei der Kampagne „Grüne Meilen“ zogen alle Kinder die Grüne-Meilen-Stiefel an. Ziel war, möglichst viele Wege ohne Auto zurückzulegen. Für jeden Weg ohne Auto gab es eine grüne Meile ins Sammelheft. Eltern halfen mit Fahrradausflügen am Wochenende und holten Erstklässler zu Fuß ab. Die Erkenntnis: Jeder kann ganz einfach Klimaschützer werden. Mehr unter ${ext("https://www.kindermeilen.de","kindermeilen.de")}.</p>
-<h2>Draußen lernen</h2>
-<ul>
-<li>Naturnaher Pausenhof für Pausen und Unterricht im Freien</li>
-<li>Naturerfahrung für die 2. Klassen und Unterrichtsgang zur Hecke mit dem Bund Naturschutz</li>
-<li>Sammelwoche für den Bund Naturschutz (April 2026)</li>
-<li>Schulobst aus dem EU-Schulobstprogramm, jeden Mittwoch</li>
-</ul>`};
-
-P["shop"] = {area:"eltern", title:"Schulkleidung und mehr", lead:"Im Sekretariat bei Frau Bilz, an Schultagen von 8 bis 12 Uhr. Der Erlös geht an den Förderverein.", body:`
-<div class="pricelist">
-<div class="price"><span>Dokumentenmappe mit Gummi</span><b>2 €</b></div>
-<div class="price"><span>Bandana-Tuch</span><b>3 €</b></div>
-<div class="price"><span>Hoodie</span><b>15 €</b></div>
-<div class="price out"><span>Trinkflasche · ausverkauft</span><b>9 €</b></div>
-</div>
-<p>Der Förderverein finanziert damit Schulveranstaltungen, besondere Möbel und Fahrtkosten einzelner Kinder mit.</p>`};
-
-P["termine"] = {area:"eltern", title:"Termine 2026/27", lead:"Elternabende, Feste, freie Tage und Informationsabende im Überblick.", body:`<div id="allDates"></div>`};
-
-P["schulleben"] = {area:"schule", title:"Schulleben", lead:"Was bei uns los ist. Aktuelle Beiträge erscheinen auch im Schul-Blog.", body:`<div class="life" id="allLife"></div><p>Weitere Beiträge: ${ext(S.blog,"Unser Blog auf TaskCards")}</p>`};
-
-P["abc"] = {area:"eltern", title:"Eltern-ABC", lead:"Alles Wichtige zum Schulalltag von A bis Z. Tippen Sie einfach ein Stichwort ein.", body:`
-<div class="abc-tools">
-<label class="field" for="abcq"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="abcq" type="search" placeholder="z. B. Krankheit, Handy, Mittagessen"></label>
-<div class="letters" id="letters"></div>
-</div>
-<div class="abc" id="abcList"></div>
-<p class="note">Diese Informationen gibt es auch <a href="#russisch">auf Russisch</a>.</p>`};
-
-P["russisch"] = {area:"eltern", title:"Информация для родителей", lead:"Важная информация для родителей от А до Я. Інформація для батьків.", body:`
-<p>Die Elterninformationen „Von A bis Z“ gibt es auf der bisherigen Schulwebsite auch auf Russisch: Einlass, Krankmeldung, Ferien, Hausaufgaben, Hausschuhe, Kleidung, Proben, Pausenbrot, Sport, Sprechstunde und Unterrichtsausfall.</p>
-<p>${ext(S.old+"/colibri-wp/wichtige-informationen-russisch/","Важная информация для родителей от А до Я (русский)")}</p>
-<h2>Самое важное</h2>
-<ul>
-<li><b>Болезнь:</b> до 7:40 по телефону 06021 4561090 или онлайн: ${ext("https://elternnachricht.de/fehlzeiten","elternnachricht.de")}</li>
-<li><b>Начало:</b> учитель забирает детей в 7:45 со школьного двора. С 7:30 — утренний присмотр.</li>
-</ul>
-<h2>Допомога Україні</h2>
-<p>${ext("https://www.aschaffenburg.de/Aktuelles/Ukraine-Hilfe/DE_index_6550.html","Ukraine-Hilfe der Stadt Aschaffenburg")} · ${ext("https://www.aschaffenburg.de/RU_index_1000.html","Информация города на русском")}</p>`};
-
-P["leitbild"] = {area:"schule", title:"Unser Leitbild", lead:"Das gemeinsam erarbeitete Leitbild der Schulfamilie.", body:`
-<div class="ph" style="--c:var(--sun-soft); aspect-ratio:3/4; max-width:560px"><img src="${IMG}2023/03/Leitbild-scaled.jpg" alt="Leitbild der Christian-Schad-Grundschule" loading="lazy" onerror="this.remove()"><span class="fb">Leitbild</span></div>
-<p class="note">Das Leitbild liegt bisher nur als Bild vor. Für Barrierefreiheit und Suche sollte der Text zusätzlich als Text eingepflegt werden.</p>`};
-
-P["impressum"] = {area:"recht", title:"Impressum", lead:"", body:`
-<h2>Herausgeber</h2>
-<p>Christian-Schad-Grundschule Nilkheim<br>Lindenweg 14, 63741 Aschaffenburg<br>Telefon 06021 4561090 · Fax 06021 4561099<br>E-Mail info@christian-schad-schule.de</p>
-<p>Vertretungsberechtigt und verantwortlich für den Inhalt: Rektorin Doris Wolf, Anschrift wie oben.</p>
-<h2>Nutzungsbedingungen</h2>
-<p>Texte, Bilder, Grafiken und Gestaltung dieser Website können urheberrechtlich geschützt sein, ausgenommen Gesetze und amtliche Bekanntmachungen. Private Nutzung ist im Rahmen des Urheberrechts erlaubt; andere Veröffentlichungen nur mit Einwilligung der Schule.</p>
-<h2>Haftung</h2>
-<p>Wir übernehmen keine Gewähr für Aktualität, Richtigkeit, Vollständigkeit und Verfügbarkeit der Inhalte. Die Haftung für Schäden aus der Nutzung ist ausgeschlossen, soweit gesetzlich zulässig; § 839 BGB bleibt unberührt. Für verlinkte externe Seiten sind allein deren Betreiber verantwortlich.</p>`};
-
-P["datenschutz"] = {area:"recht", title:"Datenschutz", lead:"Die wichtigsten Punkte zum Umgang mit Ihren Daten.", body:`
-<h2>Verantwortlich</h2>
-<p>Christian-Schad-Grundschule Nilkheim, Rektorin Doris Wolf, Lindenweg 14, 63741 Aschaffenburg, Telefon 06021 4561090, info@christian-schad-schule.de</p>
-<h2>Datenschutzbeauftragter</h2>
-<p>Nicolai Fleischmann, Staatliches Schulamt, Auhofstraße 21, 63741 Aschaffenburg</p>
-<h2>Kernpunkte</h2>
-<ul>
-<li><b>Zweck:</b> Erfüllung des Bildungs- und Erziehungsauftrags nach dem BayEUG (Art. 85 BayEUG i. V. m. Art. 6 Abs. 1 UAbs. 1 Buchst. e DSGVO). Fotos etwa im Jahresbericht nur mit Einwilligung.</li>
-<li><b>Dienstleister:</b> Systembetreuung durch die JCM Computer GmbH; Webserver bei der STRATO AG, jeweils als Auftragsverarbeiter.</li>
-<li><b>Server-Protokolle:</b> IP-Adresse, Datum und Zugriffsstatus; die IP-Adresse wird spätestens nach sieben Tagen gekürzt.</li>
-<li><b>Cookies:</b> nur Sitzungs-Cookies; Reichweitenmessung nur statistisch ohne Personenbezug. Diese Seite speichert nur Ihre Hell/Dunkel-Einstellung lokal im Browser.</li>
-<li><b>Speicherdauer:</b> nach den gesetzlichen Aufbewahrungsfristen (§ 40 BaySchO).</li>
-<li><b>Ihre Rechte:</b> Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch und Widerruf von Einwilligungen.</li>
-<li><b>Beschwerde:</b> beim ${ext("https://www.datenschutz-bayern.de/","Bayerischen Landesbeauftragten für den Datenschutz")}.</li>
-</ul>`};
-
-P["kontakt"] = {area:"kontakt", title:"Kontakt", lead:"So erreichen Sie uns.", body:`<div id="contactFull"></div>`};
-
-P["lernen"] = {area:"lernen", title:"Lernen bei uns", lead:"Unterricht nach dem LehrplanPlus, dazu Schwerpunkte, die unsere Schule ausmachen.", body:`<div id="learnFull"></div>`};
-
-/* Navigation */
-const AREAS = {
-  schule:{label:"Schule", links:["ueber-uns","team","schulleben","elternbeirat","partnerschaft","sozialarbeit","hausordnung","pausenordnung","leitbild"]},
-  lernen:{label:"Lernen", links:["lernen","lesen","musik","gemeinschaft","medien","umwelt","kita"]},
-  ganztag:{label:"Ganztag", links:["ganztag"]},
-  eltern:{label:"Für Eltern", links:["abc","termine","beratung","shop","russisch"]},
-  termine:{label:"Termine", links:["termine"]},
-  kontakt:{label:"Kontakt", links:["kontakt"]},
-  recht:{label:"Rechtliches", links:["impressum","datenschutz"]},
-};
+const AREA_LABEL = {schule:"Schule", bildung:"Bildungsangebote", schulleben:"Aktuelles aus dem Schulleben", schulkleidung:"Schulkleidung und mehr", recht:"Rechtliches"};
+const AREA_PAGES = a => a==="bildung" ? ["ganztag","kindergaerten","filby","pausenhelfer","klassenrat","singklasse","schulchor","medienkonzept","gruene-meilen"]
+  : (MENU.find(m=>m.area===a)?.items || Object.keys(DATA.pages).filter(k=>DATA.pages[k].area===a));
 
 /* ================= Helfer ================= */
 const $ = (s, r=document) => r.querySelector(s);
-const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const strip = h => h.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const MON = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
 const WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
 const WDL = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
@@ -868,201 +606,235 @@ const dayStart = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 function toast(msg){ const t = document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 1800); }
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-copy]"); if(!b) return;
-  const v = b.getAttribute("data-copy");
-  const done = () => toast("Kopiert: " + v);
+  const v = b.getAttribute("data-copy"), done = () => toast("Kopiert: " + v);
   try{ navigator.clipboard.writeText(v).then(done, () => fallbackCopy(v, done)); }catch(err){ fallbackCopy(v, done); }
 });
-function fallbackCopy(v, done){ const ta=document.createElement("textarea"); ta.value=v; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(e){ toast("Bitte markieren und kopieren: " + v); } ta.remove(); }
+function fallbackCopy(v, done){ const ta=document.createElement("textarea"); ta.value=v; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(e){ toast(v); } ta.remove(); }
+const fig = (src, cap="", cls="", set="", eager=false) => `<figure class="pic ${cls}"><button type="button" class="zoom" data-src="${esc(src)}" data-cap="${esc(cap)}" data-set="${esc(set)}" aria-label="Bild vergrößern${cap?": "+esc(cap):""}"><img src="${esc(src)}" alt="${esc(cap)}" ${eager?"":'loading="lazy"'} onerror="this.closest('figure').remove()"></button>${cap?`<figcaption>${esc(cap)}</figcaption>`:""}</figure>`;
 
 /* ================= Bausteine ================= */
 function dateRow(e, cls=""){
   const d = parseD(e.d);
-  return `<div class="date ${cls} ${e.free?"is-free":""}"><time datetime="${e.d}">${WD[d.getDay()]}, ${d.getDate()}. ${MON[d.getMonth()]}<small>${d.getFullYear()}${e.h?" · "+e.h+" Uhr":""}</small></time><p><b>${e.t}</b>${e.x?`<br><span class="muted">${e.x}</span>`:""}</p><span class="tag">${cls.includes("is-next")?"Als Nächstes":e.tag}</span></div>`;
+  return `<div class="date ${cls} ${e.free?"is-free":""}"><time datetime="${e.d}">${WD[d.getDay()]}, ${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getFullYear()).slice(2)}<small>${e.h||""}</small></time><div><b>${esc(e.t)}</b>${(e.x||[]).map(x=>`<br><span class="muted">${esc(x)}</span>`).join("")}</div>${cls.includes("is-next")?`<span class="tag">Als Nächstes</span>`:"<span></span>"}</div>`;
 }
-function datesHTML(mode){
+function datesHTML(mode, max){
   const today = dayStart(berlinNow());
   const upcoming = TERMINE.filter(e => parseD(e.d) >= today);
-  const list = mode==="all" ? TERMINE : upcoming;
-  if(!list.length) return `<p class="muted">Für dieses Schuljahr stehen keine weiteren Termine an.</p>`;
+  let list = mode==="all" ? TERMINE : upcoming;
+  if(max) list = list.slice(0, max);
   const nextD = upcoming[0]?.d;
   return `<div class="dates">${list.map(e => dateRow(e, (e.d===nextD?"is-next ":"") + (parseD(e.d)<today?"is-past":""))).join("")}</div>`;
 }
-function storyHTML(s){
-  const img = s.img ? `<img src="${IMG}${s.img}" alt="" loading="lazy" onerror="this.remove()">` : "";
-  return `<article class="story"><div class="ph" style="--c:${s.c}">${img}<span class="fb" aria-hidden="true">${s.k}</span></div><time>${s.m}</time><h3>${s.t}</h3><p>${s.x}</p></article>`;
-}
-const LEARN = [
-  {id:"lesen", t:"Lesen", x:"Fachintegrierte Leseförderung FiLBy, Vorlesetag und Lesefeste.", c:"var(--poppy)"},
-  {id:"musik", t:"Musik", x:"Singklasse, Schulchor, WIM und Instrumentalunterricht im Haus.", c:"var(--sun)"},
-  {id:"gemeinschaft", t:"Gemeinschaft", x:"Klassenrat ab Klasse 1 und Pausenhelfer übernehmen Verantwortung.", c:"var(--sky)"},
-  {id:"medien", t:"Medien", x:"Digitale Tafeln, 80 iPads und ein Medienkonzept mit fünf Handlungsfeldern.", c:"var(--ink-2)"},
-  {id:"umwelt", t:"Umwelt", x:"Naturnaher Pausenhof, Grüne Meilen, Schulobst und Bund Naturschutz.", c:"var(--leaf)"},
-  {id:"ganztag", t:"Ganztag", x:"Offener Ganztag bis 14 oder 16 Uhr, gebundener Ganztag bis 15:30 Uhr.", c:"var(--leaf)"},
-  {id:"kita", t:"Von der Kita in die Schule", x:"Vorlesen, Singtag, Schulhausrallye und Vorkurs Deutsch mit unseren Kitas.", c:"var(--poppy)"},
-  {id:"sozialarbeit", t:"Sozialarbeit", x:"Schulsozialpädagogin für Konflikte, Freundschaften und Klassengemeinschaft.", c:"var(--sun)"},
-];
-const learnHTML = () => `<div class="learn">${LEARN.map(l=>`<a href="#${l.id}"><span class="swatch" style="background:${l.c}"></span><h3>${l.t}</h3><p>${l.x}</p></a>`).join("")}</div>`;
-function contactHTML(){
-  const row = (k, v, c) => `<div><span>${k}</span><b>${v}</b>${c?`<button class="copy" type="button" data-copy="${c}">Kopieren</button>`:""}</div>`;
-  return `<div class="contact">
-  <div><span class="eyebrow">Sekretariat · Sandra Bilz</span><h3>Christian-Schad-Grundschule</h3><p class="muted">${S.addr}</p>
-    <div class="kv">${row("Telefon", S.tel, S.tel)}${row("E-Mail", S.mail, S.mail)}${row("Fax", S.fax)}</div>
-    <div class="hero-actions"><a class="btn btn-line" href="tel:${S.telIntl}">Anrufen</a><a class="btn btn-line" href="${S.map}" target="_blank" rel="noopener">Route planen</a></div>
-  </div>
-  <div><span class="eyebrow">Schulleitung</span>
-    <div class="kv">${row("Rektorin", "Doris Wolf")}${row("E-Mail", S.rektor, S.rektor)}${row("Konrektor", "Andreas Weniger")}${row("Hauswartin", "Zsuzsanna Zehnder")}</div>
-  </div>
-  <div><span class="eyebrow">Weitere Kontakte</span>
-    <div class="kv">${row("Schulsozialarbeit", "06021 4561092", "06021 4561092")}${row("Elternbeirat", "elternbeirat.christian-schad-schule@gmx.de", "elternbeirat.christian-schad-schule@gmx.de")}${row("Krankmeldung", "bis 7:40 Uhr")}</div>
-    <p class="muted" style="font-size:.92rem">Sprechstunden der Lehrkräfte bitte vorher anmelden: über das Hausaufgabenheft, per E-Mail oder telefonisch.</p>
-  </div></div>`;
-}
-
-/* Tagesband (auf der Ganztag-Seite) */
-const DAY = {from:7.5, to:16};
-const BANDS = [
-  {k:"Frühbetreuung", a:7.5, b:7.75, c:"var(--sun)"},
-  {k:"Unterricht", a:7.75, b:13, c:"var(--sky)", fade:true},
-  {k:"OGT kurz", a:11.33, b:14, c:"var(--poppy)", fade:true},
-  {k:"OGT lang", a:11.33, b:16, c:"var(--poppy)", fade:true},
-  {k:"GGT Mo–Do", a:7.5, b:15.5, c:"var(--leaf)"},
-];
-const pos = h => ((h - DAY.from) / (DAY.to - DAY.from) * 100);
-function bandHTML(){
-  const ticks = [8,10,12,14,16];
-  return `<div class="band" aria-label="Tagesablauf von 7:30 bis 16:00 Uhr">
-    <div class="band-rows">${BANDS.map(b=>`<div class="band-row"><span>${b.k}</span><div class="track"><i style="left:${pos(b.a)}%; width:${pos(b.b)-pos(b.a)}%; background:${b.fade?`linear-gradient(90deg, color-mix(in srgb, ${b.c} 30%, transparent), ${b.c} 35%)`:b.c}"></i></div></div>`).join("")}</div>
-    <div class="band-axis"><span></span><div>${ticks.map(t=>`<b style="left:${pos(t)}%">${t} Uhr</b>`).join("")}</div></div>
-  </div><p class="note">Ende des Unterrichts je nach Stundenplan. Der offene Ganztag beginnt nach dem Unterricht, der gebundene Ganztag läuft Montag bis Donnerstag.</p>`;
-}
-
-/* Heute-Leiste (Startseite) */
 function todayHTML(){
-  const now = berlinNow(), wd = now.getDay(), h = now.getHours() + now.getMinutes()/60;
+  const now = berlinNow();
   const hhmm = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
-  const iso = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
-  const ev = TERMINE.find(e => e.d === iso);
-  let st, cls = "";
-  if(ev && ev.free){ st = `Heute ist unterrichtsfrei: ${ev.t.split(":")[0]}.`; cls = "warn"; }
-  else if(wd === 0 || wd === 6){ st = `Schönes Wochenende! Krankmeldungen für Montag bitte bis 7:40 Uhr.`; cls = "warn"; }
-  else if(h < 7.5){ st = `Frühbetreuung ab 7:30 Uhr im Pausenhof. Krankmeldungen bis 7:40 Uhr.`; }
-  else if(h < 7.667){ st = `Krankmeldung noch bis 7:40 Uhr, telefonisch unter ${S.tel} oder online.`; cls = "alert"; }
-  else if(h < 7.75){ st = `Um 7:45 Uhr holen die Lehrkräfte die Kinder im Pausenhof ab.`; }
-  else if(h < 16){ st = `Der Schultag läuft. Das Sekretariat erreichen Sie unter ${S.tel}.`; }
-  else { st = `Schulschluss für heute. Krankmeldungen für morgen bitte bis 7:40 Uhr.`; cls = "warn"; }
-  const next = TERMINE.find(e => parseD(e.d) > dayStart(now)) ;
+  const next = TERMINE.find(e => parseD(e.d) >= dayStart(now));
   const nd = next ? parseD(next.d) : null;
   return `<div class="today-bar">
-    <div class="when"><span class="eyebrow">${WDL[wd]}, ${now.getDate()}. ${MON[now.getMonth()]}</span><b>${hhmm}</b></div>
-    <p class="msg ${cls}" role="status"><span class="dot"></span><span>${st}</span></p>
-    ${next ? `<a href="#termine">Nächster Termin: ${nd.getDate()}. ${MON[nd.getMonth()]} · ${next.t.split(":")[0].replace(/,.*$/,"")} →</a>` : ""}
+    <div class="when"><span class="eyebrow">${WDL[now.getDay()]}, ${now.getDate()}. ${MON[now.getMonth()]}</span><b>${hhmm}</b></div>
+    ${next?`<a class="msg" href="#termine"><span class="dot"></span><span><span class="eyebrow">Termine · ${String(nd.getDate()).padStart(2,"0")}.${String(nd.getMonth()+1).padStart(2,"0")}.</span><br><b>${esc(next.t)}</b></span></a>`:"<span></span>"}
+    <a class="btn btn-line" href="${S.krank}" target="_blank" rel="noopener">Krankmeldung</a>
   </div>`;
 }
 
 /* ================= Ansichten ================= */
-const PH = (src, fb, alt="") => `${src?`<img src="${IMG}${src}" alt="${alt}" loading="lazy" onerror="this.remove()">`:""}<span class="fb" aria-hidden="true">${fb}</span>`;
 function viewStart(){
   return `
 <section class="hero"><div class="wrap">
   <div class="hero-copy rise">
-    <span class="eyebrow">Staatliche Grundschule in Aschaffenburg-Nilkheim</span>
-    <h1>Hier wachsen <em>Talente.</em></h1>
-    <p class="lead">Rund 250 Kinder lernen, singen, malen und spielen bei uns in zwölf Klassen. Schön, dass Sie da sind.</p>
+    <span class="eyebrow">Herzlich Willkommen auf der Website der Christian - Schad - Grundschule in Aschaffenburg - Nilkheim</span>
+    <h1>Leben&nbsp;– Lernen&nbsp;– <em>Wohlfühlen</em> im Stadtteil Nilkheim</h1>
     <div class="hero-actions">
-      <a class="btn btn-blue" href="#ueber-uns">Unsere Schule kennenlernen</a>
-      <a class="btn btn-line" href="#abc">Eltern-ABC</a>
+      <a class="btn btn-blue" href="#ueber-uns">Über uns</a>
+      <a class="btn btn-line" href="#vonabisz">Von A bis Z</a>
     </div>
   </div>
   <figure class="exhibit rise">
-    <span class="hand" aria-hidden="true">von unseren Kindern gemalt!</span>
-    <div class="frame"><div class="ph" style="--c:var(--leaf-soft)">${PH("2021/06/Mohnbild_2-scaled.jpg","Mohnblumen","Mohnblumen, gemalt von Kindern der Christian-Schad-Grundschule")}</div></div>
-    <figcaption class="label"><b>Mohnblumen</b><small>Bilder unserer Kinder<br>aus der Schulgalerie</small></figcaption>
+    <div class="frame"><button type="button" class="zoom" data-src="${UP}2021/06/Mohnbild_2-scaled.jpg" data-cap="Hier wachsen Talente" data-set="talente" aria-label="Bild vergrößern"><div class="ph" style="--c:var(--leaf-soft)"><img src="${UP}2021/06/Mohnbild_2-scaled.jpg" alt="Hier wachsen Talente" onerror="this.remove()"></div></button></div>
+    <figcaption class="label"><b>Hier wachsen Talente</b></figcaption>
   </figure>
 </div></section>
 
-<section class="today" aria-label="Heute an der Schule"><div class="wrap" id="todayBar">${todayHTML()}</div></section>
+<section class="today" aria-label="Heute"><div class="wrap" id="todayBar">${todayHTML()}</div></section>
 
 <section class="sec"><div class="wrap">
-  <div class="sec-head"><div><span class="eyebrow">Für Eltern</span><h2>Schnell gefunden</h2></div></div>
-  <div class="ways">
-    <a class="way" href="${S.krank}" target="_blank" rel="noopener" style="--c:var(--poppy)"><span class="num">7:40</span><h3>Kind krankmelden</h3><p>Bis 7:40 Uhr online über Elternnachricht oder telefonisch unter ${S.tel}.</p></a>
-    <a class="way" href="#abc" style="--c:var(--sun)"><span class="num">A–Z</span><h3>Eltern-ABC</h3><p>Von Hausschuhen bis Zeugnis: alles zum Schulalltag, mit Suche.</p></a>
-    <a class="way" href="#ganztag" style="--c:var(--leaf)"><span class="num">15:30</span><h3>Ganztag</h3><p>Offener Ganztag bis 14 oder 16 Uhr, gebundener Ganztag bis 15:30 Uhr.</p></a>
+  <div class="quick">
+    ${[["#ansprechpartner","Ansprechpartner","Hier finden Sie Namen und Kontaktdaten","var(--poppy)"],
+       ["#vonabisz","Schulalltag","Alles, was es zu wissen gilt","var(--sun)"],
+       [S.catering,"Schulcatering","Mosaik Mehrgenerationenhaus Bachgau gGmbH, Großostheim","var(--leaf)"],
+       ["#elternbeirat","Elternbeirat","Hier finden Sie Informationen des Elternbeirats","var(--sky)"],
+       ["#informationen","Informationen","Hier finden Sie Angebote für Beratung und Hilfe","var(--blue)"]]
+      .map(([h,t,x,c]) => `<a class="way" href="${h}" ${h.startsWith("http")?'target="_blank" rel="noopener"':""} style="--c:${c}"><span class="pin"></span><h3>${t}</h3><p>${x}</p></a>`).join("")}
   </div>
 </div></section>
 
 <section class="sec" style="padding-top:0"><div class="wrap intro">
-  <div class="photo"><span class="tape" aria-hidden="true"></span><div class="ph" style="--c:var(--sky-soft)">${PH("2024/09/IMG_5253.jpg","Unser Pausenhof","Klettergerüst und Rutsche im Pausenhof")}</div></div>
+  <div class="photo"><span class="tape" aria-hidden="true"></span>${fig(UP+"2024/09/IMG_5253.jpg","","","ueberblick")}</div>
   <div class="txt">
-    <span class="eyebrow">Unsere Schule</span>
-    <h2>Ein Haus für die Kinder von Nilkheim</h2>
-    <p class="muted">Helle Räume im Neubau, große Klassenzimmer im Altbau, ein naturnaher Pausenhof mit Klettergerüst und Rutsche. Wir singen in Singklasse und Chor, lösen Konflikte im Klassenrat und lesen mit FiLBy. Benannt ist die Schule nach dem Maler Christian Schad, der ab 1942 in Aschaffenburg lebte.</p>
-    <div class="figs"><div><b>12</b><span>Klassen</span></div><div><b>2</b><span>Ganztagsklassen</span></div><div><b>80</b><span>iPads</span></div></div>
-    <p><a class="link" href="#ueber-uns">Mehr über uns →</a></p>
+    <span class="eyebrow">Über uns</span>
+    <h2>Die Christian – Schad – Grundschule im Überblick</h2>
+    <p>Die Christian-Schad-Grundschule ist eine staatliche Schule in Aschaffenburg-Nilkheim mit insgesamt 12 Klassen (10 Regelklassen und 2 gebundenen Ganztagsklassen im 3. und 4. Jahrgang).</p>
+    <p class="muted">Unser Schulhaus ist über die Jahre hinweg mehrfach erweitert worden. Es hat große Klassenzimmer im Altbau und moderne helle Klassenräume im Neubau. Alle Klassenzimmer sind mit Digitalen Tafeln oder Beamer und Laptops ausgestattet. Arbeits- und Lernecken sind im ganzen Haus verteilt.</p>
+    <p><a class="link" href="#ueber-uns">mehr erfahren →</a></p>
   </div>
-</div></section>
+</div>
+<div class="wrap"><div class="strip">${UEBERBLICK.map(u=>fig(UP+u,"","","ueberblick")).join("")}</div></div>
+</section>
 
 <section class="sec" style="padding-top:0"><div class="wrap">
-  <div class="sec-head"><div><span class="eyebrow">Schuljahr 2026/27</span><h2>Termine</h2></div><a class="link" href="#termine">Alle Termine →</a></div>
+  <div class="sec-head"><div><h2>Termine</h2></div><a class="link" href="#termine">Termine →</a></div>
   <div id="startDates"></div>
 </div></section>
 
 <section class="sec" style="padding-top:0"><div class="wrap">
-  <div class="sec-head"><div><span class="eyebrow">Schulleben</span><h2>Zuletzt bei uns <span class="hand" style="font-size:1.5rem">… was für ein Jahr!</span></h2></div><a class="link" href="#schulleben">Alle Beiträge →</a></div>
-  <div class="life">${LEBEN.slice(0,3).map(storyHTML).join("")}</div>
+  <div class="sec-head"><div><h2>Aktuelles aus dem Schulleben</h2></div><a class="link" href="#galerie">Galerie →</a></div>
+  <div class="news">${AKTUELL.map((a,i) => `<article class="post ${i===0?"lead":""}">
+    <div class="post-imgs">${a.imgs.map(([u,c])=>fig(UP+u,c,"","akt"+i)).join("")}</div>
+    <div class="post-txt"><h3>${a.href?`<a href="#${a.href}">${esc(a.t)}</a>`:esc(a.t)}</h3>${(a.lines||[]).map(l=>`<p class="muted">${esc(l)}</p>`).join("")}</div>
+  </article>`).join("")}</div>
+  <p style="margin-top:28px"><a class="link" href="${S.blog}" target="_blank" rel="noopener">Unser Blog – Aktuelles →</a> &nbsp; <a class="link" href="${S.elterninfo}" target="_blank" rel="noopener">Informationen für Eltern →</a></p>
+</div></section>
+
+<section class="sec talente-sec"><div class="wrap">
+  <div class="sec-head"><div><h2>Hier wachsen Talente</h2></div></div>
+  <div class="talente">${TALENTE.map(u=>fig(UP+u,"","","talente",true)).join("")}</div>
+</div></section>
+
+<section class="sec" style="padding-block:56px"><div class="wrap ukraine">
+  <div><h3>Допомога біженцям з України</h3><a class="link" href="${S.ukraineRU}" target="_blank" rel="noopener">Слідувати за посиланням →</a></div>
+  <div><h3>Hilfen für geflüchtete aus der Ukraine</h3><a class="link" href="${S.ukraineDE}" target="_blank" rel="noopener">hier entlang →</a></div>
 </div></section>`;
 }
 
-const chev = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+function pageBody(id){
+  const p = DATA.pages[id];
+  let h = p.html;
+  if(id === "vonabisz") h = `<div class="abc-tools"><label class="field" for="abcq"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="abcq" type="search" placeholder="Suchen …"></label><div class="letters" id="letters"></div></div><div class="abc" id="abcList"></div>`;
+  if(id === "russisch") h += `<p><a href="https://www.christian-schad-volksschule.de/colibri-wp/wichtige-informationen-russisch/" target="_blank" rel="noopener">от А до Я (русский) →</a></p>`;
+  if(p.imgs.length) h += `<div class="pics ${p.imgs.length>2?"grid":""}">${p.imgs.map(i=>fig(i.src, i.cap, "", id)).join("")}</div>`;
+  return h;
+}
 function viewPage(id){
-  const p = P[id]; const a = AREAS[p.area];
-  const siblings = a.links.filter(x => P[x]);
+  const p = DATA.pages[id];
+  const sib = AREA_PAGES(p.area).filter(x => DATA.pages[x]);
   return `
 <section class="page-head"><div class="wrap">
-  <div class="crumbs"><a href="#start">Start</a><span aria-hidden="true">/</span>${a.label}</div>
-  <h1 style="font-size:clamp(2.2rem,4.6vw,3.4rem)">${p.title}</h1>
-  ${p.lead?`<p class="lead">${p.lead}</p>`:""}
+  <div class="crumbs"><a href="#start">Startseite</a><span aria-hidden="true">/</span>${AREA_LABEL[p.area]||""}</div>
+  <h1 style="font-size:clamp(2.2rem,4.6vw,3.4rem)">${esc(p.title)}</h1>
 </div></section>
 <div class="wrap"><div class="page">
-  <article class="prose">${p.body}</article>
+  <article class="prose">${p.exact?"":`<p class="draft">Entwurf: Dieser Text ist sinngemäß von der bisherigen Website übernommen. Der Originalwortlaut wird noch eingesetzt.</p>`}${pageBody(id)}</article>
   <aside class="aside">
-    ${siblings.length>1?`<div class="box"><h4>${a.label}</h4>${siblings.map(x=>`<a href="#${x}" ${x===id?'aria-current="page"':""}>${P[x].title}</a>`).join("")}</div>`:""}
-    <div class="box"><h4>Schnell erledigt</h4><a href="${S.krank}" target="_blank" rel="noopener">Kind krankmelden</a><a href="#abc">Eltern-ABC</a><a href="#termine">Termine</a><a href="${S.elterninfo}" target="_blank" rel="noopener">Elterninfos (TaskCards)</a></div>
-    <div class="box"><h4>Sekretariat</h4><p><b>${S.tel}</b><br><span class="muted">${S.mail}</span></p></div>
+    ${sib.length>1?`<div class="box"><h4>${AREA_LABEL[p.area]}</h4>${sib.map(x=>`<a href="#${x}" ${x===id?'aria-current="page"':""}>${esc(DATA.pages[x].title)}</a>`).join("")}</div>`:""}
+    <div class="box"><h4>Christian-Schad-Grundschule</h4><p>${S.addr}<br>${S.tel}<br>${S.mail}</p><a href="${S.krank}" target="_blank" rel="noopener">Krankmeldung</a><a href="#termine">Termine</a></div>
   </aside>
 </div></div>`;
 }
+function viewSimple(title, body){
+  return `<section class="page-head"><div class="wrap"><div class="crumbs"><a href="#start">Startseite</a></div><h1 style="font-size:clamp(2.2rem,4.6vw,3.4rem)">${title}</h1></div></section><div class="wrap" style="padding-block:44px 72px">${body}</div>`;
+}
+const viewTermine = () => viewSimple("Termine", `<div style="max-width:52em" id="allDates"></div>`);
+const viewGalerie = () => viewSimple("Galerie", DATA.gal.map((a,i) => `<section class="album"><div class="album-head"><h2>${esc(a.t)}</h2>${a.caps.map(c=>`<p class="muted">${esc(c)}</p>`).join("")}</div><div class="pics grid">${a.imgs.map(u=>fig(u, "", "", "gal"+i)).join("")}</div></section>`).join(""));
+
+/* ================= Router ================= */
+let dateMode = "upcoming";
+const SPECIAL = {termine:viewTermine, galerie:viewGalerie};
+function render(){
+  const id = (location.hash || "#start").slice(1);
+  const main = $("#inhalt");
+  const page = DATA.pages[id], special = SPECIAL[id];
+  main.innerHTML = page ? viewPage(id) : special ? special() : viewStart();
+  document.title = page ? `${page.title} – Christian-Schad-Grundschule` : special ? `${id[0].toUpperCase()+id.slice(1)} – Christian-Schad-Grundschule` : "Christian-Schad-Grundschule";
+  const area = page ? page.area : special ? id : (id==="start"||!location.hash ? "start" : null);
+  document.querySelectorAll(".nav > a, .dd > button").forEach(a => { if(a.dataset.area===area) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  if($("#startDates")) $("#startDates").innerHTML = datesHTML("upcoming", 4);
+  if($("#allDates")) renderAllDates();
+  if($("#abcList")) renderABC("");
+  window.scrollTo(0,0);
+}
+function renderAllDates(){
+  $("#allDates").innerHTML = `<div class="seg" role="group" aria-label="Termine" style="margin-bottom:18px"><button type="button" data-mode="upcoming" aria-pressed="${dateMode==="upcoming"}">Kommende</button><button type="button" data-mode="all" aria-pressed="${dateMode==="all"}">Schuljahr 2026/27</button></div>` + datesHTML(dateMode);
+  $("#allDates").querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { dateMode = b.dataset.mode; renderAllDates(); });
+}
+function renderABC(q){
+  const nq = norm(q.trim());
+  const items = DATA.abc.filter(([t,x]) => !nq || norm(t + " " + strip(x)).includes(nq));
+  const hi = s => { if(!nq) return s; const re = new RegExp("(" + q.trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")","gi"); return s.replace(/(<[^>]+>)|([^<]+)/g, (m, tag, txt) => tag ? tag : txt.replace(re, "<mark>$1</mark>")); };
+  let last = "", out = "";
+  items.forEach(([t,x]) => {
+    const L = t[0].toUpperCase();
+    if(L !== last){ out += `<div class="initial" id="abc-${L}">${L}</div>`; last = L; }
+    out += `<details ${nq?"open":""}><summary>${hi(esc(t))}</summary><div>${hi(x)}</div></details>`;
+  });
+  $("#abcList").innerHTML = out || `<p class="muted" style="padding:18px 0">–</p>`;
+  const letters = [...new Set(DATA.abc.map(([t]) => t[0].toUpperCase()))];
+  $("#letters").innerHTML = letters.map(L => `<a href="#vonabisz" data-letter="${L}">${L}</a>`).join("");
+  $("#letters").querySelectorAll("a").forEach(a => a.onclick = ev => { ev.preventDefault(); document.getElementById("abc-"+a.dataset.letter)?.scrollIntoView({behavior:"smooth", block:"start"}); });
+  const inp = $("#abcq"); if(inp && !inp.dataset.bound){ inp.dataset.bound = "1"; inp.addEventListener("input", () => renderABC(inp.value)); }
+}
+window.addEventListener("hashchange", render);
+
+/* ================= Bild-Großansicht ================= */
+const lb = $("#lightbox"); let lbSet = [], lbIdx = 0;
+function lbShow(){ const b = lbSet[lbIdx]; $("#lbImg").src = b.dataset.src; $("#lbImg").alt = b.dataset.cap; $("#lbCap").textContent = b.dataset.cap; $("#lbCount").textContent = lbSet.length>1 ? `${lbIdx+1} / ${lbSet.length}` : ""; $("#lbPrev").hidden = $("#lbNext").hidden = lbSet.length < 2; }
+document.addEventListener("click", e => {
+  const z = e.target.closest(".zoom"); if(!z) return;
+  const set = z.dataset.set;
+  lbSet = set ? [...document.querySelectorAll(`.zoom[data-set="${CSS.escape(set)}"]`)] : [z];
+  lbIdx = Math.max(0, lbSet.indexOf(z)); lbShow();
+  if(typeof lb.showModal === "function") lb.showModal(); else lb.setAttribute("open","");
+});
+$("#lbPrev").onclick = () => { lbIdx = (lbIdx - 1 + lbSet.length) % lbSet.length; lbShow(); };
+$("#lbNext").onclick = () => { lbIdx = (lbIdx + 1) % lbSet.length; lbShow(); };
+$("#lbClose").onclick = () => lb.close();
+lb.addEventListener("click", e => { if(e.target === lb) lb.close(); });
+lb.addEventListener("keydown", e => { if(e.key==="ArrowLeft") $("#lbPrev").click(); if(e.key==="ArrowRight") $("#lbNext").click(); });
+
+/* ================= Suche ================= */
+const INDEX = [
+  ...Object.entries(DATA.pages).map(([id,p]) => ({h:"#"+id, t:p.title, body:strip(p.html)})),
+  ...DATA.abc.map(([t,x]) => ({h:"#vonabisz", t:"Von A bis Z: " + t, body:strip(x)})),
+  ...TERMINE.map(e => ({h:"#termine", t:e.t, body:e.d.split("-").reverse().join(".") + " " + (e.x||[]).join(" ")})),
+  ...DATA.gal.map(a => ({h:"#galerie", t:"Galerie: " + a.t, body:a.caps.join(" ")})),
+];
+const dlg = $("#search"), q = $("#q"), sres = $("#sres");
+let sel = 0;
+function search(){
+  const terms = norm(q.value.trim()).split(/\s+/).filter(Boolean);
+  const hits = !terms.length ? INDEX.filter(i => ["#ansprechpartner","#vonabisz","#termine","#ganztag","#informationen"].includes(i.h) && !i.t.includes(":")) :
+    INDEX.map(i => { const T = norm(i.t), B = norm(i.body); let sc = 0; for(const w of terms){ if(T.includes(w)) sc += 3; else if(B.includes(w)) sc += 1; else return null; } return {...i, sc}; }).filter(Boolean).sort((a,b) => b.sc - a.sc).slice(0, 12);
+  sel = 0;
+  sres.innerHTML = hits.length ? hits.map((i,k) => `<a href="${i.h}" class="${k===0?"on":""}"><b>${esc(i.t)}</b><small>${esc(i.body.slice(0,130))}${i.body.length>130?" …":""}</small></a>`).join("") : `<div class="empty">–</div>`;
+}
+function openSearch(){ if(typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open",""); q.value=""; search(); setTimeout(()=>q.focus(), 10); }
+$("#openSearch").onclick = openSearch;
+q.addEventListener("input", search);
+q.addEventListener("keydown", e => {
+  const links = [...sres.querySelectorAll("a")];
+  if(e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); if(!links.length) return; sel = (sel + (e.key==="ArrowDown"?1:-1) + links.length) % links.length; links.forEach((l,k)=>l.classList.toggle("on", k===sel)); links[sel].scrollIntoView({block:"nearest"}); }
+  if(e.key === "Enter" && links[sel]){ e.preventDefault(); links[sel].click(); }
+});
+sres.addEventListener("click", e => { if(e.target.closest("a")) dlg.close(); });
+dlg.addEventListener("click", e => { if(e.target === dlg) dlg.close(); });
+document.addEventListener("keydown", e => {
+  const typing = /INPUT|TEXTAREA/.test(document.activeElement?.tagName || "");
+  if((e.key === "/" && !typing) || (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey))){ e.preventDefault(); openSearch(); }
+});
 
 /* ================= Menü ================= */
-const MENU = [
-  {label:"Schule", area:"schule", two:true, items:[
-    ["ueber-uns","Über uns","Haus, Unterricht und Kollegium"],["team","Team","Schulleitung und Lehrkräfte 2026/27"],
-    ["schulleben","Schulleben","Feste, Projekte, Ausflüge"],["elternbeirat","Elternbeirat","Ihre Vertretung 2025–2027"],
-    ["partnerschaft","Elternhaus und Schule","Erziehungspartnerschaft"],["sozialarbeit","Schulsozialarbeit","Frau Gröpler-Braun, Sprechzeiten"],
-    ["hausordnung","Schulhausordnung","Regeln für unser Zusammenleben"],["pausenordnung","Pausenordnung","Damit die Pause allen Spaß macht"],
-    ["leitbild","Leitbild","Was uns wichtig ist"]]},
-  {label:"Lernen", area:"lernen", two:true, items:[
-    ["lernen","Überblick","Alle Schwerpunkte auf einen Blick"],["lesen","Lesen","Leseförderung mit FiLBy"],
-    ["musik","Musik","Singklasse, Chor und WIM"],["gemeinschaft","Gemeinschaft","Klassenrat und Pausenhelfer"],
-    ["medien","Medien","Digitale Bildung mit Augenmaß"],["umwelt","Umwelt","Grüne Meilen und Natur"],
-    ["kita","Von der Kita in die Schule","Übergang mit unseren Kitas"]]},
-  {label:"Ganztag", href:"ganztag", area:"ganztag"},
-  {label:"Für Eltern", area:"eltern", items:[
-    ["abc","Eltern-ABC","Alles zum Schulalltag von A bis Z"],["termine","Termine","Schuljahr 2026/27"],
-    ["beratung","Beratung und Hilfe","Ansprechpersonen und Notrufe"],["shop","Schulkleidung","Hoodies, Bandanas, Mappen"],
-    ["russisch","По-русски / Українською","Informationen für Familien"]]},
-  {label:"Kontakt", href:"kontakt", area:"kontakt"},
-];
+const chev = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+const T = id => esc(DATA.pages[id].title);
+function panelHTML(m){
+  if(m.items) return m.items.map(id => `<a href="#${id}">${T(id)}</a>`).join("");
+  return m.groups.map(([label, id, kids]) => `<div class="grp">${id?`<a class="gl" href="#${id}">${esc(label)}</a>`:`<span class="gh">${esc(label)}</span>`}${kids.map(k=>`<a href="#${k}">${T(k)}</a>`).join("")}</div>`).join("");
+}
 function buildMenus(){
-  $("#nav").innerHTML = MENU.map((m,i) => m.href
-    ? `<a href="#${m.href}" data-area="${m.area}">${m.label}</a>`
-    : `<div class="dd" data-area="${m.area}"><button type="button" aria-expanded="false" aria-controls="dd${i}" data-area="${m.area}">${m.label}${chev}</button>
-       <div class="panel ${m.two?"two":""}" id="dd${i}">${m.items.map(([h,t,s])=>`<a href="#${h}"><b>${t}</b><small>${s}</small></a>`).join("")}</div></div>`).join("");
-  $("#drawerNav").innerHTML = `<div class="dh"><a class="brand" href="#start"><b style="font:400 1.1rem var(--f-display)">Startseite</b></a><button class="iconbtn" type="button" id="closeMenu" aria-label="Menü schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`
-    + MENU.map(m => m.href ? `<a class="solo" href="#${m.href}">${m.label}</a>`
-      : `<details><summary>${m.label}${chev}</summary><div>${m.items.map(([h,t])=>`<a href="#${h}">${t}</a>`).join("")}</div></details>`).join("")
-    + `<a class="btn btn-blue" href="${S.krank}" target="_blank" rel="noopener">Kind krankmelden</a><button class="btn btn-line" type="button" id="themeBtn2" style="margin-top:10px">Hell / Dunkel umschalten</button>`;
-
+  $("#nav").innerHTML = MENU.filter(m => m.href !== "start").map((m,i) => m.href
+    ? `<a href="#${m.href}" data-area="${m.area||m.href}">${m.label}</a>`
+    : `<div class="dd"><button type="button" aria-expanded="false" aria-controls="dd${i}" data-area="${m.area}">${m.label}${chev}</button><div class="panel ${m.groups?"groups":"cols"}" id="dd${i}">${panelHTML(m)}</div></div>`).join("");
+  $("#drawerNav").innerHTML = `<div class="dh"><span class="eyebrow">Menü</span><button class="iconbtn" type="button" id="closeMenu" aria-label="Menü schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`
+    + MENU.map(m => m.href ? `<a class="solo" href="#${m.href}">${m.label}</a>` : `<details><summary>${m.label}${chev}</summary><div>${panelHTML(m)}</div></details>`).join("")
+    + `<a class="btn btn-blue" href="${S.krank}" target="_blank" rel="noopener">Krankmeldung</a><button class="btn btn-line" type="button" id="themeBtn2" style="margin-top:10px" aria-label="Hell oder dunkel umschalten">◐</button>`;
   const dds = [...document.querySelectorAll(".dd")];
   const close = (except) => dds.forEach(d => { if(d !== except){ d.classList.remove("open"); d.querySelector("button").setAttribute("aria-expanded","false"); } });
   const hover = matchMedia("(hover: hover) and (pointer: fine)");
@@ -1085,87 +857,6 @@ function buildMenus(){
   document.addEventListener("click", e => { if(!e.target.closest(".dd")) close(); });
   window.addEventListener("hashchange", () => close());
 }
-
-/* ================= Router ================= */
-let dateMode = "upcoming";
-function render(){
-  const id = (location.hash || "#start").slice(1);
-  const main = $("#inhalt");
-  const isStart = !P[id];
-  main.innerHTML = isStart ? viewStart() : viewPage(id);
-  document.title = isStart ? "Christian-Schad-Grundschule Nilkheim" : `${P[id].title} · Christian-Schad-Grundschule`;
-  const area = isStart ? null : P[id].area;
-  document.querySelectorAll(".nav > a, .dd > button").forEach(a => { if(a.dataset.area===area) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
-  if($("#dayband")) $("#dayband").innerHTML = bandHTML();
-  if($("#startDates")){
-    $("#startDates").innerHTML = datesHTML("upcoming");
-    $("#startDates").querySelectorAll(".date").forEach((r,i) => { if(i>3) r.remove(); });
-  }
-  if($("#allDates")) renderAllDates();
-  if($("#allLife")) $("#allLife").innerHTML = LEBEN.map(storyHTML).join("");
-  if($("#contactFull")) $("#contactFull").innerHTML = contactHTML() + `<h2 style="margin-top:32px">Anfahrt</h2><p>${S.addr} · <a href="${S.map}" target="_blank" rel="noopener">In Google Maps öffnen</a></p>`;
-  if($("#learnFull")) $("#learnFull").innerHTML = learnHTML() + `<p style="margin-top:20px">Wie wir unterrichten, steht unter <a href="#ueber-uns">Über uns</a>.</p>`;
-  if($("#abcList")) renderABC("");
-  if(!isStart || location.hash) window.scrollTo(0,0);
-}
-function renderAllDates(){
-  $("#allDates").innerHTML = `<div class="seg" role="group" aria-label="Termine filtern" style="margin-bottom:18px"><button type="button" data-mode="upcoming" aria-pressed="${dateMode==="upcoming"}">Kommende</button><button type="button" data-mode="all" aria-pressed="${dateMode==="all"}">Ganzes Schuljahr</button></div>` + datesHTML(dateMode) + `<p class="note" style="margin-top:18px">Kurzfristige Änderungen erfahren Sie über Elternnachricht.</p>`;
-  $("#allDates").querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { dateMode = b.dataset.mode; renderAllDates(); });
-}
-function renderABC(q){
-  const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
-  const nq = norm(q.trim());
-  const items = ABC.filter(([t,x]) => !nq || norm(t + " " + strip(x)).includes(nq));
-  const hi = s => { if(!nq) return s; const re = new RegExp("(" + q.trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")","gi"); return s.replace(/(<[^>]+>)|([^<]+)/g, (m, tag, txt) => tag ? tag : txt.replace(re, "<mark>$1</mark>")); };
-  let last = "", html = "";
-  items.forEach(([t,x], i) => {
-    const L = t[0].toUpperCase();
-    if(L !== last){ html += `<div class="initial" id="abc-${L}">${L}</div>`; last = L; }
-    html += `<details ${nq?"open":""}><summary>${hi(t)}</summary><div>${hi(x)}</div></details>`;
-  });
-  $("#abcList").innerHTML = html || `<p class="muted" style="padding:18px 0">Kein Eintrag zu „${esc(q)}“. Rufen Sie gern im Sekretariat an: ${S.tel}.</p>`;
-  const letters = [...new Set(ABC.map(([t]) => t[0].toUpperCase()))];
-  $("#letters").innerHTML = letters.map(L => `<a href="#abc" data-letter="${L}">${L}</a>`).join("");
-  $("#letters").querySelectorAll("a").forEach(a => a.onclick = ev => { ev.preventDefault(); const el = document.getElementById("abc-"+a.dataset.letter); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); });
-  const inp = $("#abcq"); if(inp && !inp.dataset.bound){ inp.dataset.bound = "1"; inp.addEventListener("input", () => renderABC(inp.value)); }
-}
-window.addEventListener("hashchange", render);
-
-/* ================= Suche ================= */
-const INDEX = [
-  ...Object.entries(P).map(([id,p]) => ({h:"#"+id, t:p.title, s:p.lead || "", body:strip(p.body)})),
-  ...ABC.map(([t,x]) => ({h:"#abc", t:"Eltern-ABC: " + t, s:strip(x), body:strip(x)})),
-  ...TERMINE.map(e => { const d = parseD(e.d); return {h:"#termine", t:e.t, s:`${WDL[d.getDay()]}, ${d.getDate()}. ${MON[d.getMonth()]} ${d.getFullYear()}${e.h?", "+e.h+" Uhr":""}`, body:(e.x||"") + " " + e.tag}; }),
-];
-const dlg = $("#search"), q = $("#q"), sres = $("#sres");
-let sel = 0;
-function search(){
-  const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
-  const terms = norm(q.value.trim()).split(/\s+/).filter(Boolean);
-  let hits;
-  if(!terms.length){ hits = ["#abc","#termine","#ganztag","#kontakt","#beratung"].map(h => INDEX.find(i => i.h===h && !i.t.includes(":"))).filter(Boolean); }
-  else{
-    hits = INDEX.map(i => { const T = norm(i.t), B = norm(i.s + " " + i.body); let sc = 0; for(const w of terms){ if(T.includes(w)) sc += 3; else if(B.includes(w)) sc += 1; else return null; } return {...i, sc}; }).filter(Boolean).sort((a,b) => b.sc - a.sc).slice(0, 12);
-  }
-  sel = 0;
-  sres.innerHTML = hits.length ? hits.map((i,k) => `<a href="${i.h}" class="${k===0?"on":""}"><b>${esc(i.t)}</b><small>${esc((i.s||i.body).slice(0,130))}${(i.s||i.body).length>130?" …":""}</small></a>`).join("") : `<div class="empty">Nichts gefunden. Versuchen Sie ein anderes Wort oder rufen Sie an: ${S.tel}.</div>`;
-}
-function openSearch(){ if(typeof dlg.showModal === "function"){ dlg.showModal(); } else { dlg.setAttribute("open",""); } q.value=""; search(); setTimeout(()=>q.focus(), 10); }
-$("#openSearch").onclick = openSearch;
-q.addEventListener("input", search);
-q.addEventListener("keydown", e => {
-  const links = [...sres.querySelectorAll("a")];
-  if(e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); if(!links.length) return; sel = (sel + (e.key==="ArrowDown"?1:-1) + links.length) % links.length; links.forEach((l,k)=>l.classList.toggle("on", k===sel)); links[sel].scrollIntoView({block:"nearest"}); }
-  if(e.key === "Enter" && links[sel]){ e.preventDefault(); links[sel].click(); }
-});
-sres.addEventListener("click", e => { if(e.target.closest("a")) dlg.close(); });
-dlg.addEventListener("click", e => { if(e.target === dlg) dlg.close(); });
-document.addEventListener("keydown", e => {
-  const typing = /INPUT|TEXTAREA/.test(document.activeElement?.tagName || "");
-  if((e.key === "/" && !typing) || (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey))){ e.preventDefault(); openSearch(); }
-});
-
-/* ================= Menü & Theme ================= */
 buildMenus();
 const drawer = $("#drawer"), menuBtn = $("#menuBtn");
 const closeDrawer = () => { drawer.hidden = true; menuBtn.setAttribute("aria-expanded","false"); };
@@ -1173,6 +864,7 @@ menuBtn.onclick = () => { drawer.hidden = false; menuBtn.setAttribute("aria-expa
 drawer.addEventListener("click", e => { if(e.target === drawer || e.target.closest("a") || e.target.closest("#closeMenu")) closeDrawer(); });
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !drawer.hidden){ closeDrawer(); menuBtn.focus(); } });
 
+/* ================= Hell / Dunkel ================= */
 const root = document.documentElement;
 try{ const t = localStorage.getItem("csgs-theme"); if(t) root.dataset.theme = t; }catch(e){}
 const toggleTheme = () => {
