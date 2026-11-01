@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
-<title>Nachhilfe Online – Probestunde in 1 Minute anfragen</title>
+<title>Nachhilfe Online – alle Fächer, 1:1, seit 2001</title>
 <meta name="description" content="Online-Nachhilfe in allen Fächern, 1:1 und persönlich – seit 2001, 5,0 ★ bei 623 Google-Bewertungen. Kostenlose Probestunde in einer Minute anfragen.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
@@ -101,49 +101,16 @@ p { margin: 0; }
 .hero h1 .q { position: relative; display: inline-block; color: var(--muted); margin-left: .12em; }
 .hero h1 .q::after { content: ""; position: absolute; left: -12%; top: -12%; width: 124%; height: 126%; pointer-events: none;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 120' preserveAspectRatio='none'%3E%3Cpath d='M120 8C40 2 4 30 10 64c6 40 110 54 172 34 44-16 40-68-14-84-28-8-68-8-84-2' fill='none' stroke='%23d42a2a' stroke-width='3.4' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
-  clip-path: inset(0 calc(100% - var(--circle, 0%)) 0 0); transition: clip-path .7s ease-out; }
+  animation: reveal 1s .3s ease-out backwards; }
+@keyframes reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 /* Der Textmarker unter "Aha." ist der Fortschrittsbalken */
-.hero h1 .aha { --p: 0; position: relative; display: inline-block; padding: 0 .06em; z-index: 0; }
-.hero h1 .aha::before { content: ""; position: absolute; z-index: -1; left: 0; top: 14%; height: 76%; width: calc(var(--p) * 100%); background: var(--marker); transition: width .6s cubic-bezier(.3,.8,.3,1); }
-.hero h1 .aha::after { content: ""; position: absolute; z-index: -2; left: 0; top: 14%; height: 76%; width: 100%; border: 2px dashed #e5d76e; border-radius: 2px; }
+.hero h1 .aha { position: relative; display: inline-block; padding: 0 .06em; z-index: 0; }
+.hero h1 .aha::before { content: ""; position: absolute; z-index: -1; left: 0; top: 14%; height: 76%; width: 100%; background: var(--marker); animation: grow .7s 1s cubic-bezier(.3,.8,.3,1) backwards; }
+@keyframes grow { from { width: 0; } }
 .hero .lead { font-size: clamp(1.1rem, 1.7vw, 1.3rem); margin-top: 18px; max-width: 560px; }
 .promise { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--hand); font-size: 21px; color: var(--blue); line-height: 1.3; }
 .promise li::before { content: "✓ "; color: var(--red); }
-@media (max-width: 979px) { .hero .lead { display: none; } .hero .lead.always { display: block; } .promise { display: none; } }
 
-.sheet { background: var(--white); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 7px 7px 0 var(--blue); position: relative; overflow: hidden; scroll-margin-top: 80px; }
-.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 20px; border-bottom: 1.5px dashed var(--line); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; }
-.sheet-head .t { font-family: var(--hand); color: var(--red); font-size: 21px; line-height: 1.1; }
-.boxes { display: flex; gap: 6px; }
-.boxes i { width: 22px; height: 22px; border: 2px solid var(--ink); background: var(--white); display: grid; place-items: center; font: 700 17px/1 var(--hand); font-style: normal; color: var(--red); }
-.boxes i.done::after { content: "✓"; }
-.boxes i.now { background: var(--marker); }
-.sheet-body { padding: clamp(18px, 3vw, 28px); }
-.answers { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-.answers:empty { display: none; }
-.answers button { font: 600 14px var(--body); border: 1.5px solid var(--ink); background: var(--marker-soft); border-radius: 999px; padding: 5px 12px; cursor: pointer; color: var(--ink); min-height: 34px; }
-.answers button::after { content: " ✎"; color: var(--blue); }
-.step { border: 0; margin: 0; padding: 0; min-width: 0; }
-.step legend { font-family: var(--display); font-weight: 800; font-size: clamp(1.5rem, 3.2vw, 2rem); letter-spacing: -.02em; line-height: 1.1; padding: 0; margin-bottom: 14px; }
-.step legend small { display: block; font-family: var(--body); font-weight: 400; letter-spacing: 0; font-size: 15px; color: var(--muted); margin-top: 6px; }
-.picks { display: flex; flex-wrap: wrap; gap: 8px; }
-.pick { position: relative; }
-.pick input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.pick span { display: inline-flex; align-items: center; min-height: 46px; padding: 0 16px; border: 1.5px solid var(--ink); border-radius: var(--r); background: var(--white); font-weight: 600; cursor: pointer; user-select: none; transition: background .12s, transform .08s; }
-.pick span:hover { background: var(--marker-soft); }
-.pick input:checked + span { background: var(--ink); color: var(--white); }
-.pick input:focus-visible + span { outline: 3px solid var(--blue); outline-offset: 2px; }
-.pick input:disabled + span { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
-.picks.nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; }
-.picks.nums .pick span { justify-content: center; min-height: 52px; padding: 0; font-family: var(--hand); font-size: 24px; }
-.picks.nums .pick.wide { grid-column: span 2; }
-.picks.nums .pick.wide span { font-family: var(--body); font-size: 15px; font-weight: 600; }
-.step-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-.loesung { margin: 0 0 18px; padding: 14px 16px; border: 2px solid var(--red); border-radius: var(--r); position: relative; background: var(--white); }
-.loesung::before { content: "Lösung"; position: absolute; top: -15px; left: 12px; background: var(--white); padding: 0 6px; font: 700 20px/1 var(--hand); color: var(--red); transform: rotate(-3deg); }
-.loesung p { font-family: var(--hand); font-size: 20px; line-height: 1.3; color: var(--blue); }
-.loesung p + p { margin-top: 4px; }
-.loesung .warn { color: var(--red); }
 .field { display: grid; gap: 6px; min-width: 0; }
 .fields { display: grid; gap: 12px; }
 @media (min-width: 560px) { .fields.two { grid-template-columns: 1fr 1fr; } }
@@ -179,6 +146,27 @@ input:focus, textarea:focus { outline: 3px solid var(--marker); border-color: va
 @media (min-width: 620px) and (max-width: 999px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .card { background: var(--white); border: 1.5px solid var(--ink); border-radius: var(--r); padding: clamp(18px, 2.4vw, 26px); box-shadow: 5px 5px 0 var(--ink); display: flex; flex-direction: column; gap: 8px; }
 .card p { color: var(--muted); }
+
+/* Held: Text links, Tafelbild rechts */
+.hero-text { display: grid; gap: 0; justify-items: start; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+@media (max-width: 520px) { .cta-row .btn { width: 100%; } }
+.hero-visual { display: grid; gap: 12px; min-width: 0; }
+.visual-note { font: 700 21px/1.2 var(--hand); color: var(--red); transform: rotate(-1.2deg); transform-origin: left; }
+@media (max-width: 979px) { .promise { margin-top: 18px; } }
+
+/* Anfrage */
+.form-grid { display: grid; gap: 34px; align-items: start; }
+@media (min-width: 960px) { .form-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 56px; } }
+.form-intro { display: grid; gap: 16px; }
+.form-intro .note { font: 700 21px/1.2 var(--hand); color: var(--red); transform: rotate(-1.2deg); transform-origin: left; }
+.form-intro .intro { color: var(--muted); font-size: 19px; }
+.form-intro .steps { grid-template-columns: 1fr; margin-top: 6px; }
+.form-card { background: var(--white); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 7px 7px 0 var(--blue); padding: clamp(20px, 3vw, 32px); scroll-margin-top: 90px; }
+select { width: 100%; min-height: 52px; padding: 12px 14px; border: 1.5px solid var(--ink); border-radius: var(--r); font: 17px var(--body); color: var(--ink); background: var(--white); }
+select:focus { outline: 3px solid var(--marker); border-color: var(--blue); }
+textarea { min-height: 110px; resize: vertical; }
+.hint { margin-top: 12px; background: var(--marker-soft); border: 1.5px solid var(--ink); border-radius: var(--r); padding: 10px 14px; font-size: 15px; font-weight: 600; }
 
 /* Beweise */
 .numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 2px solid var(--ink); background: var(--white); border-radius: var(--r); }
@@ -304,13 +292,13 @@ footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
 </style>
 </head>
 <body>
-<a class="skip" href="#anfrage">Direkt zur Anfrage springen</a>
+<a class="skip" href="#h1">Zum Inhalt springen</a>
 <div class="proto"><b>Prototyp</b> · Ideen-Entwurf „Catcher“ – nicht die echte Website, das Formular sendet nichts.</div>
 
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="Nachhilfe Online – nach oben"><b>Nachhilfe <span>Online</span></b><small>Alle Fächer · seit 2001</small></a>
-    <nav aria-label="Seitenbereiche"><a href="#stimmen">Stimmen</a><a href="#ehrlich">Preise &amp; Bedingungen</a><a href="#unterricht">So klingt’s</a></nav>
+    <nav aria-label="Seitenbereiche"><a href="#stimmen">Stimmen</a><a href="#ehrlich">Preise &amp; Bedingungen</a><a href="#anfrage">Anfrage</a></nav>
     <div class="top-actions">
       <a class="tel" href="tel:+491703141596">+49 170 3141596</a>
       <a class="btn btn-primary btn-sm" href="#anfrage" data-to-form>Probestunde</a>
@@ -319,99 +307,47 @@ footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
 </header>
 
 <main id="top">
-<!-- ================= Held: die Anfrage ist der erste Bildschirm ================= -->
+<!-- ================= Held ================= -->
 <section class="hero" aria-labelledby="h1"><div class="wrap hero-grid">
-  <div>
+  <div class="hero-text">
     <p class="proof"><span class="stars" aria-hidden="true">★★★★★</span><a href="#stimmen">5,0 bei 623 Google-Bewertungen</a><span class="since">· seit 2001</span></p>
-    <h1 id="h1">Aus <span class="q">Hä?</span><br>wird <span class="aha" id="aha">Aha.</span></h1>
-    <p class="lead always">Online-Nachhilfe in allen Fächern – 1:1, persönlich und mit einer Lehrkraft, die passt. Die erste Stunde ist kostenlos.</p>
-    <ul class="promise"><li>kostenlos &amp; unverbindlich</li><li>kein Vertrag</li><li>Antwort persönlich von Marcel</li></ul>
+    <h1 id="h1">Aus <span class="q">Hä?</span><br>wird <span class="aha">Aha.</span></h1>
+    <p class="lead">Online-Nachhilfe in allen Fächern – 1:1, persönlich und mit einer Lehrkraft, die passt. Die erste Stunde ist kostenlos.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#anfrage" data-to-form>Kostenlose Probestunde anfragen</a>
+      <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener">WhatsApp</a>
+    </div>
+    <ul class="promise"><li>kostenlos &amp; unverbindlich</li><li>kein Vertrag</li><li>alle Fächer</li></ul>
   </div>
-
-  <form class="sheet" id="anfrage" novalidate aria-label="Kostenlose Probestunde anfragen">
-    <div class="sheet-head"><span class="t" id="sheet-title">Aufgabe 1 von 4</span><span class="boxes" aria-hidden="true"><i class="now"></i><i></i><i></i><i></i></span></div>
-    <div class="sheet-body">
-      <div class="answers" id="answers" aria-label="Deine Antworten"></div>
-
-      <fieldset class="step" data-step="1">
-        <legend>Wobei hängt’s gerade?<small>Tipp einfach an – es dauert eine Minute.</small></legend>
-        <div class="picks">
-          <label class="pick"><input type="radio" name="fach" value="Mathe"><span>Mathe</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Deutsch"><span>Deutsch</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Englisch"><span>Englisch</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Französisch"><span>Französisch</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Latein"><span>Latein</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Spanisch"><span>Spanisch</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Physik"><span>Physik</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Chemie"><span>Chemie</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Biologie"><span>Biologie</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Informatik"><span>Informatik</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Wirtschaft"><span>Wirtschaft</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Geschichte"><span>Geschichte</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Geografie"><span>Geografie</span></label>
-          <label class="pick"><input type="radio" name="fach" value="Mehrere Fächer"><span>Mehrere Fächer</span></label>
-        </div>
-        <div class="step-foot"><span class="small">Schritt 1 von 4</span><button class="btn btn-ghost btn-sm" type="button" data-next>Weiter</button></div>
-      </fieldset>
-
-      <fieldset class="step" data-step="2" hidden>
-        <legend>In welcher Klasse?</legend>
-        <div class="picks nums">
-          <label class="pick"><input type="radio" name="klasse" value="1"><span>1</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="2"><span>2</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="3"><span>3</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="4"><span>4</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="5"><span>5</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="6"><span>6</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="7"><span>7</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="8"><span>8</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="9"><span>9</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="10"><span>10</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="11"><span>11</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="12"><span>12</span></label>
-          <label class="pick"><input type="radio" name="klasse" value="13"><span>13</span></label>
-          <label class="pick wide"><input type="radio" name="klasse" value="Studium"><span>Studium</span></label>
-          <label class="pick wide"><input type="radio" name="klasse" value="Sonstiges"><span>Sonstiges</span></label>
-        </div>
-        <div class="step-foot"><button class="btn-link" type="button" data-back>← zurück</button><button class="btn btn-ghost btn-sm" type="button" data-next>Weiter</button></div>
-      </fieldset>
-
-      <fieldset class="step" data-step="3" hidden>
-        <legend>Was steht an?</legend>
-        <div class="picks">
-          <label class="pick"><input type="radio" name="ziel" value="luecken"><span>Lücken schließen</span></label>
-          <label class="pick"><input type="radio" name="ziel" value="arbeit"><span>Nächste Klassenarbeit</span></label>
-          <label class="pick"><input type="radio" name="ziel" value="pruefung"><span>Abschlussprüfung</span></label>
-          <label class="pick"><input type="radio" name="ziel" value="sicherer"><span>Einfach sicherer werden</span></label>
-          <label class="pick"><input type="radio" name="ziel" value="fragen"><span>Nur einzelne Fragen</span></label>
-        </div>
-        <div class="step-foot"><button class="btn-link" type="button" data-back>← zurück</button><button class="btn btn-ghost btn-sm" type="button" data-next>Weiter</button></div>
-      </fieldset>
-
-      <fieldset class="step" data-step="4" hidden>
-        <div class="loesung" id="loesung" aria-live="polite"><p id="l1"></p><p id="l2"></p><p id="l3" class="warn" hidden></p></div>
-        <legend>Wie erreichen wir euch?<small>Bei Kindern bitte die Daten eines Elternteils.</small></legend>
-        <div class="fields two">
-          <div class="field"><label class="l" for="f-name">Vorname</label><input type="text" id="f-name" name="name" autocomplete="given-name" required maxlength="80" aria-describedby="f-name-msg"><span class="msg" id="f-name-msg" hidden>Wie dürfen wir dich ansprechen?</span></div>
-          <div class="field"><label class="l" for="f-kontakt">Handy oder E-Mail</label><input type="text" id="f-kontakt" name="kontakt" autocomplete="email" inputmode="email" required maxlength="120" aria-describedby="f-kontakt-msg"><span class="msg" id="f-kontakt-msg" hidden>Damit Marcel antworten kann – Handy oder E-Mail reicht.</span></div>
-        </div>
-        <div class="fields" style="margin-top:12px"><div class="field"><label class="l" for="f-zeit">Wann passt es meistens? <span>(optional)</span></label><input type="text" id="f-zeit" name="zeiten" maxlength="200" placeholder="z. B. nachmittags, Mo/Mi"></div></div>
-        <div class="hp" aria-hidden="true"><label for="f-web">Website</label><input type="text" id="f-web" name="website" tabindex="-1" autocomplete="off"></div>
-        <button class="btn btn-primary submit" type="submit">Kostenlose Probestunde anfragen</button>
-        <p class="fine"><b>Kostenlos · unverbindlich · kein Vertrag.</b> Wir nutzen deine Angaben nur für die Rückmeldung. <a href="https://www.mathenachhilfe-online.com/datenschutz/">Datenschutz</a></p>
-        <div class="step-foot"><button class="btn-link" type="button" data-back>← zurück</button></div>
-      </fieldset>
-
-      <div class="done-box" id="done" hidden tabindex="-1">
-        <span class="stamp-ok" aria-hidden="true">Aha!</span>
-        <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Danke, <span id="done-name">dir</span>!</h2>
-        <p>Deine Anfrage ist angekommen. Marcel meldet sich persönlich bei dir und schlägt eine passende Lehrkraft und einen Termin vor.</p>
-        <p class="small"><b>Prototyp:</b> Es wurde nichts verschickt.</p>
-        <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener">Schneller per WhatsApp</a>
+  <div class="hero-visual">
+    <p class="visual-note">Ein Blick in die Stunde – so klingt „Aha.“</p>
+    <div class="boards" data-boards>
+      <div class="tabs" role="tablist" aria-label="Fach wählen" hidden>
+        <button type="button" role="tab" data-tab="mathe" aria-selected="true" aria-controls="b-mathe">Mathe</button>
+        <button type="button" role="tab" data-tab="deutsch" aria-selected="false" aria-controls="b-deutsch">Deutsch</button>
+        <button type="button" role="tab" data-tab="englisch" aria-selected="false" aria-controls="b-englisch">Englisch</button>
+      </div>
+      <div class="board" id="b-mathe" data-board="mathe" role="tabpanel" aria-label="Mathe">
+        <p class="tag">Prozentrechnung · Klasse 7</p>
+        <p class="task">Eine Jacke kostet 80&nbsp;€. Sie wird um 25&nbsp;% reduziert. Wie viel kostet sie jetzt?</p>
+        <ol><li><span class="lbl">1 · Gesucht</span><span class="h">der neue Preis</span></li><li><span class="lbl">2 · Gegeben</span><span class="h">Grundwert 80&nbsp;€ · Rabatt 25&nbsp;%</span></li><li><span class="lbl">3 · Ansatz</span><span class="h">100&nbsp;% − 25&nbsp;% = 75&nbsp;% bleiben</span></li><li><span class="lbl">4 · Rechnen</span><span class="h">80&nbsp;€ · 0,75 = 60&nbsp;€</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">25&nbsp;% von 80&nbsp;€ = 20&nbsp;€ → 80&nbsp;€ − 20&nbsp;€ = 60&nbsp;€ <b class="ok">✓</b></span></li></ol>
+        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
+      </div>
+      <div class="board" id="b-deutsch" data-board="deutsch" role="tabpanel" aria-label="Deutsch">
+        <p class="tag">das oder dass · Klasse 6</p>
+        <p class="task">Ich hoffe, ___ das Wetter morgen gut wird.</p>
+        <ol><li><span class="lbl">1 · Frage</span><span class="h">„das“ oder „dass“?</span></li><li><span class="lbl">2 · Test</span><span class="h">„dieses“ einsetzen: „Ich hoffe, dieses das Wetter …“ – passt nicht</span></li><li><span class="lbl">3 · Regel</span><span class="h">Passt nicht → Bindewort → dass</span></li><li><span class="lbl">4 · Lösung</span><span class="h">Ich hoffe, dass das Wetter morgen gut wird.</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">Nebensatz, Verb am Ende („wird“) <b class="ok">✓</b></span></li></ol>
+        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
+      </div>
+      <div class="board" id="b-englisch" data-board="englisch" role="tabpanel" aria-label="Englisch">
+        <p class="tag">Simple Past · Klasse 6</p>
+        <p class="task">Yesterday I ___ (go) to the cinema.</p>
+        <ol><li><span class="lbl">1 · Gesucht</span><span class="h">die richtige Zeitform</span></li><li><span class="lbl">2 · Signalwort</span><span class="h">yesterday → abgeschlossen, Vergangenheit</span></li><li><span class="lbl">3 · Regel</span><span class="h">Signalwort der Vergangenheit → Simple Past</span></li><li><span class="lbl">4 · Lösung</span><span class="h">go → went: Yesterday I went to the cinema.</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">nicht „have gone“ – passt nicht zu yesterday <b class="ok">✓</b></span></li></ol>
+        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
       </div>
     </div>
-  </form>
-  <p class="alt" style="grid-column:1/-1;margin-top:0">Lieber direkt? <a href="https://wa.me/491703141596" rel="noopener">WhatsApp</a> · <a href="tel:+491703141596">+49 170 3141596</a> · täglich 9–17 Uhr</p>
+    <p class="small"><span class="ph">[Prototyp: Beispiele – später echte Tafelbilder oder ein Foto aus dem Unterricht]</span></p>
+  </div>
 </div></section>
 
 <!-- ================= Beweise ================= -->
@@ -446,50 +382,40 @@ footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
   </ul>
 </div></section>
 
-<!-- ================= Ablauf + Tafelbild ================= -->
-<section class="sec" id="unterricht" aria-labelledby="h-aha"><div class="wrap">
-  <div class="grid g2" style="gap:36px;align-items:center">
-    <div style="display:grid;gap:14px">
-      <p class="note hand" style="color:var(--red);font-size:21px">Ein Blick in die Stunde</p>
-      <h2 id="h-aha">So klingt „Aha.“</h2>
-      <p style="color:var(--muted);font-size:19px">Ob Prozentrechnung, Rechtschreibung oder Grammatik: Wir gehen jede Aufgabe Schritt für Schritt an – gemeinsam am Tablet. Die Notizen gibt es danach als PDF oder in GoodNotes.</p>
-      <p class="small"><span class="ph">[Prototyp: Beispiele – später echte Tafelbilder aus dem Unterricht]</span></p>
-    </div>
-    <div class="boards" data-boards>
-      <div class="tabs" role="tablist" aria-label="Fach wählen" hidden>
-        <button type="button" role="tab" data-tab="mathe" aria-selected="true" aria-controls="b-mathe">Mathe</button>
-        <button type="button" role="tab" data-tab="deutsch" aria-selected="false" aria-controls="b-deutsch">Deutsch</button>
-        <button type="button" role="tab" data-tab="englisch" aria-selected="false" aria-controls="b-englisch">Englisch</button>
-      </div>
-      <div class="board" id="b-mathe" data-board="mathe" role="tabpanel" aria-label="Mathe">
-        <p class="tag">Prozentrechnung · Klasse 7</p>
-        <p class="task">Eine Jacke kostet 80 €. Sie wird um 25 % reduziert. Wie viel kostet sie jetzt?</p>
-        <ol><li><span class="lbl">1 · Gesucht</span><span class="h">der neue Preis</span></li><li><span class="lbl">2 · Gegeben</span><span class="h">Grundwert 80 € · Rabatt 25 %</span></li><li><span class="lbl">3 · Ansatz</span><span class="h">100 % − 25 % = 75 % bleiben</span></li><li><span class="lbl">4 · Rechnen</span><span class="h">80 € · 0,75 = 60 €</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">25 % von 80 € = 20 € → 80 € − 20 € = 60 € <b class="ok">✓</b></span></li></ol>
-        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
-      </div>
-      <div class="board" id="b-deutsch" data-board="deutsch" role="tabpanel" aria-label="Deutsch">
-        <p class="tag">das oder dass · Klasse 6</p>
-        <p class="task">Ich hoffe, ___ das Wetter morgen gut wird.</p>
-        <ol><li><span class="lbl">1 · Frage</span><span class="h">„das“ oder „dass“?</span></li><li><span class="lbl">2 · Test</span><span class="h">„dieses“ einsetzen: „Ich hoffe, dieses das Wetter …“ – passt nicht</span></li><li><span class="lbl">3 · Regel</span><span class="h">Passt nicht → Bindewort → dass</span></li><li><span class="lbl">4 · Lösung</span><span class="h">Ich hoffe, dass das Wetter morgen gut wird.</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">Nebensatz, Verb am Ende („wird“) <b class="ok">✓</b></span></li></ol>
-        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
-      </div>
-      <div class="board" id="b-englisch" data-board="englisch" role="tabpanel" aria-label="Englisch">
-        <p class="tag">Simple Past · Klasse 6</p>
-        <p class="task">Yesterday I ___ (go) to the cinema.</p>
-        <ol><li><span class="lbl">1 · Gesucht</span><span class="h">die richtige Zeitform</span></li><li><span class="lbl">2 · Signalwort</span><span class="h">yesterday → abgeschlossen, Vergangenheit</span></li><li><span class="lbl">3 · Regel</span><span class="h">Signalwort der Vergangenheit → Simple Past</span></li><li><span class="lbl">4 · Lösung</span><span class="h">go → went: Yesterday I went to the cinema.</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">nicht „have gone“ – passt nicht zu yesterday <b class="ok">✓</b></span></li></ol>
-        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
-      </div>
-    </div>
+<!-- ================= Anfrage ================= -->
+<section class="sec form-sec" aria-labelledby="h-anfrage"><div class="wrap form-grid">
+  <div class="form-intro">
+    <p class="note">Der erste Schritt darf leicht sein</p>
+    <h2 id="h-anfrage">Kostenlose Probestunde anfragen.</h2>
+    <p class="intro">Kurz ausfüllen – Marcel meldet sich persönlich und schlägt eine Lehrkraft vor, die zu Fach und Kind passt.</p>
+    <ol class="steps">
+      <li><strong>Anfrage senden</strong><span>Dauert etwa eine Minute.</span></li>
+      <li><strong>Persönliche Rückmeldung</strong><span>Mit passender Lehrkraft und Terminvorschlag.</span></li>
+      <li><strong>Probestunde über Teams</strong><span>Kostenlos. Danach entscheidet ihr in Ruhe.</span></li>
+    </ol>
+    <p class="small">Lieber direkt? <a href="https://wa.me/491703141596" rel="noopener">WhatsApp</a> · <a href="tel:+491703141596">+49 170 3141596</a> · täglich 9–17 Uhr</p>
   </div>
-</div></section>
-
-<!-- ================= Schluss ================= -->
-<section class="sec" style="padding-top:0"><div class="wrap">
-  <div class="final">
-    <p class="note">Hausaufgabe für heute</p>
-    <h2>Eine Minute.<br>Dann ist die Frage raus.</h2>
-    <a class="btn btn-primary" href="#anfrage" data-to-form>Kostenlose Probestunde anfragen</a>
-    <p class="small" style="color:#3b3f52">Kostenlos · unverbindlich · kein Vertrag</p>
+  <div>
+  <form class="form-card" id="anfrage" novalidate aria-labelledby="h-anfrage">
+    <div class="fields two">
+      <div class="field"><label class="l" for="f-name">Vorname</label><input type="text" id="f-name" name="name" autocomplete="given-name" required maxlength="80" aria-describedby="f-name-msg"><span class="msg" id="f-name-msg" hidden>Wie dürfen wir dich ansprechen?</span></div>
+      <div class="field"><label class="l" for="f-kontakt">Handy oder E-Mail</label><input type="text" id="f-kontakt" name="kontakt" autocomplete="email" required maxlength="120" aria-describedby="f-kontakt-msg"><span class="msg" id="f-kontakt-msg" hidden>Damit wir antworten können.</span></div>
+      <div class="field"><label class="l" for="f-fach">Fach</label><select id="f-fach" name="fach" required aria-describedby="f-fach-msg"><option value="">Bitte wählen</option><option>Mathe</option><option>Deutsch</option><option>Englisch</option><option>Französisch</option><option>Latein</option><option>Spanisch</option><option>Physik</option><option>Chemie</option><option>Biologie</option><option>Informatik</option><option>Wirtschaft / BWL</option><option>Geschichte</option><option>Geografie</option><option>Mehrere Fächer</option><option>Anderes Fach</option></select><span class="msg" id="f-fach-msg" hidden>Bitte ein Fach wählen.</span></div>
+      <div class="field"><label class="l" for="f-klasse">Klasse</label><select id="f-klasse" name="klasse" required aria-describedby="f-klasse-msg"><option value="">Bitte wählen</option><option>Klasse 1</option><option>Klasse 2</option><option>Klasse 3</option><option>Klasse 4</option><option>Klasse 5</option><option>Klasse 6</option><option>Klasse 7</option><option>Klasse 8</option><option>Klasse 9</option><option>Klasse 10</option><option>Klasse 11</option><option>Klasse 12</option><option>Klasse 13</option><option>Studium</option><option>Sonstiges</option></select><span class="msg" id="f-klasse-msg" hidden>Bitte die Klasse wählen.</span></div>
+    </div>
+    <div class="field" style="margin-top:12px"><label class="l" for="f-msg">Worum geht’s? <span>(optional)</span></label><textarea id="f-msg" name="nachricht" maxlength="1500" placeholder="z. B. Klassenarbeit nächste Woche, Lücken bei Brüchen …"></textarea></div>
+    <p class="hint" id="f-hint" hidden>Für Abschlussklassen: Die Anfrage muss spätestens drei Monate vor der Prüfung bei uns sein.</p>
+    <div class="hp" aria-hidden="true"><label for="f-web">Website</label><input type="text" id="f-web" name="website" tabindex="-1" autocomplete="off"></div>
+    <button class="btn btn-primary submit" type="submit">Kostenlose Probestunde anfragen</button>
+    <p class="fine"><b>Kostenlos · unverbindlich · kein Vertrag.</b> Bei Kindern bitte die Daten eines Elternteils. <a href="https://www.mathenachhilfe-online.com/datenschutz/">Datenschutz</a></p>
+  </form>
+  <div class="form-card done-box" id="done" hidden tabindex="-1">
+    <span class="stamp-ok" aria-hidden="true">Aha!</span>
+    <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Danke, <span id="done-name">dir</span>!</h2>
+    <p>Deine Anfrage ist angekommen. Marcel meldet sich persönlich bei dir.</p>
+    <p class="small"><b>Prototyp:</b> Es wurde nichts verschickt.</p>
+    <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener">Schneller per WhatsApp</a>
+  </div>
   </div>
 </div></section>
 </main>
@@ -500,153 +426,17 @@ footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
 </div></footer>
 
 <div class="bar" id="bar" inert>
-  <a class="btn btn-primary" href="#anfrage" data-to-form>Probestunde in 1 Minute</a>
+  <a class="btn btn-primary" href="#anfrage" data-to-form>Kostenlose Probestunde</a>
   <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener" aria-label="Per WhatsApp schreiben">WhatsApp</a>
 </div>
 
 <script>
 (function () {
   "use strict";
-  // Lehrkräfte je Fach (aus der Team-Seite der bisherigen Website)
-  var LK = { "Mathe": 17, "Deutsch": 4, "Englisch": 8, "Französisch": 3, "Latein": 1, "Spanisch": 1, "Physik": 5, "Chemie": 2, "Biologie": 6, "Informatik": 1, "Wirtschaft": 1, "Geschichte": 1 };
-  var ZIEL = { luecken: "Lücken schließen", arbeit: "nächste Klassenarbeit", pruefung: "Abschlussprüfung", sicherer: "sicherer werden", fragen: "einzelne Fragen" };
-
   var form = document.getElementById("anfrage");
-  var steps = [].slice.call(form.querySelectorAll(".step"));
-  var boxes = form.querySelectorAll(".boxes i");
-  var title = document.getElementById("sheet-title");
-  var answers = document.getElementById("answers");
-  var aha = document.getElementById("aha");
-  var q = document.querySelector(".hero h1 .q");
-  var cur = 1, pointer = false;
+  var done = document.getElementById("done");
 
-  var val = function (n) { var c = form.querySelector('input[name="' + n + '"]:checked'); return c ? c.value : ""; };
-
-  function progress(n) {
-    // 0 % am Anfang, 100 % nach dem Absenden
-    // ein kleines Stück Marker von Anfang an – damit klar ist: das füllt sich
-    aha.style.setProperty("--p", String(0.12 + 0.88 * n));
-  }
-
-  function show(n, focus) {
-    cur = n;
-    steps.forEach(function (s) { s.hidden = Number(s.dataset.step) !== n; });
-    boxes.forEach(function (b, i) { b.className = i < n - 1 ? "done" : (i === n - 1 ? "now" : ""); });
-    title.textContent = "Aufgabe " + n + " von 4";
-    progress((n - 1) / 4);
-    renderAnswers();
-    if (n === 4) solve();
-    if (focus) {
-      var step = steps[n - 1];
-      var target = step.querySelector("input:checked") || step.querySelector("input:not([type=hidden]):not(:disabled)") || step;
-      target.focus({ preventScroll: true });
-      var r = form.getBoundingClientRect();
-      if (r.top < 60 || r.top > window.innerHeight * 0.5) form.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-
-  function renderAnswers() {
-    var a = [];
-    if (val("fach") && cur > 1) a.push([1, val("fach")]);
-    if (val("klasse") && cur > 2) a.push([2, /^\d+$/.test(val("klasse")) ? "Klasse " + val("klasse") : val("klasse")]);
-    if (val("ziel") && cur > 3) a.push([3, ZIEL[val("ziel")]]);
-    answers.innerHTML = "";
-    a.forEach(function (x) {
-      var b = document.createElement("button");
-      b.type = "button"; b.textContent = x[1];
-      b.setAttribute("aria-label", x[1] + " – ändern");
-      b.addEventListener("click", function () { show(x[0], true); });
-      answers.appendChild(b);
-    });
-  }
-
-  // Grundschule: keine Abschlussprüfung
-  function updateZiel() {
-    var k = Number(val("klasse"));
-    var p = form.querySelector('input[name="ziel"][value="pruefung"]');
-    var grund = k >= 1 && k <= 4;
-    p.disabled = grund;
-    if (grund && p.checked) p.checked = false;
-  }
-
-  function solve() {
-    var fach = val("fach"), k = val("klasse"), z = val("ziel"), kn = Number(k);
-    var wer = /^\d+$/.test(k) ? "Klasse " + k : k;
-    var rec = {
-      luecken: "Erst finden wir heraus, wo die Lücke beginnt – dann bauen wir die Grundlagen Schritt für Schritt wieder auf.",
-      arbeit: "Wir starten beim aktuellen Thema und machen einen realistischen Plan bis zur Arbeit.",
-      pruefung: (kn >= 11 ? "Abitur" : (kn >= 9 ? "Mittlere Reife oder Mittelschulabschluss" : "Prüfung")) + " mit Plan: Stoff ordnen, echte Prüfungsaufgaben, zwei Probeläufe.",
-      sicherer: "Regelmäßig 1:1 – damit Fragen gar nicht erst liegen bleiben.",
-      fragen: fach === "Mathe" ? "Für einzelne Mathe-Fragen gibt es auch den Fragenpass – erst mal aber die kostenlose Probestunde." : "Ihr bucht einfach Stunden, wenn eine Frage ansteht – sie verfallen nicht."
-    }[z] || "Wir schauen gemeinsam, was gerade am meisten hilft.";
-    document.getElementById("l1").textContent = "Aha: " + [fach, wer, ZIEL[z]].filter(Boolean).join(" · ") + ".";
-    var n = LK[fach];
-    document.getElementById("l2").textContent = "→ " + rec + (n ? " " + n + (n === 1 ? " Lehrkraft unterrichtet " : " Lehrkräfte unterrichten ") + fach + "." : " Die passende Lehrkraft sucht Marcel persönlich aus.");
-    var w = document.getElementById("l3");
-    w.hidden = z !== "pruefung";
-    w.textContent = "Wichtig: Für Abschlussklassen muss die Anfrage spätestens drei Monate vor der Prüfung bei uns sein.";
-  }
-
-  // Antippen = weiter (mit kurzer Pause, damit man die Auswahl sieht). Tastatur: "Weiter".
-  form.addEventListener("pointerdown", function (e) { if (e.target.closest(".pick")) pointer = true; });
-  form.addEventListener("change", function (e) {
-    if (e.target.name === "klasse") updateZiel();
-    if (!e.target.closest(".picks")) return;
-    if (pointer && cur < 4) { pointer = false; var n = cur + 1; setTimeout(function () { show(n, true); }, 260); }
-  });
-  form.querySelectorAll("[data-next]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      var need = { 1: "fach", 2: "klasse", 3: "ziel" }[cur];
-      if (need && !val(need)) {
-        var first = steps[cur - 1].querySelector("input:not(:disabled)");
-        first.focus();
-        b.textContent = "Bitte erst antippen";
-        setTimeout(function () { b.textContent = "Weiter"; }, 1600);
-        return;
-      }
-      show(cur + 1, true);
-    });
-  });
-  form.querySelectorAll("[data-back]").forEach(function (b) { b.addEventListener("click", function () { show(Math.max(1, cur - 1), true); }); });
-
-  // Absenden (Prototyp: nichts wird verschickt)
-  var check = function (el) {
-    var ok = el.value.trim().length > 1;
-    el.setAttribute("aria-invalid", String(!ok));
-    document.getElementById(el.id + "-msg").hidden = ok;
-    return ok;
-  };
-  ["f-name", "f-kontakt"].forEach(function (id) {
-    var el = document.getElementById(id);
-    el.addEventListener("input", function () { if (el.getAttribute("aria-invalid") === "true") check(el); });
-  });
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    if (document.getElementById("f-web").value) return; // Honeypot
-    var bad = ["f-name", "f-kontakt"].map(function (id) { return document.getElementById(id); }).filter(function (el) { return !check(el); });
-    if (bad.length) { bad[0].focus(); return; }
-    steps.forEach(function (s) { s.hidden = true; });
-    answers.innerHTML = "";
-    boxes.forEach(function (b) { b.className = "done"; });
-    title.textContent = "Alle Aufgaben gelöst";
-    progress(1);
-    document.getElementById("done-name").textContent = document.getElementById("f-name").value.trim().split(/\s+/)[0];
-    var d = document.getElementById("done"); d.hidden = false; d.focus();
-  });
-
-  // Alle "Probestunde"-Links: zum Arbeitsblatt und erste offene Aufgabe fokussieren
-  document.querySelectorAll("[data-to-form]").forEach(function (a) {
-    a.addEventListener("click", function (e) {
-      e.preventDefault();
-      form.scrollIntoView({ behavior: "smooth", block: "start" });
-      setTimeout(function () { if (!document.getElementById("done").hidden) return; show(cur, true); }, 450);
-    });
-  });
-
-  show(1, false);
-  setTimeout(function () { q.style.setProperty("--circle", "100%"); }, 250);
-
-  // Tafelbild: Reiter + Schritt für Schritt (ohne JS alles sichtbar)
+  // ---------- Tafelbild: Reiter + Schritt für Schritt (ohne JS ist alles sichtbar)
   var wrap = document.querySelector("[data-boards]");
   var tabs = wrap.querySelectorAll("[data-tab]");
   var boards = wrap.querySelectorAll("[data-board]");
@@ -657,12 +447,12 @@ footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
   };
   tabs.forEach(function (t) { t.addEventListener("click", function () { pick(t.dataset.tab); }); });
   boards.forEach(function (b) {
-    var li = b.querySelectorAll("li"), next = b.querySelector("[data-step-next]"), cnt = b.querySelector("[data-count]"), ah = b.querySelector("[data-aha]"), n = 1;
+    var li = b.querySelectorAll("li"), next = b.querySelector("[data-step-next]"), cnt = b.querySelector("[data-count]"), ah = b.querySelector("[data-aha]"), n = li.length;
     var r = function (anim) {
       li.forEach(function (x, i) { x.hidden = i >= n; x.classList.toggle("new", anim && i === n - 1); });
       ah.hidden = n < li.length;
-      next.textContent = n >= li.length ? "Noch mal von vorn" : "Nächster Schritt";
-      cnt.textContent = "Schritt " + n + " von " + li.length;
+      next.textContent = n >= li.length ? "Schritt für Schritt ansehen" : "Nächster Schritt";
+      cnt.textContent = n >= li.length ? "" : "Schritt " + n + " von " + li.length;
     };
     next.hidden = false;
     next.addEventListener("click", function () { n = n >= li.length ? 1 : n + 1; r(true); });
@@ -670,17 +460,51 @@ footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
   });
   pick("mathe");
 
-  // Handy-Leiste: erst, wenn das Arbeitsblatt aus dem Bild ist; weg am Schluss-Zettel und Fuß
+  // ---------- Buttons "Probestunde": zum Formular und ins erste Feld
+  document.querySelectorAll("[data-to-form]").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      var target = done.hidden ? form : done;
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (done.hidden) setTimeout(function () { document.getElementById("f-name").focus({ preventScroll: true }); }, 500);
+    });
+  });
+
+  // ---------- Hinweis für Abschlussklassen (ab Klasse 9)
+  var kl = document.getElementById("f-klasse"), hint = document.getElementById("f-hint");
+  kl.addEventListener("change", function () { var k = parseInt(kl.value.replace(/\D/g, ""), 10); hint.hidden = !(k >= 9 && k <= 13); });
+
+  // ---------- Prüfen und absenden (Prototyp: nichts wird verschickt)
+  var req = ["f-name", "f-kontakt", "f-fach", "f-klasse"].map(function (id) { return document.getElementById(id); });
+  var check = function (el) {
+    var ok = el.value.trim().length > (el.tagName === "SELECT" ? 0 : 1);
+    el.setAttribute("aria-invalid", String(!ok));
+    document.getElementById(el.id + "-msg").hidden = ok;
+    return ok;
+  };
+  req.forEach(function (el) {
+    ["input", "change"].forEach(function (ev) { el.addEventListener(ev, function () { if (el.getAttribute("aria-invalid") === "true") check(el); }); });
+  });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (document.getElementById("f-web").value) return; // Honeypot
+    var bad = req.filter(function (el) { return !check(el); });
+    if (bad.length) { bad[0].focus(); return; }
+    document.getElementById("done-name").textContent = document.getElementById("f-name").value.trim().split(/\s+/)[0];
+    form.hidden = true; done.hidden = false; done.focus();
+  });
+
+  // ---------- Handy-Leiste: nicht, solange Held, Formular oder Fuß sichtbar sind
   var bar = document.getElementById("bar");
   if ("IntersectionObserver" in window) {
     var seen = new Set();
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) { if (e.isIntersecting) seen.add(e.target); else seen.delete(e.target); });
-      var show = seen.size === 0 && window.scrollY > 200;
+      var show = seen.size === 0;
       bar.classList.toggle("show", show);
       if (show) bar.removeAttribute("inert"); else bar.setAttribute("inert", "");
     });
-    [form, document.querySelector(".final"), document.querySelector("footer")].forEach(function (x) { io.observe(x); });
+    [document.querySelector(".hero .cta-row"), document.querySelector(".form-sec"), document.querySelector("footer")].forEach(function (x) { io.observe(x); });
   }
 })();
 </script>

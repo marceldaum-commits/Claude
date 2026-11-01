@@ -6,24 +6,22 @@ GRUNDIDEE
 Die Startseite hat genau eine Aufgabe: dass Eltern die kostenlose
 Probestunde anfragen. Darum IST der erste Bildschirm die Anfrage.
 
-FÜNF ABSCHNITTE STATT ZEHN
-1. Hero = Arbeitsblatt mit 4 Aufgaben zum Antippen:
-   Fach (alle 13 + "Mehrere") → Klasse → Anliegen → Kontakt.
-   - Antippen springt automatisch weiter; Antworten bleiben oben als
-     Zettel stehen und lassen sich per Klick ändern.
-   - Der gelbe Marker unter "Aha." ist der Fortschrittsbalken.
-   - Vor dem Kontakt erscheint eine persönliche "Lösung" in Handschrift
-     (Empfehlung + Anzahl Lehrkräfte im Fach; bei Prüfung der Hinweis
-     "spätestens drei Monate vorher").
-   - Klasse 1–4: "Abschlussprüfung" ist gesperrt.
-   - Nur 2 Pflichtfelder: Vorname, Handy oder E-Mail.
+VIER ABSCHNITTE STATT ZEHN
+1. Hero: "Aus Hä? wird Aha.", ein Satz, Button "Kostenlose Probestunde
+   anfragen" + WhatsApp, Bewertung. Rechts als Bild der Seite das
+   Tafelbild (Mathe / Deutsch / Englisch), fertig gelöst; auf Wunsch
+   Schritt für Schritt.
+   (Erste Fassung hatte ein Quiz im Hero – verworfen: wirkte wie ein Test
+   und fragte, bevor die Seite etwas erklärt hat.)
 2. Stimmen: 5,0 ★ · 623 · seit 2001 · 20 Lehrkräfte, zwei echte
    Bewertungen, Marcel in einem Satz.
 3. "Kleingedrucktes? Hier ist es groß." – Preis, kein Vertrag, Stunden
    verfallen nicht, 14 Tage Geld zurück, Absage 24 h, Wechsel, online 1:1.
    (Ersetzt Preis-, FAQ- und Vorteile-Abschnitte.)
-4. "So klingt Aha." – Tafelbild Mathe / Deutsch / Englisch.
-5. Schluss-Zettel mit einem Button.
+4. Anfrage: ganz normales kurzes Formular – Vorname, Handy oder E-Mail,
+   Fach, Klasse (Pflicht), Nachricht (optional). Ab Klasse 9 erscheint der
+   Hinweis "Abschlussklassen: spätestens drei Monate vorher anfragen".
+   Daneben: so geht es weiter, Telefon, WhatsApp.
 
 BEWUSST WEGGELASSEN (gehört auf Unterseiten)
 Team-Raster, Fächer-Abschnitt, Preistabelle, FAQ-Liste, Angebotsfinder,
@@ -31,7 +29,7 @@ Heftetikett, kostenlose Materialien.
 
 FÜR DEN EINBAU IN WORDPRESS
 Das Formular entspricht [mmm_probestunde] im Theme (wordpress/):
-Felder fach, klasse, ziel, name, kontakt, zeiten → admin-post.php.
+Felder name, kontakt, fach, klasse, nachricht → admin-post.php.
 Die Startseite des Themes kann durch diese Seite ersetzt werden.
 
 PLATZHALTER: Tafelbilder sind Beispiele; Fotos fehlen; Antwortzeit
@@ -39,5 +37,5 @@ bewusst ohne Versprechen ("Marcel meldet sich persönlich").
 
 GEPRÜFT (Playwright, 390 und 1440 px): kein seitliches Scrollen, eine H1,
 keine JS-Fehler; ganzer Ablauf durchgeklickt inkl. Fehlermeldungen,
-gesperrter Prüfung bei Klasse 3 und Danke-Ansicht. Am Handy liegen die
-ersten Fach-Kacheln im ersten Bildschirm.
+Hinweis für Abschlussklassen und Danke-Ansicht. Am Handy ist der
+Probestunden-Button im ersten Bildschirm sichtbar.
