@@ -8,7 +8,7 @@ index.html im Browser öffnen. Reines HTML/CSS, ein kleines script.js
 (Handy-Menü, Dropdowns, Team-Filter, Demo-Formulare). Keine Build-Tools.
 Formulare senden nichts. Alle Seiten tragen "noindex" (nur im Prototyp).
 
-SEITEN (15)
+SEITEN (16)
 -----------
 index.html                 Startseite
 nachhilfe.html             Nachhilfe-Übersicht (+ "Das ist dabei", "Für Eltern")
@@ -26,6 +26,7 @@ kontakt.html               Kontakt
 probestunde.html           Probestunde (vereinfachtes Formular, Demo)
 impressum.html             Impressum-Platzhalter (+ Datenschutz/AGB/Widerruf)
 kundenbereich.html         Anmelden / Aufbau "Mein Bereich" (Demo)
+aschaffenburg.html         Lokale Landingpage Aschaffenburg & Umgebung (neu in V2)
 
 Jeder Menüpunkt führt auf eine Prototyp-Seite oder einen Abschnitt darin.
 Tiefe Inhalte, die hier nicht nachgebaut sind (Shop-Produkte, Artikel,
@@ -102,6 +103,54 @@ SEO (D1–D6)
 Barrierefreiheit
 - "Zum Inhalt springen", sichtbarer Tastatur-Fokus, Escape schließt
   Menüs, Dropdowns per Klick und Tastatur bedienbar.
+
+VERSION 2 – DIE GRÖSSTEN HEBEL (01.11.2026)
+------------------------------------------
+"10x besser" lässt sich nicht messen. Gemessen wird am Ende: Wie viele
+Besucher fragen eine Probestunde an? Darauf zielt jede Änderung.
+
+1. Angebotsfinder (Startseite, #finder)
+   Drei Fragen (Wer lernt? Worum geht's? Welches Fach?) → sofort eine
+   Empfehlung aus den echten Angeboten, mit Anzahl passender Lehrkräfte.
+   "Probestunde mit diesen Angaben" trägt Fach und Anliegen ins Formular
+   ein. Die echte Seite hatte einen "Angebotsfinder"-Button – hier ist er
+   umgesetzt.
+
+2. Interaktives Tafelbild statt eingeklapptem Kasten (B8)
+   Eine Textaufgabe Schritt für Schritt (Gesucht → Gegeben → Ansatz →
+   Rechnen → Prüfen) auf Karopapier in Handschrift – so wie im Unterricht
+   am Tablet. Eltern sehen in 20 Sekunden, wie erklärt wird.
+   [Beispielaufgabe – durch ein echtes Tafelbild ersetzen]
+
+3. Klebende Leiste am Handy
+   "Kostenlose Probestunde" + WhatsApp erscheinen unten, sobald der
+   obere Button aus dem Bild ist. Ausgeblendet, wenn ohnehin ein
+   Probestunden-Block sichtbar ist, und auf Formularseiten.
+
+4. Probestunden-Formular weiter vereinfacht
+   - Wunsch-Lehrkraft wird nach Fach gefiltert ("17 Lehrkräfte für
+     Mathematik").
+   - "Probestunde mit Jule" auf jeder Team-Karte füllt Lehrkraft und Fach
+     vor.
+   - Fehlermeldungen direkt am Feld statt einer Sammelmeldung.
+
+5. Startseite: "So startet ihr" (3 Schritte) + die vier häufigsten
+   Elternfragen direkt beantwortet. Der doppelte Familien-Block ist dafür
+   entfallen (steht schon im Preis-Kasten).
+
+6. Lokal gefunden werden (D9)
+   Neue Seite aschaffenburg.html, verlinkt im Footer. Nur echte Fakten:
+   Sitz Aschaffenburg, seit 2001, Abschlusskurse im Landkreis und in
+   Hessen.
+
+7. Google: FAQPage-Schema auf der Hilfe-Seite (Fragen können direkt in
+   den Suchergebnissen erscheinen), Person-Schema für Marcel.
+
+8. Eigene Handschrift der Marke: Karopapier-Raster und Handschrift-
+   Akzente (nur im Tafelbild) – erkennbar Mathe, nicht austauschbar.
+
+Weiterhin gilt: nichts erfunden. Neue Texte sind Kürzungen der echten
+Inhalte; die Beispielaufgabe ist als Beispiel gekennzeichnet.
 
 PLATZHALTER [in eckigen Klammern] – bitte ergänzen oder bestätigen
 ------------------------------------------------------------------

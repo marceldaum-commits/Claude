@@ -23,7 +23,7 @@
 <meta name="theme-color" content="#101b43">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap">
 <link rel="stylesheet" href="styles.css">
 
 </head>
@@ -65,11 +65,11 @@
     <form class="form-card" data-demo="kontakt-ok" novalidate>
       <h2 style="font-size:1.6rem">Deine Nachricht</h2>
       <div class="field-row">
-        <div class="field"><label for="k-name">Name *</label><input id="k-name" name="name" autocomplete="name" required></div>
-        <div class="field"><label for="k-kontakt">E-Mail oder Handynummer *</label><input id="k-kontakt" name="kontakt" autocomplete="email" required></div>
+        <div class="field"><label for="k-name">Name *</label><input id="k-name" name="name" autocomplete="name" required aria-describedby="k-name-msg"><span class="field-msg" id="k-name-msg" hidden>Bitte gib deinen Namen an.</span></div>
+        <div class="field"><label for="k-kontakt">E-Mail oder Handynummer *</label><input id="k-kontakt" name="kontakt" autocomplete="email" required aria-describedby="k-kontakt-msg"><span class="field-msg" id="k-kontakt-msg" hidden>Bitte E-Mail oder Handynummer angeben.</span></div>
       </div>
       <div class="field"><label for="k-klasse">Schulform und Klasse <span class="opt">(optional)</span></label><input id="k-klasse" name="klasse" placeholder="z. B. Realschule, 9. Klasse"></div>
-      <div class="field"><label for="k-msg">Nachricht *</label><textarea id="k-msg" name="nachricht" maxlength="1500" required></textarea><span class="hint"><span data-count>0</span> / 1500 Zeichen</span></div>
+      <div class="field"><label for="k-msg">Nachricht *</label><textarea id="k-msg" name="nachricht" maxlength="1500" required aria-describedby="k-msg-msg"></textarea><span class="field-msg" id="k-msg-msg" hidden>Worum geht es? Ein Satz reicht.</span><span class="hint"><span data-count>0</span> / 1500 Zeichen</span></div>
       <div class="hp" aria-hidden="true"><label for="k-web">Website</label><input id="k-web" name="website" tabindex="-1" autocomplete="off"></div>
       <p class="form-error" hidden>Bitte fülle die Felder mit * aus.</p>
       <div class="btn-row"><button class="btn btn-primary" type="submit">Nachricht senden</button></div>
@@ -99,6 +99,7 @@
         <p>Persönliche Online-Nachhilfe in Mathe und weiteren Fächern. Seit 2001, von Marcel Daum und Team aus Aschaffenburg.</p>
         <p><a href="tel:+491703141596">+49 170 3141596</a><br><a href="mailto:marcel.daum@mathenachhilfe-online.com">marcel.daum@mathenachhilfe-online.com</a></p>
         <p>★ 5,0 bei 623 Google-Bewertungen</p>
+        <p><a href="aschaffenburg.html">Online-Nachhilfe für Aschaffenburg &amp; Umgebung →</a></p>
       </div>
       <div><h3>Nachhilfe</h3><ul><li><a href="online-nachhilfe.html">Online-Nachhilfe – so läuft&#x27;s</a></li><li><a href="luecken-schliessen.html">Lücken schließen</a></li><li><a href="pruefungsvorbereitung.html">Prüfungsvorbereitung</a></li><li><a href="faecher-klassenstufen.html">Fächer &amp; Klassenstufen</a></li><li><a href="nachhilfe.html#dabei">Das ist dabei</a></li><li><a href="nachhilfe.html#eltern">Für Eltern</a></li></ul></div><div><h3>Preise</h3><ul><li><a href="preise.html#einzel">Stundenpakete &amp; Preise</a></li><li><a href="preise.html#erstes-paket">Erstes Paket buchen</a></li><li><a href="preise.html#weitere">Weitere Angebote</a></li></ul></div><div><h3>Team</h3><ul><li><a href="team.html#lehrkraefte">Unsere Lehrkräfte</a></li><li><a href="team-marcel-daum.html">Marcel &amp; unsere Geschichte</a></li><li><a href="team.html#konzept">So unterrichten wir</a></li><li><a href="index.html#bewertungen">Was Familien sagen</a></li></ul></div><div><h3>Kostenlos lernen</h3><ul><li><a href="kostenlos-lernen.html#lernstand-check">Lernstand-Check</a></li><li><a href="kostenlos-lernen.html#textaufgaben">Textaufgaben-Kompass (PDF)</a></li><li><a href="kostenlos-lernen.html#arbeitsblaetter">Arbeitsblätter</a></li><li><a href="kostenlos-lernen.html#buecher">Mathe-Bücher &amp; Leseproben</a></li><li><a href="kostenlos-lernen.html#lerntipps">Lerntipps &amp; Ratgeber</a></li></ul></div><div><h3>Hilfe</h3><ul><li><a href="faq.html#ablauf">Ablauf &amp; wichtige Infos</a></li><li><a href="faq.html#fragen">Häufige Fragen</a></li><li><a href="kontakt.html">Kontakt</a></li></ul></div>
     </div>
@@ -108,6 +109,7 @@
     </div>
   </div>
 </footer>
+
 <script src="script.js" defer></script>
 </body>
 </html>

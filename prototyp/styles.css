@@ -328,3 +328,65 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); outline: 
 .anchor { scroll-margin-top: 90px; }
 [id] { scroll-margin-top: 90px; }
 .menu-toggle[aria-expanded="true"] { background: var(--blue); }
+
+/* ================= v2 ================= */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.card-links { margin-top: auto; padding-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.card-links .card-link { margin-top: 0; padding-top: 0; }
+
+/* Karopapier + Handschrift: wie im Schulheft und auf dem Tablet */
+.paper {
+  background-color: #fcfdff;
+  background-image: linear-gradient(#e3eaf5 1px, transparent 1px), linear-gradient(90deg, #e3eaf5 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.aha-card { background-image: linear-gradient(rgba(23, 58, 116, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(23, 58, 116, .06) 1px, transparent 1px), linear-gradient(150deg, #f2f6fd 0%, #e8effa 62%, #fbefe6 100%); background-size: 22px 22px, 22px 22px, auto; }
+.hand { font-family: "Caveat", "Segoe Print", "Bradley Hand", cursive; font-weight: 700; }
+
+/* Angebotsfinder */
+.finder { display: grid; gap: 20px; }
+@media (min-width: 960px) { .finder { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); align-items: start; } }
+.finder-form { gap: 22px; }
+.q { border: 0; margin: 0; padding: 0; min-width: 0; }
+.q legend { font-weight: 700; color: var(--navy); font-size: 17px; padding: 0; margin-bottom: 10px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.opt span { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid #c5d1e2; border-radius: 999px; background: var(--white); cursor: pointer; font-weight: 600; font-size: 15.5px; color: var(--navy); }
+.opt span:hover { border-color: var(--blue); }
+.opt input:checked + span { background: var(--navy); border-color: var(--navy); color: var(--white); }
+.opt input:focus-visible + span { outline: 3px solid var(--orange); outline-offset: 2px; }
+.result { border-radius: 24px; padding: clamp(22px, 3vw, 32px); background: linear-gradient(140deg, var(--soft-orange), var(--white) 70%); border: 1px solid #f3d6c1; display: grid; gap: 12px; box-shadow: var(--shadow-card); }
+@media (min-width: 960px) { .result { position: sticky; top: calc(96px + env(safe-area-inset-top, 0px)); } }
+.result h3 { font-size: 1.5rem; }
+.result .small:empty { display: none; }
+
+/* Tafelbild */
+.board { border-radius: 24px; border: 1px solid var(--border); padding: clamp(20px, 3vw, 32px); display: grid; gap: 16px; box-shadow: var(--shadow-card); position: relative; overflow: hidden; }
+.board-tag { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--orange-dark); }
+.board-task { font-weight: 600; color: var(--navy); font-size: 18px; background: rgba(255, 255, 255, .85); border-radius: 10px; padding: 10px 12px; margin-inline: -12px; }
+.board-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.board-steps li { display: grid; gap: 0 14px; align-items: baseline; }
+@media (min-width: 560px) { .board-steps li { grid-template-columns: 112px minmax(0, 1fr); } }
+.board-steps .lbl { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.board-steps .hand { font-size: 27px; line-height: 1.15; color: #1d3f87; }
+.board-steps li.new .hand { animation: ink .5s ease-out; }
+@keyframes ink { from { opacity: .2; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.board-steps .ok { color: var(--ok); }
+.board-ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; min-height: 44px; }
+.board-aha { position: absolute; top: 10px; right: 20px; font-size: 46px; line-height: 1; color: var(--orange); transform: rotate(-8deg); }
+.board-tag { padding-right: 84px; }
+
+/* Klebende Leiste am Handy */
+.sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; display: flex; gap: 10px; background: rgba(255, 255, 255, .97); border-top: 1px solid var(--border); box-shadow: 0 -8px 24px rgba(16, 27, 67, .08); padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); transform: translateY(110%); transition: transform .22s ease; }
+.sticky-cta.show { transform: none; }
+.sticky-cta .btn { min-height: 48px; padding: 0 12px; white-space: nowrap; font-size: 15.5px; }
+.sticky-cta .btn-primary { flex: 1; box-shadow: none; }
+.sticky-cta .wa { flex: 0 0 auto; padding: 0 16px; }
+@media (min-width: 1100px) { .sticky-cta { display: none; } }
+@media (max-width: 1099px) { body.has-sticky .site-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); } }
+
+/* Formulare: Meldungen pro Feld, Vorbelegung */
+.field-msg { color: #b42318; font-size: 14px; font-weight: 600; }
+[aria-invalid="true"] { border-color: #b42318; background: #fff8f7; }
+.prefill-note { background: var(--soft-blue); border: 1px solid var(--border); color: var(--navy); border-radius: 14px; padding: 12px 16px; font-weight: 600; font-size: 15px; margin-bottom: 14px; }
