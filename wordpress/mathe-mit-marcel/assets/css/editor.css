@@ -1,0 +1,3 @@
+/* Nur im Block-Editor: Hintergrund ruhiger, Abstände sichtbar */
+.editor-styles-wrapper { background-size: 24px 24px; }
+.editor-styles-wrapper .wp-block-shortcode { border: 2px dashed #1f3fbf; background: #e8eefc; padding: 12px; font-family: monospace; }

@@ -1,0 +1,142 @@
+[
+ {
+  "slug": "startseite",
+  "parent": null,
+  "title": "Startseite",
+  "path": "/",
+  "seo_title": "Mathe mit Marcel – Online-Nachhilfe seit 2001 · 5,0 ★",
+  "description": "Persönliche Online-Nachhilfe in Mathe und weiteren Fächern – seit 2001, von Marcel Daum und Team. 5,0 ★ bei 623 Google-Bewertungen. Probestunde kostenlos.",
+  "file": "startseite.html",
+  "front_page": true
+ },
+ {
+  "slug": "angebot",
+  "parent": null,
+  "title": "Nachhilfe",
+  "path": "/angebot/",
+  "seo_title": "Nachhilfe-Angebote: Lücken, Klassenarbeiten, Prüfungen",
+  "description": "Persönliche Online-Nachhilfe für Lücken, Klassenarbeiten und Abschlussprüfungen. 1:1, Stunden ohne Verfallsdatum, für Geschwister nutzbar. Probestunde gratis.",
+  "file": "angebot.html",
+  "front_page": false
+ },
+ {
+  "slug": "online-nachhilfe",
+  "parent": "angebot",
+  "title": "Online-Nachhilfe",
+  "path": "/angebot/online-nachhilfe/",
+  "seo_title": "Online-Nachhilfe im 1:1 – so läuft's",
+  "description": "Online-Nachhilfe im 1:1 über Microsoft Teams: gemeinsam am Tablet arbeiten, Notizen als PDF mitnehmen, flexibel ohne Vertragslaufzeit. Jetzt gratis testen.",
+  "file": "online-nachhilfe.html",
+  "front_page": false
+ },
+ {
+  "slug": "mathe-themen-aufarbeiten",
+  "parent": "angebot",
+  "title": "Lücken schließen",
+  "path": "/angebot/mathe-themen-aufarbeiten/",
+  "seo_title": "Mathe-Lücken schließen – Schritt für Schritt",
+  "description": "Mathe-Lücken gezielt schließen: Lernstand klären, Grundlagen wie Brüche, Terme und Gleichungen aufbauen und sicher anwenden. Mit kostenloser Probestunde.",
+  "file": "mathe-themen-aufarbeiten.html",
+  "front_page": false
+ },
+ {
+  "slug": "abschlusspruefungen",
+  "parent": "angebot",
+  "title": "Prüfungsvorbereitung",
+  "path": "/angebot/abschlusspruefungen/",
+  "seo_title": "Prüfungsvorbereitung: Abitur, Mittlere Reife & mehr",
+  "description": "Mathe-Prüfungsvorbereitung für Abitur, Mittlere Reife und Mittelschulabschluss: Theorie, echte Prüfungsaufgaben und zwei Probeläufe. Online und persönlich.",
+  "file": "abschlusspruefungen.html",
+  "front_page": false
+ },
+ {
+  "slug": "faecher-klassenstufen",
+  "parent": null,
+  "title": "Fächer & Klassenstufen",
+  "path": "/faecher-klassenstufen/",
+  "seo_title": "Fächer & Klassenstufen: Mathe, Deutsch, Englisch …",
+  "description": "Online-Nachhilfe in Mathe, Deutsch, Englisch, Physik, Chemie und mehr – von der Grundschule bis zur Abschlussprüfung. Passende Fachlehrkraft, gratis testen.",
+  "file": "faecher-klassenstufen.html",
+  "front_page": false
+ },
+ {
+  "slug": "stundenpakete-preise",
+  "parent": null,
+  "title": "Preise",
+  "path": "/stundenpakete-preise/",
+  "seo_title": "Preise: Online-Nachhilfe ab 23,50 € pro Stunde",
+  "description": "Online-Nachhilfe ab 23,50 € pro Stunde im 20-Stunden-Paket. Stunden ohne Verfallsdatum, für Geschwister nutzbar, ohne lange Vertragsbindung. Probestunde gratis.",
+  "file": "stundenpakete-preise.html",
+  "front_page": false
+ },
+ {
+  "slug": "team",
+  "parent": null,
+  "title": "Team",
+  "path": "/team/",
+  "seo_title": "Unser Team: 20 Lehrkräfte rund um Marcel Daum",
+  "description": "Lerne unsere 20 Lehrkräfte kennen – für Mathe, Physik, Chemie, Biologie, Sprachen und mehr. Persönlich begleitet, online. Probestunde mit Wunsch-Lehrkraft.",
+  "file": "team.html",
+  "front_page": false
+ },
+ {
+  "slug": "marcel-daum",
+  "parent": "team",
+  "title": "Marcel Daum",
+  "path": "/team/marcel-daum/",
+  "seo_title": "Marcel Daum – Mathe-Coach seit 2001",
+  "description": "Marcel Daum gibt seit 2001 Nachhilfe in Mathe und Physik, leitet Abschlusskurse in Aschaffenburg und Hessen und erklärt erst die Idee, dann die Formel.",
+  "file": "marcel-daum.html",
+  "front_page": false
+ },
+ {
+  "slug": "kostenlos-lernen",
+  "parent": null,
+  "title": "Kostenlos lernen",
+  "path": "/kostenlos-lernen/",
+  "seo_title": "Kostenlos lernen: Arbeitsblätter, PDF, Check",
+  "description": "560 kostenlose Mathe-Arbeitsblätter, Textaufgaben-Kompass als PDF, Lernstand-Check und Leseproben für Klasse 6–13 – ohne Anmeldung.",
+  "file": "kostenlos-lernen.html",
+  "front_page": false
+ },
+ {
+  "slug": "faq",
+  "parent": null,
+  "title": "Hilfe & häufige Fragen",
+  "path": "/faq/",
+  "seo_title": "Hilfe & häufige Fragen zur Online-Nachhilfe",
+  "description": "Antworten zu Probestunde, Ablauf, Technik, Preisen und Terminen der Online-Nachhilfe – plus Absage- und Rückerstattungsregeln auf einen Blick.",
+  "file": "faq.html",
+  "front_page": false
+ },
+ {
+  "slug": "kontakt",
+  "parent": null,
+  "title": "Kontakt",
+  "path": "/kontakt/",
+  "seo_title": "Kontakt – Marcel Daum persönlich erreichen",
+  "description": "Schreib uns oder ruf an: Telefon und WhatsApp +49 170 3141596, täglich 9–17 Uhr. Marcel Daum meldet sich persönlich bei dir.",
+  "file": "kontakt.html",
+  "front_page": false
+ },
+ {
+  "slug": "probestunde",
+  "parent": null,
+  "title": "Kostenlose Probestunde",
+  "path": "/probestunde/",
+  "seo_title": "Kostenlose Probestunde anfragen",
+  "description": "Kostenlose Probestunde Online-Nachhilfe in zwei kurzen Schritten anfragen: Fach, Klasse und Kontakt angeben – wir melden uns persönlich.",
+  "file": "probestunde.html",
+  "front_page": false
+ },
+ {
+  "slug": "online-nachhilfe-aschaffenburg",
+  "parent": null,
+  "title": "Online-Nachhilfe Aschaffenburg",
+  "path": "/online-nachhilfe-aschaffenburg/",
+  "seo_title": "Online-Nachhilfe Aschaffenburg – seit 2001",
+  "description": "Online-Nachhilfe aus Aschaffenburg: Marcel Daum und Team, seit 2001, 5,0 ★ bei 623 Google-Bewertungen. Ohne Anfahrt, 1:1, Probestunde kostenlos.",
+  "file": "online-nachhilfe-aschaffenburg.html",
+  "front_page": false
+ }
+]

@@ -1,0 +1,64 @@
+WORDPRESS-THEME "MATHE MIT MARCEL" – Startbasis für den Umzug
+=============================================================
+Stand: 01.11.2026. Grundlage: prototyp-neu/ ("Das Heft").
+Zum Ideen-Sammeln und als Startpunkt – in Plesk wird weitergebaut.
+
+INHALT
+------
+mathe-mit-marcel.zip      Theme zum Hochladen (WordPress → Design → Themes)
+mathe-mit-marcel/         Quellcode des Themes
+  content/                14 fertige Seiten als Gutenberg-Blöcke + manifest.json
+  inc/                    Funktionen (siehe Kopf von functions.php)
+  templates/design-seite.php   Vorlage für die Design-Seiten
+
+WAS DAS THEME KANN
+------------------
+- Heft-Design mit Kopf-/Fußzeile, Menü (Desktop-Dropdowns, Handy-Menü,
+  Probestunden-Button, Kunden-Symbol, Warenkorb-Symbol nur bei Inhalt).
+- Alle Seiten aus echten Blöcken – Texte im Editor normal änderbar.
+  Bisherige Adressen bleiben (/angebot/…, /stundenpakete-preise/, /faq/ …).
+- Bausteine als Shortcodes: [mmm_finder] [mmm_tafelbild] [mmm_team]
+  [mmm_probestunde] [mmm_kontaktformular] [mmm_etikett] [mmm_stempel] …
+  (Liste oben in inc/shortcodes.php).
+- Formulare mit echtem Versand: Mail an Marcel, Bestätigungsmail an die
+  Familie, Sicherung unter "Anfragen" im Admin, Spam-Schutz ohne Google,
+  automatisches Löschen nach Frist (Standard 180 Tage).
+- Vorbelegung: Finder, Team-Karten und Heftetikett tragen Fach, Klasse,
+  Name, Lehrkraft direkt ins Probestunden-Formular ein.
+- Einstellungen zentral: Design → Customizer → "Mathe mit Marcel"
+  (Telefon, WhatsApp, E-Mail, Antwortzeit, Bewertung, Google-Link …).
+- SEO ohne Plugin: Titel, Beschreibung, Open Graph, Schema (Organisation
+  mit Bewertung, FAQ). Ist Yoast/Rank Math aktiv, übernimmt das Plugin;
+  der Import schreibt die Texte auch in deren Felder.
+- Schriften lokal (DSGVO) – Dateien in assets/fonts/ legen (LIESMICH dort).
+- WooCommerce: Grundlage (Theme-Unterstützung, Heft-Look für Buttons,
+  Preise, Produktkarten; Artikelnummer/Kategorien ausgeblendet; Shop-
+  Skripte nur auf Shop-Seiten). Der eigentliche Shop kommt später.
+
+SO KOMMT ES IN PLESK (empfohlen: erst auf einer Kopie)
+------------------------------------------------------
+1. Plesk → WordPress Toolkit → bei der Website "Klonen" → Ziel z. B.
+   staging.mathenachhilfe-online.com. (Vorher: "Sicherung" anlegen.)
+2. Auf der Kopie: WordPress-Admin → Design → Themes → Hochladen →
+   mathe-mit-marcel.zip → Aktivieren.
+3. Design → "Mathe mit Marcel einrichten" → "Jetzt einrichten".
+   Legt fehlende Seiten und Menüs an. Bestehende Seiten werden NICHT
+   verändert. Wer die neuen Inhalte auf einer bestehenden Seite will:
+   Inhalt aus content/<seite>.html im Code-Editor einfügen (Editor →
+   ⋮ → Code-Editor) und Vorlage "Design-Seite" wählen.
+4. Customizer-Werte prüfen, gelbe [Platzhalter] ersetzen, Schriften
+   hochladen, og-bild.png (1200×630) nach assets/ legen.
+5. Formular testen. Kommt keine Mail: Plugin "WP Mail SMTP" mit dem
+   Postfach der Domain einrichten.
+6. Alles gut? WordPress Toolkit → "Daten kopieren" von Staging auf Live
+   (oder Theme auf Live hochladen und Schritt 3–5 dort wiederholen).
+
+NICHT GETESTET
+--------------
+Ein echtes WordPress konnte in dieser Umgebung nicht installiert werden.
+Geprüft wurde: PHP-Syntax aller Dateien, saubere Blockstruktur aller
+Seiten, und der echte Theme-Code (Kopf, Fuß, Menü, alle Shortcodes)
+in einer WordPress-Nachbildung mit Playwright bei 390/1440 px – ohne
+PHP-Warnungen, ohne JS-Fehler, ohne seitliches Scrollen, eine H1 je Seite.
+Ungetestet sind: Import-Assistent, Mailversand, Customizer, WooCommerce,
+Block-Editor-Darstellung. Erster Test also auf der Staging-Kopie.

@@ -1,0 +1,16 @@
+SCHRIFTEN LOKAL EINBINDEN (DSGVO: keine Verbindung zu Google)
+=============================================================
+Das Theme lädt Schriften nur von hier. Fehlen die Dateien, erscheinen
+Ersatzschriften – die Seite funktioniert trotzdem.
+
+So geht's:
+1. https://gwfh.mranftl.com/fonts öffnen (google-webfonts-helper).
+2. Je Schrift die Schnitte wählen, Format "woff2", herunterladen:
+     Bricolage Grotesque: 700, 800
+     Lexend:              400, 600, 700
+     Kalam:               400, 700
+3. Dateien so umbenennen und in diesen Ordner legen:
+     bricolage-grotesque-700.woff2   bricolage-grotesque-800.woff2
+     lexend-400.woff2   lexend-600.woff2   lexend-700.woff2
+     kalam-400.woff2    kalam-700.woff2
+Alle drei Schriften stehen unter der SIL Open Font License (frei nutzbar).

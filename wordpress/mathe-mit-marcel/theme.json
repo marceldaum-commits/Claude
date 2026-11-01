@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 2,
+	"settings": {
+		"appearanceTools": false,
+		"layout": { "contentSize": "820px", "wideSize": "1180px" },
+		"spacing": { "blockGap": true },
+		"color": {
+			"defaultPalette": false,
+			"defaultGradients": false,
+			"palette": [
+				{ "slug": "tinte", "name": "Tinte", "color": "#101631" },
+				{ "slug": "koenigsblau", "name": "Königsblau", "color": "#1f3fbf" },
+				{ "slug": "rotstift", "name": "Rotstift", "color": "#d42a2a" },
+				{ "slug": "textmarker", "name": "Textmarker", "color": "#ffe94a" },
+				{ "slug": "papier", "name": "Papier", "color": "#f8fafc" },
+				{ "slug": "weiss", "name": "Weiß", "color": "#ffffff" }
+			]
+		},
+		"typography": {
+			"customFontSize": false,
+			"fontSizes": [
+				{ "slug": "klein", "name": "Klein", "size": "15.5px" },
+				{ "slug": "normal", "name": "Normal", "size": "17.5px" },
+				{ "slug": "gross", "name": "Groß", "size": "21px" }
+			]
+		}
+	},
+	"styles": {
+		"spacing": { "blockGap": "0px" }
+	}
+}
