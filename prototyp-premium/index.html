@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-look="hell">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Nachhilfe Online">
 <meta property="og:title" content="Aus Fragen wird Klarheit – Nachhilfe Online">
 <meta property="og:description" content="1:1-Online-Nachhilfe in allen Fächern. Seit 2001 · 5,0 ★ bei 623 Google-Bewertungen · Probestunde kostenlos.">
-<meta name="theme-color" content="#0a0f24">
+<meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&amp;family=Geist:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
@@ -316,6 +316,47 @@ footer a:hover { color: var(--white); }
 .js .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .js .reveal { opacity: 1; transform: none; } }
 
+/* ================= Variante HELL (Standard) =================
+   Gleiches Design, heller Grundton; Nachtblau nur noch als Akzent:
+   Stunden-Fenster, große Kachel, Preis-Karte, Anfrage, Fuß. */
+html[data-look="hell"] { color-scheme: light; }
+html[data-look="hell"] body { background: var(--paper); color: var(--ink); }
+html[data-look="hell"] body::before { background: var(--white); }
+html[data-look="hell"] .nav { background: rgba(255,255,255,.78); border-bottom-color: var(--line); }
+html[data-look="hell"] .logo { color: var(--ink); }
+html[data-look="hell"] .nav-links a, html[data-look="hell"] .nav-tel { color: var(--muted); }
+html[data-look="hell"] .nav-links a:hover { color: var(--ink); background: rgba(10,15,36,.05); }
+html[data-look="hell"] .nav-tel:hover { color: var(--ink); }
+html[data-look="hell"] .hero { background: linear-gradient(180deg, var(--white), var(--paper)); }
+html[data-look="hell"] .hero::before { background:
+    radial-gradient(600px 420px at 80% 30%, rgba(255,116,24,.16), transparent 60%),
+    radial-gradient(700px 520px at 12% 0%, rgba(124,156,255,.16), transparent 60%); }
+html[data-look="hell"] .hero::after { background-image: linear-gradient(rgba(10,15,36,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(10,15,36,.05) 1px, transparent 1px); opacity: .6; }
+html[data-look="hell"] .pill { background: var(--white); border-color: var(--line); color: var(--muted); box-shadow: 0 6px 20px -14px rgba(10,15,36,.3); }
+html[data-look="hell"] .pill b { color: #c4560a; background: rgba(255,116,24,.12); }
+html[data-look="hell"] .hero h1 { color: var(--ink); }
+html[data-look="hell"] .hero h1 em.s { background: linear-gradient(100deg, #ff8a3d 10%, var(--orange) 50%, #e2461f 95%); -webkit-background-clip: text; background-clip: text; }
+html[data-look="hell"] .hero .lead { color: var(--muted); }
+html[data-look="hell"] .hero .lead b { color: var(--ink); }
+html[data-look="hell"] .hero .btn-ghost { background: var(--white); color: var(--ink); border-color: var(--line); }
+html[data-look="hell"] .hero .btn-ghost:hover { border-color: var(--ink); }
+html[data-look="hell"] .trust-t { color: var(--muted); }
+html[data-look="hell"] .trust-t b { color: var(--ink); }
+html[data-look="hell"] .stack span { border-color: var(--white); }
+html[data-look="hell"] .win { background: var(--night); border-color: var(--night); box-shadow: 0 50px 100px -40px rgba(10,15,36,.55), 0 0 0 1px rgba(10,15,36,.06); }
+html[data-look="hell"] .lesson-note { color: var(--muted); }
+html[data-look="hell"] .stats { background: var(--white); border-color: var(--line); }
+html[data-look="hell"] .stat { border-color: var(--line) !important; }
+html[data-look="hell"] .stat span { color: var(--muted); }
+html[data-look="hell"] .stat b em.s { color: var(--orange); }
+html[data-look="hell"] .ask { background: var(--night); color: var(--white); }
+html[data-look="hell"] footer { background: var(--night); border-top: 0; }
+html[data-look="hell"] .bar { background: rgba(10,15,36,.9); }
+/* Umschalter im Prototyp-Hinweis */
+.look { display: inline-flex; gap: 2px; margin-left: 10px; padding: 2px; border-radius: 999px; background: rgba(255,255,255,.08); vertical-align: middle; }
+.look button { font: 600 12px var(--sans); border: 0; background: none; color: var(--muted-d); padding: 3px 10px; border-radius: 999px; cursor: pointer; min-height: 24px; }
+.look button[aria-pressed="true"] { background: var(--white); color: var(--ink); }
+
 /* Handy-Leiste */
 .bar { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 55; display: flex; gap: 8px; padding: 8px; border-radius: var(--r-pill); background: rgba(17,25,56,.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 20px 40px -16px rgba(0,0,0,.6); transform: translateY(140%); transition: transform .35s var(--ease); }
 .bar.show { transform: none; }
@@ -326,7 +367,7 @@ footer a:hover { color: var(--white); }
 </head>
 <body>
 <a class="skip" href="#inhalt">Zum Inhalt springen</a>
-<div class="proto"><b>Prototyp</b> · Design-Entwurf „Premium“ – nicht die echte Website, das Formular sendet nichts.</div>
+<div class="proto"><b>Prototyp</b> · Design-Entwurf „Premium“ – nicht die echte Website, das Formular sendet nichts. <span class="look" role="group" aria-label="Ansicht wählen"><button type="button" data-look="hell" aria-pressed="true">Hell</button><button type="button" data-look="dunkel" aria-pressed="false">Dunkel</button></span></div>
 
 <header class="nav">
   <div class="wrap">
@@ -536,6 +577,17 @@ footer a:hover { color: var(--white); }
 (function () {
   "use strict";
   document.documentElement.classList.add("js");
+
+  // ---------- Ansicht Hell / Dunkel (nur Prototyp, zum Vergleichen)
+  var root = document.documentElement;
+  var lookBtns = document.querySelectorAll(".look [data-look]");
+  function setLook(v) {
+    root.setAttribute("data-look", v);
+    lookBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.look === v)); });
+    try { localStorage.setItem("nho-look", v); } catch (e) { /* egal */ }
+  }
+  try { var saved = localStorage.getItem("nho-look"); if (saved === "hell" || saved === "dunkel") setLook(saved); } catch (e) { /* egal */ }
+  lookBtns.forEach(function (b) { b.addEventListener("click", function () { setLook(b.dataset.look); }); });
 
   // ---------- Online-Stunde: Lösung schreibt sich an die Tafel
   var DATA = {
