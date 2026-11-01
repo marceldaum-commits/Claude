@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Nachhilfe Online – Aus Fragen wird Klarheit</title>
+<meta name="description" content="Persönliche Online-Nachhilfe in allen Fächern, 1:1 – seit 2001, 5,0 ★ bei 623 Google-Bewertungen. Kostenlose Probestunde anfragen.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="Nachhilfe Online">
+<meta property="og:title" content="Aus Fragen wird Klarheit – Nachhilfe Online">
+<meta property="og:description" content="1:1-Online-Nachhilfe in allen Fächern. Seit 2001 · 5,0 ★ bei 623 Google-Bewertungen · Probestunde kostenlos.">
+<meta name="theme-color" content="#0a0f24">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&amp;family=Geist:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
+<style>
+/* Nachhilfe Online – Premium
+   Konzept: Nachtblau als Bühne, ein Akzent (das Orange der bisherigen Marke),
+   große Schrift mit einem kursiven Serifenwort, ein einziger Wow-Moment:
+   eine Online-Stunde, in der sich die Lösung von selbst an die Tafel schreibt.
+   Bewusst ein Thema (dunkle Bühne + helle Abschnitte), keine Effektschlacht. */
+:root {
+  --night: #0a0f24;
+  --night-2: #111938;
+  --night-3: #1a2350;
+  --orange: #ff7418;
+  --orange-2: #ff9550;
+  --sky: #7c9cff;
+  --paper: #f4f5f8;
+  --white: #ffffff;
+  --ink: #0a0f24;
+  --muted: #5a6379;
+  --muted-d: #a8b0c8;
+  --line: #e1e4ec;
+  --line-d: rgba(255,255,255,.12);
+  --ok: #2fbf71;
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  --maxw: 1200px;
+  --r-xl: 28px; --r-lg: 20px; --r-md: 14px; --r-pill: 999px;
+  --ease: cubic-bezier(.2,.7,.2,1);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0ms !important; transition: none !important; } }
+body { margin: 0; background: var(--night); color: var(--white); font-family: var(--sans); font-size: 17px; line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 70; background: var(--night); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.035em; line-height: 1.02; text-wrap: balance; }
+p { margin: 0; }
+em.s { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
+.wrap { position: relative; width: 100%; max-width: calc(var(--maxw) + 48px); margin-inline: auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 760px) { .wrap { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); } }
+.skip { position: absolute; left: -999px; top: 8px; background: var(--white); color: var(--ink); padding: 8px 14px; z-index: 100; border-radius: 8px; }
+.skip:focus { left: 16px; }
+.proto { background: #05081a; color: var(--muted-d); font-size: 12.5px; text-align: center; padding: 6px 16px; border-bottom: 1px solid var(--line-d); }
+.proto b { color: var(--orange-2); font-weight: 600; }
+.ph { color: #8a6a00; background: #fff4cc; border: 1px dashed #d9a640; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+.dark .ph { color: #ffd98a; background: rgba(255,200,80,.08); border-color: rgba(255,200,80,.4); }
+
+/* ---------- Buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: var(--r-pill); font: 600 16px/1 var(--sans); text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform .2s var(--ease), background .2s, box-shadow .2s, border-color .2s; white-space: nowrap; }
+.btn:active { transform: scale(.98); }
+.btn-primary { background: var(--orange); color: #1a0d00; box-shadow: 0 10px 30px -10px rgba(255,116,24,.7), inset 0 1px 0 rgba(255,255,255,.35); }
+.btn-primary:hover { background: var(--orange-2); transform: translateY(-1px); }
+.btn-primary .arr { transition: transform .2s var(--ease); }
+.btn-primary:hover .arr { transform: translateX(3px); }
+.btn-ghost { background: rgba(255,255,255,.06); color: var(--white); border-color: var(--line-d); }
+.btn-ghost:hover { background: rgba(255,255,255,.12); }
+.light .btn-ghost { background: var(--white); color: var(--ink); border-color: var(--line); }
+.light .btn-ghost:hover { border-color: var(--ink); }
+.btn-sm { min-height: 42px; padding: 0 18px; font-size: 15px; }
+
+/* ---------- Kopf (Milchglas) ---------- */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 60; background: rgba(10,15,36,.72); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); border-bottom: 1px solid var(--line-d); }
+.nav .wrap { display: flex; align-items: center; gap: 20px; min-height: 66px; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 700; font-size: 18px; letter-spacing: -.03em; white-space: nowrap; }
+.logo i { width: 28px; height: 28px; border-radius: 9px; background: conic-gradient(from 210deg, var(--orange), #ffb070, var(--orange)); display: grid; place-items: center; font: italic 400 19px/1 var(--serif); color: #1a0d00; }
+.nav-links { display: none; gap: 4px; margin-left: 10px; }
+.nav-links a { text-decoration: none; color: var(--muted-d); font-weight: 500; font-size: 15px; padding: 8px 12px; border-radius: var(--r-pill); transition: color .2s, background .2s; }
+.nav-links a:hover { color: var(--white); background: rgba(255,255,255,.06); }
+.nav-cta { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.nav-tel { display: none; color: var(--muted-d); text-decoration: none; font-size: 15px; font-weight: 500; }
+.nav-tel:hover { color: var(--white); }
+@media (min-width: 980px) { .nav-links { display: flex; } .nav-tel { display: inline; } }
+
+/* ---------- Held ---------- */
+.hero { position: relative; overflow: hidden; padding-block: clamp(48px, 8vw, 104px) clamp(56px, 8vw, 96px); isolation: isolate; }
+.hero::before { content: ""; position: absolute; inset: -20% -10% auto -10%; height: 120%; z-index: -1;
+  background:
+    radial-gradient(600px 420px at 78% 30%, rgba(255,116,24,.28), transparent 60%),
+    radial-gradient(700px 520px at 18% 10%, rgba(124,156,255,.20), transparent 60%),
+    radial-gradient(900px 600px at 60% 100%, rgba(26,35,80,.9), transparent 70%); }
+.hero::after { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .35;
+  background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 56px 56px; mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%); }
+.hero-grid { display: grid; gap: 48px; align-items: center; }
+@media (min-width: 1040px) { .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); gap: 56px; } }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border-radius: var(--r-pill); background: rgba(255,255,255,.06); border: 1px solid var(--line-d); color: var(--muted-d); font-size: 14px; font-weight: 500; }
+.pill b { white-space: nowrap; background: rgba(255,116,24,.16); color: var(--orange-2); font-weight: 600; padding: 2px 9px; border-radius: var(--r-pill); font-size: 12.5px; letter-spacing: .02em; }
+.hero h1 { font-size: clamp(3rem, 8.2vw, 6.4rem); margin-top: 22px; letter-spacing: -.05em; line-height: .96; }
+.hero h1 em.s { font-size: 1.08em; background: linear-gradient(100deg, #ffb070 10%, var(--orange) 55%, #ff5e3a 95%); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .06em; }
+.hero .lead { margin-top: 22px; font-size: clamp(1.08rem, 1.6vw, 1.25rem); color: var(--muted-d); max-width: 520px; line-height: 1.55; }
+.hero .lead b { color: var(--white); font-weight: 500; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+@media (max-width: 520px) { .cta .btn { width: 100%; } }
+.trust { display: flex; align-items: center; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+.stack { display: flex; }
+.stack span { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--night); margin-left: -10px; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--white); background: var(--night-3); }
+.stack span:first-child { margin-left: 0; background: var(--orange); color: #1a0d00; }
+.stack span:nth-child(2) { background: #3d56c9; } .stack span:nth-child(3) { background: #6b4fd1; } .stack span:nth-child(4) { background: #1f8f74; }
+.trust-t { font-size: 14.5px; color: var(--muted-d); line-height: 1.35; }
+.trust-t b { color: var(--white); font-weight: 600; }
+.trust-t .st { color: #ffc24a; letter-spacing: 1px; }
+
+/* ---------- Der Wow-Moment: Online-Stunde ---------- */
+.lesson { position: relative; }
+.win { position: relative; border-radius: var(--r-xl); background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 120px -40px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.03) inset; padding: 10px; backdrop-filter: blur(10px); }
+.win-bar { display: flex; align-items: center; gap: 10px; padding: 8px 10px 12px; }
+.dots { display: flex; gap: 6px; } .dots i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,.18); }
+.dots i:first-child { background: #ff5f57; } .dots i:nth-child(2) { background: #febc2e; } .dots i:nth-child(3) { background: #28c840; }
+.win-title { font-size: 13.5px; color: var(--muted-d); font-weight: 500; }
+.live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #ff9a9a; background: rgba(255,80,80,.12); padding: 4px 10px; border-radius: var(--r-pill); }
+.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #ff5a5a; animation: pulse 1.6s infinite; }
+@keyframes pulse { 50% { opacity: .3; } }
+.board { position: relative; background: #fbfbf8; color: var(--ink); border-radius: 18px; padding: clamp(18px, 3vw, 28px); min-height: 360px; overflow: hidden;
+  background-image: linear-gradient(#eceef3 1px, transparent 1px), linear-gradient(90deg, #eceef3 1px, transparent 1px); background-size: 26px 26px; }
+.subj { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.subj button { font: 600 13.5px var(--sans); border: 1px solid var(--line); background: var(--white); color: var(--ink); padding: 7px 14px; border-radius: var(--r-pill); cursor: pointer; transition: background .2s, color .2s; min-height: 36px; }
+.subj button[aria-selected="true"] { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.task { font-weight: 600; font-size: 16.5px; line-height: 1.45; padding: 10px 14px; background: var(--white); border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 6px 20px -12px rgba(10,15,36,.25); }
+.task small { display: block; font-weight: 500; color: var(--muted); font-size: 12.5px; letter-spacing: .02em; margin-bottom: 2px; }
+.lines { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 6px; }
+.lines li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.lines .n { font: 600 12px var(--sans); color: var(--muted); text-align: right; }
+.lines .w { font: 700 clamp(22px, 2.5vw, 27px)/1.25 var(--hand); color: #2443c4; clip-path: inset(0 100% 0 0); }
+.board.play .lines .w { animation: write .85s var(--ease) forwards; }
+.board.play .lines li:nth-child(1) .w { animation-delay: .25s; }
+.board.play .lines li:nth-child(2) .w { animation-delay: 1.05s; }
+.board.play .lines li:nth-child(3) .w { animation-delay: 1.85s; }
+.board.play .lines li:nth-child(4) .w { animation-delay: 2.65s; }
+@keyframes write { to { clip-path: inset(0 0 0 0); } }
+.lines .ok { color: var(--ok); }
+.aha { position: absolute; right: 22px; bottom: 16px; font: 700 54px/1 var(--hand); color: var(--orange); transform: rotate(-8deg) scale(.6); opacity: 0; }
+.board.play .aha { animation: pop .5s 3.5s var(--ease) forwards; }
+@keyframes pop { to { opacity: 1; transform: rotate(-8deg) scale(1); } }
+.people { display: flex; gap: 8px; padding: 12px 6px 4px; flex-wrap: wrap; }
+.person { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted-d); background: rgba(255,255,255,.06); border: 1px solid var(--line-d); border-radius: var(--r-pill); padding: 4px 12px 4px 4px; }
+.person i { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font: 600 10.5px var(--sans); font-style: normal; color: #1a0d00; background: var(--orange); }
+.person.s i { background: #7c9cff; color: var(--night); }
+.float { position: absolute; z-index: 2; background: rgba(17,25,56,.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.14); border-radius: 16px; padding: 12px 16px; box-shadow: 0 20px 50px -20px rgba(0,0,0,.7); font-size: 13.5px; color: var(--muted-d); line-height: 1.3; }
+.float b { display: block; color: var(--white); font-size: 15px; font-weight: 600; }
+.float.f1 { right: -18px; bottom: -24px; }
+.float.f2 { right: -18px; top: 64px; }
+.float .st { color: #ffc24a; }
+@media (max-width: 1100px) { .float.f1 { right: 10px; bottom: -22px; } .float.f2 { right: 10px; top: -22px; } }
+@media (max-width: 699px) { .float { display: none; } .board { padding-bottom: 70px; } .aha { font-size: 44px; right: 16px; bottom: 12px; } .win-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .pill .long { display: none; } }
+@media (max-width: 520px) { .float { padding: 9px 12px; font-size: 12px; } .float b { font-size: 13.5px; } .board { min-height: 330px; } }
+.lesson-note { margin-top: 30px; font-size: 13px; color: var(--muted-d); text-align: left; padding-left: 12px; padding-right: 200px; }
+@media (max-width: 699px) { .lesson-note { padding-right: 0; text-align: center; padding-left: 0; } }
+
+/* ---------- Zahlen ---------- */
+.stats { border-top: 1px solid var(--line-d); border-bottom: 1px solid var(--line-d); background: rgba(255,255,255,.02); }
+.stats .wrap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 860px) { .stats .wrap { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.stat { padding: 26px 8px; display: grid; gap: 4px; border-right: 1px solid var(--line-d); text-align: center; }
+.stat:nth-child(2n) { border-right: 0; }
+@media (min-width: 860px) { .stat:nth-child(2n) { border-right: 1px solid var(--line-d); } .stat:last-child { border-right: 0; } }
+@media (max-width: 859px) { .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line-d); } }
+.stat b { font-size: clamp(2rem, 4vw, 2.9rem); font-weight: 600; letter-spacing: -.04em; line-height: 1; }
+.stat b em.s { color: var(--orange-2); }
+.stat span { font-size: 14px; color: var(--muted-d); }
+
+/* ---------- Helle Abschnitte ---------- */
+.light { background: var(--paper); color: var(--ink); }
+.sec { padding-block: clamp(72px, 10vw, 136px); }
+.head { display: grid; gap: 16px; max-width: 780px; margin-bottom: clamp(36px, 5vw, 60px); }
+.kicker { font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--orange); }
+.head h2 { font-size: clamp(2.3rem, 5.4vw, 4.2rem); }
+.head p { font-size: 19px; color: var(--muted); max-width: 620px; }
+.dark .head p { color: var(--muted-d); }
+
+/* Bento */
+.bento { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 700px) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1040px) { .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(210px, auto); } }
+.tile { position: relative; overflow: hidden; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(22px, 2.6vw, 30px); display: flex; flex-direction: column; gap: 10px; transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
+.tile:hover { transform: translateY(-3px); box-shadow: 0 24px 50px -30px rgba(10,15,36,.35); }
+.tile h3 { font-size: clamp(1.35rem, 2vw, 1.6rem); line-height: 1.12; }
+.tile p { color: var(--muted); font-size: 15.5px; }
+.tile .mt { margin-top: auto; }
+.t-big { background: var(--night); color: var(--white); border-color: var(--night); }
+.t-big p { color: var(--muted-d); }
+.t-big h3 { font-size: clamp(1.8rem, 3vw, 2.5rem); }
+@media (min-width: 1040px) { .t-big { grid-column: span 2; grid-row: span 2; } .t-wide { grid-column: span 4; } }
+@media (min-width: 700px) and (max-width: 1039px) { .t-big, .t-wide { grid-column: span 2; } }
+.t-big::after { content: ""; position: absolute; right: -120px; bottom: -160px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(255,116,24,.35), transparent 65%); pointer-events: none; }
+.faces { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; margin-top: auto; position: relative; z-index: 1; max-width: 460px; }
+.faces span { aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; font-size: clamp(9px, 1vw, 11.5px); font-weight: 600; color: var(--white); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); }
+.faces span:first-child { background: var(--orange); color: #1a0d00; border-color: var(--orange); }
+.big-n { font-family: var(--serif); font-style: italic; font-size: 76px; line-height: .8; color: var(--orange); letter-spacing: -.02em; }
+.chat { display: grid; gap: 8px; margin-top: auto; }
+.bub { max-width: 88%; font-size: 14px; line-height: 1.35; padding: 9px 13px; border-radius: 16px; }
+.bub.in { background: #eef0f5; border-bottom-left-radius: 5px; }
+.bub.out { justify-self: end; background: #dcf8c6; border-bottom-right-radius: 5px; }
+.tiny { font-size: 11.5px; color: var(--muted); }
+.subjects { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline; margin-top: auto; }
+.subjects span { font-family: var(--serif); font-style: italic; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.15; color: var(--ink); }
+.subjects span:nth-child(3n+2) { color: var(--orange); }
+.subjects span:nth-child(3n) { color: #3d56c9; }
+.money { font-size: 46px; font-weight: 600; letter-spacing: -.04em; line-height: 1; }
+
+/* Stimmen */
+.quotes { display: grid; gap: 22px; }
+@media (min-width: 900px) { .quotes { grid-template-columns: 1fr 1fr; } }
+.quote { margin: 0; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: clamp(24px, 3vw, 38px); display: grid; gap: 22px; }
+.quote blockquote { margin: 0; font-family: var(--serif); font-size: clamp(1.45rem, 2.4vw, 1.9rem); line-height: 1.25; letter-spacing: -.01em; }
+.quote figcaption { display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: var(--muted); }
+.quote figcaption i { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font: 600 13px var(--sans); font-style: normal; background: var(--night); color: var(--white); }
+.quote figcaption b { color: var(--ink); font-weight: 600; display: block; }
+.quote .st { color: #f5a623; letter-spacing: 2px; font-size: 15px; }
+.g-link { display: inline-flex; gap: 8px; align-items: center; margin-top: 26px; font-weight: 600; color: var(--ink); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+.founder { margin-top: 22px; display: grid; gap: 22px; align-items: center; background: var(--night); color: var(--white); border-radius: var(--r-lg); padding: clamp(22px, 3vw, 34px); }
+@media (min-width: 760px) { .founder { grid-template-columns: 120px minmax(0, 1fr) auto; } }
+.portrait { width: 120px; height: 120px; border-radius: 24px; background: linear-gradient(140deg, var(--night-3), #2d3a7a); display: grid; place-items: center; font: italic 400 46px var(--serif); color: var(--orange-2); border: 1px solid var(--line-d); }
+.founder p { color: var(--muted-d); }
+.founder q { font-family: var(--serif); font-size: clamp(1.3rem, 2.2vw, 1.65rem); line-height: 1.3; color: var(--white); quotes: "„" "“"; display: block; margin-bottom: 8px; }
+
+/* Start + Preise */
+.split { display: grid; gap: 40px; }
+@media (min-width: 1000px) { .split { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 64px; align-items: start; } }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 16px; padding: 22px 0; border-top: 1px solid var(--line); }
+.steps li:last-child { border-bottom: 1px solid var(--line); }
+.steps li::before { content: "0" counter(s); grid-row: span 2; font-family: var(--serif); font-style: italic; font-size: 34px; line-height: 1; color: var(--orange); }
+.steps strong { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+.steps span { color: var(--muted); font-size: 15.5px; }
+.prices { display: grid; gap: 16px; }
+@media (min-width: 640px) { .prices { grid-template-columns: 1fr 1fr; } }
+.price { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+.price.hi { background: var(--night); color: var(--white); border-color: var(--night); position: relative; overflow: hidden; }
+.price.hi::after { content: ""; position: absolute; right: -100px; top: -120px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,116,24,.35), transparent 65%); pointer-events: none; }
+.price .lbl { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.price.hi .lbl { color: var(--orange-2); }
+.price .amt { font-size: 52px; font-weight: 600; letter-spacing: -.05em; line-height: 1; }
+.price .amt small { display: inline-block; white-space: nowrap; font-size: 16px; font-weight: 500; letter-spacing: 0; color: var(--muted); }
+.price.hi .amt small { color: var(--muted-d); }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 15.5px; }
+.list li { display: flex; gap: 10px; }
+.list li::before { content: ""; flex: 0 0 18px; height: 18px; margin-top: 4px; border-radius: 50%; background: rgba(255,116,24,.15) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.5l2.5 2.5L13 6.5' fill='none' stroke='%23ff7418' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/18px no-repeat; }
+.price.hi .list { color: #d6dbee; }
+.price .btn { margin-top: auto; width: 100%; }
+.fine { margin-top: 18px; font-size: 14.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.fine span::before { content: "✓ "; color: var(--orange); font-weight: 700; }
+
+/* FAQ (kompakt) */
+.faq { display: grid; gap: 0; margin-top: 56px; border-top: 1px solid var(--line); }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { list-style: none; cursor: pointer; padding: 20px 44px 20px 0; font-weight: 600; font-size: 17.5px; position: relative; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; position: absolute; right: 4px; top: 14px; font-size: 26px; font-weight: 300; color: var(--orange); transition: transform .25s var(--ease); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { padding: 0 0 22px; color: var(--muted); max-width: 720px; }
+
+/* ---------- Anfrage ---------- */
+.ask { position: relative; overflow: hidden; isolation: isolate; }
+.ask::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(700px 480px at 85% 20%, rgba(255,116,24,.22), transparent 60%), radial-gradient(800px 600px at 10% 90%, rgba(124,156,255,.14), transparent 60%); }
+.ask-grid { display: grid; gap: 40px; align-items: start; }
+@media (min-width: 1000px) { .ask-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 64px; } }
+.ask h2 { font-size: clamp(2.4rem, 5.6vw, 4.4rem); }
+.ask h2 em.s { color: var(--orange-2); }
+.ask .sub { margin-top: 18px; color: var(--muted-d); font-size: 18.5px; max-width: 480px; }
+.contact { margin-top: 30px; display: grid; gap: 12px; }
+.contact a { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--white); font-weight: 500; }
+.contact a span { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: rgba(255,255,255,.06); border: 1px solid var(--line-d); font-size: 16px; }
+.contact small { color: var(--muted-d); font-size: 14px; }
+.glass { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: var(--r-xl); padding: clamp(22px, 3.4vw, 38px); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 40px 100px -40px rgba(0,0,0,.7); scroll-margin-top: 90px; }
+.fields { display: grid; gap: 14px; }
+@media (min-width: 600px) { .fields.two { grid-template-columns: 1fr 1fr; } }
+.field { display: grid; gap: 7px; min-width: 0; }
+.field label { font-size: 14px; font-weight: 500; color: var(--muted-d); }
+.field label span { color: rgba(168,176,200,.7); }
+.field input, .field select, .field textarea { width: 100%; min-height: 52px; padding: 13px 16px; border-radius: var(--r-md); border: 1px solid rgba(255,255,255,.16); background: rgba(10,15,36,.55); color: var(--white); font: 16.5px var(--sans); transition: border-color .2s, background .2s; }
+.field select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23a8b0c8' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px; padding-right: 40px; }
+.field select option { color: var(--ink); background: var(--white); }
+.field textarea { min-height: 104px; resize: vertical; }
+.field input::placeholder, .field textarea::placeholder { color: rgba(168,176,200,.55); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--orange); background: rgba(10,15,36,.8); box-shadow: 0 0 0 4px rgba(255,116,24,.18); }
+.field [aria-invalid="true"] { border-color: #ff6b6b; }
+.msg { color: #ff9a9a; font-size: 13.5px; font-weight: 500; }
+.hint { margin-top: 14px; padding: 12px 16px; border-radius: var(--r-md); background: rgba(255,116,24,.1); border: 1px solid rgba(255,116,24,.3); color: #ffd2b0; font-size: 14.5px; }
+.hp { position: absolute !important; left: -9999px !important; }
+.submit { width: 100%; margin-top: 18px; min-height: 58px; font-size: 17px; }
+.legal { margin-top: 14px; font-size: 13.5px; color: var(--muted-d); text-align: center; }
+.legal a { color: var(--white); }
+.thanks { text-align: left; display: grid; gap: 14px; }
+.thanks .big { font-family: var(--serif); font-style: italic; font-size: 64px; line-height: .9; color: var(--orange); }
+.thanks p { color: var(--muted-d); }
+
+/* ---------- Fuß ---------- */
+footer { border-top: 1px solid var(--line-d); padding-block: 40px; color: var(--muted-d); font-size: 14.5px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 28px; justify-content: space-between; align-items: center; }
+footer nav { display: flex; gap: 6px 18px; flex-wrap: wrap; }
+footer a { color: var(--muted-d); text-decoration: none; }
+footer a:hover { color: var(--white); }
+
+/* Einblenden beim Scrollen (Ruhezustand sichtbar; nur mit JS + Bewegung) */
+.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+.js .reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .js .reveal { opacity: 1; transform: none; } }
+
+/* Handy-Leiste */
+.bar { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 55; display: flex; gap: 8px; padding: 8px; border-radius: var(--r-pill); background: rgba(17,25,56,.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 20px 40px -16px rgba(0,0,0,.6); transform: translateY(140%); transition: transform .35s var(--ease); }
+.bar.show { transform: none; }
+.bar .btn { min-height: 46px; flex: 1; font-size: 15.5px; padding: 0 14px; }
+.bar .btn-ghost { flex: 0 0 auto; }
+@media (min-width: 1040px) { .bar { display: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+<div class="proto"><b>Prototyp</b> · Design-Entwurf „Premium“ – nicht die echte Website, das Formular sendet nichts.</div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#inhalt" aria-label="Nachhilfe Online – nach oben"><i aria-hidden="true">N</i>Nachhilfe Online</a>
+    <nav class="nav-links" aria-label="Bereiche"><a href="#vorteile">Warum wir</a><a href="#stimmen">Stimmen</a><a href="#preise">Preise</a><a href="#anfrage-sec">Kontakt</a></nav>
+    <div class="nav-cta">
+      <a class="nav-tel" href="tel:+491703141596">+49 170 3141596</a>
+      <a class="btn btn-primary btn-sm" href="#anfrage" data-to-form>Probestunde</a>
+    </div>
+  </div>
+</header>
+
+<main id="inhalt">
+<!-- ================= Held ================= -->
+<section class="hero" aria-labelledby="h1"><div class="wrap hero-grid">
+  <div>
+    <span class="pill"><b>★ 5,0</b><span><span class="long">Online-Nachhilfe in </span>alle<span class="long">n</span> Fächer<span class="long">n</span> · seit 2001</span></span>
+    <h1 id="h1">Aus Fragen wird <em class="s">Klarheit.</em></h1>
+    <p class="lead">Persönliche <b>1:1-Nachhilfe online</b> – mit einer Lehrkraft, die zu deinem Kind passt. Von Marcel Daum und Team. Die erste Stunde ist kostenlos.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#anfrage" data-to-form>Kostenlose Probestunde <span class="arr" aria-hidden="true">→</span></a>
+      <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener">Per WhatsApp fragen</a>
+    </div>
+    <div class="trust">
+      <div class="stack" aria-hidden="true"><span>MD</span><span>JM</span><span>SY</span><span>PM</span></div>
+      <p class="trust-t"><span class="st" aria-hidden="true">★★★★★</span> <b>5,0</b> aus <b>623 Google-Bewertungen</b><br>20 Lehrkräfte · kein Vertrag</p>
+    </div>
+  </div>
+
+  <div class="lesson" aria-label="Beispiel: So sieht eine Online-Stunde aus">
+    <div class="win">
+      <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="win-title" id="win-title">Online-Stunde · Mathe, Klasse 7</span><span class="live">Live</span></div>
+      <div class="board play" id="board">
+        <div class="subj" role="tablist" aria-label="Fach wählen">
+          <button type="button" role="tab" aria-selected="true" data-k="mathe">Mathe</button>
+          <button type="button" role="tab" aria-selected="false" data-k="deutsch">Deutsch</button>
+          <button type="button" role="tab" aria-selected="false" data-k="englisch">Englisch</button>
+        </div>
+        <p class="task"><small id="b-tag">Prozentrechnung</small><span id="b-task">Eine Jacke kostet 80&nbsp;€ und wird um 25&nbsp;% reduziert. Was kostet sie jetzt?</span></p>
+        <ol class="lines" id="b-lines" aria-live="polite">
+          <li><span class="n">1</span><span class="w">Gesucht: der neue Preis</span></li>
+          <li><span class="n">2</span><span class="w">100&nbsp;% − 25&nbsp;% = 75&nbsp;% bleiben</span></li>
+          <li><span class="n">3</span><span class="w">80&nbsp;€ · 0,75 = 60&nbsp;€</span></li>
+          <li><span class="n">4</span><span class="w">Probe: 80&nbsp;€ − 20&nbsp;€ = 60&nbsp;€ <b class="ok">✓</b></span></li>
+        </ol>
+        <span class="aha" aria-hidden="true">Aha!</span>
+      </div>
+      <div class="people"><span class="person"><i>MD</i>Marcel · Lehrkraft</span><span class="person s"><i>S</i>Schüler:in</span></div>
+    </div>
+    <div class="float f1"><b><span class="st">★★★★★</span> 5,0</b>623 Google-Bewertungen</div>
+    <div class="float f2"><b>0 € Probestunde</b>unverbindlich</div>
+    <p class="lesson-note">Beispiel-Tafelbild · <span class="ph">[später echte Aufnahme aus dem Unterricht]</span></p>
+  </div>
+</div></section>
+
+<!-- Zahlen -->
+<div class="stats" aria-label="Zahlen">
+  <div class="wrap">
+    <div class="stat"><b>5,0<em class="s">★</em></b><span>Google-Bewertung</span></div>
+    <div class="stat"><b>623</b><span>Bewertungen</span></div>
+    <div class="stat"><b><em class="s">seit</em> 2001</b><span>in der Nachhilfe</span></div>
+    <div class="stat"><b>20</b><span>Lehrkräfte, alle Fächer</span></div>
+  </div>
+</div>
+
+<!-- ================= Warum wir: Bento ================= -->
+<section class="sec light" id="vorteile" aria-labelledby="h-vorteile"><div class="wrap">
+  <div class="head reveal"><p class="kicker">Warum Familien bleiben</p><h2 id="h-vorteile">Nachhilfe, die sich nach <em class="s">Begleitung</em> anfühlt.</h2></div>
+  <div class="bento">
+    <article class="tile t-big reveal">
+      <h3>1:1 mit einer Lehrkraft, die wirklich passt.</h3>
+      <p>Marcel sucht persönlich aus, wer fachlich und menschlich zu deinem Kind passt. Und wenn es einmal nicht passt, ist ein Wechsel unkompliziert.</p>
+      <div class="faces" aria-label="20 Lehrkräfte">
+        <span>MD</span><span>AS</span><span>AL</span><span>AK</span><span>CP</span><span>CK</span><span>EA</span><span>HH</span><span>HK</span><span>JW</span>
+        <span>JM</span><span>LK</span><span>LB</span><span>LJ</span><span>MJ</span><span>MS</span><span>PM</span><span>SG</span><span>SY</span><span>XS</span>
+      </div>
+    </article>
+    <article class="tile reveal">
+      <span class="big-n" aria-hidden="true">∞</span>
+      <h3>Stunden verfallen nicht.</h3>
+      <p>Keine Einlösefrist – Ferien und Lernpausen sind kein Problem.</p>
+    </article>
+    <article class="tile reveal">
+      <h3>Fragen zwischendurch.</h3>
+      <p>Per WhatsApp – wir antworten persönlich und so zeitnah wie möglich.</p>
+      <div class="chat" aria-hidden="true">
+        <span class="bub in">Ich häng bei Aufgabe 3 fest …</span>
+        <span class="bub out">Schick mir ein Foto, ich schau’s mir an.</span>
+        <span class="tiny">Beispiel</span>
+      </div>
+    </article>
+    <article class="tile reveal">
+      <span class="money">14 Tage</span>
+      <h3>Geld zurück.</h3>
+      <p>Noch keine Stunde genutzt? Voller Kaufpreis zurück.</p>
+    </article>
+    <article class="tile reveal">
+      <h3>Ein Paket für die ganze Familie.</h3>
+      <p>Geschwister nutzen dasselbe Stundenkonto – in allen Fächern. Kein Vertrag, kein Abo.</p>
+    </article>
+    <article class="tile t-wide reveal">
+      <p class="kicker" style="color:var(--muted)">Alle Fächer, eine Anlaufstelle</p>
+      <div class="subjects"><span>Mathe</span><span>Deutsch</span><span>Englisch</span><span>Französisch</span><span>Latein</span><span>Spanisch</span><span>Physik</span><span>Chemie</span><span>Biologie</span><span>Informatik</span><span>Wirtschaft</span><span>Geschichte</span><span>Geografie</span></div>
+      <p>Von der Grundschule bis zum Abschluss – Abitur, Mittlere Reife, Mittelschulabschluss.</p>
+    </article>
+  </div>
+</div></section>
+
+<!-- ================= Stimmen ================= -->
+<section class="sec light" id="stimmen" aria-labelledby="h-stimmen" style="padding-top:0"><div class="wrap">
+  <div class="head reveal"><p class="kicker">Stimmen</p><h2 id="h-stimmen">Lieber echte Stimmen als <em class="s">große Versprechen.</em></h2></div>
+  <div class="quotes">
+    <figure class="quote reveal"><span class="st" aria-label="5 von 5 Sternen">★★★★★</span><blockquote>„Ich bin jetzt seit knapp zwei Monaten einmal pro Woche bei Selinay in der Mathenachhilfe und bin wirklich sehr zufrieden. Sie erklärt die Themen …“</blockquote><figcaption><i aria-hidden="true">LM</i><span><b>Lina Maier</b>Google-Bewertung</span></figcaption></figure>
+    <figure class="quote reveal"><span class="st" aria-label="5 von 5 Sternen">★★★★★</span><blockquote>„Wir sind sehr zufrieden mit Marcel und seinem gesamten Team. Unsere Tochter hatte Unterricht bei Selinay zur Vorbereitung auf die Realschul-Abschlussprüfung …“</blockquote><figcaption><i aria-hidden="true">N</i><span><b>niduscka</b>Google-Bewertung</span></figcaption></figure>
+  </div>
+  <a class="g-link" href="https://www.google.com/search?q=Mathenachhilfe-Online+Marcel+Daum+Aschaffenburg+Rezensionen" rel="noopener">Alle 623 Bewertungen bei Google ↗</a>
+  <div class="founder reveal">
+    <div class="portrait" aria-hidden="true">MD</div>
+    <div><q>Gemeinsam finden wir die passende Lehrkraft. Bei Fragen bleibe ich persönlich für euch da.</q><p>Marcel Daum · Gründer, seit 2001 in der Nachhilfe, Dozent für Abschlusskurse in Aschaffenburg und Hessen</p></div>
+    <span class="ph">[Porträtfoto]</span>
+  </div>
+</div></section>
+
+<!-- ================= Start + Preise ================= -->
+<section class="sec light" id="preise" aria-labelledby="h-preise" style="padding-top:0"><div class="wrap">
+  <div class="head reveal"><p class="kicker">So startet ihr</p><h2 id="h-preise">Erst kennenlernen. <em class="s">Dann</em> entscheiden.</h2></div>
+  <div class="split">
+    <ol class="steps reveal">
+      <li><strong>Probestunde anfragen</strong><span>Name, Kontakt, Fach, Klasse – dauert eine Minute.</span></li>
+      <li><strong>Persönliche Rückmeldung</strong><span>Marcel schlägt eine passende Lehrkraft und einen Termin vor.</span></li>
+      <li><strong>Kostenlose Probestunde</strong><span>Online über Microsoft Teams. Danach entscheidet ihr in Ruhe.</span></li>
+    </ol>
+    <div class="reveal">
+      <div class="prices">
+        <div class="price">
+          <span class="lbl">Zum Start</span>
+          <span class="amt">0 € <small>Probestunde</small></span>
+          <ul class="list"><li>Einmal pro Schülerin oder Schüler</li><li>Online über Microsoft Teams</li><li>Inhalte eine Woche verfügbar</li></ul>
+          <a class="btn btn-ghost" href="#anfrage" data-to-form>Anfragen</a>
+        </div>
+        <div class="price hi">
+          <span class="lbl">Einzelnachhilfe 1:1</span>
+          <span class="amt">23,50 € <small>pro Stunde</small></span>
+          <ul class="list"><li>60 Minuten, im ersten 20-Stunden-Paket (470 €)</li><li>Pakete mit 5, 10, 15 oder 20 Stunden</li><li>Weitere Pakete ab 23,75 € pro Stunde</li></ul>
+          <a class="btn btn-primary" href="#anfrage" data-to-form>Probestunde zuerst <span class="arr" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+      <p class="fine"><span>kein Vertrag</span><span>14 Tage Geld zurück</span><span>Absage bis 24 h kostenlos</span><span>Gruppe ab 15,38 € pro Kind</span></p>
+    </div>
+  </div>
+  <div class="faq reveal">
+    <details><summary>Ist Online-Nachhilfe so persönlich wie vor Ort?</summary><p>Ja. Der Unterricht ist 1:1 über Microsoft Teams, mit Bild, Ton und gemeinsamem Arbeitsbereich. Lösungswege entstehen gemeinsam am Tablet; die Notizen gibt es danach als PDF oder in GoodNotes.</p></details>
+    <details><summary>Was brauchen wir dafür?</summary><p>Eine stabile Internetverbindung und Microsoft Teams. Ein Tablet mit Stift ist hilfreich, aber nicht nötig.</p></details>
+    <details><summary>Müssen wir nach der Probestunde etwas buchen?</summary><p>Nein. Die Probestunde ist kein Vertrag – ihr entscheidet danach in Ruhe.</p></details>
+    <details><summary>Gibt es Fristen für Abschlussklassen?</summary><p>Ja: Die Anfrage zur kostenlosen Probestunde muss spätestens drei Monate vor der Abschlussprüfung bei uns sein.</p></details>
+  </div>
+</div></section>
+
+<!-- ================= Anfrage ================= -->
+<section class="sec ask dark" id="anfrage-sec" aria-labelledby="h-ask"><div class="wrap ask-grid">
+  <div class="reveal">
+    <p class="kicker">Kostenlose Probestunde</p>
+    <h2 id="h-ask" style="margin-top:14px">Bereit für das erste <em class="s">Aha?</em></h2>
+    <p class="sub">Kurz ausfüllen – Marcel meldet sich persönlich und schlägt eine Lehrkraft vor, die zu Fach und Kind passt.</p>
+    <div class="contact">
+      <a href="https://wa.me/491703141596" rel="noopener"><span><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 20l1.3-3.8A8 8 0 1 1 8 19z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>WhatsApp: 0170 3141596</a>
+      <a href="tel:+491703141596"><span><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5.5a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>+49 170 3141596</a>
+      <small>Erreichbar täglich 9–17 Uhr</small>
+    </div>
+  </div>
+  <div class="reveal">
+    <form class="glass" id="anfrage" novalidate aria-labelledby="h-ask">
+      <div class="fields two">
+        <div class="field"><label for="f-name">Vorname</label><input id="f-name" name="name" autocomplete="given-name" required maxlength="80" aria-describedby="f-name-msg"><span class="msg" id="f-name-msg" hidden>Wie dürfen wir dich ansprechen?</span></div>
+        <div class="field"><label for="f-kontakt">Handy oder E-Mail</label><input id="f-kontakt" name="kontakt" autocomplete="email" required maxlength="120" aria-describedby="f-kontakt-msg"><span class="msg" id="f-kontakt-msg" hidden>Damit wir antworten können.</span></div>
+        <div class="field"><label for="f-fach">Fach</label><select id="f-fach" name="fach" required aria-describedby="f-fach-msg"><option value="">Bitte wählen</option><option>Mathe</option><option>Deutsch</option><option>Englisch</option><option>Französisch</option><option>Latein</option><option>Spanisch</option><option>Physik</option><option>Chemie</option><option>Biologie</option><option>Informatik</option><option>Wirtschaft / BWL</option><option>Geschichte</option><option>Geografie</option><option>Mehrere Fächer</option><option>Anderes Fach</option></select><span class="msg" id="f-fach-msg" hidden>Bitte ein Fach wählen.</span></div>
+        <div class="field"><label for="f-klasse">Klasse</label><select id="f-klasse" name="klasse" required aria-describedby="f-klasse-msg"><option value="">Bitte wählen</option><option>Klasse 1</option><option>Klasse 2</option><option>Klasse 3</option><option>Klasse 4</option><option>Klasse 5</option><option>Klasse 6</option><option>Klasse 7</option><option>Klasse 8</option><option>Klasse 9</option><option>Klasse 10</option><option>Klasse 11</option><option>Klasse 12</option><option>Klasse 13</option><option>Studium</option><option>Sonstiges</option></select><span class="msg" id="f-klasse-msg" hidden>Bitte die Klasse wählen.</span></div>
+      </div>
+      <div class="field" style="margin-top:14px"><label for="f-msg">Worum geht’s? <span>(optional)</span></label><textarea id="f-msg" name="nachricht" maxlength="1500" placeholder="z. B. Klassenarbeit nächste Woche, Lücken bei Brüchen …"></textarea></div>
+      <p class="hint" id="f-hint" hidden>Für Abschlussklassen: Die Anfrage muss spätestens drei Monate vor der Prüfung bei uns sein.</p>
+      <div class="hp" aria-hidden="true"><label for="f-web">Website</label><input id="f-web" name="website" tabindex="-1" autocomplete="off"></div>
+      <button class="btn btn-primary submit" type="submit">Kostenlose Probestunde anfragen <span class="arr" aria-hidden="true">→</span></button>
+      <p class="legal">Kostenlos · unverbindlich · kein Vertrag. Bei Kindern bitte die Daten eines Elternteils. <a href="https://www.mathenachhilfe-online.com/datenschutz/">Datenschutz</a></p>
+    </form>
+    <div class="glass thanks" id="done" hidden tabindex="-1">
+      <span class="big" aria-hidden="true">Aha!</span>
+      <h3 style="font-size:clamp(1.6rem,3vw,2.2rem)">Danke, <span id="done-name">dir</span>.</h3>
+      <p>Deine Anfrage ist angekommen. Marcel meldet sich persönlich bei dir.</p>
+      <p class="ph" style="justify-self:start">Prototyp: Es wurde nichts verschickt.</p>
+      <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener">Schneller per WhatsApp</a>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <span>© 2026 Nachhilfe Online · Marcel Daum, Aschaffenburg</span>
+  <nav aria-label="Rechtliches"><a href="https://www.mathenachhilfe-online.com/impressum/">Impressum</a><a href="https://www.mathenachhilfe-online.com/datenschutz/">Datenschutz</a><a href="https://www.mathenachhilfe-online.com/agb/">AGB</a><a href="mailto:marcel.daum@mathenachhilfe-online.com">marcel.daum@mathenachhilfe-online.com</a></nav>
+</div></footer>
+
+<div class="bar" id="bar" inert>
+  <a class="btn btn-primary" href="#anfrage" data-to-form>Kostenlose Probestunde</a>
+  <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener">WhatsApp</a>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  document.documentElement.classList.add("js");
+
+  // ---------- Online-Stunde: Lösung schreibt sich an die Tafel
+  var DATA = {
+    mathe: { t: "Online-Stunde · Mathe, Klasse 7", tag: "Prozentrechnung", task: "Eine Jacke kostet 80 € und wird um 25 % reduziert. Was kostet sie jetzt?",
+      l: ["Gesucht: der neue Preis", "100 % − 25 % = 75 % bleiben", "80 € · 0,75 = 60 €", "Probe: 80 € − 20 € = 60 € ✓"] },
+    deutsch: { t: "Online-Stunde · Deutsch, Klasse 6", tag: "das oder dass?", task: "Ich hoffe, ___ das Wetter morgen gut wird.",
+      l: ["Test: „dieses“ einsetzen – passt nicht", "→ Bindewort → dass", "Ich hoffe, dass das Wetter gut wird.", "Nebensatz, Verb am Ende ✓"] },
+    englisch: { t: "Online-Stunde · Englisch, Klasse 6", tag: "Simple Past", task: "Yesterday I ___ (go) to the cinema.",
+      l: ["Signalwort: yesterday", "→ abgeschlossen → Simple Past", "go → went (unregelmäßig)", "Yesterday I went to the cinema. ✓"] }
+  };
+  var board = document.getElementById("board");
+  var tabs = board.querySelectorAll("[data-k]");
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+  function play(k) {
+    var d = DATA[k];
+    tabs.forEach(function (t) { t.setAttribute("aria-selected", String(t.dataset.k === k)); });
+    document.getElementById("win-title").textContent = d.t;
+    document.getElementById("b-tag").textContent = d.tag;
+    document.getElementById("b-task").textContent = d.task;
+    document.getElementById("b-lines").innerHTML = d.l.map(function (x, i) {
+      var h = esc(x).replace(/ ✓$/, ' <b class="ok">✓</b>');
+      return '<li><span class="n">' + (i + 1) + '</span><span class="w">' + h + "</span></li>";
+    }).join("");
+    board.classList.remove("play"); void board.offsetWidth; board.classList.add("play");
+  }
+  tabs.forEach(function (t) { t.addEventListener("click", function () { play(t.dataset.k); }); });
+  // Neu abspielen, wenn die Stunde wieder ins Bild kommt (einmal pro Eintritt)
+  if ("IntersectionObserver" in window) {
+    var first = true;
+    new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting && !first) { var cur = board.querySelector('[aria-selected="true"]').dataset.k; play(cur); }
+      first = false;
+    }, { threshold: 0.6 }).observe(board);
+  }
+
+  // ---------- Einblenden beim Scrollen
+  var rev = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    var ro = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); ro.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    rev.forEach(function (r) { ro.observe(r); });
+  } else { rev.forEach(function (r) { r.classList.add("in"); }); }
+
+  // ---------- Zum Formular
+  var form = document.getElementById("anfrage"), done = document.getElementById("done");
+  document.querySelectorAll("[data-to-form]").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      (done.hidden ? form : done).scrollIntoView({ behavior: "smooth", block: "start" });
+      if (done.hidden) setTimeout(function () { document.getElementById("f-name").focus({ preventScroll: true }); }, 550);
+    });
+  });
+
+  // ---------- Formular (Prototyp: nichts wird verschickt)
+  var kl = document.getElementById("f-klasse"), hint = document.getElementById("f-hint");
+  kl.addEventListener("change", function () { var k = parseInt(kl.value.replace(/\D/g, ""), 10); hint.hidden = !(k >= 9 && k <= 13); });
+  var req = ["f-name", "f-kontakt", "f-fach", "f-klasse"].map(function (id) { return document.getElementById(id); });
+  var check = function (el) {
+    var ok = el.value.trim().length > (el.tagName === "SELECT" ? 0 : 1);
+    el.setAttribute("aria-invalid", String(!ok));
+    document.getElementById(el.id + "-msg").hidden = ok;
+    return ok;
+  };
+  req.forEach(function (el) { ["input", "change"].forEach(function (ev) { el.addEventListener(ev, function () { if (el.getAttribute("aria-invalid") === "true") check(el); }); }); });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (document.getElementById("f-web").value) return;
+    var bad = req.filter(function (el) { return !check(el); });
+    if (bad.length) { bad[0].focus(); return; }
+    document.getElementById("done-name").textContent = document.getElementById("f-name").value.trim().split(/\s+/)[0];
+    form.hidden = true; done.hidden = false; done.focus();
+  });
+
+  // ---------- Handy-Leiste: erst nach dem Held, nicht beim Formular
+  var bar = document.getElementById("bar");
+  if ("IntersectionObserver" in window) {
+    var seen = new Set();
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) seen.add(e.target); else seen.delete(e.target); });
+      var show = seen.size === 0;
+      bar.classList.toggle("show", show);
+      if (show) bar.removeAttribute("inert"); else bar.setAttribute("inert", "");
+    });
+    [document.querySelector(".hero .cta"), document.getElementById("anfrage-sec"), document.querySelector("footer")].forEach(function (x) { io.observe(x); });
+  }
+})();
+</script>
+</body>
+</html>
