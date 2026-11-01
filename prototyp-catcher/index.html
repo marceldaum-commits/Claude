@@ -188,13 +188,15 @@ textarea { min-height: 110px; resize: vertical; }
 .founder-line .av { flex: 0 0 64px; width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font: 700 26px var(--hand); color: var(--blue); background: var(--white); }
 .founder-line q { font: 700 20px/1.3 var(--hand); color: var(--blue); quotes: "„" "“"; }
 
-/* Kleingedrucktes – groß */
-.big-print { display: grid; gap: 0; border-top: 2px solid var(--white); }
-.big-print li { list-style: none; display: grid; gap: 4px 28px; padding: 22px 0; border-bottom: 1.5px dashed rgba(255,255,255,.35); }
+/* Kleingedrucktes – groß, aber ruhig: helles Papier statt Farbfläche */
+.sec.calm { background: var(--white); border-block: 1px solid var(--line); }
+.sec.calm .head .note { color: var(--red); }
+.big-print { display: grid; gap: 0; border-top: 2px solid var(--ink); }
+.big-print li { list-style: none; display: grid; gap: 4px 28px; padding: 18px 0; border-bottom: 1.5px dashed var(--line); }
 @media (min-width: 820px) { .big-print li { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: baseline; } }
-.big-print strong { font-family: var(--display); font-size: clamp(1.5rem, 3.2vw, 2.3rem); line-height: 1.08; letter-spacing: -.02em; color: var(--white); }
-.big-print strong mark { background: none; color: var(--marker); }
-.big-print span { color: #d7defb; }
+.big-print strong { font-family: var(--display); font-size: clamp(1.3rem, 2.4vw, 1.75rem); line-height: 1.15; letter-spacing: -.015em; color: var(--ink); }
+.big-print strong mark { background: linear-gradient(transparent 55%, var(--marker) 55%, var(--marker) 92%, transparent 92%); color: inherit; padding: 0 .05em; }
+.big-print span { color: var(--muted); }
 .big-print { margin: 0; padding: 0; }
 
 /* Ablauf */
@@ -368,7 +370,7 @@ footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
 </div></section>
 
 <!-- ================= Kleingedrucktes, groß ================= -->
-<section class="sec ink" id="ehrlich" aria-labelledby="h-klein"><div class="wrap">
+<section class="sec calm" id="ehrlich" aria-labelledby="h-klein"><div class="wrap">
   <div class="head"><p class="note">Ehrlich gesagt</p><h2 id="h-klein">Kleingedrucktes? Hier ist es groß.</h2><p>Preis, Bedingungen und Ablauf – alles, was Eltern vor dem Start wissen wollen.</p></div>
   <ul class="big-print">
     <li><strong>Die Probestunde kostet <mark>nichts</mark>.</strong><span>Einmal pro Schülerin oder Schüler. Für Abschlussklassen: Anfrage spätestens drei Monate vor der Prüfung.</span></li>
