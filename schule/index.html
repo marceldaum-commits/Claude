@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--ARTIFACT-START-->
+<title>Christian-Schad-Grundschule Nilkheim</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Staatliche Grundschule in Aschaffenburg-Nilkheim: Termine, Krankmeldung, Ganztag, Eltern-ABC, Ansprechpartner und Schulleben.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: Schulheft-Raster als Grund, ein Tagesband (7:30–16:00) als Leitmotiv, Inhalte in klaren Spalten ohne Kartenflut. */
+:root{
+  --paper:#f7f8fb; --sheet:#ffffff; --ink:#15213f; --ink-2:#4a5677; --line:#dde2ee; --grid:#e9edf5;
+  --poppy:#d9422a; --poppy-ink:#ffffff; --poppy-soft:#fbe5df;
+  --leaf:#2a7f52; --leaf-soft:#e0f1e7;
+  --sun:#f0b429; --sun-soft:#fdf1d2;
+  --sky:#2f62c8; --sky-soft:#e3ebfb;
+  --shadow:0 1px 2px rgb(21 33 63 / .06), 0 8px 24px rgb(21 33 63 / .06);
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r:14px; --max:1180px;
+  --gut-l:max(16px, env(safe-area-inset-left, 0px));
+  --gut-r:max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0e1424; --sheet:#151d33; --ink:#eef1f8; --ink-2:#a7b1c9; --line:#28324d; --grid:#161f37;
+  --poppy:#ff7a5c; --poppy-ink:#1a0d08; --poppy-soft:#3a1d18;
+  --leaf:#5fcf93; --leaf-soft:#15301f;
+  --sun:#f6c64f; --sun-soft:#352b10;
+  --sky:#86a9ff; --sky-soft:#1a2648;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0e1424; --sheet:#151d33; --ink:#eef1f8; --ink-2:#a7b1c9; --line:#28324d; --grid:#161f37;
+  --poppy:#ff7a5c; --poppy-ink:#1a0d08; --poppy-soft:#3a1d18;
+  --leaf:#5fcf93; --leaf-soft:#15301f;
+  --sun:#f6c64f; --sun-soft:#352b10;
+  --sky:#86a9ff; --sky-soft:#1a2648;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important; transition:none!important} }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font:400 1.0625rem/1.6 var(--f-body);
+  background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:28px 28px; background-attachment:fixed;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:60; background:var(--sheet)}
+a{color:inherit}
+h1,h2,h3,h4{font-family:var(--f-display); line-height:1.1; text-wrap:balance; margin:0; letter-spacing:-.01em}
+h1{font-size:clamp(2.3rem, 5.4vw, 4.1rem); font-weight:800}
+h2{font-size:clamp(1.6rem, 3vw, 2.25rem); font-weight:800}
+h3{font-size:1.25rem; font-weight:700}
+p{margin:0}
+.wrap{max-width:var(--max); margin:0 auto; padding-left:var(--gut-l); padding-right:var(--gut-r)}
+.eyebrow{font:700 .78rem/1 var(--f-body); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2)}
+.muted{color:var(--ink-2)}
+:focus-visible{outline:3px solid var(--sky); outline-offset:2px; border-radius:6px}
+.skip{position:absolute; left:-999px; top:8px; background:var(--ink); color:var(--paper); padding:10px 14px; border-radius:8px; z-index:100}
+.skip:focus{left:16px}
+
+/* ---------- Kopfzeile ---------- */
+.top{position:sticky; top:env(safe-area-inset-top, 0px); z-index:50; background:color-mix(in srgb, var(--sheet) 92%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+.top .wrap{display:flex; align-items:center; gap:14px; min-height:68px}
+.brand{display:flex; align-items:center; gap:12px; text-decoration:none; min-width:0}
+.brand svg{flex:none}
+.brand b{display:block; font:800 1.02rem/1.1 var(--f-display)}
+.brand small{display:block; font-size:.8rem; color:var(--ink-2)}
+.nav{display:flex; gap:2px; margin-left:auto}
+.nav a{padding:8px 12px; white-space:nowrap; border-radius:999px; text-decoration:none; font-weight:700; font-size:.95rem; color:var(--ink-2)}
+.nav a:hover{background:var(--grid); color:var(--ink)}
+.nav a[aria-current="page"]{color:var(--ink); background:var(--grid)}
+.tools{display:flex; gap:6px; align-items:center}
+.iconbtn{display:inline-grid; place-items:center; width:42px; height:42px; border-radius:999px; border:1px solid var(--line); background:var(--sheet); color:var(--ink); cursor:pointer}
+.iconbtn:hover{border-color:var(--ink-2)}
+.searchbtn{display:inline-flex; align-items:center; gap:8px; height:42px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:var(--sheet); color:var(--ink-2); font:inherit; font-size:.95rem; cursor:pointer}
+.searchbtn kbd{font:700 .72rem var(--f-body); border:1px solid var(--line); border-radius:6px; padding:2px 6px}
+.btn{display:inline-flex; align-items:center; gap:8px; justify-content:center; min-height:46px; padding:0 18px; border-radius:999px; font:700 1rem var(--f-body); text-decoration:none; border:2px solid transparent; cursor:pointer}
+.btn-poppy{background:var(--poppy); color:var(--poppy-ink)}
+.btn-poppy:hover{filter:brightness(1.06)}
+.btn-ghost{border-color:var(--ink); color:var(--ink); background:transparent}
+.btn-ghost:hover{background:var(--ink); color:var(--paper)}
+.top .btn{min-height:42px; padding:0 16px}
+.menubtn{display:none}
+@media (max-width:1020px){
+  .nav{display:none}
+  .menubtn{display:inline-grid}
+  .tools{margin-left:auto}
+  .searchbtn span, .searchbtn kbd{display:none}
+  .searchbtn{width:42px; padding:0; justify-content:center}
+}
+@media (max-width:560px){ .top .btn-poppy span{display:none} .top .btn-poppy{width:42px; padding:0} .brand small{display:none} }
+.drawer{position:fixed; inset:0; z-index:70; background:rgb(10 15 30 / .45)}
+.drawer nav{position:absolute; right:0; top:0; bottom:0; width:min(360px, 88vw); background:var(--sheet); padding:calc(18px + env(safe-area-inset-top,0px)) max(20px, env(safe-area-inset-right,0px)) 24px 20px; overflow:auto; display:flex; flex-direction:column; gap:4px}
+.drawer nav a{padding:12px 10px; border-radius:10px; text-decoration:none; font-weight:700}
+.drawer nav a:hover{background:var(--grid)}
+.drawer h4{font:700 .75rem var(--f-body); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:14px 10px 4px}
+
+/* ---------- Startseite ---------- */
+.hero{padding-block:56px 36px}
+.hero .wrap{display:grid; grid-template-columns:1.15fr .85fr; gap:40px; align-items:start}
+.hero-copy{display:flex; flex-direction:column; gap:22px; min-width:0}
+.hero h1 em{font-style:normal; color:var(--poppy); position:relative; white-space:nowrap}
+.hero h1 em::after{content:""; position:absolute; left:-2%; right:-2%; bottom:.04em; height:.16em; background:var(--sun); opacity:.55; z-index:-1; border-radius:4px}
+.hero .lead{font-size:1.2rem; max-width:34em; color:var(--ink-2)}
+.hero-actions{display:flex; flex-wrap:wrap; gap:10px}
+.facts{display:flex; flex-wrap:wrap; gap:8px 22px; font-size:.95rem; color:var(--ink-2)}
+.facts b{color:var(--ink); font-family:var(--f-display); font-size:1.15rem; margin-right:4px}
+@media (max-width:900px){ .hero .wrap{grid-template-columns:1fr} .hero{padding-block:36px 24px} }
+
+/* Heute-Karte mit Tagesband */
+.today{background:var(--sheet); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow); padding:22px; display:flex; flex-direction:column; gap:16px; min-width:0}
+.today-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap}
+.today-head h3{font-size:1.1rem}
+.clock{font:800 1.9rem/1 var(--f-display); font-variant-numeric:tabular-nums}
+.status{display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:12px; background:var(--leaf-soft)}
+.status.warn{background:var(--sun-soft)} .status.alert{background:var(--poppy-soft)}
+.status .dot{flex:none; width:10px; height:10px; border-radius:50%; background:var(--leaf); margin-top:.45em}
+.status.warn .dot{background:var(--sun)} .status.alert .dot{background:var(--poppy)}
+.band{position:relative; padding-top:6px}
+.band-rows{display:grid; gap:6px}
+.band-row{display:grid; grid-template-columns:96px 1fr; gap:10px; align-items:center; font-size:.82rem}
+.band-row span{color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.track{position:relative; height:14px; background:var(--grid); border-radius:999px}
+.track i{position:absolute; top:0; bottom:0; border-radius:999px}
+.band-axis{display:grid; grid-template-columns:96px 1fr; gap:10px; font-size:.72rem; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.band-axis div{position:relative; height:16px}
+.band-axis b{position:absolute; transform:translateX(-50%); font-weight:400}
+.now{position:absolute; top:0; bottom:22px; width:2px; background:var(--poppy); border-radius:2px}
+.now::before{content:"jetzt"; position:absolute; top:-14px; left:50%; transform:translateX(-50%); font:700 .65rem var(--f-body); color:var(--poppy); text-transform:uppercase; letter-spacing:.08em}
+.next{display:flex; gap:14px; align-items:center; padding-top:14px; border-top:1px dashed var(--line); text-decoration:none}
+.datechip{flex:none; width:58px; text-align:center; border-radius:12px; border:2px solid var(--ink); padding:6px 0; line-height:1}
+.datechip b{display:block; font:800 1.45rem var(--f-display)}
+.datechip small{display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; margin-top:3px}
+
+/* Schnellzugriff */
+.quick{padding-block:8px 48px}
+.quick-grid{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px}
+.qt{display:flex; gap:14px; align-items:flex-start; padding:18px; border-radius:var(--r); background:var(--sheet); border:1px solid var(--line); text-decoration:none; transition:transform .15s, border-color .15s}
+.qt:hover{transform:translateY(-2px); border-color:var(--ink-2)}
+.qt .ic{flex:none; width:44px; height:44px; border-radius:12px; display:grid; place-items:center}
+.qt b{display:block; font:700 1.08rem var(--f-display)}
+.qt small{display:block; color:var(--ink-2); font-size:.92rem; line-height:1.4; margin-top:2px}
+@media (max-width:860px){ .quick-grid{grid-template-columns:repeat(2, minmax(0,1fr))} }
+@media (max-width:520px){ .quick-grid{grid-template-columns:1fr} }
+
+/* Abschnitte */
+.sec{padding-block:56px}
+.sec-head{display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap; margin-bottom:26px}
+.sec-head > div{display:flex; flex-direction:column; gap:8px; max-width:40em}
+.band-sheet{background:var(--sheet); border-block:1px solid var(--line)}
+.link{font-weight:700; text-decoration:none; border-bottom:2px solid var(--poppy); padding-bottom:1px}
+.link:hover{color:var(--poppy)}
+
+/* Termine */
+.dates{display:grid; gap:0; border-top:1px solid var(--line)}
+.date{display:grid; grid-template-columns:120px 1fr auto; gap:18px; align-items:baseline; padding:16px 4px; border-bottom:1px solid var(--line)}
+.date time{font:700 1rem var(--f-display); font-variant-numeric:tabular-nums}
+.date time small{display:block; font:400 .82rem var(--f-body); color:var(--ink-2)}
+.date p{min-width:0}
+.date .tag{font-size:.78rem; font-weight:700; padding:3px 10px; border-radius:999px; background:var(--grid); color:var(--ink-2); white-space:nowrap}
+.date.is-next{background:linear-gradient(90deg, var(--sun-soft), transparent)}
+.date.is-next .tag{background:var(--sun); color:#2a1d00}
+.date.is-past{opacity:.5}
+.date.is-free .tag{background:var(--leaf-soft); color:var(--leaf)}
+@media (max-width:620px){ .date{grid-template-columns:1fr; gap:4px} .date .tag{justify-self:start} }
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--sheet)}
+.seg button{border:0; background:transparent; font:700 .9rem var(--f-body); color:var(--ink-2); padding:7px 14px; border-radius:999px; cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+
+/* Lernen */
+.learn{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.learn a{background:var(--sheet); padding:22px 20px 24px; text-decoration:none; display:flex; flex-direction:column; gap:10px; min-height:190px}
+.learn a:hover{background:var(--paper)}
+.learn .swatch{width:36px; height:36px; border-radius:50% 50% 50% 8px}
+.learn p{color:var(--ink-2); font-size:.95rem; line-height:1.45}
+@media (max-width:960px){ .learn{grid-template-columns:repeat(2, minmax(0,1fr))} }
+@media (max-width:520px){ .learn{grid-template-columns:1fr} .learn a{min-height:0} }
+
+/* Schulleben */
+.life{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:18px}
+.story{display:flex; flex-direction:column; gap:10px; min-width:0}
+.ph{position:relative; aspect-ratio:4/3; max-width:100%; border-radius:var(--r); overflow:hidden; background:var(--c, var(--sky-soft))}
+.ph img{width:100%; height:100%; object-fit:cover; display:block}
+.ph .fb{position:absolute; inset:0; display:grid; place-items:center; font:800 3.2rem var(--f-display); color:var(--ink); opacity:.18}
+.ph img + .fb{display:none}
+.story time{font-size:.82rem; color:var(--ink-2); font-weight:700; text-transform:uppercase; letter-spacing:.08em}
+.story h3{font-size:1.12rem}
+.story p{color:var(--ink-2); font-size:.95rem}
+@media (max-width:860px){ .life{grid-template-columns:repeat(2, minmax(0,1fr))} }
+@media (max-width:520px){ .life{grid-template-columns:1fr} }
+
+/* Kontakt */
+.contact{display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:28px}
+.contact > div{display:flex; flex-direction:column; gap:12px; min-width:0}
+.kv{display:grid; gap:10px}
+.kv div{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); flex-wrap:wrap}
+.kv span{color:var(--ink-2); font-size:.92rem}
+.kv b{font-variant-numeric:tabular-nums; word-break:break-word}
+.copy{border:1px solid var(--line); background:var(--sheet); color:var(--ink-2); font:700 .78rem var(--f-body); border-radius:999px; padding:4px 10px; cursor:pointer}
+.copy:hover{color:var(--ink); border-color:var(--ink-2)}
+@media (max-width:900px){ .contact{grid-template-columns:1fr} }
+
+/* Fußzeile */
+footer{background:var(--ink); color:var(--paper); padding-block:44px calc(32px + env(safe-area-inset-bottom,0px)); margin-top:24px}
+footer .wrap{display:grid; grid-template-columns:1.3fr 1fr 1fr 1fr; gap:28px}
+footer h4{font:700 .78rem var(--f-body); letter-spacing:.12em; text-transform:uppercase; opacity:.7; margin-bottom:10px}
+footer a{display:block; text-decoration:none; padding:3px 0; opacity:.9}
+footer a:hover{opacity:1; text-decoration:underline}
+footer p{opacity:.8; font-size:.95rem}
+@media (max-width:860px){ footer .wrap{grid-template-columns:1fr 1fr} }
+@media (max-width:480px){ footer .wrap{grid-template-columns:1fr} }
+
+/* ---------- Unterseiten ---------- */
+.page-head{padding-block:44px 28px; border-bottom:1px solid var(--line); background:var(--sheet)}
+.page-head .wrap{display:flex; flex-direction:column; gap:12px}
+.crumbs{font-size:.9rem; color:var(--ink-2)}
+.crumbs a{text-decoration:none; font-weight:700}
+.crumbs a:hover{color:var(--poppy)}
+.page-head .lead{font-size:1.15rem; color:var(--ink-2); max-width:42em}
+.page{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:48px; padding-block:40px 64px}
+@media (max-width:960px){ .page{grid-template-columns:1fr; gap:32px} }
+.prose{display:flex; flex-direction:column; gap:18px; max-width:46em; min-width:0}
+.prose h2{font-size:1.6rem; margin-top:14px}
+.prose h3{margin-top:6px}
+.prose ul, .prose ol{margin:0; padding-left:1.3em; display:grid; gap:6px}
+.prose li::marker{color:var(--poppy); font-weight:700}
+.prose .note{font-size:.92rem; color:var(--ink-2); border-left:3px solid var(--sun); padding:4px 0 4px 14px}
+.prose a{text-decoration-color:var(--poppy); text-decoration-thickness:2px; text-underline-offset:3px}
+.tbl{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--sheet)}
+.tbl table{border-collapse:collapse; width:100%; font-size:.95rem; min-width:520px}
+.tbl th, .tbl td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+.tbl th{font:700 .8rem var(--f-body); letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); background:var(--paper)}
+.tbl tr:last-child td{border-bottom:0}
+.rule{display:grid; grid-template-columns:44px 1fr; gap:14px; align-items:start; padding:12px 0; border-bottom:1px solid var(--line)}
+.rule b{font:800 1.3rem var(--f-display); color:var(--poppy); font-variant-numeric:tabular-nums}
+.conseq{font-size:.92rem; color:var(--ink-2); margin-top:4px}
+.aside{display:flex; flex-direction:column; gap:14px; align-self:start; position:sticky; top:calc(88px + env(safe-area-inset-top,0px))}
+@media (max-width:960px){ .aside{position:static} }
+.box{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; flex-direction:column; gap:8px}
+.box h4{font:700 .78rem var(--f-body); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2)}
+.box a{text-decoration:none; font-weight:700; padding:4px 0}
+.box a:hover{color:var(--poppy)}
+.people{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap:10px}
+.person{background:var(--sheet); border:1px solid var(--line); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:2px}
+.person small{color:var(--ink-2); font-size:.85rem}
+.person b{font-family:var(--f-display); font-size:1.05rem}
+.compare{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.compare > div{border-radius:var(--r); padding:20px; display:flex; flex-direction:column; gap:10px}
+.compare .ogt{background:var(--sky-soft)} .compare .ggt{background:var(--leaf-soft)}
+.compare .big{font:800 1.8rem var(--f-display)}
+@media (max-width:620px){ .compare{grid-template-columns:1fr} }
+.steps{counter-reset:s; display:grid; gap:10px; list-style:none; padding:0!important}
+.steps li{counter-increment:s; display:grid; grid-template-columns:36px 1fr; gap:12px; align-items:start}
+.steps li::before{content:counter(s); width:32px; height:32px; border-radius:50%; background:var(--ink); color:var(--paper); display:grid; place-items:center; font:800 .95rem var(--f-display)}
+.pricelist{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,200px),1fr)); gap:10px}
+.price{background:var(--sheet); border:1px solid var(--line); border-radius:12px; padding:16px; display:flex; justify-content:space-between; gap:10px; align-items:baseline}
+.price b{font:800 1.4rem var(--f-display); font-variant-numeric:tabular-nums}
+.price.out{opacity:.55}
+
+/* Eltern-ABC */
+.abc-tools{display:flex; flex-direction:column; gap:12px}
+.field{display:flex; align-items:center; gap:10px; background:var(--sheet); border:2px solid var(--line); border-radius:12px; padding:0 14px}
+.field:focus-within{border-color:var(--ink)}
+.field input{flex:1; min-width:0; border:0; background:transparent; font:inherit; color:var(--ink); padding:13px 0; outline:none}
+.letters{display:flex; flex-wrap:wrap; gap:4px}
+.letters a{width:34px; height:34px; display:grid; place-items:center; border-radius:8px; text-decoration:none; font:700 .95rem var(--f-display); background:var(--sheet); border:1px solid var(--line)}
+.letters a:hover{background:var(--ink); color:var(--paper)}
+.abc{display:grid; gap:0}
+.abc details{border-bottom:1px solid var(--line)}
+.abc summary{cursor:pointer; list-style:none; display:flex; justify-content:space-between; gap:12px; align-items:center; padding:16px 2px; font:700 1.1rem var(--f-display)}
+.abc summary::-webkit-details-marker{display:none}
+.abc summary::after{content:"+"; font:800 1.4rem var(--f-display); color:var(--poppy); transition:transform .2s}
+.abc details[open] summary::after{transform:rotate(45deg)}
+.abc details > div{padding:0 2px 18px; color:var(--ink-2); max-width:44em}
+.abc .initial{font:800 .8rem var(--f-body); letter-spacing:.14em; color:var(--poppy); padding-top:22px}
+mark{background:var(--sun-soft); color:inherit; border-radius:3px; padding:0 2px}
+
+/* Suche */
+dialog{border:0; padding:0; background:transparent; width:min(680px, calc(100vw - 32px)); max-height:min(640px, 80vh); margin:12vh auto auto}
+dialog::backdrop{background:rgb(10 15 30 / .5); backdrop-filter:blur(2px)}
+.sbox{background:var(--sheet); color:var(--ink); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; max-height:inherit}
+.sbox .field{border:0; border-bottom:1px solid var(--line); border-radius:0; padding:4px 18px}
+.sres{overflow:auto; padding:8px}
+.sres a{display:block; padding:12px 14px; border-radius:10px; text-decoration:none}
+.sres a:hover, .sres a.on{background:var(--grid)}
+.sres b{display:block}
+.sres small{color:var(--ink-2); display:block; font-size:.88rem; line-height:1.4}
+.sres .empty{padding:18px; color:var(--ink-2)}
+
+.toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:999px; font-weight:700; z-index:90}
+.rise{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{transform:translateY(8px)} to{transform:none}}
+</style>
+<!--HEAD-END-->
+</head>
+<body>
+<!--BODY-START-->
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#start" aria-label="Christian-Schad-Grundschule, Startseite">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+        <rect width="44" height="44" rx="12" fill="var(--ink)"/>
+        <circle cx="16" cy="18" r="7" fill="var(--poppy)"/>
+        <circle cx="28" cy="16" r="5" fill="var(--sun)"/>
+        <path d="M10 33c6-7 18-7 24 0" stroke="var(--leaf)" stroke-width="4" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span><b>Christian-Schad-Grundschule</b><small>Aschaffenburg-Nilkheim</small></span>
+    </a>
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a href="#ueber-uns" data-area="schule">Schule</a>
+      <a href="#lernen" data-area="lernen">Lernen</a>
+      <a href="#ganztag" data-area="ganztag">Ganztag</a>
+      <a href="#abc" data-area="eltern">Eltern-ABC</a>
+      <a href="#termine" data-area="termine">Termine</a>
+      <a href="#kontakt" data-area="kontakt">Kontakt</a>
+    </nav>
+    <div class="tools">
+      <button class="searchbtn" id="openSearch" type="button" aria-label="Suche öffnen">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <span>Suchen</span><kbd>/</kbd>
+      </button>
+      <button class="iconbtn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <a class="btn btn-poppy" href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener" aria-label="Kind krankmelden (elternnachricht.de)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Krankmelden</span>
+      </a>
+      <button class="iconbtn menubtn" id="menuBtn" type="button" aria-label="Menü öffnen" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer" id="drawer" hidden>
+  <nav aria-label="Menü" id="drawerNav"></nav>
+</div>
+
+<main id="inhalt" tabindex="-1"></main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h4>Christian-Schad-Grundschule</h4>
+      <p>Staatliche Grundschule Aschaffenburg-Nilkheim<br>Lindenweg 14, 63741 Aschaffenburg<br>Telefon 06021 4561090</p>
+    </div>
+    <div>
+      <h4>Schule</h4>
+      <a href="#ueber-uns">Über uns</a><a href="#team">Team</a><a href="#elternbeirat">Elternbeirat</a><a href="#sozialarbeit">Schulsozialarbeit</a><a href="#hausordnung">Schulhausordnung</a>
+    </div>
+    <div>
+      <h4>Für Eltern</h4>
+      <a href="#abc">Eltern-ABC</a><a href="#termine">Termine</a><a href="#beratung">Beratung &amp; Hilfe</a><a href="#shop">Schulkleidung</a><a href="#russisch">По-русски / Українською</a>
+    </div>
+    <div>
+      <h4>Rechtliches</h4>
+      <a href="#impressum">Impressum</a><a href="#datenschutz">Datenschutz</a>
+      <p style="margin-top:12px; font-size:.82rem">© 2026 Christian-Schad-Grundschule</p>
+    </div>
+  </div>
+</footer>
+
+<dialog id="search" aria-label="Suche">
+  <div class="sbox">
+    <label class="field" for="q">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Suchen: Hausschuhe, Ganztag, Sprechstunde …" autocomplete="off">
+    </label>
+    <div class="sres" id="sres"></div>
+  </div>
+</dialog>
+
+<script>
+"use strict";
+/* ================= Daten ================= */
+const S = {
+  tel:"06021 4561090", telIntl:"+4960214561090", fax:"06021 4561099",
+  mail:"info@christian-schad-schule.de", rektor:"rektor@christian-schad-schule.de",
+  addr:"Lindenweg 14, 63741 Aschaffenburg",
+  map:"https://goo.gl/maps/vwzMqMJZB4PycGnn8",
+  krank:"https://elternnachricht.de/fehlzeiten",
+  blog:"https://aschaffenburg.taskcards.app/#/board/dc0c51fb-669a-4e37-aba5-2b065768a05f",
+  elterninfo:"https://aschaffenburg.taskcards.app/#/board/b592fefe-93bb-42b5-89f6-bf27e9e445d8",
+  old:"https://www.christian-schad-volksschule.de",
+};
+const IMG = S.old + "/wp-content/uploads/";
+
+/* Termine Schuljahr 2026/27 */
+const TERMINE = [
+  {d:"2026-09-15", t:"Erster Schultag im Schuljahr 2026/27", x:"Einschulungsfeier in den Klassen 1a, 1b, 1c, anschließend ökumenischer Schulanfangs-Gottesdienst in St. Kilian. Jahrgänge 2 bis 4: Unterricht von 8:00 bis 11:20 Uhr.", tag:"Schulstart"},
+  {d:"2026-09-16", h:"19:00", t:"Klassenelternabend Jahrgang 1", x:"mit Wahl der Klassenelternsprecher", tag:"Elternabend"},
+  {d:"2026-09-18", h:"19:00", t:"Schulanfangsgottesdienst für die Jahrgänge 2, 3 und 4", tag:"Gottesdienst"},
+  {d:"2026-09-22", h:"19:00", t:"Klassenelternabend Jahrgang 2", x:"mit Wahl der Klassenelternsprecher", tag:"Elternabend"},
+  {d:"2026-09-23", h:"19:00", t:"Klassenelternabend Jahrgang 3", x:"mit Wahl der Klassenelternsprecher", tag:"Elternabend"},
+  {d:"2026-09-24", h:"19:00", t:"Klassenelternabend Jahrgang 4", x:"mit Wahl der Klassenelternsprecher", tag:"Elternabend"},
+  {d:"2026-10-23", t:"Feier der Amtseinführung von Rektorin Wolf", x:"Unterrichtsende 11:00 Uhr", tag:"Fest"},
+  {d:"2026-11-16", t:"Mathematik-Meisterschaft, Runde 1", x:"Jahrgang 4", tag:"Wettbewerb"},
+  {d:"2026-11-18", t:"Buß- und Bettag: unterrichtsfrei", x:"An allen bayerischen Schulen unterrichtsfrei. Kein offener und kein gebundener Ganztag.", tag:"frei", free:true},
+  {d:"2026-11-24", t:"Elternsprechabend Jahrgänge 2, 3 und 4", tag:"Sprechabend"},
+  {d:"2026-11-25", t:"Elternsprechabend Jahrgang 1", tag:"Sprechabend"},
+  {d:"2026-12-03", h:"19:00", t:"1. Informationsabend zur Einschulung 2027/28", x:"Vorstellung der Bildungs- und Betreuungsangebote: gebundener Ganztag, offener Ganztag, Kurz- und Langgruppen, Hort.", tag:"Einschulung"},
+  {d:"2027-02-17", h:"19:00", t:"2. Informationsabend zur Einschulung 2027/28", x:"Ausgabe der Anmeldeformulare und Erläuterungen zum Screening.", tag:"Einschulung"},
+  {d:"2027-06-24", h:"19:00", t:"3. Informationsabend zur Einschulung 2027/28", x:"Hinweise zur Materialliste, zum ersten Schultag und zur ersten Schulwoche.", tag:"Einschulung"},
+];
+
+/* Eltern-ABC */
+const ABC = [
+  ["Ankommen und Betreten des Schulhauses","Die Lehrkraft holt die Kinder um 7:45 Uhr im Pausenhof ab. Ab 7:30 Uhr gibt es dort eine Frühbetreuung. Bitte begleiten Sie Ihr Kind nicht bis ins Schulhaus und warten Sie auch beim Abholen draußen. Den Schulweg sollte Ihr Kind möglichst bald selbstständig zu Fuß gehen, am besten mit Nachbarskindern."],
+  ["Copyright","Arbeitsblätter, Proben und Lernzielkontrollen sind geistiges Eigentum der jeweiligen Lehrkraft. Kopieren, Fotografieren und Weitergeben, auch per WhatsApp, ist nicht erlaubt. Fragen zu einer Probe richten Sie bitte direkt an die Lehrkraft."],
+  ["Datenschutz","Auf dem Schulgelände und im Schulhaus ist das Fotografieren von Kindern nicht erlaubt. Fotos von Schulveranstaltungen, auf denen andere Personen zu sehen sind, dürfen nicht im Internet, per WhatsApp oder auf Plattformen wie Facebook veröffentlicht werden."],
+  ["Elternhausaufgabe","Ihr Kind bringt eine Mitteilung für Sie mit. Bitte lesen Sie sie sorgfältig; oft wird eine Rückmeldung erbeten."],
+  ["Entschuldigung bei Krankheit","Kranke Kinder bitte <b>vor 7:40 Uhr</b> telefonisch unter <b>06021 4561090</b> oder online über <a href=\"https://elternnachricht.de/fehlzeiten\" target=\"_blank\" rel=\"noopener\">elternnachricht.de</a> entschuldigen. Eine ärztliche Bescheinigung ist erst ab dem dritten Krankheitstag nötig."],
+  ["Feier von Geburtstagen","In der Klasse wird ein Ständchen gesungen und das Geburtstagskind hochgelebt. Mitgebrachte Süßigkeiten zum Verteilen sind nicht erwünscht. Erlaubt ist ein kleines Spiel für das Klassenzimmer."],
+  ["Ferienordnung","Urlaube müssen in den Ferien liegen. Eine Befreiung vom Unterricht ist nur in begründeten Ausnahmefällen möglich und muss schriftlich bei der Schulleitung beantragt werden."],
+  ["Handy und Smartwatch","Digitale Geräte dürfen nur auf Aufforderung der Lehrkraft für den Unterricht genutzt werden. Ausgeschaltet dürfen sie in der Schultasche bleiben; besser ist es, sie gar nicht mitzubringen. Die Regel folgt dem Bayerischen Erziehungs- und Unterrichtsgesetz und ist mit dem Datenschutzbeauftragten und dem medienpädagogischen Berater am Schulamt Aschaffenburg abgestimmt."],
+  ["Hausaufgaben","Hausaufgaben wiederholen den Stoff und bereiten auf den nächsten Tag vor. Bitte kontrollieren Sie, ob sie vollständig erledigt sind. Kinder der Ganztagsklassen haben auch am Wochenende Aufgaben."],
+  ["Hausschuhe","Im Klassenzimmer tragen alle Hausschuhe. Das hält den Schmutz von Straße und Pausenhof draußen und sorgt besonders im Winter für ein angenehmes Raumklima."],
+  ["Informationen an die Lehrkraft","Dringende Mitteilungen schreiben Sie am besten ins Hausaufgabenheft; Ihr Kind zeigt sie vor Unterrichtsbeginn vor. E-Mails werden meist erst nach dem Unterricht gelesen."],
+  ["Kleidung","Die Pausen finden meist im Freien statt, auch bei leichtem Regen. Bitte achten Sie auf wetterfeste Kleidung."],
+  ["Lernzielkontrollen und Proben","Proben werden mit nach Hause gegeben und kommen unterschrieben zurück. Die Schule bewahrt sie auf. Auch hier gilt das Copyright der Lehrkraft."],
+  ["Mitarbeit der Eltern","Eltern sind zu Elternabenden, Schulfesten, Projekttagen und weiteren Veranstaltungen eingeladen. Das stärkt den Austausch und die Gemeinschaft."],
+  ["Mittagessen","Nur Kinder im Ganztag oder Hort essen in der Mensa, betreut vom Personal. Das Essen wird bis Mittwoch, 11 Uhr, der Vorwoche online bei <a href=\"https://www.bantschow-kids.de\" target=\"_blank\" rel=\"noopener\">Bantschow Kids</a> bestellt."],
+  ["Pausenbrot","Süßigkeiten und süße Brotaufstriche sind nicht erwünscht. Mittwochs gibt es Obst aus dem Schulobstprogramm. Gesunde Ernährung ist ein Unterrichtsprinzip."],
+  ["Sportunterricht","Turnbeutel können von Montag bis Freitag in der Schule bleiben und gehen am Wochenende mit nach Hause. An Sporttagen bitte keinen Schmuck tragen, vor allem keinen Ohrschmuck. Lange Haare werden zusammengebunden."],
+  ["Sprechstunde","Jede Lehrkraft bietet einmal pro Woche vormittags eine Sprechstunde an. Berufstätige Eltern können einmal im Jahr eine Sprechstunde am frühen Abend nutzen. Bitte melden Sie sich vorher an, zum Beispiel über das Hausaufgabenheft, per E-Mail oder telefonisch. Während des Unterrichts sind keine Gespräche möglich. Auf Wunsch gibt es auch Termine außerhalb der Sprechstunde."],
+  ["Trinken","Im Schulhaus gibt es einen Trinkwasserspender zum Auffüllen der Trinkflaschen. Aromatisierte oder gesüßte Getränke sind nicht erwünscht, ebenso Air-up-Flaschen mit künstlichen Duftstoffen."],
+  ["Unterrichtsausfall","Verlässliche Unterrichtszeiten sind der Schule wichtig. Bei Ausfällen werden Sie in der Regel rechtzeitig informiert. Kann Ihr Kind nicht früher nach Hause, melden Sie es der Klassenlehrkraft; es wird dann bis zum regulären Unterrichtsende betreut."],
+  ["Vergleichs- und Orientierungsarbeiten","Bayernweite, standardisierte Tests: In der 2. Klasse schreiben alle die Orientierungsarbeit OA-2 in Deutsch, in der 3. Klasse VERA-3 in Deutsch und Mathematik."],
+  ["Zeugnis","Am Schuljahresende gibt es ein Jahreszeugnis. In den Klassen 1 bis 3 ersetzen Lernentwicklungsgespräche zum Halbjahr das Zwischenzeugnis. In der 4. Klasse gibt es im Januar eine Notenstandsmitteilung und im Mai das Übertrittszeugnis."],
+];
+
+/* Schulleben (aus der Galerie) */
+const LEBEN = [
+  {m:"April 2026", t:"Fußballtag mit dem VfR", x:"Training mit dem VfR für die 1. und 2. Klassen, Turnier aller 3. und 4. Klassen. Schul-Siegerklasse: die 3aGT.", img:"2026/04/Alle-3.-und-4.-Klassen-spielen-gegeneinander-und-ermitteln-die-Schul-Siegerklasse.jpeg", c:"var(--leaf-soft)", k:"⚽"},
+  {m:"April 2026", t:"Sammelwoche für den Bund Naturschutz", x:"Die 2. Klassen sammeln für den BN. Schon im Herbst 2025 hat eine BN-Mitarbeiterin beim Unterrichtsgang zur Hecke vieles erklärt.", c:"var(--leaf-soft)", k:"BN"},
+  {m:"Schuljahr 2025/26", t:"Mathewettbewerb: unsere Schulsieger", x:"Die stolzen Schulsieger heißen Jannik und Noemi.", c:"var(--sun-soft)", k:"1+1"},
+  {m:"Januar 2026", t:"Schneetag", x:"Bei der Schulschließung am 12.1.26 bauen die Kinder in der Betreuung einen Schneemann.", c:"var(--sky-soft)", k:"❄"},
+  {m:"Dezember 2025", t:"Adventssingen mit den Kitas", x:"Unsere Erstklässler singen mit den Vorschulkindern der Nilkheimer Kitas. Leitung: Frau Grose und Musiklehrer Herr Oberhofer.", c:"var(--poppy-soft)", k:"♪"},
+  {m:"Dezember 2025", t:"Päckchen für das Sozialkaufhaus", x:"Spendenpäckchen-Aktion für das Diakonie-Sozialkaufhaus Aschaffenburg.", c:"var(--poppy-soft)", k:"♥"},
+  {m:"Dezember 2025", t:"Judokurs vor den Weihnachtsferien", x:"Kursleiter: Detlev Staffa.", c:"var(--sky-soft)", k:"柔"},
+  {m:"November 2025", t:"AG Jugend und Technik", x:"Gesponsert von der Firma Hörnig Bau, Kursleitung: Sebastian Kunkel.", c:"var(--sun-soft)", k:"⚙"},
+  {m:"Oktober 2025", t:"Schulobst für alle Klassen", x:"Regelmäßig frisches Obst aus dem EU-Schulobstprogramm. Danke an das Schnibbelteam des Elternbeirats!", c:"var(--leaf-soft)", k:"🍎"},
+];
+
+/* Unterseiten */
+const P = {};
+const tbl = (head, rows) => `<div class="tbl"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+const ext = (url, txt) => `<a href="${url}" target="_blank" rel="noopener">${txt}</a>`;
+const rules = (list) => list.map((r,i)=>`<div class="rule"><b>${String(r.n ?? i+1).padStart(2,"0")}</b><div>${r.t}${r.f?`<div class="conseq">Folge bei Verstoß: … ${r.f}</div>`:""}</div></div>`).join("");
+
+P["ueber-uns"] = {area:"schule", title:"Über uns", lead:"Eine staatliche Grundschule für den Stadtteil Nilkheim: rund 250 Kinder, zehn Regelklassen und bis zu zwei gebundene Ganztagsklassen.", body:`
+<h2>Unser Haus</h2>
+<p>Das Schulhaus wurde über die Jahre mehrfach erweitert. Im Altbau liegen große Klassenzimmer, im Neubau helle, moderne Räume. Alle Klassenzimmer haben digitale Tafeln oder Beamer und Laptops. Im ganzen Haus gibt es Arbeits- und Lernecken.</p>
+<ul>
+<li><b>Mensa</b> für das gemeinsame Mittagessen mit dem Hort, für Veranstaltungen, Elternabende und Projekte</li>
+<li><b>Musiksaal</b> für alle Klassen, Singklasse, Chor, WIM („Wir musizieren“) und den Instrumentalunterricht der Musikschule</li>
+<li><b>Handarbeits- und Werkraum</b> für kreatives Arbeiten</li>
+<li><b>Turnhalle</b> und eigener <b>Sportplatz</b>; Ganztagskinder haben zusätzlich Judo und Handball</li>
+<li><b>Spielzimmer, Gruppenraum und Horträume</b> für die Betreuung außerhalb des Unterrichts</li>
+<li><b>Naturnaher Pausenhof</b> mit Klettergerüst und Rutsche, auch zum Lernen im Freien</li>
+</ul>
+<h2>Unsere Arbeit</h2>
+<p>Der Unterricht folgt dem ${ext("https://www.lehrplanplus.bayern.de/","LehrplanPlus für die Grundschule in Bayern")}. Lehrkräfte und pädagogisches Personal stimmen Unterricht und Betreuung eng aufeinander ab, damit die Kinder den ganzen Tag in einem kindgerechten Umfeld lernen und sich wohlfühlen.</p>
+<h3>Der Unterricht ist geprägt von</h3>
+<ul>
+<li>vielfältigen Lernformen: schüler-, projekt- und materialorientierter Unterricht, Wochenplanarbeit, digitale Geräte</li>
+<li>Elementen, die das Miteinander stärken: wechselnde Sozialformen, Aufgaben für die Gemeinschaft, Klassenrat, jahrgangsübergreifende Projekte</li>
+<li>Besuchen außerschulischer Lernorte: Museen, Theater, Stadtführungen, naturkundliche Exkursionen</li>
+</ul>
+<h3>Das Kollegium steht für</h3>
+<ul>
+<li>ein aufgeschlossenes, positives Verhältnis zu den Kindern</li>
+<li>einen respektvollen, wertschätzenden Umgang mit allen</li>
+<li>Unterricht und Erziehung nach gemeinsam erarbeiteten Zielen und Werten</li>
+<li>pädagogische Konferenzen und regelmäßige Arbeit im Jahrgangsteam</li>
+<li>Offenheit für Neues und regelmäßige Fortbildung</li>
+</ul>
+<h3>Zusammenarbeit mit Eltern</h3>
+<p>Wir verstehen uns als Bildungs- und Erziehungspartner der Familien. Das persönliche Gespräch hat einen hohen Stellenwert: in Sprechstunden, an Elternsprechtagen und Elternabenden. Für schnelle Nachrichten nutzen wir Elternnachricht. Eltern bringen sich ein, etwa beim wöchentlichen Schulobst-Schnibbeln, mit Expertenvorträgen, Vorleseabenden, Frühstücksaktionen, als Begleitung bei Ausflügen und bei Festen.</p>
+<h2>Unser Namensgeber</h2>
+<p>Christian Schad (1894–1982) war ein Maler der Neuen Sachlichkeit. Ab 1942 lebte und arbeitete er in Aschaffenburg.</p>
+<p><a href="#leitbild">Unser Leitbild ansehen →</a></p>`};
+
+P["team"] = {area:"schule", title:"Unser Team", lead:"Lehrkräfte im Schuljahr 2026/27.", body:`
+<h2>Schulleitung</h2>
+<div class="people"><div class="person"><small>Rektorin</small><b>Doris Wolf</b></div><div class="person"><small>Konrektor</small><b>Andreas Weniger</b></div></div>
+<h2>Klassenleitungen</h2>
+<div class="people">${[["1a","Frau Busse"],["1b","Frau Fecher"],["1c","Frau Grose"],["2a","Frau Kuffel"],["2b","Frau Breid"],["2c","Frau Hufnagel"],["3aGT","Frau von Campenhausen"],["3b","Frau Bedenk"],["3c","Frau Eberlein"],["4aGT","Frau Schober"],["4b","Frau Müller"],["4c","Herr Weniger"]].map(([k,n])=>`<div class="person"><small>Klasse ${k}${k.includes("GT")?" · Ganztag":""}</small><b>${n}</b></div>`).join("")}</div>
+<h2>Lehrkräfte ohne Klassenleitung</h2>
+<div class="people">${["Frau Brenz","Frau Bergmann","Frau Neuburger","Frau Hofmann","Frau Meier|abgeordnet von der GS Grünewald","Frau Auer|abgeordnet von der GS Grünewald","Frau Löffelmann|abgeordnet von der GS Johannesberg"].map(s=>{const [n,z]=s.split("|");return `<div class="person"><small>${z||"Lehrkraft"}</small><b>${n}</b></div>`}).join("")}</div>
+<h2>Werken und Gestalten</h2>
+<div class="people"><div class="person"><small>Fachlehrkraft</small><b>Frau Britta Wolf</b></div><div class="person"><small>Fachlehrkraft</small><b>Frau Zahn</b></div></div>
+<h2>Bundesfreiwilligendienst</h2>
+<div class="people"><div class="person"><small>BFD</small><b>Frau Schymura</b></div></div>
+<h2>Weitere Ansprechpersonen</h2>
+<div class="people">
+<div class="person"><small>Sekretariat</small><b>Sandra Bilz</b></div>
+<div class="person"><small>Hauswartin</small><b>Zsuzsanna Zehnder</b></div>
+<div class="person"><small>Schulsozialpädagogin</small><b>Michaela Gröpler-Braun</b></div>
+<div class="person"><small>Beratungslehrerin</small><b>Regina Kauer-Quast</b></div>
+<div class="person"><small>Schulpsychologin</small><b>Barbara Hufner</b></div>
+</div>`};
+
+P["elternbeirat"] = {area:"schule", title:"Elternbeirat", lead:"Das Bindeglied zwischen Elternschaft und Schule. Amtszeit 2025 bis 2027.", body:`
+<div class="people">
+<div class="person"><small>Vorsitzende</small><b>Nina Wensauer-Grimm</b></div>
+<div class="person"><small>Stellv. Vorsitzende</small><b>Bettina Stürmer</b></div>
+<div class="person"><small>Kassenwart</small><b>Jörg Fecher</b></div>
+<div class="person"><small>Kassenprüferinnen</small><b>Daniela Krimm, Nicole Beckert</b></div>
+<div class="person"><small>Schriftführerin</small><b>Beate Schmitt</b></div>
+<div class="person"><small>Weitere Mitglieder</small><b>Susanne Demuth, Dominika Hauber, Peter Maisa, Alice Völkl</b></div>
+</div>
+<p>„Wir bedanken uns für das Vertrauen und freuen uns, das Bindeglied zwischen Elternschaft und Schule zu sein, um auch Ihre Interessen zu vertreten. Wann immer Sie Fragen haben, unterstützen oder sich einbringen möchten, wenden Sie sich gerne an uns.“</p>
+<p>Sie erreichen den Elternbeirat persönlich oder per E-Mail: <b>elternbeirat.christian-schad-schule@gmx.de</b> <button class="copy" data-copy="elternbeirat.christian-schad-schule@gmx.de" type="button">Kopieren</button></p>
+<p class="note">Der Elternbeirat organisiert unter anderem das Schulobst-Schnibbelteam und die Bewirtung bei der Einschulungsfeier.</p>`};
+
+P["partnerschaft"] = {area:"schule", title:"Elternhaus und Schule", lead:"Erziehungspartnerschaft zum Wohl des Kindes, nach den Empfehlungen des Bayerischen Kultusministeriums.", body:`
+<h2>Partnerschaft als Grundlage</h2>
+<p>Grundlage sind gegenseitiges Vertrauen und Respekt. Eltern und Schule verstehen sich als gemeinsame Erziehungspartner. Das gemeinsame Ziel ist die individuelle Förderung jedes Kindes; die Sicht der Eltern und die pädagogische Sicht der Lehrkräfte ergänzen sich.</p>
+<h2>Lernentwicklungsgespräche in den Klassen 1 bis 3</h2>
+<p>In den Jahrgangsstufen 1 bis 3 ersetzen Lernentwicklungsgespräche das Zwischenzeugnis. Eltern, Lehrkraft und Kind sprechen gemeinsam über Lernfortschritte, Stärken und mögliche Herausforderungen, um das Lernen gezielt zu fördern.</p>
+<h2>Mitwirkung im Schulleben</h2>
+<p>Das Engagement der Eltern ist ausdrücklich willkommen: bei Elternabenden, Schulfesten, Projekttagen und weiteren Veranstaltungen.</p>
+<h2>Kommunikation</h2>
+<p>Über Elternnachricht tauschen sich Lehrkräfte und Eltern zeitnah aus: Informationen, Termine, Hausaufgaben, Lernmaterial und persönliche Rückmeldungen.</p>`};
+
+P["hausordnung"] = {area:"schule", title:"Schulhausordnung", lead:"Regeln für unser Zusammenleben und den Umgang mit Sachen.", body:`
+<h2>Regeln für unser Zusammenleben</h2>
+${rules([
+{t:"Ich bin freundlich, rücksichtsvoll und höflich!"},
+{t:"Ich achte auf Pünktlichkeit und gehe um 7:45 Uhr ins Klassenzimmer!"},
+{t:"Ich gehe im ganzen Schulhaus langsam und auf Treppen auf der rechten Seite!", f:"muss die Regeln für unser Zusammenleben abschreiben."},
+{t:"Im Schulhaus trage ich Hausschuhe!"},
+{t:"Auf dem Pausenhof wird das Fahrrad oder der Roller geschoben!"},
+{t:"Kaugummikauen ist verboten!"},
+{t:"Wir wollen keine Gewalt! Auch Schimpfwörter können verletzen!", f:"muss eine ausführliche Entschuldigung schreiben."},
+{t:"Müll werfe ich in die Abfalleimer!", f:"übernimmt eine Woche lang den Ordnungsdienst."},
+])}
+<h2>Regeln für den Umgang mit Sachen</h2>
+${rules([
+{n:9, t:"Ich halte meinen Arbeitsplatz sauber und hinterlasse jeden Raum ordentlich!", f:"übernimmt eine Woche lang den Ordnungsdienst."},
+{n:10, t:"Ich achte auf fremdes Eigentum! Fundsachen gebe ich bei der Klassenlehrerin oder der Hausmeisterin ab!", f:"muss den Schaden ersetzen."},
+{n:11, t:"Schulbücher werden eingebunden und sorgsam behandelt!"},
+{n:12, t:"Möbel im Haus und Spielgeräte im Pausenhof behandle ich schonend!"},
+{n:13, t:"Musikinstrumente, Sportgeräte und Computer benutze ich nur mit Erlaubnis der Lehrkräfte!", f:"darf die Gegenstände nicht mehr benutzen."},
+{n:14, t:"Unterrichtsfremde Gegenstände lasse ich zu Hause!", f:"bekommt den Gegenstand für eine Woche abgenommen."},
+])}
+<p><a href="#pausenordnung">Zur Pausenordnung →</a></p>`};
+
+P["pausenordnung"] = {area:"schule", title:"Pausenordnung", lead:"Damit die Pause für alle schön und sicher ist.", body:`
+<h2>Diese Regeln gelten</h2>
+${rules([
+{t:"Wir verbringen die Pause draußen auf dem Pausenhof. Jeder denkt an wettergerechte Kleidung."},
+{t:"Bei schlechtem Wetter folgen wir der Durchsage. Die Regenpause findet in den Klassenzimmern statt."},
+{t:"Die Toiletten benutzen wir vor oder nach der Pause. Ausnahmen besprechen wir mit der Aufsicht."},
+{t:"Den Abfall werfen wir in den Mülleimer."},
+{t:"Außer den Pausenhelfern betritt niemand während der Pause den Fahrradplatz."},
+{t:"Ballspielen sowie das Werfen und Kicken von Gegenständen ist verboten (Verletzungsgefahr!)."},
+{t:"Konflikte besprechen wir miteinander. Wenn wir uns nicht einigen können, holen wir eine Pausenaufsicht."},
+{t:"Beim Gong stellen wir uns am Sammelplatz unserer Klasse in einer Zweierreihe auf. Jetzt ist auch das Tischtennisspiel zu Ende!"},
+{t:"Wir benutzen Brotdosen mit Namen und nehmen sie am Ende der Pause wieder mit."},
+])}
+<h2>Wer sich nicht daran hält, muss …</h2>
+<ul>
+<li>… die Pausenordnung abschreiben,</li>
+<li>… die Pause vor dem Lehrerzimmer verbringen,</li>
+<li>… bei Schimpfwörtern oder Gewalt eine ausführliche Entschuldigung schreiben,</li>
+<li>… seinen Schläger abgeben und hat eine Woche Tischtennisverbot,</li>
+<li>… wissen, dass namenlose, herumliegende Brotdosen entsorgt werden.</li>
+</ul>
+<p class="note">Bei groben oder wiederholten Regelverstößen erhalten die Eltern eine offizielle schriftliche Mitteilung.</p>`};
+
+P["sozialarbeit"] = {area:"schule", title:"Schulsozialarbeit", lead:"Michaela Gröpler-Braun, Diplom-Sozialpädagogin (FH), im Programm „Schule öffnet sich“.", body:`
+<div class="tbl"><table><thead><tr><th>Tag</th><th>Christian-Schad-Grundschule</th></tr></thead><tbody>
+<tr><td>Dienstag</td><td>8:00 – 12:00 Uhr</td></tr><tr><td>Donnerstag</td><td>11:00 – 14:00 Uhr</td></tr><tr><td>Freitag</td><td>8:00 – 13:00 Uhr</td></tr></tbody></table></div>
+<p class="note">Montags und mittwochs (8:00 – 12:15 Uhr) arbeitet Frau Gröpler-Braun an der Erthal-Grundschule in Aschaffenburg-Leider.</p>
+<p>Telefon <b>06021 4561092</b> · E-Mail <b>schulsozialarbeit@christian-schad-schule.de</b> <button class="copy" data-copy="schulsozialarbeit@christian-schad-schule.de" type="button">Kopieren</button></p>
+<h2>Was macht eine Schulsozialpädagogin?</h2>
+<p>Sie ist Fachkraft für soziale Fragen aller Kinder in der Schule. Sie arbeitet vorbeugend in der Klasse, in Kleingruppen und bei Bedarf in kurzen Einzelgesprächen, mit Spielen und Projekten zu bestimmten Themen. Seit September 2023 ist sie an unserer Schule.</p>
+<h3>Zum Beispiel</h3>
+<ul><li>Konflikte gewaltfrei lösen</li><li>Ängste bewältigen</li><li>Freundschaften knüpfen</li><li>die Klasse spielerisch zusammenführen, sodass niemand ausgeschlossen wird</li><li>Verschiedenheit erkennen und einander akzeptieren</li></ul>
+<h3>Ziele</h3>
+<ul><li>Gewalt und Mobbing vorbeugen</li><li>Werte und Persönlichkeit fördern</li><li>Sozialkompetenz und Konfliktlösung stärken</li><li>Klassengemeinschaft und Integration unterstützen</li></ul>`};
+
+P["beratung"] = {area:"eltern", title:"Beratung und Hilfe", lead:"Wenn es schwierig wird: Ansprechpersonen an der Schule und Hilfe in Stadt und Landkreis Aschaffenburg.", body:`
+<h2>An der Schule</h2>
+<div class="people">
+<div class="person"><small>Schulsozialpädagogin</small><b>Michaela Gröpler-Braun</b><small>06021 4561092 · <a href="#sozialarbeit">Sprechzeiten</a></small></div>
+<div class="person"><small>Beratungslehrerin</small><b>Regina Kauer-Quast</b><small>Termine nach Vereinbarung<br>kauerquast-beratung@web.de</small></div>
+<div class="person"><small>Schulpsychologin</small><b>Barbara Hufner</b><small>Telefonsprechstunde Mi 10:30–11:30 Uhr<br>06021 394222 · Barbara.Hufner@lra-ab.bayern.de</small></div>
+</div>
+<h2>Hilfe vor Ort</h2>
+${tbl(["Stelle","Telefon"],[
+["Klinikum Aschaffenburg, Kinder- und Jugendpsychiatrie","06021 32-0"],
+["Beratungsstelle für Kinder, Jugendliche und Eltern (Stadt)","06021 392220"],
+["Beratungsstelle für Kinder, Jugendliche und Eltern (Landkreis)","06021 392301"],
+["Sefra e.V. (für Frauen)","06021 24728"],
+["AWO Sozialpsychiatrischer Dienst (für Erwachsene)","06021 902500"],
+["Jugendamt Stadt Aschaffenburg","06021 3301324"],
+["Jugendamt Landkreis Aschaffenburg","06021 394553"],
+["Allgemeiner Sozialer Dienst","06021 394375"],
+["Gesundheitsamt","06021 394100 (Zentrale), 06021 394184 (ärztlicher Dienst)"],
+["Staatliche Schulberatungsstelle Unterfranken","0931 7945410 · mail@schulberatung-unterfranken.de"],
+])}
+<h2>Bundesweit und online</h2>
+<ul>
+<li><b>Nummer gegen Kummer:</b> 116 111 oder 0800 1110888, Mo–Sa 14–20 Uhr · ${ext("https://www.nummergegenkummer.de","nummergegenkummer.de")}</li>
+<li>${ext("https://jugend.bke-beratung.de","jugend.bke-beratung.de")}: Online-Jugendberatung</li>
+<li>${ext("https://www.telefonseelsorge.de","telefonseelsorge.de")}: Mail- und Chatberatung</li>
+<li>${ext("https://www.youth-life-line.de","youth-life-line.de")}: Online-Beratung von Jugendlichen für Jugendliche</li>
+</ul>
+<h2>Hilfe für Geflüchtete aus der Ukraine</h2>
+<p>Die Stadt Aschaffenburg bündelt Informationen: ${ext("https://www.aschaffenburg.de/Aktuelles/Ukraine-Hilfe/DE_index_6550.html","Ukraine-Hilfe (Deutsch)")} · ${ext("https://www.aschaffenburg.de/RU_index_1000.html","Информация на русском")}</p>`};
+
+P["ganztag"] = {area:"ganztag", title:"Ganztag", lead:"Zwei Modelle für Betreuung und Lernen über den Vormittag hinaus: der offene Ganztag (OGT) und der gebundene Ganztag (GGT).", body:`
+<div class="compare">
+<div class="ogt"><span class="eyebrow">Offener Ganztag · OGT</span><span class="big">bis 14 oder 16 Uhr</span><p>Freiwillig, an mindestens 2 festen Tagen pro Woche. Kurzgruppe bis 14:00 Uhr, Langgruppe bis 16:00 Uhr. Gruppen aus mehreren Klassen. Partner: AWO Kreisverband Aschaffenburg e.V.</p></div>
+<div class="ggt"><span class="eyebrow">Gebundener Ganztag · GGT</span><span class="big">Mo–Do bis 15:30 Uhr</span><p>Eine ganze Klasse lernt den ganzen Tag zusammen. Unterricht, Bewegung, Musik und Spiel wechseln sich ab. Die Teilnahme an allen 4 Tagen ist verpflichtend. Derzeit die Klassen 3aGT und 4aGT.</p></div>
+</div>
+<h2>Im Vergleich</h2>
+${tbl(["","Offener Ganztag","Gebundener Ganztag"],[
+["Teilnahme","Freiwillig, mindestens 2 Tage pro Woche, begrenzte Plätze","Verpflichtend für die angemeldeten Kinder, begrenzte Plätze pro Jahrgang"],
+["Zeiten","Nach dem Unterricht, Kurzgruppe bis 14 Uhr, Langgruppe bis 16 Uhr","Montag bis Donnerstag 7:30 bis 15:30 Uhr"],
+["Tagesablauf","Vormittags Unterricht, danach Betreuung in eigenen Spielzimmern","Klassenunterricht wechselt mit musischen und sportlichen Angeboten und Spiel in der Mittagspause"],
+["Inhalt","Betreuung und Freizeitangebote","Unterricht, Lern- und Freizeitangebote greifen ineinander"],
+["Mittagessen","Optional in der Mensa","Gemeinsames warmes Mittagessen in der Mensa, verpflichtend"],
+["Organisation","AWO Kreisverband Aschaffenburg und Schulleitung","Schule, Betreuung in Kooperation mit der AWO"],
+["Kosten","In der Regel kostenlos; Kosten für Essen oder besondere Aktivitäten möglich","Teilnahme kostenlos; das warme Essen wird kostenpflichtig beim Caterer bestellt"],
+["Für wen?","Familien, die an festen Tagen Betreuung bis 14 Uhr brauchen","Familien, die sich für das ganzheitliche Modell entscheiden"],
+["Pflichten","Tage werden zu Schuljahresbeginn festgelegt; Fehlen schriftlich bei der Schulleitung entschuldigen","Schulpflicht an allen 4 Tagen bis 15:30 Uhr"],
+["Ferien","Keine Ferienbetreuung","Keine Ferienbetreuung"],
+])}
+<h2>Welches Modell passt?</h2>
+<p>Der <b>offene Ganztag</b> ist flexibel und passt zu Familien, die Betreuung nach dem Unterricht brauchen, aber nicht jeden Tag bis zum Nachmittag. Der <b>gebundene Ganztag</b> ist fester strukturiert, an den Klassenunterricht gebunden und hilft besonders Kindern, die von einem klaren Tagesrhythmus profitieren.</p>
+<p class="note">Mittagessen bestellen: bis Mittwoch, 11 Uhr, der Vorwoche online bei ${ext("https://www.bantschow-kids.de","Bantschow Kids")}. Alle Modelle stellt die Schule auch beim Informationsabend zur Einschulung vor (<a href="#termine">Termine</a>).</p>`};
+
+P["kita"] = {area:"lernen", title:"Von der Kita in die Schule", lead:"„Die Kinder sollen sich darauf freuen, bald ein Schulkind zu sein!“", body:`
+<p>Wir arbeiten eng mit der <b>KiTa St. Jakobus</b> (Haus für Kinder) und der <b>KiTa Zauberwald St. Kilian</b> zusammen. Im Laufe des Schuljahres treffen sich die 1. und 2. Klassen mehrmals mit den Vorschulkindern. Für Eltern künftiger Schulkinder gibt es Informationsabende.</p>
+<h2>Herbst und Winter</h2>
+<ul>
+<li><b>Wir lesen vor:</b> Zum bundesweiten Vorlesetag lesen Kinder der 4. Klassen den Vorschulkindern ihre Lieblingsgeschichte vor.</li>
+<li><b>Es weihnachtet sehr:</b> Die Vorschulkinder kommen zu einem adventlichen Tagesstart mit Liedern und Bilderbuchkino.</li>
+</ul>
+<h2>Frühling und Sommer</h2>
+<ul>
+<li><b>Schulstunde und Schulhausrallye:</b> Die Vorschulkinder erleben eine Schulstunde mit den 1. und 2. Klassen, lösen Rätsel und lernen das Schulhaus kennen.</li>
+<li><b>Singtag:</b> Die Vorschulkinder besuchen die 1. Klassen; der Tag beginnt musikalisch in der Pausenhalle.</li>
+<li><b>Gemeinsamer Ausflug:</b> Zum Kinderkulturtag geht es mit den 1. Klassen meist zu einem Mitmachkonzert in den Schönbusch.</li>
+<li><b>Vorkurs Deutsch 240:</b> Lehrkräfte besuchen regelmäßig die Kitas und fördern ausgewählte Kinder sprachlich, mit Spielen, Basteln, Singen, Bilderbüchern und Geschichten.</li>
+</ul>
+<p><a href="#termine">Termine der Informationsabende zur Einschulung 2027/28 →</a></p>`};
+
+P["lesen"] = {area:"lernen", title:"Leseförderung mit FiLBy", lead:"Fachintegrierte Leseförderung Bayern, wissenschaftlich begleitet von der Universität Regensburg.", body:`
+<p>Unsere Schule hat als Erprobungsschule mit zwei Klassen drei Jahre lang am Leseförderprojekt FiLBy teilgenommen. Davon profitieren auch alle folgenden Klassen: durch die wissenschaftliche Begleitung und umfangreiche Lese- und Arbeitsmaterialien.</p>
+<p>Das Material reicht von Kinder- und Jugendbüchern, deren Anspruch mit dem Alter steigt, bis zu lehrplanbezogenen, wissenschaftlich geprüften Sachtexten. Die Kinder haben ihre Leseflüssigkeit verbessert, das Leseverstehen trainiert und gelernt, ihr Lesen selbst zu steuern. Nebenbei lernten sie spannende Geschichten kennen und erfuhren viel über die Welt.</p>
+<h3>Mehr erfahren</h3>
+<ul><li>${ext("https://filby.alp.dillingen.de/","FiLBy an der Akademie Dillingen")}</li><li>${ext("https://www.uni-regensburg.de/sprache-literatur-kultur/germanistik-did/filby/index.html","FiLBy an der Universität Regensburg")}</li></ul>
+<p class="note">Auch der Vorlesetag im November und das Lesefest „Wir befragen Autoren“ gehören zur Leseförderung.</p>`};
+
+P["gemeinschaft"] = {area:"lernen", title:"Gemeinschaft lernen", lead:"Klassenrat und Pausenhelfer: Kinder übernehmen Verantwortung und lernen Demokratie.", body:`
+<h2>Der Klassenrat</h2>
+<p>Einmal pro Woche, etwa eine Schulstunde lang, beraten, diskutieren und entscheiden die Kinder über Themen, die sie selbst gesammelt haben. Das verringert Streit, schafft ein gutes Klassenklima und lehrt Verantwortung. Ab der 1. Klasse führen die Lehrkräfte schrittweise heran, ab Mitte der 2. Klasse folgt jede Sitzung einem festen Ablauf. Wir arbeiten dabei mit In Via Aschaffenburg zusammen.</p>
+<h3>Ämter</h3>
+<p>Leitung · Zeitwächter · Regelwächter · Schreiber · Ratsmitglieder</p>
+<h3>So läuft eine Sitzung ab</h3>
+<ol class="steps">
+<li>Eröffnung und positive Runde: Begrüßung, Regeln (Ich-Botschaften, keine Beleidigungen), Schönes aus der letzten Woche</li>
+<li>Was ist aus den Beschlüssen der letzten Sitzung geworden?</li>
+<li>Welche Anliegen gibt es heute? (gesammelt an der Zettelwand oder im Klassenbriefkasten)</li>
+<li>Das Anliegen wird besprochen.</li>
+<li>Gemeinsam eine Lösung finden und sich einigen.</li>
+<li>Beschlüsse ins Klassenratsbuch eintragen.</li>
+</ol>
+<h2>Die Pausenhelfer</h2>
+<p>Fünf bis sechs Pausenhelfer, erkennbar an ihrem Band, sind in jeder Pause im Einsatz:</p>
+<ul>
+<li>Drei Helfer achten in den Gängen darauf, dass alle zügig nach draußen gehen; andere halten die Tür zum Pausenhof auf.</li>
+<li>Zwei Helfer bleiben am Eingang, denn niemand soll einfach ins Schulhaus gehen. Ausnahmen regeln die Lehrerinnen.</li>
+<li>Sie erinnern daran, dass der Fahrradplatz tabu ist.</li>
+<li>Bei kleinen Anliegen helfen sie, bei ernstem Streit oder Verletzungen holen sie sofort die Pausenaufsicht.</li>
+<li>Nach dem Gong säubern die übrigen Helfer den Hof.</li>
+</ul>`};
+
+P["musik"] = {area:"lernen", title:"Musik", lead:"Singklasse, Schulchor und Instrumentalunterricht der Städtischen Musikschule im eigenen Haus. Ausgezeichnet als musikbegeisterte Grundschule: „Unsere Schule singt und klingt“.", body:`
+<h2>Singklasse für Erstklässler</h2>
+<p>„Für Kinder ist ihre Singstimme ein natürliches Instrument.“ In der freiwilligen AG Singklasse lernen Erstklässler, ihre Stimme richtig zu gebrauchen. Einmal pro Woche leitet Herr Oberhofer, Gesangspädagoge, Pianist und Leiter der ${ext("https://www.musikschule-aschaffenburg.eu/","Städtischen Musikschule Aschaffenburg")}, eine professionelle Musikstunde.</p>
+<ul><li>Die eigene Singstimme spielerisch entdecken</li><li>Lieder mit Gesten und Körperinstrumenten begleiten</li><li>Klangrätsel und Bewegung zur Klaviermusik</li><li>Erste musikalische Grundbegriffe</li><li>Mehrere Auftritte im Schuljahr vor der Schulgemeinschaft</li></ul>
+<p>Die Singklasse ist Teil der Aschaffenburger Singakademie. Eine Lehrkraft der Schule ist bei allen Stunden und Auftritten dabei.</p>
+<h2>Schulchor für die Klassen 2 bis 4</h2>
+<p><b>Hast du Lust zu singen? Dann komm zum Chor!</b> Der Chor trifft sich einmal pro Woche und baut auf der Singklasse auf. Kinder, die ihre Freude am Singen erst später entdecken, sind genauso willkommen.</p>
+<ol class="steps"><li>Stimmspiele zum Einsingen</li><li>Rhythmus und Bewegung</li><li>Neue Lieder und Songs für Aufführungen</li><li>Kanons für mehrstimmiges Singen, begleitet von Klavier oder Gitarre</li></ol>
+<p>Der Chor tritt bei Singtagen, Schulfesten, Singspielen und musikalischen Theaterstücken auf. Zum Schuljahresende gibt es ein <b>Sommerkonzert</b> mit Singklasse, Chor und den Kindern, die im Haus ein Instrument lernen.</p>
+<h2>WIM: Wir musizieren</h2>
+<p>Musikalische Grundbildung im Musiksaal, gemeinsam mit der Musikschule.</p>`};
+
+P["medien"] = {area:"lernen", title:"Medienbildung", lead:"Digitale Medien gehören dazu. Lesen, Schreiben und Rechnen bleiben die Grundlage.", body:`
+<p>Handschrift, Bücher und schriftliches Rechnen bleiben die Basis. Digitales Lernen kommt als „vierte Kulturtechnik“ dazu. Die Kinder lernen, digitale Medien kreativ zu nutzen und kritisch mit Werten und Regeln im Netz umzugehen.</p>
+<h2>Fünf Handlungsfelder</h2>
+<ol class="steps"><li>Basiskompetenzen</li><li>Suchen und Verarbeiten</li><li>Kommunizieren und Kooperieren</li><li>Produzieren und Präsentieren</li><li>Analysieren und Reflektieren</li></ol>
+<h2>Ausstattung</h2>
+<ul>
+<li>In jedem Klassenzimmer: digitale Tafel oder Beamer, Laptop und Dokumentenkamera</li>
+<li>Pädagogisches Netz per LAN in allen Klassen- und Fachräumen, im Neubau teilweise WLAN</li>
+<li>15 Schülerlaptops (für den Unterricht oder zum Ausleihen) und 8 feste Schülerarbeitsplätze</li>
+<li>80 iPads: 40 Leihgeräte der Stadt und 40 schuleigene</li>
+</ul>
+<h2>Eingesetzte Apps (Auswahl)</h2>
+<p>Anton, Antolin, Book Creator, Blitzlesen, Mathe mit dem Känguru, Hunderterfeld, Zwanzigerfeld, Zahlenstrahl, Einmaleins, iStopMotion, GreenScreen by Do Ink, Puppet Pals, Wortarten Weltreise und weitere.</p>
+<p class="note">Stand des Medienkonzepts: Juni 2021. Die Regeln zu Handy und Smartwatch stehen im <a href="#abc">Eltern-ABC</a>.</p>`};
+
+P["umwelt"] = {area:"lernen", title:"Umwelt und Natur", lead:"Klimaschutz beginnt auf dem Schulweg.", body:`
+<h2>Grüne Meilen</h2>
+<p>Bei der Kampagne „Grüne Meilen“ zogen alle Kinder die Grüne-Meilen-Stiefel an. Ziel war, möglichst viele Wege ohne Auto zurückzulegen. Für jeden Weg ohne Auto gab es eine grüne Meile ins Sammelheft. Eltern halfen mit Fahrradausflügen am Wochenende und holten Erstklässler zu Fuß ab. Die Erkenntnis: Jeder kann ganz einfach Klimaschützer werden. Mehr unter ${ext("https://www.kindermeilen.de","kindermeilen.de")}.</p>
+<h2>Draußen lernen</h2>
+<ul>
+<li>Naturnaher Pausenhof für Pausen und Unterricht im Freien</li>
+<li>Naturerfahrung für die 2. Klassen und Unterrichtsgang zur Hecke mit dem Bund Naturschutz</li>
+<li>Sammelwoche für den Bund Naturschutz (April 2026)</li>
+<li>Schulobst aus dem EU-Schulobstprogramm, jeden Mittwoch</li>
+</ul>`};
+
+P["shop"] = {area:"eltern", title:"Schulkleidung und mehr", lead:"Im Sekretariat bei Frau Bilz, an Schultagen von 8 bis 12 Uhr. Der Erlös geht an den Förderverein.", body:`
+<div class="pricelist">
+<div class="price"><span>Dokumentenmappe mit Gummi</span><b>2 €</b></div>
+<div class="price"><span>Bandana-Tuch</span><b>3 €</b></div>
+<div class="price"><span>Hoodie</span><b>15 €</b></div>
+<div class="price out"><span>Trinkflasche · ausverkauft</span><b>9 €</b></div>
+</div>
+<p>Der Förderverein finanziert damit Schulveranstaltungen, besondere Möbel und Fahrtkosten einzelner Kinder mit.</p>`};
+
+P["termine"] = {area:"termine", title:"Termine 2026/27", lead:"Elternabende, Feste, freie Tage und Informationsabende im Überblick.", body:`<div id="allDates"></div>`};
+
+P["schulleben"] = {area:"schule", title:"Schulleben", lead:"Was bei uns los ist. Aktuelle Beiträge erscheinen auch im Schul-Blog.", body:`<div class="life" id="allLife"></div><p>Weitere Beiträge: ${ext(S.blog,"Unser Blog auf TaskCards")}</p>`};
+
+P["abc"] = {area:"eltern", title:"Eltern-ABC", lead:"Alles Wichtige zum Schulalltag von A bis Z. Tippen Sie einfach ein Stichwort ein.", body:`
+<div class="abc-tools">
+<label class="field" for="abcq"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="abcq" type="search" placeholder="z. B. Krankheit, Handy, Mittagessen"></label>
+<div class="letters" id="letters"></div>
+</div>
+<div class="abc" id="abcList"></div>
+<p class="note">Diese Informationen gibt es auch <a href="#russisch">auf Russisch</a>.</p>`};
+
+P["russisch"] = {area:"eltern", title:"Информация для родителей", lead:"Важная информация для родителей от А до Я. Інформація для батьків.", body:`
+<p>Die Elterninformationen „Von A bis Z“ gibt es auf der bisherigen Schulwebsite auch auf Russisch: Einlass, Krankmeldung, Ferien, Hausaufgaben, Hausschuhe, Kleidung, Proben, Pausenbrot, Sport, Sprechstunde und Unterrichtsausfall.</p>
+<p>${ext(S.old+"/colibri-wp/wichtige-informationen-russisch/","Важная информация для родителей от А до Я (русский)")}</p>
+<h2>Самое важное</h2>
+<ul>
+<li><b>Болезнь:</b> до 7:40 по телефону 06021 4561090 или онлайн: ${ext("https://elternnachricht.de/fehlzeiten","elternnachricht.de")}</li>
+<li><b>Начало:</b> учитель забирает детей в 7:45 со школьного двора. С 7:30 — утренний присмотр.</li>
+</ul>
+<h2>Допомога Україні</h2>
+<p>${ext("https://www.aschaffenburg.de/Aktuelles/Ukraine-Hilfe/DE_index_6550.html","Ukraine-Hilfe der Stadt Aschaffenburg")} · ${ext("https://www.aschaffenburg.de/RU_index_1000.html","Информация города на русском")}</p>`};
+
+P["leitbild"] = {area:"schule", title:"Unser Leitbild", lead:"Das gemeinsam erarbeitete Leitbild der Schulfamilie.", body:`
+<div class="ph" style="--c:var(--sun-soft); aspect-ratio:3/4; max-width:560px"><img src="${IMG}2023/03/Leitbild-scaled.jpg" alt="Leitbild der Christian-Schad-Grundschule" loading="lazy" onerror="this.remove()"><span class="fb">Leitbild</span></div>
+<p class="note">Das Leitbild liegt bisher nur als Bild vor. Für Barrierefreiheit und Suche sollte der Text zusätzlich als Text eingepflegt werden.</p>`};
+
+P["impressum"] = {area:"recht", title:"Impressum", lead:"", body:`
+<h2>Herausgeber</h2>
+<p>Christian-Schad-Grundschule Nilkheim<br>Lindenweg 14, 63741 Aschaffenburg<br>Telefon 06021 4561090 · Fax 06021 4561099<br>E-Mail info@christian-schad-schule.de</p>
+<p>Vertretungsberechtigt und verantwortlich für den Inhalt: Rektorin Doris Wolf, Anschrift wie oben.</p>
+<h2>Nutzungsbedingungen</h2>
+<p>Texte, Bilder, Grafiken und Gestaltung dieser Website können urheberrechtlich geschützt sein, ausgenommen Gesetze und amtliche Bekanntmachungen. Private Nutzung ist im Rahmen des Urheberrechts erlaubt; andere Veröffentlichungen nur mit Einwilligung der Schule.</p>
+<h2>Haftung</h2>
+<p>Wir übernehmen keine Gewähr für Aktualität, Richtigkeit, Vollständigkeit und Verfügbarkeit der Inhalte. Die Haftung für Schäden aus der Nutzung ist ausgeschlossen, soweit gesetzlich zulässig; § 839 BGB bleibt unberührt. Für verlinkte externe Seiten sind allein deren Betreiber verantwortlich.</p>`};
+
+P["datenschutz"] = {area:"recht", title:"Datenschutz", lead:"Die wichtigsten Punkte zum Umgang mit Ihren Daten.", body:`
+<h2>Verantwortlich</h2>
+<p>Christian-Schad-Grundschule Nilkheim, Rektorin Doris Wolf, Lindenweg 14, 63741 Aschaffenburg, Telefon 06021 4561090, info@christian-schad-schule.de</p>
+<h2>Datenschutzbeauftragter</h2>
+<p>Nicolai Fleischmann, Staatliches Schulamt, Auhofstraße 21, 63741 Aschaffenburg</p>
+<h2>Kernpunkte</h2>
+<ul>
+<li><b>Zweck:</b> Erfüllung des Bildungs- und Erziehungsauftrags nach dem BayEUG (Art. 85 BayEUG i. V. m. Art. 6 Abs. 1 UAbs. 1 Buchst. e DSGVO). Fotos etwa im Jahresbericht nur mit Einwilligung.</li>
+<li><b>Dienstleister:</b> Systembetreuung durch die JCM Computer GmbH; Webserver bei der STRATO AG, jeweils als Auftragsverarbeiter.</li>
+<li><b>Server-Protokolle:</b> IP-Adresse, Datum und Zugriffsstatus; die IP-Adresse wird spätestens nach sieben Tagen gekürzt.</li>
+<li><b>Cookies:</b> nur Sitzungs-Cookies; Reichweitenmessung nur statistisch ohne Personenbezug. Diese Seite speichert nur Ihre Hell/Dunkel-Einstellung lokal im Browser.</li>
+<li><b>Speicherdauer:</b> nach den gesetzlichen Aufbewahrungsfristen (§ 40 BaySchO).</li>
+<li><b>Ihre Rechte:</b> Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerspruch und Widerruf von Einwilligungen.</li>
+<li><b>Beschwerde:</b> beim ${ext("https://www.datenschutz-bayern.de/","Bayerischen Landesbeauftragten für den Datenschutz")}.</li>
+</ul>`};
+
+P["kontakt"] = {area:"kontakt", title:"Kontakt", lead:"So erreichen Sie uns.", body:`<div id="contactFull"></div>`};
+
+P["lernen"] = {area:"lernen", title:"Lernen bei uns", lead:"Unterricht nach dem LehrplanPlus, dazu Schwerpunkte, die unsere Schule ausmachen.", body:`<div id="learnFull"></div>`};
+
+/* Navigation */
+const AREAS = {
+  schule:{label:"Schule", links:["ueber-uns","team","schulleben","elternbeirat","partnerschaft","sozialarbeit","hausordnung","pausenordnung","leitbild"]},
+  lernen:{label:"Lernen", links:["lernen","lesen","musik","gemeinschaft","medien","umwelt","kita"]},
+  ganztag:{label:"Ganztag", links:["ganztag"]},
+  eltern:{label:"Für Eltern", links:["abc","beratung","shop","russisch"]},
+  termine:{label:"Termine", links:["termine"]},
+  kontakt:{label:"Kontakt", links:["kontakt"]},
+  recht:{label:"Rechtliches", links:["impressum","datenschutz"]},
+};
+
+/* ================= Helfer ================= */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const strip = h => h.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+const MON = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+const WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const WDL = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+const parseD = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+function berlinNow(){
+  try{
+    const p = Object.fromEntries(new Intl.DateTimeFormat("de-DE",{timeZone:"Europe/Berlin",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+    return new Date(+p.year, +p.month-1, +p.day, +p.hour % 24, +p.minute);
+  }catch(e){ return new Date(); }
+}
+const dayStart = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+function toast(msg){ const t = document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 1800); }
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-copy]"); if(!b) return;
+  const v = b.getAttribute("data-copy");
+  const done = () => toast("Kopiert: " + v);
+  try{ navigator.clipboard.writeText(v).then(done, () => fallbackCopy(v, done)); }catch(err){ fallbackCopy(v, done); }
+});
+function fallbackCopy(v, done){ const ta=document.createElement("textarea"); ta.value=v; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(e){ toast("Bitte markieren und kopieren: " + v); } ta.remove(); }
+
+/* ================= Bausteine ================= */
+function dateRow(e, cls=""){
+  const d = parseD(e.d);
+  return `<div class="date ${cls} ${e.free?"is-free":""}"><time datetime="${e.d}">${WD[d.getDay()]}, ${d.getDate()}. ${MON[d.getMonth()]}<small>${d.getFullYear()}${e.h?" · "+e.h+" Uhr":""}</small></time><p><b>${e.t}</b>${e.x?`<br><span class="muted">${e.x}</span>`:""}</p><span class="tag">${cls.includes("is-next")?"Als Nächstes":e.tag}</span></div>`;
+}
+function datesHTML(mode){
+  const today = dayStart(berlinNow());
+  const upcoming = TERMINE.filter(e => parseD(e.d) >= today);
+  const list = mode==="all" ? TERMINE : upcoming;
+  if(!list.length) return `<p class="muted">Für dieses Schuljahr stehen keine weiteren Termine an.</p>`;
+  const nextD = upcoming[0]?.d;
+  return `<div class="dates">${list.map(e => dateRow(e, (e.d===nextD?"is-next ":"") + (parseD(e.d)<today?"is-past":""))).join("")}</div>`;
+}
+function storyHTML(s){
+  const img = s.img ? `<img src="${IMG}${s.img}" alt="" loading="lazy" onerror="this.remove()">` : "";
+  return `<article class="story"><div class="ph" style="--c:${s.c}">${img}<span class="fb" aria-hidden="true">${s.k}</span></div><time>${s.m}</time><h3>${s.t}</h3><p>${s.x}</p></article>`;
+}
+const LEARN = [
+  {id:"lesen", t:"Lesen", x:"Fachintegrierte Leseförderung FiLBy, Vorlesetag und Lesefeste.", c:"var(--poppy)"},
+  {id:"musik", t:"Musik", x:"Singklasse, Schulchor, WIM und Instrumentalunterricht im Haus.", c:"var(--sun)"},
+  {id:"gemeinschaft", t:"Gemeinschaft", x:"Klassenrat ab Klasse 1 und Pausenhelfer übernehmen Verantwortung.", c:"var(--sky)"},
+  {id:"medien", t:"Medien", x:"Digitale Tafeln, 80 iPads und ein Medienkonzept mit fünf Handlungsfeldern.", c:"var(--ink-2)"},
+  {id:"umwelt", t:"Umwelt", x:"Naturnaher Pausenhof, Grüne Meilen, Schulobst und Bund Naturschutz.", c:"var(--leaf)"},
+  {id:"ganztag", t:"Ganztag", x:"Offener Ganztag bis 14 oder 16 Uhr, gebundener Ganztag bis 15:30 Uhr.", c:"var(--leaf)"},
+  {id:"kita", t:"Von der Kita in die Schule", x:"Vorlesen, Singtag, Schulhausrallye und Vorkurs Deutsch mit unseren Kitas.", c:"var(--poppy)"},
+  {id:"sozialarbeit", t:"Sozialarbeit", x:"Schulsozialpädagogin für Konflikte, Freundschaften und Klassengemeinschaft.", c:"var(--sun)"},
+];
+const learnHTML = () => `<div class="learn">${LEARN.map(l=>`<a href="#${l.id}"><span class="swatch" style="background:${l.c}"></span><h3>${l.t}</h3><p>${l.x}</p></a>`).join("")}</div>`;
+function contactHTML(){
+  const row = (k, v, c) => `<div><span>${k}</span><b>${v}</b>${c?`<button class="copy" type="button" data-copy="${c}">Kopieren</button>`:""}</div>`;
+  return `<div class="contact">
+  <div><span class="eyebrow">Sekretariat · Sandra Bilz</span><h3>Christian-Schad-Grundschule</h3><p class="muted">${S.addr}</p>
+    <div class="kv">${row("Telefon", S.tel, S.tel)}${row("E-Mail", S.mail, S.mail)}${row("Fax", S.fax)}</div>
+    <div class="hero-actions"><a class="btn btn-ghost" href="tel:${S.telIntl}">Anrufen</a><a class="btn btn-ghost" href="${S.map}" target="_blank" rel="noopener">Route planen</a></div>
+  </div>
+  <div><span class="eyebrow">Schulleitung</span>
+    <div class="kv">${row("Rektorin", "Doris Wolf")}${row("E-Mail", S.rektor, S.rektor)}${row("Konrektor", "Andreas Weniger")}${row("Hauswartin", "Zsuzsanna Zehnder")}</div>
+  </div>
+  <div><span class="eyebrow">Weitere Kontakte</span>
+    <div class="kv">${row("Schulsozialarbeit", "06021 4561092", "06021 4561092")}${row("Elternbeirat", "elternbeirat.christian-schad-schule@gmx.de", "elternbeirat.christian-schad-schule@gmx.de")}${row("Krankmeldung", "bis 7:40 Uhr")}</div>
+    <p class="muted" style="font-size:.92rem">Sprechstunden der Lehrkräfte bitte vorher anmelden: über das Hausaufgabenheft, per E-Mail oder telefonisch.</p>
+  </div></div>`;
+}
+
+/* Tagesband */
+const DAY = {from:7.5, to:16};
+const BANDS = [
+  {k:"Frühbetreuung", a:7.5, b:7.75, c:"var(--sun)"},
+  {k:"Unterricht", a:7.75, b:13, c:"var(--sky)", fade:true},
+  {k:"OGT kurz", a:11.33, b:14, c:"var(--poppy)", fade:true},
+  {k:"OGT lang", a:11.33, b:16, c:"var(--poppy)", fade:true},
+  {k:"GGT Mo–Do", a:7.5, b:15.5, c:"var(--leaf)"},
+];
+const pos = h => ((h - DAY.from) / (DAY.to - DAY.from) * 100);
+function todayHTML(){
+  const now = berlinNow(), wd = now.getDay(), h = now.getHours() + now.getMinutes()/60;
+  const hhmm = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
+  const todayISO = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+  const ev = TERMINE.find(e => e.d === todayISO);
+  const weekend = wd===0 || wd===6;
+  let st, cls="";
+  if(ev && ev.free){ st = `<b>Heute unterrichtsfrei.</b> ${ev.t.split(":")[0]}.`; cls="warn"; }
+  else if(weekend){ st = `<b>Wochenende.</b> Krankmeldungen für Montag bitte bis 7:40 Uhr.`; cls="warn"; }
+  else if(h < 7.5){ st = `<b>Gleich geht's los.</b> Frühbetreuung ab 7:30 Uhr im Pausenhof, Krankmeldung bis 7:40 Uhr.`; }
+  else if(h < 7.667){ st = `<b>Krankmeldung noch bis 7:40 Uhr</b> unter ${S.tel} oder online.`; cls="alert"; }
+  else if(h < 7.75){ st = `<b>Um 7:45 Uhr</b> holen die Lehrkräfte die Kinder im Pausenhof ab.`; }
+  else if(h < 16){ st = `<b>Schultag läuft.</b> Sekretariat erreichbar unter ${S.tel}.`; }
+  else { st = `<b>Schulschluss für heute.</b> Krankmeldungen für morgen bis 7:40 Uhr.`; cls="warn"; }
+  const next = TERMINE.find(e => parseD(e.d) >= dayStart(now));
+  const showNow = !weekend && h >= DAY.from && h <= DAY.to && !(ev && ev.free);
+  const ticks = [8,10,12,14,16];
+  const nd = next ? parseD(next.d) : null;
+  return `<div class="today-head"><div><span class="eyebrow">${WDL[wd]}, ${now.getDate()}. ${MON[now.getMonth()]}</span><h3>Der Schultag</h3></div><span class="clock" aria-label="Uhrzeit ${hhmm}">${hhmm}</span></div>
+  <div class="status ${cls}" role="status"><span class="dot"></span><p>${st}</p></div>
+  <div class="band" aria-label="Tagesablauf von 7:30 bis 16:00 Uhr">
+    <div class="band-rows">${BANDS.map(b=>`<div class="band-row"><span>${b.k}</span><div class="track"><i style="left:${pos(b.a)}%; width:${pos(b.b)-pos(b.a)}%; background:${b.fade?`linear-gradient(90deg, color-mix(in srgb, ${b.c} 35%, transparent), ${b.c} 30%)`:b.c}"></i></div></div>`).join("")}</div>
+    <div class="band-axis"><span></span><div>${ticks.map(t=>`<b style="left:${pos(t)}%">${t}</b>`).join("")}</div></div>
+    ${showNow?`<div class="now" style="left:calc(106px + (100% - 106px) * ${pos(h)/100})"></div>`:""}
+  </div>
+  <p class="muted" style="font-size:.82rem; margin-top:-6px">Unterrichtsende je nach Stundenplan. OGT nach Unterrichtsende, GGT Montag bis Donnerstag.</p>
+  ${next?`<a class="next" href="#termine"><span class="datechip"><b>${nd.getDate()}</b><small>${MON[nd.getMonth()]}</small></span><span><span class="eyebrow">Nächster Termin</span><br><b>${next.t}</b></span></a>`:""}`;
+}
+
+/* ================= Ansichten ================= */
+function viewStart(){
+  return `
+<section class="hero"><div class="wrap">
+  <div class="hero-copy rise">
+    <span class="eyebrow">Staatliche Grundschule · Aschaffenburg-Nilkheim</span>
+    <h1>Hier wachsen <em>Talente.</em></h1>
+    <p class="lead">Rund 250 Kinder lernen bei uns in zwölf Klassen, mit Singklasse und Chor, Klassenrat, Leseförderung und zwei Ganztagsmodellen. Hier finden Eltern alles für den Schulalltag.</p>
+    <div class="hero-actions">
+      <a class="btn btn-poppy" href="${S.krank}" target="_blank" rel="noopener">Kind krankmelden</a>
+      <a class="btn btn-ghost" href="#abc">Eltern-ABC</a>
+      <a class="btn btn-ghost" href="#ganztag">Ganztag</a>
+    </div>
+    <div class="facts"><span><b>12</b>Klassen</span><span><b>2</b>Ganztagsklassen</span><span><b>7:45</b>Unterrichtsbeginn</span><span><b>7:40</b>Krankmeldung bis</span></div>
+  </div>
+  <aside class="today rise" id="today" aria-label="Heute an der Schule">${todayHTML()}</aside>
+</div></section>
+
+<section class="quick" aria-label="Schnellzugriff"><div class="wrap"><div class="quick-grid">
+  ${[
+   ["#kontakt","Ansprechpartner","Sekretariat, Schulleitung und alle Kontakte","var(--sky-soft)","var(--sky)",'<path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/><circle cx="12" cy="8" r="4"/>'],
+   ["#termine","Termine","Elternabende, freie Tage, Infoabende","var(--sun-soft)","#9a6a00",'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'],
+   ["#abc","Eltern-ABC","Von Ankommen bis Zeugnis, durchsuchbar","var(--poppy-soft)","var(--poppy)",'<path d="M4 19 9 5l5 14M6 14h6M15 9h5l-5 8h5"/>'],
+   ["#beratung","Beratung & Hilfe","Schulpsychologie, Beratungsstellen, Notrufe","var(--leaf-soft)","var(--leaf)",'<path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/>'],
+   ["#elternbeirat","Elternbeirat","Ihre Vertretung an der Schule","var(--sky-soft)","var(--sky)",'<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c1-3 3.5-5 6-5s5 2 6 5M14 15c2.5 0 5 2 6 5"/>'],
+   ["#shop","Schulkleidung","Hoodies, Bandanas und Mappen im Sekretariat","var(--sun-soft)","#9a6a00",'<path d="M8 3 3 6l2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"/>'],
+  ].map(([h,t,x,bg,fg,ic])=>`<a class="qt" href="${h}"><span class="ic" style="background:${bg}; color:${fg}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg></span><span><b>${t}</b><small>${x}</small></span></a>`).join("")}
+</div></div></section>
+
+<section class="sec band-sheet"><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">Schuljahr 2026/27</span><h2>Was als Nächstes ansteht</h2></div><a class="link" href="#termine">Alle Termine</a></div>
+  <div id="startDates"></div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">Lernen bei uns</span><h2>Mehr als Lesen, Schreiben, Rechnen</h2><p class="muted">Unterricht nach dem LehrplanPlus, dazu Schwerpunkte, die unsere Schule ausmachen.</p></div></div>
+  ${learnHTML()}
+</div></section>
+
+<section class="sec band-sheet"><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">Schulleben</span><h2>Zuletzt bei uns</h2></div><a class="link" href="#schulleben">Alle Beiträge</a></div>
+  <div class="life">${LEBEN.slice(0,3).map(storyHTML).join("")}</div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">Kontakt</span><h2>So erreichen Sie uns</h2></div></div>
+  ${contactHTML()}
+</div></section>`;
+}
+
+function viewPage(id){
+  const p = P[id]; const a = AREAS[p.area];
+  const siblings = a.links.filter(x => P[x]);
+  return `
+<section class="page-head"><div class="wrap">
+  <div class="crumbs"><a href="#start">Start</a> / ${a.label}</div>
+  <h1 style="font-size:clamp(2rem,4.4vw,3.2rem)">${p.title}</h1>
+  ${p.lead?`<p class="lead">${p.lead}</p>`:""}
+</div></section>
+<div class="wrap"><div class="page">
+  <article class="prose">${p.body}</article>
+  <aside class="aside">
+    ${siblings.length>1?`<div class="box"><h4>${a.label}</h4>${siblings.map(x=>`<a href="#${x}" ${x===id?'aria-current="page" style="color:var(--poppy)"':""}>${P[x].title}</a>`).join("")}</div>`:""}
+    <div class="box"><h4>Schnell erledigt</h4><a href="${S.krank}" target="_blank" rel="noopener">Kind krankmelden (bis 7:40 Uhr)</a><a href="#abc">Eltern-ABC</a><a href="#termine">Termine</a><a href="${S.elterninfo}" target="_blank" rel="noopener">Elterninfos auf TaskCards</a></div>
+    <div class="box"><h4>Sekretariat</h4><p><b>${S.tel}</b><br><span class="muted">${S.mail}</span></p></div>
+  </aside>
+</div></div>`;
+}
+
+/* ================= Router ================= */
+let dateMode = "upcoming";
+function render(){
+  const id = (location.hash || "#start").slice(1);
+  const main = $("#inhalt");
+  const isStart = !P[id];
+  main.innerHTML = isStart ? viewStart() : viewPage(id);
+  document.title = isStart ? "Christian-Schad-Grundschule Nilkheim" : `${P[id].title} · Christian-Schad-Grundschule`;
+  const area = isStart ? null : P[id].area;
+  document.querySelectorAll(".nav a").forEach(a => { if(a.dataset.area===area) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  if($("#startDates")){
+    $("#startDates").innerHTML = datesHTML("upcoming");
+    $("#startDates").querySelectorAll(".date").forEach((r,i) => { if(i>3) r.remove(); });
+  }
+  if($("#allDates")) renderAllDates();
+  if($("#allLife")) $("#allLife").innerHTML = LEBEN.map(storyHTML).join("");
+  if($("#contactFull")) $("#contactFull").innerHTML = contactHTML() + `<h2 style="margin-top:32px">Anfahrt</h2><p>${S.addr} · <a href="${S.map}" target="_blank" rel="noopener">In Google Maps öffnen</a></p>`;
+  if($("#learnFull")) $("#learnFull").innerHTML = learnHTML() + `<p style="margin-top:20px">Wie wir unterrichten, steht unter <a href="#ueber-uns">Über uns</a>.</p>`;
+  if($("#abcList")) renderABC("");
+  if(!isStart || location.hash) window.scrollTo(0,0);
+}
+function renderAllDates(){
+  $("#allDates").innerHTML = `<div class="seg" role="group" aria-label="Termine filtern" style="margin-bottom:18px"><button type="button" data-mode="upcoming" aria-pressed="${dateMode==="upcoming"}">Kommende</button><button type="button" data-mode="all" aria-pressed="${dateMode==="all"}">Ganzes Schuljahr</button></div>` + datesHTML(dateMode) + `<p class="note" style="margin-top:18px">Kurzfristige Änderungen erfahren Sie über Elternnachricht.</p>`;
+  $("#allDates").querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { dateMode = b.dataset.mode; renderAllDates(); });
+}
+function renderABC(q){
+  const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  const nq = norm(q.trim());
+  const items = ABC.filter(([t,x]) => !nq || norm(t + " " + strip(x)).includes(nq));
+  const hi = s => { if(!nq) return s; const re = new RegExp("(" + q.trim().replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")","gi"); return s.replace(/(<[^>]+>)|([^<]+)/g, (m, tag, txt) => tag ? tag : txt.replace(re, "<mark>$1</mark>")); };
+  let last = "", html = "";
+  items.forEach(([t,x], i) => {
+    const L = t[0].toUpperCase();
+    if(L !== last){ html += `<div class="initial" id="abc-${L}">${L}</div>`; last = L; }
+    html += `<details ${nq?"open":""}><summary>${hi(t)}</summary><div>${hi(x)}</div></details>`;
+  });
+  $("#abcList").innerHTML = html || `<p class="muted" style="padding:18px 0">Kein Eintrag zu „${esc(q)}“. Rufen Sie gern im Sekretariat an: ${S.tel}.</p>`;
+  const letters = [...new Set(ABC.map(([t]) => t[0].toUpperCase()))];
+  $("#letters").innerHTML = letters.map(L => `<a href="#abc" data-letter="${L}">${L}</a>`).join("");
+  $("#letters").querySelectorAll("a").forEach(a => a.onclick = ev => { ev.preventDefault(); const el = document.getElementById("abc-"+a.dataset.letter); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); });
+  const inp = $("#abcq"); if(inp && !inp.dataset.bound){ inp.dataset.bound = "1"; inp.addEventListener("input", () => renderABC(inp.value)); }
+}
+window.addEventListener("hashchange", render);
+
+/* ================= Suche ================= */
+const INDEX = [
+  ...Object.entries(P).map(([id,p]) => ({h:"#"+id, t:p.title, s:p.lead || "", body:strip(p.body)})),
+  ...ABC.map(([t,x]) => ({h:"#abc", t:"Eltern-ABC: " + t, s:strip(x), body:strip(x)})),
+  ...TERMINE.map(e => { const d = parseD(e.d); return {h:"#termine", t:e.t, s:`${WDL[d.getDay()]}, ${d.getDate()}. ${MON[d.getMonth()]} ${d.getFullYear()}${e.h?", "+e.h+" Uhr":""}`, body:(e.x||"") + " " + e.tag}; }),
+];
+const dlg = $("#search"), q = $("#q"), sres = $("#sres");
+let sel = 0;
+function search(){
+  const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  const terms = norm(q.value.trim()).split(/\s+/).filter(Boolean);
+  let hits;
+  if(!terms.length){ hits = ["#abc","#termine","#ganztag","#kontakt","#beratung"].map(h => INDEX.find(i => i.h===h && !i.t.includes(":"))).filter(Boolean); }
+  else{
+    hits = INDEX.map(i => { const T = norm(i.t), B = norm(i.s + " " + i.body); let sc = 0; for(const w of terms){ if(T.includes(w)) sc += 3; else if(B.includes(w)) sc += 1; else return null; } return {...i, sc}; }).filter(Boolean).sort((a,b) => b.sc - a.sc).slice(0, 12);
+  }
+  sel = 0;
+  sres.innerHTML = hits.length ? hits.map((i,k) => `<a href="${i.h}" class="${k===0?"on":""}"><b>${esc(i.t)}</b><small>${esc((i.s||i.body).slice(0,130))}${(i.s||i.body).length>130?" …":""}</small></a>`).join("") : `<div class="empty">Nichts gefunden. Versuchen Sie ein anderes Wort oder rufen Sie an: ${S.tel}.</div>`;
+}
+function openSearch(){ if(typeof dlg.showModal === "function"){ dlg.showModal(); } else { dlg.setAttribute("open",""); } q.value=""; search(); setTimeout(()=>q.focus(), 10); }
+$("#openSearch").onclick = openSearch;
+q.addEventListener("input", search);
+q.addEventListener("keydown", e => {
+  const links = [...sres.querySelectorAll("a")];
+  if(e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); if(!links.length) return; sel = (sel + (e.key==="ArrowDown"?1:-1) + links.length) % links.length; links.forEach((l,k)=>l.classList.toggle("on", k===sel)); links[sel].scrollIntoView({block:"nearest"}); }
+  if(e.key === "Enter" && links[sel]){ e.preventDefault(); links[sel].click(); }
+});
+sres.addEventListener("click", e => { if(e.target.closest("a")) dlg.close(); });
+dlg.addEventListener("click", e => { if(e.target === dlg) dlg.close(); });
+document.addEventListener("keydown", e => {
+  const typing = /INPUT|TEXTAREA/.test(document.activeElement?.tagName || "");
+  if((e.key === "/" && !typing) || (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey))){ e.preventDefault(); openSearch(); }
+});
+
+/* ================= Menü & Theme ================= */
+const drawer = $("#drawer"), menuBtn = $("#menuBtn");
+$("#drawerNav").innerHTML = `<a href="#start">Startseite</a>` + Object.values(AREAS).filter(a=>a.label!=="Rechtliches").map(a => `<h4>${a.label}</h4>` + a.links.map(x => `<a href="#${x}">${P[x].title}</a>`).join("")).join("");
+menuBtn.onclick = () => { drawer.hidden = false; menuBtn.setAttribute("aria-expanded","true"); drawer.querySelector("a").focus(); };
+drawer.addEventListener("click", e => { if(e.target === drawer || e.target.closest("a")){ drawer.hidden = true; menuBtn.setAttribute("aria-expanded","false"); } });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !drawer.hidden){ drawer.hidden = true; menuBtn.setAttribute("aria-expanded","false"); menuBtn.focus(); } });
+
+const root = document.documentElement;
+try{ const t = localStorage.getItem("csgs-theme"); if(t) root.dataset.theme = t; }catch(e){}
+$("#themeBtn").onclick = () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try{ localStorage.setItem("csgs-theme", root.dataset.theme); }catch(e){}
+};
+
+render();
+setInterval(() => { const t = $("#today"); if(t) t.innerHTML = todayHTML(); }, 30000);
+</script>
+<!--BODY-END-->
+</body>
+</html>
