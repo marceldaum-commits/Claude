@@ -12,11 +12,13 @@ RICHTUNG (aus der Recherche zu Webdesign-Trends 2026)
 - Bento-Raster für die Vorteile (größte Kachel = wichtigste Aussage).
 - Milchglas nur für Navigation, schwebende Hinweise und das Formular.
 
-HELL ODER DUNKEL
+HELL ODER DUNKEL – Schalter für Besucher
 Standard ist HELL: freundlicher und vertrauenswürdiger für Eltern. Nachtblau
 bleibt als Akzent (Stunden-Fenster wie ein Produktfoto, große Kachel,
-Preis-Karte, Anfrage, Fuß). Im Prototyp-Hinweis oben gibt es einen
-Schalter "Hell / Dunkel" zum direkten Vergleich.
+Preis-Karte, Anfrage, Fuß).
+In der Kopfzeile sitzt ein Sonne/Mond-Knopf: Besucher schalten auf
+"Dunkel" um – dann ist die ganze Seite dunkel. Die Wahl wird im Browser
+gespeichert und beim nächsten Besuch ohne Aufblitzen sofort angewendet.
 
 DER WOW-MOMENT
 Rechts im Hero ein Fenster einer Online-Stunde: Die Lösung schreibt sich

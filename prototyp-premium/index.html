@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&amp;family=Geist:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
+<script>try{var l=localStorage.getItem("nho-look");if(l==="dunkel"||l==="hell")document.documentElement.setAttribute("data-look",l);}catch(e){}</script>
 <style>
 /* Nachhilfe Online – Premium
    Konzept: Nachtblau als Bühne, ein Akzent (das Orange der bisherigen Marke),
@@ -352,10 +353,45 @@ html[data-look="hell"] .stat b em.s { color: var(--orange); }
 html[data-look="hell"] .ask { background: var(--night); color: var(--white); }
 html[data-look="hell"] footer { background: var(--night); border-top: 0; }
 html[data-look="hell"] .bar { background: rgba(10,15,36,.9); }
-/* Umschalter im Prototyp-Hinweis */
-.look { display: inline-flex; gap: 2px; margin-left: 10px; padding: 2px; border-radius: 999px; background: rgba(255,255,255,.08); vertical-align: middle; }
-.look button { font: 600 12px var(--sans); border: 0; background: none; color: var(--muted-d); padding: 3px 10px; border-radius: 999px; cursor: pointer; min-height: 24px; }
-.look button[aria-pressed="true"] { background: var(--white); color: var(--ink); }
+
+/* ---------- Hell/Dunkel-Schalter in der Kopfzeile ---------- */
+@media (max-width: 440px) { .logo i { display: none; } .nav .wrap { gap: 10px; } .nav-cta { gap: 8px; } .nav .btn-sm { padding: 0 15px; } }
+.theme-btn { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; border: 1px solid var(--line-d); background: rgba(255,255,255,.06); color: var(--white); transition: background .2s, border-color .2s, transform .3s var(--ease); }
+.theme-btn:hover { background: rgba(255,255,255,.12); }
+.theme-btn:active { transform: rotate(-20deg); }
+.theme-btn svg { width: 19px; height: 19px; }
+.theme-btn .i-sun { display: none; }
+html:not([data-look="hell"]) .theme-btn .i-sun { display: block; }
+html:not([data-look="hell"]) .theme-btn .i-moon { display: none; }
+html[data-look="hell"] .theme-btn { background: var(--white); border-color: var(--line); color: var(--ink); }
+html[data-look="hell"] .theme-btn:hover { border-color: var(--ink); }
+body, .light, .tile, .quote, .price, .nav { transition: background-color .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease); }
+
+/* ---------- Dunkel: auch die Inhaltsabschnitte dunkel ---------- */
+html[data-look="dunkel"] .light { background: var(--night); color: var(--white); }
+html[data-look="dunkel"] .light .head p, html[data-look="dunkel"] .tile p, html[data-look="dunkel"] .steps span, html[data-look="dunkel"] .faq details p, html[data-look="dunkel"] .fine { color: var(--muted-d); }
+html[data-look="dunkel"] .tile { background: var(--night-2); border-color: var(--line-d); }
+html[data-look="dunkel"] .tile:hover { box-shadow: 0 24px 50px -30px rgba(0,0,0,.8); }
+html[data-look="dunkel"] .t-big { background: var(--night-3); border-color: rgba(255,255,255,.16); }
+html[data-look="dunkel"] .bub.in { background: rgba(255,255,255,.09); color: var(--white); }
+html[data-look="dunkel"] .bub.out { background: #1e5a3c; color: #e8ffe9; }
+html[data-look="dunkel"] .tiny { color: var(--muted-d); }
+html[data-look="dunkel"] .subjects span { color: var(--white); }
+html[data-look="dunkel"] .subjects span:nth-child(3n) { color: var(--sky); }
+html[data-look="dunkel"] .subjects span:nth-child(3n+2) { color: var(--orange-2); }
+html[data-look="dunkel"] .quote { background: var(--night-2); border-color: var(--line-d); }
+html[data-look="dunkel"] .quote figcaption { color: var(--muted-d); }
+html[data-look="dunkel"] .quote figcaption b, html[data-look="dunkel"] .g-link { color: var(--white); }
+html[data-look="dunkel"] .quote figcaption i { background: var(--night-3); }
+html[data-look="dunkel"] .founder { background: var(--night-2); border: 1px solid var(--line-d); }
+html[data-look="dunkel"] .steps li { border-color: var(--line-d); }
+html[data-look="dunkel"] .price { background: var(--night-2); border-color: var(--line-d); }
+html[data-look="dunkel"] .price .amt small, html[data-look="dunkel"] .price .lbl { color: var(--muted-d); }
+html[data-look="dunkel"] .price.hi { background: var(--night-3); }
+html[data-look="dunkel"] .price.hi .lbl { color: var(--orange-2); }
+html[data-look="dunkel"] .light .btn-ghost { background: rgba(255,255,255,.06); color: var(--white); border-color: var(--line-d); }
+html[data-look="dunkel"] .faq, html[data-look="dunkel"] .faq details { border-color: var(--line-d); }
+html[data-look="dunkel"] .light .ph { color: #ffd98a; background: rgba(255,200,80,.08); border-color: rgba(255,200,80,.4); }
 
 /* Handy-Leiste */
 .bar { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 55; display: flex; gap: 8px; padding: 8px; border-radius: var(--r-pill); background: rgba(17,25,56,.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 20px 40px -16px rgba(0,0,0,.6); transform: translateY(140%); transition: transform .35s var(--ease); }
@@ -367,13 +403,14 @@ html[data-look="hell"] .bar { background: rgba(10,15,36,.9); }
 </head>
 <body>
 <a class="skip" href="#inhalt">Zum Inhalt springen</a>
-<div class="proto"><b>Prototyp</b> · Design-Entwurf „Premium“ – nicht die echte Website, das Formular sendet nichts. <span class="look" role="group" aria-label="Ansicht wählen"><button type="button" data-look="hell" aria-pressed="true">Hell</button><button type="button" data-look="dunkel" aria-pressed="false">Dunkel</button></span></div>
+<div class="proto"><b>Prototyp</b> · Design-Entwurf „Premium“ – nicht die echte Website, das Formular sendet nichts.</div>
 
 <header class="nav">
   <div class="wrap">
     <a class="logo" href="#inhalt" aria-label="Nachhilfe Online – nach oben"><i aria-hidden="true">N</i>Nachhilfe Online</a>
     <nav class="nav-links" aria-label="Bereiche"><a href="#vorteile">Warum wir</a><a href="#stimmen">Stimmen</a><a href="#preise">Preise</a><a href="#anfrage-sec">Kontakt</a></nav>
     <div class="nav-cta">
+      <button class="theme-btn" type="button" id="theme-btn" aria-label="Dunkles Design einschalten" aria-pressed="false"><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       <a class="nav-tel" href="tel:+491703141596">+49 170 3141596</a>
       <a class="btn btn-primary btn-sm" href="#anfrage" data-to-form>Probestunde</a>
     </div>
@@ -578,16 +615,20 @@ html[data-look="hell"] .bar { background: rgba(10,15,36,.9); }
   "use strict";
   document.documentElement.classList.add("js");
 
-  // ---------- Ansicht Hell / Dunkel (nur Prototyp, zum Vergleichen)
+  // ---------- Hell / Dunkel (Wahl wird gespeichert)
   var root = document.documentElement;
-  var lookBtns = document.querySelectorAll(".look [data-look]");
-  function setLook(v) {
+  var tb = document.getElementById("theme-btn");
+  var meta = document.querySelector('meta[name="theme-color"]');
+  function applyLook(v, save) {
     root.setAttribute("data-look", v);
-    lookBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.look === v)); });
-    try { localStorage.setItem("nho-look", v); } catch (e) { /* egal */ }
+    var dark = v === "dunkel";
+    tb.setAttribute("aria-pressed", String(dark));
+    tb.setAttribute("aria-label", dark ? "Helles Design einschalten" : "Dunkles Design einschalten");
+    if (meta) meta.setAttribute("content", dark ? "#0a0f24" : "#ffffff");
+    if (save) { try { localStorage.setItem("nho-look", v); } catch (e) { /* egal */ } }
   }
-  try { var saved = localStorage.getItem("nho-look"); if (saved === "hell" || saved === "dunkel") setLook(saved); } catch (e) { /* egal */ }
-  lookBtns.forEach(function (b) { b.addEventListener("click", function () { setLook(b.dataset.look); }); });
+  applyLook(root.getAttribute("data-look") === "dunkel" ? "dunkel" : "hell", false);
+  tb.addEventListener("click", function () { applyLook(root.getAttribute("data-look") === "dunkel" ? "hell" : "dunkel", true); });
 
   // ---------- Online-Stunde: Lösung schreibt sich an die Tafel
   var DATA = {
