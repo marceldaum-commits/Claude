@@ -13,6 +13,8 @@ nachhilfe-online/         Quellcode des Themes
 
 WAS DAS THEME KANN
 ------------------
+- Ohne zusätzliche Plugins: Formulare, Spam-Schutz, SEO, Social-Vorschau,
+  Mailversand (SMTP) und Schriften stecken im Theme selbst.
 - Alle Fächer im Blick: Marke "Nachhilfe Online · Alle Fächer · seit 2001",
   Fächer-Band auf der Startseite (Mathe bis Geografie), Tafelbild mit
   Beispielen aus Mathe, Deutsch und Englisch, Finder mit allen Fächern.
@@ -51,8 +53,9 @@ SO KOMMT ES IN PLESK (empfohlen: erst auf einer Kopie)
    ⋮ → Code-Editor) und Vorlage "Design-Seite" wählen.
 4. Customizer-Werte prüfen, gelbe [Platzhalter] ersetzen, Schriften
    hochladen, og-bild.png (1200×630) nach assets/ legen.
-5. Formular testen. Kommt keine Mail: Plugin "WP Mail SMTP" mit dem
-   Postfach der Domain einrichten.
+5. Formular testen. Für zuverlässigen Versand die SMTP-Zugangsdaten des
+   Postfachs in wp-config.php eintragen (Anleitung oben in inc/mail.php) –
+   kein Plugin nötig.
 6. Alles gut? WordPress Toolkit → "Daten kopieren" von Staging auf Live
    (oder Theme auf Live hochladen und Schritt 3–5 dort wiederholen).
 

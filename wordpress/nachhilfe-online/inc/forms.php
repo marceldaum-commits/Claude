@@ -10,8 +10,8 @@
  * - Gespeicherte Anfragen werden nach der eingestellten Frist automatisch
  *   gelöscht (Customizer, Standard 180 Tage). In der Datenschutzerklärung erwähnen.
  *
- * Tipp: Für zuverlässigen Mailversand auf Strato/Plesk ein SMTP-Plugin
- * (z. B. "WP Mail SMTP") mit dem Postfach der Domain einrichten.
+ * Zuverlässiger Versand über das Postfach der Domain: siehe inc/mail.php
+ * (SMTP ohne Plugin, Zugangsdaten in wp-config.php).
  *
  * @package MatheMitMarcel
  */
