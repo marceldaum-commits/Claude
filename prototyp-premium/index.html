@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" data-look="hell">
+<html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&amp;family=Geist:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
-<script>try{var l=localStorage.getItem("nho-look");if(l==="dunkel"||l==="hell")document.documentElement.setAttribute("data-look",l);}catch(e){}</script>
+<script>(function(){var l=null;try{l=localStorage.getItem("nho-look");}catch(e){}if(l!=="dunkel"&&l!=="hell"){l=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dunkel":"hell";}document.documentElement.setAttribute("data-look",l);})();</script>
 <style>
 /* Nachhilfe Online – Premium
    Konzept: Nachtblau als Bühne, ein Akzent (das Orange der bisherigen Marke),
@@ -629,6 +629,13 @@ html[data-look="dunkel"] .light .ph { color: #ffd98a; background: rgba(255,200,8
   }
   applyLook(root.getAttribute("data-look") === "dunkel" ? "dunkel" : "hell", false);
   tb.addEventListener("click", function () { applyLook(root.getAttribute("data-look") === "dunkel" ? "hell" : "dunkel", true); });
+  // Ohne eigene Wahl folgt die Seite der Handy-/System-Einstellung – auch wenn sie sich ändert (z. B. abends automatisch dunkel)
+  var mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  var chosen = function () { try { var v = localStorage.getItem("nho-look"); return v === "hell" || v === "dunkel"; } catch (e) { return false; } };
+  if (mq) {
+    var follow = function () { if (!chosen()) applyLook(mq.matches ? "dunkel" : "hell", false); };
+    if (mq.addEventListener) mq.addEventListener("change", follow); else if (mq.addListener) mq.addListener(follow);
+  }
 
   // ---------- Online-Stunde: Lösung schreibt sich an die Tafel
   var DATA = {
