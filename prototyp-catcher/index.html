@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Nachhilfe Online – Probestunde in 1 Minute anfragen</title>
+<meta name="description" content="Online-Nachhilfe in allen Fächern, 1:1 und persönlich – seit 2001, 5,0 ★ bei 623 Google-Bewertungen. Kostenlose Probestunde in einer Minute anfragen.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="Nachhilfe Online">
+<meta property="og:title" content="Aus Hä? wird Aha. – Nachhilfe Online">
+<meta property="og:description" content="Online-Nachhilfe in allen Fächern, 1:1 – seit 2001, 5,0 ★ bei 623 Google-Bewertungen. Probestunde kostenlos.">
+<meta property="og:image" content="https://www.mathenachhilfe-online.com/og-bild-1200x630.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700..800&amp;family=Kalam:wght@400;700&amp;family=Lexend:wght@400;600;700&amp;display=swap">
+<style>
+/* Nachhilfe Online – "Catcher"
+   Idee: Die Anfrage IST der erste Bildschirm. Ein Arbeitsblatt mit vier
+   Aufgaben zum Antippen; das gelbe "Aha." füllt sich mit dem Fortschritt.
+   Farben aus dem Federmäppchen: Tinte, Füller-Königsblau (Handeln),
+   Rotstift (Korrektur, Haken), Textmarker (das Wichtigste) auf Karopapier. */
+:root {
+  --paper: #f8fafc; --grid: #e2e9f2; --white: #fff;
+  --ink: #101631; --muted: #4b566f; --line: #cdd7e4;
+  --blue: #1f3fbf; --blue-dark: #142a8a; --sky: #e8eefc;
+  --red: #d42a2a; --marker: #ffe94a; --marker-soft: #fff7b8; --ok: #157347;
+  --display: "Bricolage Grotesque", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "Lexend", "Verdana", "Segoe UI", sans-serif;
+  --hand: "Kalam", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  --r: 6px; --maxw: 1180px;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+body {
+  margin: 0; color: var(--ink); font-family: var(--body); font-size: 17.5px; line-height: 1.6; overflow-x: hidden;
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--white); }
+a { color: var(--blue); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+a:hover { color: var(--blue-dark); }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.02; letter-spacing: -.03em; text-wrap: balance; font-weight: 800; }
+h2 { font-size: clamp(2rem, 4.6vw, 3.4rem); }
+h3 { font-size: 1.3rem; letter-spacing: -.01em; line-height: 1.15; }
+p { margin: 0; }
+.hand { font-family: var(--hand); font-weight: 700; }
+.small { font-size: 15px; color: var(--muted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: var(--white); padding: 8px 14px; z-index: 100; }
+.skip:focus { left: 16px; }
+.wrap { width: 100%; max-width: calc(var(--maxw) + 48px); margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 700px) { .wrap { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); } }
+.proto { background: var(--ink); color: #cfd6ea; font-size: 13px; text-align: center; padding: 6px 16px; }
+.proto b { color: var(--marker); }
+
+/* ---------- Kopf ---------- */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: rgba(255,255,255,.97); border-bottom: 2px solid var(--ink); }
+.top .wrap { display: flex; align-items: center; gap: 14px; min-height: 64px; }
+.brand { display: flex; flex-direction: column; line-height: 1; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--display); font-weight: 800; font-size: 21px; letter-spacing: -.03em; white-space: nowrap; }
+.brand b span { font-family: var(--hand); color: var(--blue); font-size: .92em; letter-spacing: 0; }
+.brand small { font-size: 12px; color: var(--muted); margin-top: 3px; white-space: nowrap; }
+.top nav { display: none; margin-left: 8px; }
+.top nav a { color: var(--ink); text-decoration: none; font-weight: 600; padding: 8px 11px; border-radius: var(--r); }
+.top nav a:hover { background: var(--marker); }
+.top-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.tel { display: none; font-weight: 700; color: var(--ink); text-decoration: none; white-space: nowrap; }
+@media (min-width: 1060px) { .top nav { display: flex; } .tel { display: inline; } }
+@media (max-width: 520px) { .proof .since { display: none; } }
+
+/* ---------- Buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; padding: 0 24px; border-radius: var(--r); font: 700 17px/1.2 var(--body); text-decoration: none; border: 2px solid transparent; cursor: pointer; text-align: center; transition: transform .08s, box-shadow .08s, background .15s; }
+.btn:active { transform: translateY(2px); }
+.btn-primary { background: var(--blue); color: var(--white); box-shadow: 0 4px 0 var(--blue-dark); }
+.btn-primary:hover { background: var(--blue-dark); color: var(--white); }
+.btn-primary:active { box-shadow: 0 2px 0 var(--blue-dark); }
+.btn-ghost { background: var(--white); color: var(--ink); border-color: var(--ink); }
+.btn-ghost:hover { background: var(--marker); color: var(--ink); }
+.btn-sm { min-height: 44px; padding: 0 16px; font-size: 15.5px; }
+.btn-link { background: none; border: 0; padding: 8px 4px; font: 600 15.5px var(--body); color: var(--muted); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
+.btn-link:hover { color: var(--ink); }
+
+/* ---------- Held + Arbeitsblatt ---------- */
+.hero { background: var(--white); border-bottom: 2px solid var(--ink); padding-block: clamp(24px, 5vw, 64px) clamp(36px, 5vw, 72px); position: relative; }
+.hero-grid { display: grid; gap: 26px; align-items: start; }
+@media (min-width: 980px) { .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); gap: 56px; align-items: center; } }
+.proof { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-weight: 700; font-size: 15.5px; }
+.proof .stars { color: var(--red); letter-spacing: 1px; }
+.proof a { color: var(--ink); }
+.hero h1 { font-size: clamp(3.2rem, 11vw, 7.6rem); line-height: .92; letter-spacing: -.05em; margin-top: 14px; }
+.hero h1 .q { position: relative; display: inline-block; color: var(--muted); margin-left: .12em; }
+.hero h1 .q::after { content: ""; position: absolute; left: -12%; top: -12%; width: 124%; height: 126%; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 120' preserveAspectRatio='none'%3E%3Cpath d='M120 8C40 2 4 30 10 64c6 40 110 54 172 34 44-16 40-68-14-84-28-8-68-8-84-2' fill='none' stroke='%23d42a2a' stroke-width='3.4' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  clip-path: inset(0 calc(100% - var(--circle, 0%)) 0 0); transition: clip-path .7s ease-out; }
+/* Der Textmarker unter "Aha." ist der Fortschrittsbalken */
+.hero h1 .aha { --p: 0; position: relative; display: inline-block; padding: 0 .06em; z-index: 0; }
+.hero h1 .aha::before { content: ""; position: absolute; z-index: -1; left: 0; top: 14%; height: 76%; width: calc(var(--p) * 100%); background: var(--marker); transition: width .6s cubic-bezier(.3,.8,.3,1); }
+.hero h1 .aha::after { content: ""; position: absolute; z-index: -2; left: 0; top: 14%; height: 76%; width: 100%; border: 2px dashed #e5d76e; border-radius: 2px; }
+.hero .lead { font-size: clamp(1.1rem, 1.7vw, 1.3rem); margin-top: 18px; max-width: 560px; }
+.promise { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--hand); font-size: 21px; color: var(--blue); line-height: 1.3; }
+.promise li::before { content: "✓ "; color: var(--red); }
+@media (max-width: 979px) { .hero .lead { display: none; } .hero .lead.always { display: block; } .promise { display: none; } }
+
+.sheet { background: var(--white); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 7px 7px 0 var(--blue); position: relative; overflow: hidden; scroll-margin-top: 80px; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 20px; border-bottom: 1.5px dashed var(--line); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; }
+.sheet-head .t { font-family: var(--hand); color: var(--red); font-size: 21px; line-height: 1.1; }
+.boxes { display: flex; gap: 6px; }
+.boxes i { width: 22px; height: 22px; border: 2px solid var(--ink); background: var(--white); display: grid; place-items: center; font: 700 17px/1 var(--hand); font-style: normal; color: var(--red); }
+.boxes i.done::after { content: "✓"; }
+.boxes i.now { background: var(--marker); }
+.sheet-body { padding: clamp(18px, 3vw, 28px); }
+.answers { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.answers:empty { display: none; }
+.answers button { font: 600 14px var(--body); border: 1.5px solid var(--ink); background: var(--marker-soft); border-radius: 999px; padding: 5px 12px; cursor: pointer; color: var(--ink); min-height: 34px; }
+.answers button::after { content: " ✎"; color: var(--blue); }
+.step { border: 0; margin: 0; padding: 0; min-width: 0; }
+.step legend { font-family: var(--display); font-weight: 800; font-size: clamp(1.5rem, 3.2vw, 2rem); letter-spacing: -.02em; line-height: 1.1; padding: 0; margin-bottom: 14px; }
+.step legend small { display: block; font-family: var(--body); font-weight: 400; letter-spacing: 0; font-size: 15px; color: var(--muted); margin-top: 6px; }
+.picks { display: flex; flex-wrap: wrap; gap: 8px; }
+.pick { position: relative; }
+.pick input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pick span { display: inline-flex; align-items: center; min-height: 46px; padding: 0 16px; border: 1.5px solid var(--ink); border-radius: var(--r); background: var(--white); font-weight: 600; cursor: pointer; user-select: none; transition: background .12s, transform .08s; }
+.pick span:hover { background: var(--marker-soft); }
+.pick input:checked + span { background: var(--ink); color: var(--white); }
+.pick input:focus-visible + span { outline: 3px solid var(--blue); outline-offset: 2px; }
+.pick input:disabled + span { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
+.picks.nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; }
+.picks.nums .pick span { justify-content: center; min-height: 52px; padding: 0; font-family: var(--hand); font-size: 24px; }
+.picks.nums .pick.wide { grid-column: span 2; }
+.picks.nums .pick.wide span { font-family: var(--body); font-size: 15px; font-weight: 600; }
+.step-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.loesung { margin: 0 0 18px; padding: 14px 16px; border: 2px solid var(--red); border-radius: var(--r); position: relative; background: var(--white); }
+.loesung::before { content: "Lösung"; position: absolute; top: -15px; left: 12px; background: var(--white); padding: 0 6px; font: 700 20px/1 var(--hand); color: var(--red); transform: rotate(-3deg); }
+.loesung p { font-family: var(--hand); font-size: 20px; line-height: 1.3; color: var(--blue); }
+.loesung p + p { margin-top: 4px; }
+.loesung .warn { color: var(--red); }
+.field { display: grid; gap: 6px; min-width: 0; }
+.fields { display: grid; gap: 12px; }
+@media (min-width: 560px) { .fields.two { grid-template-columns: 1fr 1fr; } }
+label.l { font-weight: 700; font-size: 15.5px; }
+label.l span { font-weight: 400; color: var(--muted); }
+input[type=text], input[type=tel], input[type=email], textarea { width: 100%; min-height: 52px; padding: 12px 14px; border: 1.5px solid var(--ink); border-radius: var(--r); font: 17px var(--body); color: var(--ink); background: var(--white); }
+input:focus, textarea:focus { outline: 3px solid var(--marker); border-color: var(--blue); }
+[aria-invalid="true"] { border-color: var(--red) !important; background: #fff6f6 !important; }
+.msg { color: var(--red); font-size: 14.5px; font-weight: 700; }
+.hp { position: absolute !important; left: -9999px !important; }
+.submit { width: 100%; margin-top: 16px; min-height: 58px; font-size: 18px; }
+.fine { margin-top: 12px; font-size: 14px; color: var(--muted); text-align: center; }
+.fine b { color: var(--ink); }
+.done-box { text-align: left; display: grid; gap: 12px; }
+.done-box .stamp-ok { justify-self: start; font: 700 44px/1 var(--hand); color: var(--red); border: 3px double var(--red); border-radius: 50%; padding: 18px 22px; transform: rotate(-8deg); }
+.alt { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; margin-top: 14px; font-size: 15px; }
+.alt a { font-weight: 700; }
+
+/* ---------- Sektionen ---------- */
+.sec { padding-block: clamp(56px, 8vw, 110px); }
+.sec.soft { background: rgba(232,238,252,.75); border-block: 1px solid var(--line); }
+.sec.ink { background: var(--blue); color: #e6ebff; background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px); background-size: 24px 24px; }
+.sec.ink h2, .sec.ink h3 { color: var(--white); }
+.head { max-width: 760px; display: grid; gap: 14px; margin-bottom: clamp(28px, 4vw, 48px); }
+.head .note { font: 700 21px/1.2 var(--hand); color: var(--red); transform: rotate(-1.2deg); transform-origin: left; }
+.sec.ink .head .note { color: var(--marker); }
+.head p:not(.note) { color: var(--muted); font-size: 19px; }
+.sec.ink .head p:not(.note) { color: #d7defb; }
+.grid { display: grid; gap: 20px; }
+.grid > * { min-width: 0; }
+@media (min-width: 720px) { .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 620px) and (max-width: 999px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.card { background: var(--white); border: 1.5px solid var(--ink); border-radius: var(--r); padding: clamp(18px, 2.4vw, 26px); box-shadow: 5px 5px 0 var(--ink); display: flex; flex-direction: column; gap: 8px; }
+.card p { color: var(--muted); }
+
+/* Beweise */
+.numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 2px solid var(--ink); background: var(--white); border-radius: var(--r); }
+@media (min-width: 820px) { .numbers { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.numbers div { padding: 18px 16px; display: grid; gap: 2px; border-right: 1.5px dashed var(--line); border-bottom: 1.5px dashed var(--line); }
+.numbers b { font-family: var(--display); font-size: clamp(2.2rem, 4.4vw, 3.2rem); line-height: 1; letter-spacing: -.04em; }
+.numbers b em { font-style: normal; color: var(--red); font-size: .6em; vertical-align: .35em; }
+.numbers span { color: var(--muted); font-size: 15px; }
+.notes { display: grid; gap: 26px; margin-top: 34px; }
+@media (min-width: 820px) { .notes { grid-template-columns: 1fr 1fr; } }
+.postit { margin: 0; background: var(--marker-soft); padding: 26px 24px 20px; box-shadow: 0 14px 22px -14px rgba(16,22,49,.45); transform: rotate(-1deg); display: grid; gap: 10px; position: relative; }
+.postit:nth-child(2) { background: #dfeaff; transform: rotate(1deg); }
+.postit::before { content: ""; position: absolute; top: -10px; left: 50%; width: 90px; height: 22px; transform: translateX(-50%) rotate(-2deg); background: rgba(255,255,255,.65); border: 1px solid rgba(16,22,49,.08); }
+.postit blockquote { margin: 0; font-size: 18px; }
+.postit cite { font: 700 21px var(--hand); color: var(--blue); font-style: normal; }
+.postit .stars { color: var(--red); letter-spacing: 2px; }
+
+.founder-line { display: flex; gap: 16px; align-items: flex-start; margin-top: 30px; padding-top: 22px; border-top: 1.5px dashed var(--line); }
+.founder-line .av { flex: 0 0 64px; width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font: 700 26px var(--hand); color: var(--blue); background: var(--white); }
+.founder-line q { font: 700 20px/1.3 var(--hand); color: var(--blue); quotes: "„" "“"; }
+
+/* Kleingedrucktes – groß */
+.big-print { display: grid; gap: 0; border-top: 2px solid var(--white); }
+.big-print li { list-style: none; display: grid; gap: 4px 28px; padding: 22px 0; border-bottom: 1.5px dashed rgba(255,255,255,.35); }
+@media (min-width: 820px) { .big-print li { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: baseline; } }
+.big-print strong { font-family: var(--display); font-size: clamp(1.5rem, 3.2vw, 2.3rem); line-height: 1.08; letter-spacing: -.02em; color: var(--white); }
+.big-print strong mark { background: none; color: var(--marker); }
+.big-print span { color: #d7defb; }
+.big-print { margin: 0; padding: 0; }
+
+/* Ablauf */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; counter-reset: s; }
+@media (min-width: 860px) { .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.steps li { counter-increment: s; position: relative; padding-left: 62px; }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: -4px; width: 46px; height: 46px; border: 2.5px solid var(--red); border-radius: 50% 46% 52% 44%; display: grid; place-items: center; font: 700 25px var(--hand); color: var(--red); transform: rotate(-4deg); background: var(--white); }
+.steps strong { display: block; font-size: 19px; }
+.steps span { color: var(--muted); }
+
+/* Tafelbild */
+.boards { display: grid; gap: 14px; min-width: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs button { font: 700 15.5px var(--body); min-height: 44px; padding: 0 16px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--white); cursor: pointer; color: var(--ink); }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--white); }
+.board { border: 1.5px solid var(--ink); border-radius: var(--r); box-shadow: 5px 5px 0 var(--ink); padding: clamp(18px, 3vw, 30px); display: grid; gap: 14px; position: relative; overflow: hidden; background-color: var(--white); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; }
+.board .tag { font: 700 18px var(--hand); color: var(--red); padding-right: 84px; }
+.board .task { font-weight: 700; font-size: 18.5px; background: var(--white); border-left: 4px solid var(--blue); padding: 8px 12px; }
+.board ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.board li { display: grid; gap: 0 14px; align-items: baseline; }
+@media (min-width: 560px) { .board li { grid-template-columns: 112px minmax(0, 1fr); } }
+.board .lbl { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.board .h { font: 700 25px/1.2 var(--hand); color: var(--blue); }
+@media (min-width: 560px) { .board .h { font-size: 27px; } }
+.board li.new .h { animation: ink .5s ease-out; }
+@keyframes ink { from { opacity: .15; transform: translateX(-6px); } }
+.board .ok { color: var(--red); }
+.board .ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; min-height: 46px; }
+.board .aha { position: absolute; top: 8px; right: 18px; font: 700 48px/1 var(--hand); color: var(--red); transform: rotate(-10deg); }
+.btn-dark { background: var(--ink); color: var(--white); box-shadow: 0 4px 0 #000; }
+
+/* Fächer */
+.subjects { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.subjects li { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--white); font-weight: 700; }
+.subjects li:nth-child(3n+1) { box-shadow: 3px 3px 0 var(--blue); }
+.subjects li:nth-child(3n+2) { box-shadow: 3px 3px 0 var(--red); }
+.subjects li:nth-child(3n) { box-shadow: 3px 3px 0 var(--marker); }
+.subjects small { font-weight: 400; color: var(--muted); font-size: 13.5px; }
+
+/* Preis als Rechnung */
+.calc-grid { display: grid; gap: 34px; align-items: center; }
+@media (min-width: 900px) { .calc-grid { grid-template-columns: 1fr 1fr; gap: 64px; } }
+.calc { border: 1.5px solid var(--ink); border-radius: var(--r); box-shadow: 5px 5px 0 var(--ink); padding: clamp(22px, 3vw, 34px); display: grid; gap: 4px; background-color: var(--white); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; }
+.calc .label { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.calc .row { font: 700 clamp(26px, 3.4vw, 36px)/1.35 var(--hand); color: var(--blue); }
+.calc .res { display: inline-block; font: 700 clamp(34px, 4.6vw, 48px)/1.15 var(--hand); color: var(--blue); border-bottom: 3px solid var(--red); box-shadow: 0 5px 0 var(--white), 0 8px 0 var(--red); }
+.calc .sep { margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed var(--line); }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.checks li { position: relative; padding-left: 30px; font-weight: 600; }
+.checks li::before { content: "✓"; position: absolute; left: 2px; top: -6px; font: 700 27px var(--hand); color: var(--red); }
+
+/* Team */
+.team { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 820px) { .team { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.person { background: var(--white); border: 1.5px solid var(--ink); border-radius: var(--r); padding: 16px; display: grid; gap: 6px; align-content: start; }
+.person .av { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font: 700 22px var(--hand); color: var(--blue); }
+.person b { font-family: var(--display); font-size: 18px; line-height: 1.15; }
+.person span { font-size: 14px; font-weight: 700; color: var(--blue); }
+.person p { font-size: 14.5px; color: var(--muted); }
+.founder { grid-column: 1 / -1; display: grid; gap: 14px 22px; align-items: center; box-shadow: 5px 5px 0 var(--ink); }
+@media (min-width: 720px) { .founder { grid-template-columns: auto 1fr; } }
+.founder .av { width: 92px; height: 92px; font-size: 36px; }
+.founder q { font: 700 22px/1.3 var(--hand); color: var(--blue); quotes: "„" "“"; }
+.ph { color: #7a4c00; background: #fff1cc; border: 1px dashed #d9a640; padding: 0 5px; border-radius: 3px; font-size: .92em; }
+
+/* FAQ */
+.faq { display: grid; gap: 10px; max-width: 860px; }
+.faq details { border: 1.5px solid var(--ink); border-radius: var(--r); background: var(--white); }
+.faq summary { cursor: pointer; list-style: none; padding: 16px 54px 16px 18px; font-weight: 700; position: relative; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; position: absolute; right: 18px; top: 7px; font: 700 30px var(--hand); color: var(--red); }
+.faq details[open] summary { background: var(--marker-soft); }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { padding: 12px 18px 18px; }
+
+/* Schluss */
+.final { background: var(--marker); padding: clamp(28px, 5vw, 60px); display: grid; gap: 16px; justify-items: start; transform: rotate(-.4deg); box-shadow: 0 22px 30px -20px rgba(16,22,49,.5); position: relative; }
+.final::before { content: ""; position: absolute; top: -12px; left: 40px; width: 110px; height: 26px; transform: rotate(-3deg); background: rgba(255,255,255,.6); }
+.final h2 { font-size: clamp(2.2rem, 6vw, 4.4rem); }
+.final .note { font: 700 22px var(--hand); color: var(--red); }
+
+/* Fuß */
+footer { background: var(--ink); color: #c9d0e6; padding-block: 40px; font-size: 15.5px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 28px; justify-content: space-between; align-items: center; }
+footer a { color: #eef1fb; }
+footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+
+/* Handy-Leiste */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; display: flex; gap: 10px; background: var(--white); border-top: 2px solid var(--ink); padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); transform: translateY(115%); transition: transform .22s ease; }
+.bar.show { transform: none; }
+.bar .btn { min-height: 50px; padding: 0 12px; font-size: 16px; white-space: nowrap; }
+.bar .btn-primary { flex: 1; }
+@media (min-width: 980px) { .bar { display: none; } }
+@media (max-width: 979px) { footer { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); } }
+</style>
+</head>
+<body>
+<a class="skip" href="#anfrage">Direkt zur Anfrage springen</a>
+<div class="proto"><b>Prototyp</b> · Ideen-Entwurf „Catcher“ – nicht die echte Website, das Formular sendet nichts.</div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Nachhilfe Online – nach oben"><b>Nachhilfe <span>Online</span></b><small>Alle Fächer · seit 2001</small></a>
+    <nav aria-label="Seitenbereiche"><a href="#stimmen">Stimmen</a><a href="#ehrlich">Preise &amp; Bedingungen</a><a href="#unterricht">So klingt’s</a></nav>
+    <div class="top-actions">
+      <a class="tel" href="tel:+491703141596">+49 170 3141596</a>
+      <a class="btn btn-primary btn-sm" href="#anfrage" data-to-form>Probestunde</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<!-- ================= Held: die Anfrage ist der erste Bildschirm ================= -->
+<section class="hero" aria-labelledby="h1"><div class="wrap hero-grid">
+  <div>
+    <p class="proof"><span class="stars" aria-hidden="true">★★★★★</span><a href="#stimmen">5,0 bei 623 Google-Bewertungen</a><span class="since">· seit 2001</span></p>
+    <h1 id="h1">Aus <span class="q">Hä?</span><br>wird <span class="aha" id="aha">Aha.</span></h1>
+    <p class="lead always">Online-Nachhilfe in allen Fächern – 1:1, persönlich und mit einer Lehrkraft, die passt. Die erste Stunde ist kostenlos.</p>
+    <ul class="promise"><li>kostenlos &amp; unverbindlich</li><li>kein Vertrag</li><li>Antwort persönlich von Marcel</li></ul>
+  </div>
+
+  <form class="sheet" id="anfrage" novalidate aria-label="Kostenlose Probestunde anfragen">
+    <div class="sheet-head"><span class="t" id="sheet-title">Aufgabe 1 von 4</span><span class="boxes" aria-hidden="true"><i class="now"></i><i></i><i></i><i></i></span></div>
+    <div class="sheet-body">
+      <div class="answers" id="answers" aria-label="Deine Antworten"></div>
+
+      <fieldset class="step" data-step="1">
+        <legend>Wobei hängt’s gerade?<small>Tipp einfach an – es dauert eine Minute.</small></legend>
+        <div class="picks">
+          <label class="pick"><input type="radio" name="fach" value="Mathe"><span>Mathe</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Deutsch"><span>Deutsch</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Englisch"><span>Englisch</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Französisch"><span>Französisch</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Latein"><span>Latein</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Spanisch"><span>Spanisch</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Physik"><span>Physik</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Chemie"><span>Chemie</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Biologie"><span>Biologie</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Informatik"><span>Informatik</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Wirtschaft"><span>Wirtschaft</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Geschichte"><span>Geschichte</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Geografie"><span>Geografie</span></label>
+          <label class="pick"><input type="radio" name="fach" value="Mehrere Fächer"><span>Mehrere Fächer</span></label>
+        </div>
+        <div class="step-foot"><span class="small">Schritt 1 von 4</span><button class="btn btn-ghost btn-sm" type="button" data-next>Weiter</button></div>
+      </fieldset>
+
+      <fieldset class="step" data-step="2" hidden>
+        <legend>In welcher Klasse?</legend>
+        <div class="picks nums">
+          <label class="pick"><input type="radio" name="klasse" value="1"><span>1</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="2"><span>2</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="3"><span>3</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="4"><span>4</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="5"><span>5</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="6"><span>6</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="7"><span>7</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="8"><span>8</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="9"><span>9</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="10"><span>10</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="11"><span>11</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="12"><span>12</span></label>
+          <label class="pick"><input type="radio" name="klasse" value="13"><span>13</span></label>
+          <label class="pick wide"><input type="radio" name="klasse" value="Studium"><span>Studium</span></label>
+          <label class="pick wide"><input type="radio" name="klasse" value="Sonstiges"><span>Sonstiges</span></label>
+        </div>
+        <div class="step-foot"><button class="btn-link" type="button" data-back>← zurück</button><button class="btn btn-ghost btn-sm" type="button" data-next>Weiter</button></div>
+      </fieldset>
+
+      <fieldset class="step" data-step="3" hidden>
+        <legend>Was steht an?</legend>
+        <div class="picks">
+          <label class="pick"><input type="radio" name="ziel" value="luecken"><span>Lücken schließen</span></label>
+          <label class="pick"><input type="radio" name="ziel" value="arbeit"><span>Nächste Klassenarbeit</span></label>
+          <label class="pick"><input type="radio" name="ziel" value="pruefung"><span>Abschlussprüfung</span></label>
+          <label class="pick"><input type="radio" name="ziel" value="sicherer"><span>Einfach sicherer werden</span></label>
+          <label class="pick"><input type="radio" name="ziel" value="fragen"><span>Nur einzelne Fragen</span></label>
+        </div>
+        <div class="step-foot"><button class="btn-link" type="button" data-back>← zurück</button><button class="btn btn-ghost btn-sm" type="button" data-next>Weiter</button></div>
+      </fieldset>
+
+      <fieldset class="step" data-step="4" hidden>
+        <div class="loesung" id="loesung" aria-live="polite"><p id="l1"></p><p id="l2"></p><p id="l3" class="warn" hidden></p></div>
+        <legend>Wie erreichen wir euch?<small>Bei Kindern bitte die Daten eines Elternteils.</small></legend>
+        <div class="fields two">
+          <div class="field"><label class="l" for="f-name">Vorname</label><input type="text" id="f-name" name="name" autocomplete="given-name" required maxlength="80" aria-describedby="f-name-msg"><span class="msg" id="f-name-msg" hidden>Wie dürfen wir dich ansprechen?</span></div>
+          <div class="field"><label class="l" for="f-kontakt">Handy oder E-Mail</label><input type="text" id="f-kontakt" name="kontakt" autocomplete="email" inputmode="email" required maxlength="120" aria-describedby="f-kontakt-msg"><span class="msg" id="f-kontakt-msg" hidden>Damit Marcel antworten kann – Handy oder E-Mail reicht.</span></div>
+        </div>
+        <div class="fields" style="margin-top:12px"><div class="field"><label class="l" for="f-zeit">Wann passt es meistens? <span>(optional)</span></label><input type="text" id="f-zeit" name="zeiten" maxlength="200" placeholder="z. B. nachmittags, Mo/Mi"></div></div>
+        <div class="hp" aria-hidden="true"><label for="f-web">Website</label><input type="text" id="f-web" name="website" tabindex="-1" autocomplete="off"></div>
+        <button class="btn btn-primary submit" type="submit">Kostenlose Probestunde anfragen</button>
+        <p class="fine"><b>Kostenlos · unverbindlich · kein Vertrag.</b> Wir nutzen deine Angaben nur für die Rückmeldung. <a href="https://www.mathenachhilfe-online.com/datenschutz/">Datenschutz</a></p>
+        <div class="step-foot"><button class="btn-link" type="button" data-back>← zurück</button></div>
+      </fieldset>
+
+      <div class="done-box" id="done" hidden tabindex="-1">
+        <span class="stamp-ok" aria-hidden="true">Aha!</span>
+        <h2 style="font-size:clamp(1.8rem,4vw,2.6rem)">Danke, <span id="done-name">dir</span>!</h2>
+        <p>Deine Anfrage ist angekommen. Marcel meldet sich persönlich bei dir und schlägt eine passende Lehrkraft und einen Termin vor.</p>
+        <p class="small"><b>Prototyp:</b> Es wurde nichts verschickt.</p>
+        <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener">Schneller per WhatsApp</a>
+      </div>
+    </div>
+  </form>
+  <p class="alt" style="grid-column:1/-1;margin-top:0">Lieber direkt? <a href="https://wa.me/491703141596" rel="noopener">WhatsApp</a> · <a href="tel:+491703141596">+49 170 3141596</a> · täglich 9–17 Uhr</p>
+</div></section>
+
+<!-- ================= Beweise ================= -->
+<section class="sec" id="stimmen" aria-labelledby="h-stimmen"><div class="wrap">
+  <div class="head"><p class="note">Was Familien sagen</p><h2 id="h-stimmen">Lieber echte Stimmen als große Versprechen.</h2></div>
+  <div class="numbers">
+    <div><b>5,0<em>★</em></b><span>Google-Bewertung</span></div>
+    <div><b>623</b><span>Bewertungen</span></div>
+    <div><b>2001</b><span>Nachhilfe seit</span></div>
+    <div><b>20</b><span>Lehrkräfte</span></div>
+  </div>
+  <div class="notes">
+    <figure class="postit"><span class="stars" aria-label="5 von 5 Sternen">★★★★★</span><blockquote>„Ich bin jetzt seit knapp zwei Monaten einmal pro Woche bei Selinay in der Mathenachhilfe und bin wirklich sehr zufrieden. Sie erklärt die Themen …“</blockquote><figcaption><cite>Lina Maier</cite></figcaption></figure>
+    <figure class="postit"><span class="stars" aria-label="5 von 5 Sternen">★★★★★</span><blockquote>„Wir sind sehr zufrieden mit Marcel und seinem gesamten Team von Mathenachhilfe-Online. Unsere Tochter hatte Unterricht bei Selinay zur Vorbereitung auf die Realschul-Abschlussprüfung in …“</blockquote><figcaption><cite>niduscka</cite></figcaption></figure>
+  </div>
+  <div class="founder-line"><span class="av" aria-hidden="true">MD</span><p><b>Marcel Daum</b>, Gründer, seit 2001 in der Nachhilfe und Dozent für Abschlusskurse in Aschaffenburg und Hessen: <q>Gemeinsam finden wir die passende Lehrkraft. Bei Fragen bleibe ich persönlich für euch da.</q></p></div>
+  <p class="small" style="margin-top:22px">Auszug aus Google-Rezensionen, Originaltexte gekürzt. <a href="https://www.google.com/search?q=Mathenachhilfe-Online+Marcel+Daum+Aschaffenburg+Rezensionen" rel="noopener">Alle 623 bei Google ↗</a></p>
+</div></section>
+
+<!-- ================= Kleingedrucktes, groß ================= -->
+<section class="sec ink" id="ehrlich" aria-labelledby="h-klein"><div class="wrap">
+  <div class="head"><p class="note">Ehrlich gesagt</p><h2 id="h-klein">Kleingedrucktes? Hier ist es groß.</h2><p>Preis, Bedingungen und Ablauf – alles, was Eltern vor dem Start wissen wollen.</p></div>
+  <ul class="big-print">
+    <li><strong>Die Probestunde kostet <mark>nichts</mark>.</strong><span>Einmal pro Schülerin oder Schüler. Für Abschlussklassen: Anfrage spätestens drei Monate vor der Prüfung.</span></li>
+    <li><strong>Danach ab <mark>23,50 €</mark> pro Stunde.</strong><span>60 Minuten Einzelunterricht im ersten 20-Stunden-Paket (470 €), weitere Pakete ab 23,75 €. Gruppe ab 15,38 € pro Kind.</span></li>
+    <li><strong><mark>Kein Vertrag</mark>, keine Bindung.</strong><span>Ihr kauft Pakete mit 5, 10, 15 oder 20 Stunden – und entscheidet jedes Mal neu.</span></li>
+    <li><strong>Stunden <mark>verfallen nicht</mark>.</strong><span>Keine Einlösefrist. Und sie gelten für alle Fächer – auch für Geschwister.</span></li>
+    <li><strong><mark>14 Tage</mark> Geld zurück.</strong><span>Noch keine Stunde genutzt? Innerhalb von 14 Tagen nach dem Kauf gibt es den vollen Kaufpreis zurück.</span></li>
+    <li><strong>Absagen bis <mark>24 Stunden</mark> vorher: kostenlos.</strong><span>Bei Krankheit gelten mit Attest auch kürzere Fristen.</span></li>
+    <li><strong>Passt nicht? <mark>Wechseln</mark>.</strong><span>Lehrkraft oder Fach wechseln ist unkompliziert.</span></li>
+    <li><strong>Online – und trotzdem <mark>1:1</mark>.</strong><span>Über Microsoft Teams, gemeinsam am Tablet; Notizen danach als PDF. Ihr braucht nur Internet und Teams.</span></li>
+  </ul>
+</div></section>
+
+<!-- ================= Ablauf + Tafelbild ================= -->
+<section class="sec" id="unterricht" aria-labelledby="h-aha"><div class="wrap">
+  <div class="grid g2" style="gap:36px;align-items:center">
+    <div style="display:grid;gap:14px">
+      <p class="note hand" style="color:var(--red);font-size:21px">Ein Blick in die Stunde</p>
+      <h2 id="h-aha">So klingt „Aha.“</h2>
+      <p style="color:var(--muted);font-size:19px">Ob Prozentrechnung, Rechtschreibung oder Grammatik: Wir gehen jede Aufgabe Schritt für Schritt an – gemeinsam am Tablet. Die Notizen gibt es danach als PDF oder in GoodNotes.</p>
+      <p class="small"><span class="ph">[Prototyp: Beispiele – später echte Tafelbilder aus dem Unterricht]</span></p>
+    </div>
+    <div class="boards" data-boards>
+      <div class="tabs" role="tablist" aria-label="Fach wählen" hidden>
+        <button type="button" role="tab" data-tab="mathe" aria-selected="true" aria-controls="b-mathe">Mathe</button>
+        <button type="button" role="tab" data-tab="deutsch" aria-selected="false" aria-controls="b-deutsch">Deutsch</button>
+        <button type="button" role="tab" data-tab="englisch" aria-selected="false" aria-controls="b-englisch">Englisch</button>
+      </div>
+      <div class="board" id="b-mathe" data-board="mathe" role="tabpanel" aria-label="Mathe">
+        <p class="tag">Prozentrechnung · Klasse 7</p>
+        <p class="task">Eine Jacke kostet 80 €. Sie wird um 25 % reduziert. Wie viel kostet sie jetzt?</p>
+        <ol><li><span class="lbl">1 · Gesucht</span><span class="h">der neue Preis</span></li><li><span class="lbl">2 · Gegeben</span><span class="h">Grundwert 80 € · Rabatt 25 %</span></li><li><span class="lbl">3 · Ansatz</span><span class="h">100 % − 25 % = 75 % bleiben</span></li><li><span class="lbl">4 · Rechnen</span><span class="h">80 € · 0,75 = 60 €</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">25 % von 80 € = 20 € → 80 € − 20 € = 60 € <b class="ok">✓</b></span></li></ol>
+        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
+      </div>
+      <div class="board" id="b-deutsch" data-board="deutsch" role="tabpanel" aria-label="Deutsch">
+        <p class="tag">das oder dass · Klasse 6</p>
+        <p class="task">Ich hoffe, ___ das Wetter morgen gut wird.</p>
+        <ol><li><span class="lbl">1 · Frage</span><span class="h">„das“ oder „dass“?</span></li><li><span class="lbl">2 · Test</span><span class="h">„dieses“ einsetzen: „Ich hoffe, dieses das Wetter …“ – passt nicht</span></li><li><span class="lbl">3 · Regel</span><span class="h">Passt nicht → Bindewort → dass</span></li><li><span class="lbl">4 · Lösung</span><span class="h">Ich hoffe, dass das Wetter morgen gut wird.</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">Nebensatz, Verb am Ende („wird“) <b class="ok">✓</b></span></li></ol>
+        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
+      </div>
+      <div class="board" id="b-englisch" data-board="englisch" role="tabpanel" aria-label="Englisch">
+        <p class="tag">Simple Past · Klasse 6</p>
+        <p class="task">Yesterday I ___ (go) to the cinema.</p>
+        <ol><li><span class="lbl">1 · Gesucht</span><span class="h">die richtige Zeitform</span></li><li><span class="lbl">2 · Signalwort</span><span class="h">yesterday → abgeschlossen, Vergangenheit</span></li><li><span class="lbl">3 · Regel</span><span class="h">Signalwort der Vergangenheit → Simple Past</span></li><li><span class="lbl">4 · Lösung</span><span class="h">go → went: Yesterday I went to the cinema.</span></li><li><span class="lbl">5 · Prüfen</span><span class="h">nicht „have gone“ – passt nicht zu yesterday <b class="ok">✓</b></span></li></ol>
+        <div class="ctrl"><button class="btn btn-dark btn-sm" type="button" data-step-next hidden>Nächster Schritt</button><span class="small" data-count aria-live="polite"></span></div><span class="aha" data-aha>Aha.</span>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ================= Schluss ================= -->
+<section class="sec" style="padding-top:0"><div class="wrap">
+  <div class="final">
+    <p class="note">Hausaufgabe für heute</p>
+    <h2>Eine Minute.<br>Dann ist die Frage raus.</h2>
+    <a class="btn btn-primary" href="#anfrage" data-to-form>Kostenlose Probestunde anfragen</a>
+    <p class="small" style="color:#3b3f52">Kostenlos · unverbindlich · kein Vertrag</p>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <span>© 2026 Nachhilfe Online · Marcel Daum, Aschaffenburg · <a href="tel:+491703141596">+49 170 3141596</a> · <a href="mailto:marcel.daum@mathenachhilfe-online.com">marcel.daum@mathenachhilfe-online.com</a></span>
+  <nav aria-label="Rechtliches"><a href="https://www.mathenachhilfe-online.com/impressum/">Impressum</a><a href="https://www.mathenachhilfe-online.com/datenschutz/">Datenschutz</a><a href="https://www.mathenachhilfe-online.com/agb/">AGB</a></nav>
+</div></footer>
+
+<div class="bar" id="bar" inert>
+  <a class="btn btn-primary" href="#anfrage" data-to-form>Probestunde in 1 Minute</a>
+  <a class="btn btn-ghost" href="https://wa.me/491703141596" rel="noopener" aria-label="Per WhatsApp schreiben">WhatsApp</a>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  // Lehrkräfte je Fach (aus der Team-Seite der bisherigen Website)
+  var LK = { "Mathe": 17, "Deutsch": 4, "Englisch": 8, "Französisch": 3, "Latein": 1, "Spanisch": 1, "Physik": 5, "Chemie": 2, "Biologie": 6, "Informatik": 1, "Wirtschaft": 1, "Geschichte": 1 };
+  var ZIEL = { luecken: "Lücken schließen", arbeit: "nächste Klassenarbeit", pruefung: "Abschlussprüfung", sicherer: "sicherer werden", fragen: "einzelne Fragen" };
+
+  var form = document.getElementById("anfrage");
+  var steps = [].slice.call(form.querySelectorAll(".step"));
+  var boxes = form.querySelectorAll(".boxes i");
+  var title = document.getElementById("sheet-title");
+  var answers = document.getElementById("answers");
+  var aha = document.getElementById("aha");
+  var q = document.querySelector(".hero h1 .q");
+  var cur = 1, pointer = false;
+
+  var val = function (n) { var c = form.querySelector('input[name="' + n + '"]:checked'); return c ? c.value : ""; };
+
+  function progress(n) {
+    // 0 % am Anfang, 100 % nach dem Absenden
+    // ein kleines Stück Marker von Anfang an – damit klar ist: das füllt sich
+    aha.style.setProperty("--p", String(0.12 + 0.88 * n));
+  }
+
+  function show(n, focus) {
+    cur = n;
+    steps.forEach(function (s) { s.hidden = Number(s.dataset.step) !== n; });
+    boxes.forEach(function (b, i) { b.className = i < n - 1 ? "done" : (i === n - 1 ? "now" : ""); });
+    title.textContent = "Aufgabe " + n + " von 4";
+    progress((n - 1) / 4);
+    renderAnswers();
+    if (n === 4) solve();
+    if (focus) {
+      var step = steps[n - 1];
+      var target = step.querySelector("input:checked") || step.querySelector("input:not([type=hidden]):not(:disabled)") || step;
+      target.focus({ preventScroll: true });
+      var r = form.getBoundingClientRect();
+      if (r.top < 60 || r.top > window.innerHeight * 0.5) form.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function renderAnswers() {
+    var a = [];
+    if (val("fach") && cur > 1) a.push([1, val("fach")]);
+    if (val("klasse") && cur > 2) a.push([2, /^\d+$/.test(val("klasse")) ? "Klasse " + val("klasse") : val("klasse")]);
+    if (val("ziel") && cur > 3) a.push([3, ZIEL[val("ziel")]]);
+    answers.innerHTML = "";
+    a.forEach(function (x) {
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = x[1];
+      b.setAttribute("aria-label", x[1] + " – ändern");
+      b.addEventListener("click", function () { show(x[0], true); });
+      answers.appendChild(b);
+    });
+  }
+
+  // Grundschule: keine Abschlussprüfung
+  function updateZiel() {
+    var k = Number(val("klasse"));
+    var p = form.querySelector('input[name="ziel"][value="pruefung"]');
+    var grund = k >= 1 && k <= 4;
+    p.disabled = grund;
+    if (grund && p.checked) p.checked = false;
+  }
+
+  function solve() {
+    var fach = val("fach"), k = val("klasse"), z = val("ziel"), kn = Number(k);
+    var wer = /^\d+$/.test(k) ? "Klasse " + k : k;
+    var rec = {
+      luecken: "Erst finden wir heraus, wo die Lücke beginnt – dann bauen wir die Grundlagen Schritt für Schritt wieder auf.",
+      arbeit: "Wir starten beim aktuellen Thema und machen einen realistischen Plan bis zur Arbeit.",
+      pruefung: (kn >= 11 ? "Abitur" : (kn >= 9 ? "Mittlere Reife oder Mittelschulabschluss" : "Prüfung")) + " mit Plan: Stoff ordnen, echte Prüfungsaufgaben, zwei Probeläufe.",
+      sicherer: "Regelmäßig 1:1 – damit Fragen gar nicht erst liegen bleiben.",
+      fragen: fach === "Mathe" ? "Für einzelne Mathe-Fragen gibt es auch den Fragenpass – erst mal aber die kostenlose Probestunde." : "Ihr bucht einfach Stunden, wenn eine Frage ansteht – sie verfallen nicht."
+    }[z] || "Wir schauen gemeinsam, was gerade am meisten hilft.";
+    document.getElementById("l1").textContent = "Aha: " + [fach, wer, ZIEL[z]].filter(Boolean).join(" · ") + ".";
+    var n = LK[fach];
+    document.getElementById("l2").textContent = "→ " + rec + (n ? " " + n + (n === 1 ? " Lehrkraft unterrichtet " : " Lehrkräfte unterrichten ") + fach + "." : " Die passende Lehrkraft sucht Marcel persönlich aus.");
+    var w = document.getElementById("l3");
+    w.hidden = z !== "pruefung";
+    w.textContent = "Wichtig: Für Abschlussklassen muss die Anfrage spätestens drei Monate vor der Prüfung bei uns sein.";
+  }
+
+  // Antippen = weiter (mit kurzer Pause, damit man die Auswahl sieht). Tastatur: "Weiter".
+  form.addEventListener("pointerdown", function (e) { if (e.target.closest(".pick")) pointer = true; });
+  form.addEventListener("change", function (e) {
+    if (e.target.name === "klasse") updateZiel();
+    if (!e.target.closest(".picks")) return;
+    if (pointer && cur < 4) { pointer = false; var n = cur + 1; setTimeout(function () { show(n, true); }, 260); }
+  });
+  form.querySelectorAll("[data-next]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var need = { 1: "fach", 2: "klasse", 3: "ziel" }[cur];
+      if (need && !val(need)) {
+        var first = steps[cur - 1].querySelector("input:not(:disabled)");
+        first.focus();
+        b.textContent = "Bitte erst antippen";
+        setTimeout(function () { b.textContent = "Weiter"; }, 1600);
+        return;
+      }
+      show(cur + 1, true);
+    });
+  });
+  form.querySelectorAll("[data-back]").forEach(function (b) { b.addEventListener("click", function () { show(Math.max(1, cur - 1), true); }); });
+
+  // Absenden (Prototyp: nichts wird verschickt)
+  var check = function (el) {
+    var ok = el.value.trim().length > 1;
+    el.setAttribute("aria-invalid", String(!ok));
+    document.getElementById(el.id + "-msg").hidden = ok;
+    return ok;
+  };
+  ["f-name", "f-kontakt"].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener("input", function () { if (el.getAttribute("aria-invalid") === "true") check(el); });
+  });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (document.getElementById("f-web").value) return; // Honeypot
+    var bad = ["f-name", "f-kontakt"].map(function (id) { return document.getElementById(id); }).filter(function (el) { return !check(el); });
+    if (bad.length) { bad[0].focus(); return; }
+    steps.forEach(function (s) { s.hidden = true; });
+    answers.innerHTML = "";
+    boxes.forEach(function (b) { b.className = "done"; });
+    title.textContent = "Alle Aufgaben gelöst";
+    progress(1);
+    document.getElementById("done-name").textContent = document.getElementById("f-name").value.trim().split(/\s+/)[0];
+    var d = document.getElementById("done"); d.hidden = false; d.focus();
+  });
+
+  // Alle "Probestunde"-Links: zum Arbeitsblatt und erste offene Aufgabe fokussieren
+  document.querySelectorAll("[data-to-form]").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(function () { if (!document.getElementById("done").hidden) return; show(cur, true); }, 450);
+    });
+  });
+
+  show(1, false);
+  setTimeout(function () { q.style.setProperty("--circle", "100%"); }, 250);
+
+  // Tafelbild: Reiter + Schritt für Schritt (ohne JS alles sichtbar)
+  var wrap = document.querySelector("[data-boards]");
+  var tabs = wrap.querySelectorAll("[data-tab]");
+  var boards = wrap.querySelectorAll("[data-board]");
+  wrap.querySelector(".tabs").hidden = false;
+  var pick = function (k) {
+    tabs.forEach(function (t) { t.setAttribute("aria-selected", String(t.dataset.tab === k)); });
+    boards.forEach(function (b) { b.hidden = b.dataset.board !== k; });
+  };
+  tabs.forEach(function (t) { t.addEventListener("click", function () { pick(t.dataset.tab); }); });
+  boards.forEach(function (b) {
+    var li = b.querySelectorAll("li"), next = b.querySelector("[data-step-next]"), cnt = b.querySelector("[data-count]"), ah = b.querySelector("[data-aha]"), n = 1;
+    var r = function (anim) {
+      li.forEach(function (x, i) { x.hidden = i >= n; x.classList.toggle("new", anim && i === n - 1); });
+      ah.hidden = n < li.length;
+      next.textContent = n >= li.length ? "Noch mal von vorn" : "Nächster Schritt";
+      cnt.textContent = "Schritt " + n + " von " + li.length;
+    };
+    next.hidden = false;
+    next.addEventListener("click", function () { n = n >= li.length ? 1 : n + 1; r(true); });
+    r(false);
+  });
+  pick("mathe");
+
+  // Handy-Leiste: erst, wenn das Arbeitsblatt aus dem Bild ist; weg am Schluss-Zettel und Fuß
+  var bar = document.getElementById("bar");
+  if ("IntersectionObserver" in window) {
+    var seen = new Set();
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) seen.add(e.target); else seen.delete(e.target); });
+      var show = seen.size === 0 && window.scrollY > 200;
+      bar.classList.toggle("show", show);
+      if (show) bar.removeAttribute("inert"); else bar.setAttribute("inert", "");
+    });
+    [form, document.querySelector(".final"), document.querySelector("footer")].forEach(function (x) { io.observe(x); });
+  }
+})();
+</script>
+</body>
+</html>
