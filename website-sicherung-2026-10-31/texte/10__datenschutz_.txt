@@ -1,0 +1,109 @@
+DATENSCHUTZ AUF EINEN BLICK
+Datenschutzerklärung
+
+Hier erklären wir verständlich, welche Daten bei der Nutzung unserer Website verarbeitet werden und wofür.
+
+1. Verantwortlicher
+
+Nachhilfe – Online · Marcel Daum
+Fichtenweg 8, 63741 Aschaffenburg
+Telefon: +49 170 3141596
+E-Mail: website@mathenachhilfe-online.com
+
+2. Besuch dieser Website
+
+Beim Aufruf der Website verarbeitet unser Hosting-Anbieter technisch erforderliche Zugriffsdaten in Server-Logfiles: IP-Adresse, Datum und Uhrzeit, aufgerufene Seite, übertragene Datenmenge, Browser/ Betriebssystem, Referrer-URL und HTTP-Statuscode. Die Verarbeitung erfolgt zur sicheren und stabilen Bereitstellung der Website auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO.
+
+Die Website wird über Server von STRATO/Plesk betrieben. Mit dem Hosting-Anbieter besteht – soweit erforderlich – ein Vertrag zur Auftragsverarbeitung.
+
+3. Kontaktformular, E-Mail und Telefon
+
+Bei der Probestundenanfrage speichern wir nach der Sicherheitsprüfung die eingegebenen Kontakt-, Fach- und Lernbedarfsangaben sowie den vorbereiteten Originaltext in unserer geschützten Verwaltung, bevor das von dir gewählte WhatsApp- oder E-Mail-Programm geöffnet wird. Berechtigte Administratoren dokumentieren dort den Bearbeitungsstatus und interne Notizen. Erledigte Anfragen werden ins interne Archiv verschoben, nicht automatisch gelöscht. Das tatsächliche Absenden und spätere Änderungen im externen Programm sind für unsere Website nicht erkennbar. Es wird dadurch kein Termin verbindlich gebucht.
+
+Wenn du uns kontaktierst, verarbeiten wir die von dir mitgeteilten Daten (z. B. Name, E-Mail-Adresse, Telefonnummer, Schulform/Klasse und Nachricht), um dein Anliegen zu bearbeiten und gegebenenfalls zu beantworten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei vorvertraglichen Anfragen sowie Art. 6 Abs. 1 lit. f DSGVO bei sonstigen Anliegen.
+
+Die Übermittlung der Kontaktformulare erfolgt verschlüsselt an unser Website-Postfach. Eine Weitergabe erfolgt nur, wenn sie für die Bearbeitung erforderlich ist oder wir dazu gesetzlich verpflichtet sind.
+
+4. Nutzerkonten und Lehrerprofile
+
+Für geschützte Bereiche können Nutzerkonten angelegt werden. Dabei verarbeiten wir die hierfür notwendigen Konto- und Profildaten, insbesondere Name, E-Mail-Adresse, Zugangsdaten in verschlüsselter Form sowie die freiwillig gepflegten Profilangaben. Lehrkräfte können zusätzlich Angaben zu Fächern, Erfahrung, Methodik, Motto und ein Profilbild veröffentlichen.
+
+Die Verarbeitung dient der Bereitstellung des jeweiligen Kontos und der von dir gewünschten Funktionen (Art. 6 Abs. 1 lit. b DSGVO). Öffentliche Lehrerprofile erscheinen nur für Personen mit aktivierter Lehrerrolle. Ein Antrag auf Kontolöschung kann über die entsprechende Seite gestellt werden; gesetzliche Aufbewahrungspflichten bleiben unberührt.
+
+5. KI-gestützte Lernmaterialien
+
+Zur Erstellung von Aufgaben, Rechenhilfen, Trainingshilfen und Arbeitsblättern nutzen wir bei Funktionen der Website die OpenAI-API. An die API übermitteln wir ausschließlich fachliche Angaben wie Fach, Thema, Klassenstufe und Niveau – keine Namen, Kontaktdaten, Kontoangaben oder sonstigen personenbezogenen Daten von Schülerinnen, Schülern oder Eltern.
+
+OpenAI verwendet Inhalte aus der API nach eigenen Angaben standardmäßig nicht zum Training oder zur Verbesserung seiner Modelle, sofern nicht ausdrücklich eine Freigabe erteilt wird. Technische Protokolle zur Missbrauchsüberwachung können nach den Vorgaben von OpenAI zeitlich begrenzt gespeichert werden. Die Verarbeitung erfolgt zur Bereitstellung der angeforderten Lernhilfe (Art. 6 Abs. 1 lit. b DSGVO) bzw. auf Grundlage unseres berechtigten Interesses an modernen, passenden Lernmaterialien (Art. 6 Abs. 1 lit. f DSGVO).
+
+Zusätzlich erstellen wir intern Übungsunterlagen über die Gemini-App von Google. Auch dort geben wir keine personenbezogenen Kunden- oder Profildaten ein. Die generierten Unterlagen können anschließend auf unserem Server für die Nachhilfe bereitgestellt werden.
+
+Wichtiger Hinweis:
+
+Bitte trage in Freitextfelder für KI-Lernhilfen keine Namen, Kontaktdaten oder sonstigen personenbezogenen Informationen ein.
+
+Freiwilliger KI-Profil-Check für Lehrkräfte
+
+Lehrkräfte können freiwillig selbst eingegebene öffentliche Beschreibungstexte durch die OpenAI-API auf professionellen Ton prüfen lassen. Nur die ausgewählten Textfelder werden nach Klick auf „Text prüfen“ übertragen; Name, E-Mail-Adresse, Profilbild und Kundendaten werden nicht übermittelt. Die KI liefert Hinweise und Formulierungsvorschläge, ändert oder veröffentlicht jedoch nichts selbstständig.
+
+6. Google-Dienste
+
+Wir verwenden Google-Dienste für organisatorische und öffentliche Funktionen. Dazu können Google Calendar zur Terminverwaltung, Google Drive zur internen Bereitstellung und Sortierung von Arbeitsblättern sowie Google Places beziehungsweise Google Maps für Bewertungen und Verlinkungen gehören. Dabei können insbesondere IP-Adresse, Geräte- und Browserinformationen, aufgerufene Inhalte sowie bei Kalenderfunktionen Terminangaben an Google übermittelt werden. Die auf dieser Website verwendeten Schriftarten Inter und Source Serif 4 werden lokal auf unserem eigenen Server bereitgestellt; beim Laden der Schriften findet keine Verbindung zu Google statt.
+
+Google-Dienste werden durch Google Ireland Limited und verbundene Unternehmen bereitgestellt. Soweit eine Übermittlung in Drittländer stattfindet, erfolgt sie nach den vom Anbieter vorgesehenen datenschutzrechtlichen Garantien. Die Verarbeitung erfolgt je nach Funktion zur Vertragserfüllung, auf Grundlage einer Einwilligung oder unseres berechtigten Interesses an Organisation, Darstellung und transparenten Bewertungen.
+
+7. Terminbuchung und Kalender
+
+Bei einer Terminbuchung verarbeiten wir insbesondere Name, E-Mail-Adresse, Telefonnummer, Fach, Schulform, Klassenstufe, ausgewählte Lehrkraft, Datum, Uhrzeit und freiwillige Hinweise. Die Daten werden zur Bearbeitung der Anfrage, Terminplanung, Durchführung des Unterrichts sowie zur Dokumentation und Abrechnung verarbeitet (Art. 6 Abs. 1 lit. b DSGVO).
+
+Unterrichtstermine können in den dienstlich verwendeten Google-Kalendern der jeweiligen Lehrkraft gespeichert werden. Kalenderzugriffe sind auf berechtigte Personen beschränkt. Stornierungen und Änderungen werden aus organisatorischen und abrechnungsbezogenen Gründen nachvollziehbar verarbeitet; gesetzliche Aufbewahrungspflichten bleiben unberührt.
+
+8. Online-Unterricht und Kommunikation
+
+Online-Unterricht kann über Microsoft Teams stattfinden. Hierfür können Name, E-Mail-Adresse, technische Verbindungsdaten sowie während der Sitzung bereitgestellte Inhalte verarbeitet werden. Optionale Unterrichtsaufzeichnungen erfolgen nur nach vorheriger, gesonderter Information und Einwilligung der betroffenen Personen. Ohne Einwilligung findet keine Aufzeichnung statt.
+
+Wenn du selbst eine Kommunikation über WhatsApp wählst oder darin einwilligst, werden die von dir übermittelten Kontaktdaten und Nachrichten durch WhatsApp Ireland Limited beziehungsweise verbundene Unternehmen verarbeitet. Für vertrauliche Inhalte und Lernunterlagen stehen vorrangig unsere Website, E-Mail und die vereinbarten Unterrichtssysteme zur Verfügung.
+
+9. Shop, Bestellungen und Zahlungen
+
+Für Shop, Warenkorb, Bestellungen und Kundenkonto verwenden wir WooCommerce. Dabei verarbeiten wir insbesondere Kontaktdaten, Rechnungsdaten, bestellte Leistungen, gewählte Konfigurationen, Zahlungsstatus, technische Sitzungsdaten und Bestellhistorie. Die Verarbeitung erfolgt zur Anbahnung und Erfüllung des Vertrags (Art. 6 Abs. 1 lit. b DSGVO) sowie zur Erfüllung gesetzlicher Aufbewahrungs- und Nachweispflichten (Art. 6 Abs. 1 lit. c DSGVO).
+
+Je nach gewählter Zahlungsart werden die erforderlichen Zahlungs- und Transaktionsdaten an den jeweiligen Zahlungsdienst übermittelt. Für PayPal ist dies PayPal (Europe) S.à r.l. et Cie, S.C.A.; für über WooPayments angebotene Zahlungsarten werden die eingebundenen WooCommerce-/Automattic-Zahlungsdienste verwendet. Wir erhalten grundsätzlich nur die für Bestellabwicklung, Zahlungsstatus, Erstattung und Buchhaltung erforderlichen Informationen. Zahlungsanbieter verarbeiten Daten zusätzlich in eigener Verantwortung nach ihren Datenschutzhinweisen.
+
+10. Cookies und lokale Speicherung
+
+Wir verwenden technisch erforderliche Cookies und vergleichbare Speichertechniken für Login-Sitzungen, Sicherheit, Warenkorb, Checkout, Buchung, Kalenderfunktionen und grundlegende Website-Funktionen. Rechtsgrundlagen sind § 25 Abs. 2 Nr. 2 TDDDG sowie Art. 6 Abs. 1 lit. b und f DSGVO.
+
+Die Aufgabenbibliothek kann Merkliste, zuletzt angesehene Materialien, Wochenplan und Lernfortschritt lokal im Browser speichern. Diese Daten bleiben grundsätzlich auf dem jeweiligen Gerät und können durch das Löschen der Browserdaten entfernt werden.
+
+Auf Produkt-, Warenkorb- und Checkout-Seiten können Komponenten der Zahlungsanbieter geladen werden. Dabei können bereits technische Verbindungs- und Geräteinformationen verarbeitet sowie Cookies oder ähnliche Technologien eingesetzt werden. Nicht notwendige Dienste werden, soweit eine Einwilligung erforderlich ist, über die Einwilligungsverwaltung gesteuert. Eine erteilte Einwilligung kann jederzeit über die Cookie-Einstellungen widerrufen werden.
+
+11. Sicherheit, Zwei-Faktor-Anmeldung und Passkeys
+
+Zum Schutz der Website und der Benutzerkonten verwenden wir Sicherheitsfunktionen wie Firewall- und Angriffserkennung, Zwei-Faktor-Authentifizierung und optional Passkeys auf Basis von WebAuthn. Dabei werden sicherheitsbezogene Protokoll-, Geräte- und Anmeldeinformationen verarbeitet, um unberechtigte Zugriffe zu erkennen und zu verhindern (Art. 6 Abs. 1 lit. f DSGVO).
+
+11a. Google reCAPTCHA und Formularschutz
+
+Zum Schutz der Anmeldung und unserer öffentlichen Formulare vor automatisiertem Missbrauch verwenden wir Google reCAPTCHA. Dabei können insbesondere IP-Adresse, Browser- und Geräteinformationen, aufgerufene Seite, Zeitpunkt und Interaktionssignale verarbeitet werden. Google erstellt daraus eine Risikobewertung; unser Server prüft das Ergebnis, den zugehörigen Formularzweck und die Domain. Unsere Formularnachrichten, Passwörter und Rechnungsinhalte werden von uns nicht als Inhalt der reCAPTCHA-Prüfung übermittelt.
+
+Bei Kontakt, Probestundenanfragen, Feedback, Shop-Feedback und Kontoerstellung wird reCAPTCHA erst nach deiner ausdrücklichen Einwilligung und beim Absenden geladen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO sowie, soweit erforderlich, § 25 Abs. 1 TDDDG. Ohne diese Einwilligung kannst du uns direkt per E-Mail oder Telefon kontaktieren. Eine Einwilligung kann für künftige Vorgänge durch Nichtaktivierung der Prüfung widerrufen werden. Für die durch Wordfence geschützte Anmeldung wird reCAPTCHA als Sicherheitsprüfung eingesetzt; die Verarbeitung dient unserem berechtigten Interesse am Schutz bestehender Konten (Art. 6 Abs. 1 lit. f DSGVO). Die datenschutzrechtliche Einordnung erforderlicher Sicherheitsspeicherungen richtet sich nach § 25 Abs. 2 TDDDG.
+
+Google reCAPTCHA setzt insbesondere das Cookie _GRECAPTCHA zur Risikoanalyse. Anbieter ist Google beziehungsweise das für den verwendeten Google-Cloud-Dienst zuständige verbundene Unternehmen. Nach den seit 2. April 2026 geltenden Anbieterinformationen verarbeitet Google reCAPTCHA-Kundendaten als Auftragsverarbeiter nach dem Cloud Data Processing Addendum. Eine Verarbeitung außerhalb der EU, insbesondere in den USA, ist möglich. Informationen zu den Verarbeitungsbedingungen und Übermittlungsregelungen findest du im Google Cloud Data Processing Addendum und in den Anbieterinformationen zur Datenverarbeitung.
+
+Zusätzlich prüfen wir lokal signierte Formulartickets, Zeitgrenzen, Eingabelängen und wiederholte Anfragen. Dafür werden kurzlebige, gehashte Schutzkennungen verwendet. Diese Maßnahmen dienen der sicheren Bereitstellung unserer Kontakt- und Kontofunktionen (Art. 6 Abs. 1 lit. f DSGVO).
+
+12. Speicherdauer
+
+Wir speichern personenbezogene Daten nur so lange, wie dies für den jeweiligen Zweck erforderlich ist. Vertrags-, Bestellungs-, Zahlungs- und Abrechnungsdaten werden entsprechend den gesetzlichen Aufbewahrungsfristen gespeichert. Danach werden sie gelöscht oder anonymisiert, sofern keine gesetzlichen Pflichten oder berechtigten Gründe für eine längere Speicherung bestehen.
+
+13. Deine Rechte
+
+Du hast im gesetzlichen Rahmen das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit sowie Widerspruch gegen Verarbeitungen auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Erteilte Einwilligungen kannst du jederzeit mit Wirkung für die Zukunft widerrufen.
+
+Für Anliegen zum Datenschutz schreibe bitte an website@mathenachhilfe-online.com. Du hast außerdem das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.
+
+14. Aktualisierung dieser Erklärung
+
+Wir passen diese Erklärung an, wenn sich Funktionen, eingesetzte Dienste oder rechtliche Anforderungen ändern. Maßgeblich ist die jeweils auf dieser Seite veröffentlichte Fassung.
+
+Stand: 7. Oktober 2026

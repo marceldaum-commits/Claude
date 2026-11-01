@@ -1,0 +1,17 @@
+KONTO ERSTELLEN
+Schön, dass du da bist.
+
+Erstelle dein Konto. Die passende Rolle wird persönlich freigegeben.
+
+ Ich willige ein, dass Google reCAPTCHA diese Anfrage auf automatisierten Missbrauch prüft. Dabei werden Browser- und Verbindungsdaten an Google übermittelt. Datenschutzhinweise. Alternativ kannst du uns direkt per E-Mail oder Telefon kontaktieren.
+
+Website
+Vorname
+Nachname
+E-Mail-Adresse
+Passwort
+Mindestens 10 Zeichen.
+ Ich habe die Datenschutzerklärung gelesen.
+Konto erstellen →
+
+Schon registriert? Anmelden
