@@ -9,167 +9,203 @@
 <meta name="description" content="Staatliche Grundschule in Aschaffenburg-Nilkheim: Termine, Krankmeldung, Ganztag, Eltern-ABC, Ansprechpartner und Schulleben.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600&display=swap">
 <style>
-/* Layout: Schulheft-Raster als Grund, ein Tagesband (7:30–16:00) als Leitmotiv, Inhalte in klaren Spalten ohne Kartenflut. */
+/* Layout: eine kleine Galerie – viel Weißraum, Kinderbilder als gerahmte Exponate mit Museumsschild,
+   Königsblau wie Füllertinte, Buntstift-Punkte und Handschrift-Notizen als Charme. */
 :root{
-  --paper:#f7f8fb; --sheet:#ffffff; --ink:#15213f; --ink-2:#4a5677; --line:#dde2ee; --grid:#e9edf5;
-  --poppy:#d9422a; --poppy-ink:#ffffff; --poppy-soft:#fbe5df;
-  --leaf:#2a7f52; --leaf-soft:#e0f1e7;
-  --sun:#f0b429; --sun-soft:#fdf1d2;
-  --sky:#2f62c8; --sky-soft:#e3ebfb;
-  --shadow:0 1px 2px rgb(21 33 63 / .06), 0 8px 24px rgb(21 33 63 / .06);
-  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --paper:#fbfbf8; --sheet:#ffffff; --ink:#1c2240; --ink-2:#596079; --line:#e6e5df; --hair:#efeee9;
+  --blue:#2b3cae; --blue-ink:#ffffff; --blue-soft:#eceefb;
+  --poppy:#d2412e; --poppy-soft:#fbe9e5;
+  --sun:#e9b01f; --sun-soft:#fcf3d9;
+  --leaf:#3c8a5a; --leaf-soft:#e6f2ea;
+  --sky:#3f7fd0; --sky-soft:#e7f0fb;
+  --frame:#2a2620;
+  --shadow:0 1px 1px rgb(28 34 64 / .04), 0 10px 30px -12px rgb(28 34 64 / .18);
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
   --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --r:14px; --max:1180px;
-  --gut-l:max(16px, env(safe-area-inset-left, 0px));
-  --gut-r:max(16px, env(safe-area-inset-right, 0px));
+  --f-hand:"Caveat", "Segoe Print", "Comic Sans MS", cursive;
+  --r:10px; --max:1120px;
+  --gut-l:max(20px, env(safe-area-inset-left, 0px));
+  --gut-r:max(20px, env(safe-area-inset-right, 0px));
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --paper:#0e1424; --sheet:#151d33; --ink:#eef1f8; --ink-2:#a7b1c9; --line:#28324d; --grid:#161f37;
-  --poppy:#ff7a5c; --poppy-ink:#1a0d08; --poppy-soft:#3a1d18;
-  --leaf:#5fcf93; --leaf-soft:#15301f;
-  --sun:#f6c64f; --sun-soft:#352b10;
-  --sky:#86a9ff; --sky-soft:#1a2648;
-  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
+  --paper:#12141f; --sheet:#191c2a; --ink:#eeeef3; --ink-2:#a3a8bd; --line:#2b2f42; --hair:#222536;
+  --blue:#9aa8ff; --blue-ink:#11142a; --blue-soft:#20264a;
+  --poppy:#ff8a73; --poppy-soft:#3a201c;
+  --sun:#f3c64e; --sun-soft:#352c12;
+  --leaf:#72c995; --leaf-soft:#18301f;
+  --sky:#8ab8ff; --sky-soft:#1b2a44;
+  --frame:#0a0b10;
+  --shadow:0 1px 1px rgb(0 0 0 / .3), 0 12px 30px -12px rgb(0 0 0 / .6);
   color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --paper:#0e1424; --sheet:#151d33; --ink:#eef1f8; --ink-2:#a7b1c9; --line:#28324d; --grid:#161f37;
-  --poppy:#ff7a5c; --poppy-ink:#1a0d08; --poppy-soft:#3a1d18;
-  --leaf:#5fcf93; --leaf-soft:#15301f;
-  --sun:#f6c64f; --sun-soft:#352b10;
-  --sky:#86a9ff; --sky-soft:#1a2648;
-  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
+  --paper:#12141f; --sheet:#191c2a; --ink:#eeeef3; --ink-2:#a3a8bd; --line:#2b2f42; --hair:#222536;
+  --blue:#9aa8ff; --blue-ink:#11142a; --blue-soft:#20264a;
+  --poppy:#ff8a73; --poppy-soft:#3a201c;
+  --sun:#f3c64e; --sun-soft:#352c12;
+  --leaf:#72c995; --leaf-soft:#18301f;
+  --sky:#8ab8ff; --sky-soft:#1b2a44;
+  --frame:#0a0b10;
+  --shadow:0 1px 1px rgb(0 0 0 / .3), 0 12px 30px -12px rgb(0 0 0 / .6);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important; transition:none!important} }
-body{
-  margin:0; background:var(--paper); color:var(--ink);
-  font:400 1.0625rem/1.6 var(--f-body);
-  background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size:28px 28px; background-attachment:fixed;
-}
-body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:60; background:var(--sheet)}
+body{margin:0; background:var(--paper); color:var(--ink); font:400 1.0625rem/1.65 var(--f-body)}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:60; background:var(--paper)}
 a{color:inherit}
-h1,h2,h3,h4{font-family:var(--f-display); line-height:1.1; text-wrap:balance; margin:0; letter-spacing:-.01em}
-h1{font-size:clamp(2.3rem, 5.4vw, 4.1rem); font-weight:800}
-h2{font-size:clamp(1.6rem, 3vw, 2.25rem); font-weight:800}
-h3{font-size:1.25rem; font-weight:700}
+h1,h2,h3,h4{font-family:var(--f-display); font-weight:400; line-height:1.12; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.5rem, 5.6vw, 4.4rem); letter-spacing:-.015em}
+h2{font-size:clamp(1.7rem, 3.2vw, 2.4rem); letter-spacing:-.01em}
+h3{font-size:1.28rem}
 p{margin:0}
 .wrap{max-width:var(--max); margin:0 auto; padding-left:var(--gut-l); padding-right:var(--gut-r)}
-.eyebrow{font:700 .78rem/1 var(--f-body); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2)}
+.eyebrow{font:700 .74rem/1.2 var(--f-body); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2)}
+.hand{font-family:var(--f-hand); font-weight:600; color:var(--blue); font-size:1.45rem; line-height:1.1}
 .muted{color:var(--ink-2)}
-:focus-visible{outline:3px solid var(--sky); outline-offset:2px; border-radius:6px}
+:focus-visible{outline:2px solid var(--blue); outline-offset:3px; border-radius:6px}
 .skip{position:absolute; left:-999px; top:8px; background:var(--ink); color:var(--paper); padding:10px 14px; border-radius:8px; z-index:100}
 .skip:focus{left:16px}
+.dots{display:inline-flex; gap:5px; vertical-align:middle}
+.dots i{width:8px; height:8px; border-radius:50%; display:block}
+.dots i:nth-child(1){background:var(--poppy)} .dots i:nth-child(2){background:var(--sun)} .dots i:nth-child(3){background:var(--sky)} .dots i:nth-child(4){background:var(--leaf)}
 
-/* ---------- Kopfzeile ---------- */
-.top{position:sticky; top:env(safe-area-inset-top, 0px); z-index:50; background:color-mix(in srgb, var(--sheet) 92%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
-.top .wrap{display:flex; align-items:center; gap:14px; min-height:68px}
+/* ---------- Kopfzeile mit Aufklapp-Menü ---------- */
+.top{position:sticky; top:env(safe-area-inset-top, 0px); z-index:50; background:color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter:blur(12px); border-bottom:1px solid var(--line)}
+.top .wrap{display:flex; align-items:center; gap:18px; min-height:74px}
 .brand{display:flex; align-items:center; gap:12px; text-decoration:none; min-width:0}
 .brand svg{flex:none}
-.brand b{display:block; font:800 1.02rem/1.1 var(--f-display)}
-.brand small{display:block; font-size:.8rem; color:var(--ink-2)}
-.nav{display:flex; gap:2px; margin-left:auto}
-.nav a{padding:8px 12px; white-space:nowrap; border-radius:999px; text-decoration:none; font-weight:700; font-size:.95rem; color:var(--ink-2)}
-.nav a:hover{background:var(--grid); color:var(--ink)}
-.nav a[aria-current="page"]{color:var(--ink); background:var(--grid)}
+.brand b{display:block; font:400 1.12rem/1.1 var(--f-display)}
+.brand small{display:flex; align-items:center; gap:8px; font-size:.78rem; color:var(--ink-2); margin-top:3px; letter-spacing:.04em}
+.nav{display:flex; gap:2px; margin-left:auto; align-items:center}
+.nav > a, .dd > button{display:inline-flex; align-items:center; gap:6px; padding:9px 13px; border:0; background:none; border-radius:999px; text-decoration:none; font:700 .95rem var(--f-body); color:var(--ink-2); cursor:pointer; white-space:nowrap}
+.nav > a:hover, .dd > button:hover, .dd.open > button{color:var(--ink); background:var(--hair)}
+.nav [aria-current="page"]{color:var(--ink)}
+.nav [aria-current="page"]::after{content:""; width:5px; height:5px; border-radius:50%; background:var(--poppy); margin-left:2px}
+.dd{position:relative}
+.dd > button svg{transition:transform .2s}
+.dd.open > button svg{transform:rotate(180deg)}
+.panel{position:absolute; top:calc(100% + 10px); left:50%; transform:translateX(-50%); min-width:300px; background:var(--sheet); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:10px; display:none}
+.panel::before{content:""; position:absolute; inset:-12px 0 auto; height:12px}
+.dd.open .panel{display:grid; animation:drop .18s ease-out}
+@keyframes drop{from{transform:translate(-50%, -4px)} to{transform:translate(-50%, 0)}}
+.panel.two{grid-template-columns:1fr 1fr; min-width:540px}
+.panel a{display:block; padding:10px 12px; border-radius:10px; text-decoration:none}
+.panel a:hover, .panel a:focus-visible{background:var(--hair)}
+.panel a b{display:block; font-weight:700; font-size:.97rem}
+.panel a small{display:block; color:var(--ink-2); font-size:.84rem; line-height:1.35}
+.panel .note{grid-column:1/-1; display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px 4px; margin-top:4px; border-top:1px solid var(--line)}
 .tools{display:flex; gap:6px; align-items:center}
-.iconbtn{display:inline-grid; place-items:center; width:42px; height:42px; border-radius:999px; border:1px solid var(--line); background:var(--sheet); color:var(--ink); cursor:pointer}
-.iconbtn:hover{border-color:var(--ink-2)}
-.searchbtn{display:inline-flex; align-items:center; gap:8px; height:42px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:var(--sheet); color:var(--ink-2); font:inherit; font-size:.95rem; cursor:pointer}
-.searchbtn kbd{font:700 .72rem var(--f-body); border:1px solid var(--line); border-radius:6px; padding:2px 6px}
-.btn{display:inline-flex; align-items:center; gap:8px; justify-content:center; min-height:46px; padding:0 18px; border-radius:999px; font:700 1rem var(--f-body); text-decoration:none; border:2px solid transparent; cursor:pointer}
-.btn-poppy{background:var(--poppy); color:var(--poppy-ink)}
-.btn-poppy:hover{filter:brightness(1.06)}
-.btn-ghost{border-color:var(--ink); color:var(--ink); background:transparent}
-.btn-ghost:hover{background:var(--ink); color:var(--paper)}
-.top .btn{min-height:42px; padding:0 16px}
+.iconbtn{display:inline-grid; place-items:center; width:42px; height:42px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer}
+.iconbtn:hover{background:var(--hair)}
+.btn{display:inline-flex; align-items:center; gap:8px; justify-content:center; min-height:48px; padding:0 22px; border-radius:999px; font:700 1rem var(--f-body); text-decoration:none; border:1.5px solid transparent; cursor:pointer; transition:background .15s, color .15s}
+.btn-blue{background:var(--blue); color:var(--blue-ink)}
+.btn-blue:hover{filter:brightness(1.08)}
+.btn-line{border-color:var(--line); color:var(--ink); background:var(--sheet)}
+.btn-line:hover{border-color:var(--ink)}
+.top .btn{min-height:42px; padding:0 18px}
 .menubtn{display:none}
-@media (max-width:1020px){
+@media (max-width:1060px){
   .nav{display:none}
   .menubtn{display:inline-grid}
   .tools{margin-left:auto}
-  .searchbtn span, .searchbtn kbd{display:none}
-  .searchbtn{width:42px; padding:0; justify-content:center}
 }
-@media (max-width:560px){ .top .btn-poppy span{display:none} .top .btn-poppy{width:42px; padding:0} .brand small{display:none} }
-.drawer{position:fixed; inset:0; z-index:70; background:rgb(10 15 30 / .45)}
-.drawer nav{position:absolute; right:0; top:0; bottom:0; width:min(360px, 88vw); background:var(--sheet); padding:calc(18px + env(safe-area-inset-top,0px)) max(20px, env(safe-area-inset-right,0px)) 24px 20px; overflow:auto; display:flex; flex-direction:column; gap:4px}
-.drawer nav a{padding:12px 10px; border-radius:10px; text-decoration:none; font-weight:700}
-.drawer nav a:hover{background:var(--grid)}
-.drawer h4{font:700 .75rem var(--f-body); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:14px 10px 4px}
+@media (max-width:560px){ #themeBtn{display:none} .top .wrap{gap:10px} .top .btn-blue span{display:none} .top .btn-blue{width:42px; padding:0} .brand small{display:none} .brand b{font-size:1rem} }
+
+.drawer{position:fixed; inset:0; z-index:70; background:rgb(10 12 25 / .4)}
+.drawer nav{position:absolute; right:0; top:0; bottom:0; width:min(380px, 90vw); background:var(--paper); padding:calc(16px + env(safe-area-inset-top,0px)) max(20px, env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) 20px; overflow:auto; display:flex; flex-direction:column}
+.drawer .dh{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.drawer details{border-bottom:1px solid var(--line)}
+.drawer summary{list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:15px 4px; font:400 1.25rem var(--f-display)}
+.drawer summary::-webkit-details-marker{display:none}
+.drawer summary svg{transition:transform .2s; color:var(--ink-2)}
+.drawer details[open] summary svg{transform:rotate(180deg)}
+.drawer details div{display:grid; padding:0 0 12px}
+.drawer details a, .drawer .solo{padding:9px 6px; text-decoration:none; font-weight:700; border-radius:8px}
+.drawer details a:hover{background:var(--hair)}
+.drawer .solo{display:block; padding:15px 4px; font:400 1.25rem var(--f-display); border-bottom:1px solid var(--line)}
+.drawer .btn{margin-top:20px}
 
 /* ---------- Startseite ---------- */
-.hero{padding-block:56px 36px}
-.hero .wrap{display:grid; grid-template-columns:1.15fr .85fr; gap:40px; align-items:start}
-.hero-copy{display:flex; flex-direction:column; gap:22px; min-width:0}
-.hero h1 em{font-style:normal; color:var(--poppy); position:relative; white-space:nowrap}
-.hero h1 em::after{content:""; position:absolute; left:-2%; right:-2%; bottom:.04em; height:.16em; background:var(--sun); opacity:.55; z-index:-1; border-radius:4px}
-.hero .lead{font-size:1.2rem; max-width:34em; color:var(--ink-2)}
-.hero-actions{display:flex; flex-wrap:wrap; gap:10px}
-.facts{display:flex; flex-wrap:wrap; gap:8px 22px; font-size:.95rem; color:var(--ink-2)}
-.facts b{color:var(--ink); font-family:var(--f-display); font-size:1.15rem; margin-right:4px}
-@media (max-width:900px){ .hero .wrap{grid-template-columns:1fr} .hero{padding-block:36px 24px} }
+.hero{padding-block:72px 40px}
+.hero .wrap{display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center}
+.hero-copy{display:flex; flex-direction:column; gap:24px; min-width:0}
+.hero h1 em{font-style:normal; color:var(--poppy)}
+.hero .lead{font-size:1.18rem; max-width:30em; color:var(--ink-2)}
+.hero-actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+@media (max-width:900px){ .hero .wrap{grid-template-columns:1fr; gap:44px} .hero{padding-block:44px 28px} }
 
-/* Heute-Karte mit Tagesband */
-.today{background:var(--sheet); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow); padding:22px; display:flex; flex-direction:column; gap:16px; min-width:0}
-.today-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap}
-.today-head h3{font-size:1.1rem}
-.clock{font:800 1.9rem/1 var(--f-display); font-variant-numeric:tabular-nums}
-.status{display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:12px; background:var(--leaf-soft)}
-.status.warn{background:var(--sun-soft)} .status.alert{background:var(--poppy-soft)}
-.status .dot{flex:none; width:10px; height:10px; border-radius:50%; background:var(--leaf); margin-top:.45em}
-.status.warn .dot{background:var(--sun)} .status.alert .dot{background:var(--poppy)}
-.band{position:relative; padding-top:6px}
-.band-rows{display:grid; gap:6px}
-.band-row{display:grid; grid-template-columns:96px 1fr; gap:10px; align-items:center; font-size:.82rem}
-.band-row span{color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.track{position:relative; height:14px; background:var(--grid); border-radius:999px}
-.track i{position:absolute; top:0; bottom:0; border-radius:999px}
-.band-axis{display:grid; grid-template-columns:96px 1fr; gap:10px; font-size:.72rem; color:var(--ink-2); font-variant-numeric:tabular-nums}
-.band-axis div{position:relative; height:16px}
-.band-axis b{position:absolute; transform:translateX(-50%); font-weight:400}
-.now{position:absolute; top:0; bottom:22px; width:2px; background:var(--poppy); border-radius:2px}
-.now::before{content:"jetzt"; position:absolute; top:-14px; left:50%; transform:translateX(-50%); font:700 .65rem var(--f-body); color:var(--poppy); text-transform:uppercase; letter-spacing:.08em}
-.next{display:flex; gap:14px; align-items:center; padding-top:14px; border-top:1px dashed var(--line); text-decoration:none}
-.datechip{flex:none; width:58px; text-align:center; border-radius:12px; border:2px solid var(--ink); padding:6px 0; line-height:1}
-.datechip b{display:block; font:800 1.45rem var(--f-display)}
-.datechip small{display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; margin-top:3px}
+/* Exponat: gerahmtes Kinderbild mit Museumsschild */
+.exhibit{position:relative; margin:0; justify-self:center; width:min(100%, 480px)}
+.frame{background:var(--sheet); padding:clamp(14px, 3vw, 26px); border:10px solid var(--frame); box-shadow:var(--shadow); transform:rotate(1.2deg)}
+.frame .ph{aspect-ratio:5/4}
+.label{position:absolute; left:-14px; bottom:-30px; background:var(--sheet); border:1px solid var(--line); padding:12px 16px; box-shadow:var(--shadow); max-width:250px; transform:rotate(-1.5deg)}
+.label b{display:block; font:400 1.05rem var(--f-display)}
+.label small{display:block; color:var(--ink-2); font-size:.82rem; line-height:1.4}
+.exhibit .hand{position:absolute; right:-6px; top:-34px; transform:rotate(4deg)}
+@media (max-width:560px){ .label{left:0; bottom:-36px} .exhibit .hand{right:0} }
 
-/* Schnellzugriff */
-.quick{padding-block:8px 48px}
-.quick-grid{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px}
-.qt{display:flex; gap:14px; align-items:flex-start; padding:18px; border-radius:var(--r); background:var(--sheet); border:1px solid var(--line); text-decoration:none; transition:transform .15s, border-color .15s}
-.qt:hover{transform:translateY(-2px); border-color:var(--ink-2)}
-.qt .ic{flex:none; width:44px; height:44px; border-radius:12px; display:grid; place-items:center}
-.qt b{display:block; font:700 1.08rem var(--f-display)}
-.qt small{display:block; color:var(--ink-2); font-size:.92rem; line-height:1.4; margin-top:2px}
-@media (max-width:860px){ .quick-grid{grid-template-columns:repeat(2, minmax(0,1fr))} }
-@media (max-width:520px){ .quick-grid{grid-template-columns:1fr} }
+.ph{position:relative; max-width:100%; overflow:hidden; background:var(--c, var(--sky-soft))}
+.ph img{width:100%; height:100%; object-fit:cover; display:block}
+.ph .fb{position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:16px; font-family:var(--f-hand); font-size:1.7rem; color:var(--ink); opacity:.55}
+.ph img + .fb{display:none}
+
+/* Heute-Leiste */
+.today{padding-block:40px 8px}
+.today-bar{display:grid; grid-template-columns:auto 1fr auto; gap:24px; align-items:center; padding:18px 22px; background:var(--sheet); border:1px solid var(--line); border-radius:var(--r)}
+.today-bar .when{display:flex; flex-direction:column; gap:2px; padding-right:24px; border-right:1px solid var(--line)}
+.today-bar .when b{font:400 1.6rem/1 var(--f-display); font-variant-numeric:tabular-nums}
+.today-bar .msg{display:flex; gap:10px; align-items:baseline; min-width:0}
+.today-bar .msg .dot{flex:none; width:9px; height:9px; border-radius:50%; background:var(--leaf); transform:translateY(-1px)}
+.today-bar .msg.warn .dot{background:var(--sun)} .today-bar .msg.alert .dot{background:var(--poppy)}
+.today-bar > *{min-width:0}
+.today-bar a{font-weight:700; text-decoration:none}
+.today-bar a:hover{color:var(--blue)}
+@media (max-width:760px){ .today-bar{grid-template-columns:1fr; gap:12px} .today-bar .when{flex-direction:row; align-items:baseline; gap:10px; padding:0 0 12px; border-right:0; border-bottom:1px solid var(--line)} }
 
 /* Abschnitte */
-.sec{padding-block:56px}
-.sec-head{display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap; margin-bottom:26px}
-.sec-head > div{display:flex; flex-direction:column; gap:8px; max-width:40em}
-.band-sheet{background:var(--sheet); border-block:1px solid var(--line)}
-.link{font-weight:700; text-decoration:none; border-bottom:2px solid var(--poppy); padding-bottom:1px}
-.link:hover{color:var(--poppy)}
+.sec{padding-block:88px}
+.sec-head{display:flex; justify-content:space-between; align-items:end; gap:16px; flex-wrap:wrap; margin-bottom:36px}
+.sec-head > div{display:flex; flex-direction:column; gap:10px; max-width:36em}
+.link{font-weight:700; text-decoration:none; display:inline-flex; gap:6px; align-items:center; color:var(--blue)}
+.link:hover{text-decoration:underline; text-underline-offset:4px}
+
+/* Für Eltern: drei Wege */
+.ways{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:0; border-top:1px solid var(--line)}
+.way{display:flex; flex-direction:column; gap:10px; padding:28px 28px 30px 0; text-decoration:none; border-bottom:1px solid var(--line)}
+.way + .way{padding-left:28px; border-left:1px solid var(--line)}
+.way .num{font:400 2.4rem/1 var(--f-display); color:var(--c)}
+.way h3{display:flex; align-items:center; gap:8px}
+.way h3::after{content:"→"; font-family:var(--f-body); color:var(--ink-2); transition:transform .2s}
+.way:hover h3::after{transform:translateX(4px); color:var(--blue)}
+.way p{color:var(--ink-2)}
+@media (max-width:800px){ .ways{grid-template-columns:1fr} .way, .way + .way{padding:22px 0; border-left:0} }
+
+/* Über uns kurz */
+.intro{display:grid; grid-template-columns:.9fr 1.1fr; gap:72px; align-items:center}
+.intro .photo{position:relative}
+.intro .photo .ph{aspect-ratio:4/5; border-radius:4px}
+.intro .photo .tape{position:absolute; top:-12px; left:50%; width:110px; height:28px; transform:translateX(-50%) rotate(-3deg); background:color-mix(in srgb, var(--sun) 45%, transparent); opacity:.9}
+.intro .txt{display:flex; flex-direction:column; gap:20px; min-width:0}
+.figs{display:flex; flex-wrap:wrap; gap:14px 40px; padding-top:8px}
+.figs div{display:flex; flex-direction:column}
+.figs b{font:400 2.3rem/1 var(--f-display)}
+.figs span{font-size:.9rem; color:var(--ink-2)}
+@media (max-width:860px){ .intro{grid-template-columns:1fr; gap:40px} .intro .photo .ph{aspect-ratio:4/3} }
 
 /* Termine */
-.dates{display:grid; gap:0; border-top:1px solid var(--line)}
-.date{display:grid; grid-template-columns:120px 1fr auto; gap:18px; align-items:baseline; padding:16px 4px; border-bottom:1px solid var(--line)}
-.date time{font:700 1rem var(--f-display); font-variant-numeric:tabular-nums}
+.dates{display:grid; border-top:1px solid var(--line)}
+.date{display:grid; grid-template-columns:110px 1fr auto; gap:22px; align-items:baseline; padding:18px 2px; border-bottom:1px solid var(--line)}
+.date time{font:400 1.1rem var(--f-display); font-variant-numeric:tabular-nums}
 .date time small{display:block; font:400 .82rem var(--f-body); color:var(--ink-2)}
 .date p{min-width:0}
-.date .tag{font-size:.78rem; font-weight:700; padding:3px 10px; border-radius:999px; background:var(--grid); color:var(--ink-2); white-space:nowrap}
-.date.is-next{background:linear-gradient(90deg, var(--sun-soft), transparent)}
-.date.is-next .tag{background:var(--sun); color:#2a1d00}
-.date.is-past{opacity:.5}
-.date.is-free .tag{background:var(--leaf-soft); color:var(--leaf)}
+.date .tag{font-size:.76rem; font-weight:700; padding:3px 10px; border-radius:999px; border:1px solid var(--line); color:var(--ink-2); white-space:nowrap}
+.date.is-next .tag{background:var(--blue); border-color:var(--blue); color:var(--blue-ink)}
+.date.is-past{opacity:.45}
+.date.is-free .tag{background:var(--leaf-soft); border-color:transparent; color:var(--leaf)}
 @media (max-width:620px){ .date{grid-template-columns:1fr; gap:4px} .date .tag{justify-self:start} }
 .seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--sheet)}
 .seg button{border:0; background:transparent; font:700 .9rem var(--f-body); color:var(--ink-2); padding:7px 14px; border-radius:999px; cursor:pointer}
@@ -177,127 +213,138 @@ p{margin:0}
 
 /* Lernen */
 .learn{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
-.learn a{background:var(--sheet); padding:22px 20px 24px; text-decoration:none; display:flex; flex-direction:column; gap:10px; min-height:190px}
+.learn a{background:var(--sheet); padding:24px 22px 26px; text-decoration:none; display:flex; flex-direction:column; gap:10px}
 .learn a:hover{background:var(--paper)}
-.learn .swatch{width:36px; height:36px; border-radius:50% 50% 50% 8px}
+.learn .swatch{width:30px; height:30px; border-radius:50% 50% 50% 6px}
 .learn p{color:var(--ink-2); font-size:.95rem; line-height:1.45}
 @media (max-width:960px){ .learn{grid-template-columns:repeat(2, minmax(0,1fr))} }
-@media (max-width:520px){ .learn{grid-template-columns:1fr} .learn a{min-height:0} }
+@media (max-width:520px){ .learn{grid-template-columns:1fr} }
 
 /* Schulleben */
-.life{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:18px}
+.life{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:32px}
 .story{display:flex; flex-direction:column; gap:10px; min-width:0}
-.ph{position:relative; aspect-ratio:4/3; max-width:100%; border-radius:var(--r); overflow:hidden; background:var(--c, var(--sky-soft))}
-.ph img{width:100%; height:100%; object-fit:cover; display:block}
-.ph .fb{position:absolute; inset:0; display:grid; place-items:center; font:800 3.2rem var(--f-display); color:var(--ink); opacity:.18}
-.ph img + .fb{display:none}
-.story time{font-size:.82rem; color:var(--ink-2); font-weight:700; text-transform:uppercase; letter-spacing:.08em}
-.story h3{font-size:1.12rem}
-.story p{color:var(--ink-2); font-size:.95rem}
+.story .ph{aspect-ratio:4/3; border-radius:4px}
+.story time{font-size:.76rem; color:var(--ink-2); font-weight:700; text-transform:uppercase; letter-spacing:.14em; margin-top:6px}
+.story h3{font-size:1.2rem}
+.story p{color:var(--ink-2); font-size:.96rem}
 @media (max-width:860px){ .life{grid-template-columns:repeat(2, minmax(0,1fr))} }
-@media (max-width:520px){ .life{grid-template-columns:1fr} }
+@media (max-width:540px){ .life{grid-template-columns:1fr} }
 
-/* Kontakt */
-.contact{display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:28px}
+/* Kontakt (Unterseite) */
+.contact{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:32px}
 .contact > div{display:flex; flex-direction:column; gap:12px; min-width:0}
-.kv{display:grid; gap:10px}
-.kv div{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); flex-wrap:wrap}
+.kv{display:grid}
+.kv div{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:11px 0; border-bottom:1px solid var(--line); flex-wrap:wrap}
 .kv span{color:var(--ink-2); font-size:.92rem}
 .kv b{font-variant-numeric:tabular-nums; word-break:break-word}
-.copy{border:1px solid var(--line); background:var(--sheet); color:var(--ink-2); font:700 .78rem var(--f-body); border-radius:999px; padding:4px 10px; cursor:pointer}
+.copy{border:1px solid var(--line); background:var(--sheet); color:var(--ink-2); font:700 .76rem var(--f-body); border-radius:999px; padding:4px 10px; cursor:pointer}
 .copy:hover{color:var(--ink); border-color:var(--ink-2)}
 @media (max-width:900px){ .contact{grid-template-columns:1fr} }
 
 /* Fußzeile */
-footer{background:var(--ink); color:var(--paper); padding-block:44px calc(32px + env(safe-area-inset-bottom,0px)); margin-top:24px}
-footer .wrap{display:grid; grid-template-columns:1.3fr 1fr 1fr 1fr; gap:28px}
-footer h4{font:700 .78rem var(--f-body); letter-spacing:.12em; text-transform:uppercase; opacity:.7; margin-bottom:10px}
-footer a{display:block; text-decoration:none; padding:3px 0; opacity:.9}
-footer a:hover{opacity:1; text-decoration:underline}
+footer{background:var(--ink); color:var(--paper); padding-block:64px calc(36px + env(safe-area-inset-bottom,0px)); margin-top:40px}
+footer .wrap{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px}
+footer h4{font:700 .74rem var(--f-body); letter-spacing:.16em; text-transform:uppercase; opacity:.65; margin-bottom:12px}
+footer .big{font:400 1.6rem/1.2 var(--f-display); margin-bottom:14px}
+footer a{display:block; text-decoration:none; padding:3px 0; opacity:.88}
+footer a:hover{opacity:1; text-decoration:underline; text-underline-offset:3px}
 footer p{opacity:.8; font-size:.95rem}
+footer .legal{grid-column:1/-1; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding-top:24px; margin-top:12px; border-top:1px solid color-mix(in srgb, var(--paper) 18%, transparent); font-size:.85rem; opacity:.75}
+footer .legal a{display:inline; margin-left:16px}
 @media (max-width:860px){ footer .wrap{grid-template-columns:1fr 1fr} }
 @media (max-width:480px){ footer .wrap{grid-template-columns:1fr} }
 
 /* ---------- Unterseiten ---------- */
-.page-head{padding-block:44px 28px; border-bottom:1px solid var(--line); background:var(--sheet)}
-.page-head .wrap{display:flex; flex-direction:column; gap:12px}
-.crumbs{font-size:.9rem; color:var(--ink-2)}
+.page-head{padding-block:64px 36px; border-bottom:1px solid var(--line)}
+.page-head .wrap{display:flex; flex-direction:column; gap:14px}
+.crumbs{font-size:.9rem; color:var(--ink-2); display:flex; gap:8px; align-items:center}
 .crumbs a{text-decoration:none; font-weight:700}
-.crumbs a:hover{color:var(--poppy)}
-.page-head .lead{font-size:1.15rem; color:var(--ink-2); max-width:42em}
-.page{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:48px; padding-block:40px 64px}
-@media (max-width:960px){ .page{grid-template-columns:1fr; gap:32px} }
-.prose{display:flex; flex-direction:column; gap:18px; max-width:46em; min-width:0}
-.prose h2{font-size:1.6rem; margin-top:14px}
+.crumbs a:hover{color:var(--blue)}
+.page-head .lead{font-size:1.18rem; color:var(--ink-2); max-width:40em}
+.page{display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:64px; padding-block:48px 72px}
+@media (max-width:960px){ .page{grid-template-columns:1fr; gap:36px} }
+.prose{display:flex; flex-direction:column; gap:18px; max-width:44em; min-width:0}
+.prose h2{font-size:1.65rem; margin-top:18px}
 .prose h3{margin-top:6px}
 .prose ul, .prose ol{margin:0; padding-left:1.3em; display:grid; gap:6px}
-.prose li::marker{color:var(--poppy); font-weight:700}
-.prose .note{font-size:.92rem; color:var(--ink-2); border-left:3px solid var(--sun); padding:4px 0 4px 14px}
-.prose a{text-decoration-color:var(--poppy); text-decoration-thickness:2px; text-underline-offset:3px}
-.tbl{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--sheet)}
+.prose li::marker{color:var(--poppy)}
+.prose .note{font-size:.93rem; color:var(--ink-2); border-left:2px solid var(--sun); padding:4px 0 4px 14px}
+.prose a{color:var(--blue); text-decoration-thickness:1px; text-underline-offset:3px}
+.tbl{overflow-x:auto; border:1px solid var(--line); border-radius:var(--r); background:var(--sheet)}
 .tbl table{border-collapse:collapse; width:100%; font-size:.95rem; min-width:520px}
-.tbl th, .tbl td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top}
-.tbl th{font:700 .8rem var(--f-body); letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); background:var(--paper)}
+.tbl th, .tbl td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+.tbl th{font:700 .76rem var(--f-body); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); background:var(--paper)}
 .tbl tr:last-child td{border-bottom:0}
-.rule{display:grid; grid-template-columns:44px 1fr; gap:14px; align-items:start; padding:12px 0; border-bottom:1px solid var(--line)}
-.rule b{font:800 1.3rem var(--f-display); color:var(--poppy); font-variant-numeric:tabular-nums}
+.rule{display:grid; grid-template-columns:44px 1fr; gap:14px; align-items:start; padding:13px 0; border-bottom:1px solid var(--line)}
+.rule b{font:400 1.3rem var(--f-display); color:var(--poppy); font-variant-numeric:tabular-nums}
 .conseq{font-size:.92rem; color:var(--ink-2); margin-top:4px}
-.aside{display:flex; flex-direction:column; gap:14px; align-self:start; position:sticky; top:calc(88px + env(safe-area-inset-top,0px))}
+.aside{display:flex; flex-direction:column; gap:14px; align-self:start; position:sticky; top:calc(96px + env(safe-area-inset-top,0px))}
 @media (max-width:960px){ .aside{position:static} }
-.box{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; flex-direction:column; gap:8px}
-.box h4{font:700 .78rem var(--f-body); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2)}
-.box a{text-decoration:none; font-weight:700; padding:4px 0}
-.box a:hover{color:var(--poppy)}
+.box{border-top:1px solid var(--line); padding:16px 0 4px; display:flex; flex-direction:column; gap:6px}
+.box h4{font:700 .74rem var(--f-body); letter-spacing:.16em; text-transform:uppercase; color:var(--ink-2); margin-bottom:4px}
+.box a{text-decoration:none; font-weight:700; padding:3px 0}
+.box a:hover, .box a[aria-current="page"]{color:var(--blue)}
 .people{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap:10px}
-.person{background:var(--sheet); border:1px solid var(--line); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:2px}
+.person{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; display:flex; flex-direction:column; gap:2px}
 .person small{color:var(--ink-2); font-size:.85rem}
-.person b{font-family:var(--f-display); font-size:1.05rem}
+.person b{font:400 1.08rem var(--f-display)}
 .compare{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-.compare > div{border-radius:var(--r); padding:20px; display:flex; flex-direction:column; gap:10px}
+.compare > div{border-radius:var(--r); padding:22px; display:flex; flex-direction:column; gap:10px}
 .compare .ogt{background:var(--sky-soft)} .compare .ggt{background:var(--leaf-soft)}
-.compare .big{font:800 1.8rem var(--f-display)}
+.compare .big{font:400 1.8rem var(--f-display)}
 @media (max-width:620px){ .compare{grid-template-columns:1fr} }
 .steps{counter-reset:s; display:grid; gap:10px; list-style:none; padding:0!important}
 .steps li{counter-increment:s; display:grid; grid-template-columns:36px 1fr; gap:12px; align-items:start}
-.steps li::before{content:counter(s); width:32px; height:32px; border-radius:50%; background:var(--ink); color:var(--paper); display:grid; place-items:center; font:800 .95rem var(--f-display)}
+.steps li::before{content:counter(s); width:30px; height:30px; border-radius:50%; border:1.5px solid var(--blue); color:var(--blue); display:grid; place-items:center; font:400 .95rem var(--f-display)}
 .pricelist{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,200px),1fr)); gap:10px}
-.price{background:var(--sheet); border:1px solid var(--line); border-radius:12px; padding:16px; display:flex; justify-content:space-between; gap:10px; align-items:baseline}
-.price b{font:800 1.4rem var(--f-display); font-variant-numeric:tabular-nums}
+.price{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r); padding:16px; display:flex; justify-content:space-between; gap:10px; align-items:baseline}
+.price b{font:400 1.4rem var(--f-display); font-variant-numeric:tabular-nums}
 .price.out{opacity:.55}
+
+/* Tagesband (Ganztag-Seite) */
+.band{background:var(--sheet); border:1px solid var(--line); border-radius:var(--r); padding:20px 20px 14px; position:relative}
+.band-rows{display:grid; gap:8px}
+.band-row{display:grid; grid-template-columns:110px 1fr; gap:12px; align-items:center; font-size:.86rem}
+.band-row span{color:var(--ink-2); white-space:nowrap}
+.track{position:relative; height:12px; background:var(--hair); border-radius:999px}
+.track i{position:absolute; top:0; bottom:0; border-radius:999px}
+.band-axis{display:grid; grid-template-columns:110px 1fr; gap:12px; font-size:.74rem; color:var(--ink-2); font-variant-numeric:tabular-nums; margin-top:6px}
+.band-axis div{position:relative; height:16px}
+.band-axis b{position:absolute; transform:translateX(-50%); font-weight:400}
+@media (max-width:480px){ .band-row, .band-axis{grid-template-columns:84px 1fr} .band-row{font-size:.78rem} }
 
 /* Eltern-ABC */
 .abc-tools{display:flex; flex-direction:column; gap:12px}
-.field{display:flex; align-items:center; gap:10px; background:var(--sheet); border:2px solid var(--line); border-radius:12px; padding:0 14px}
-.field:focus-within{border-color:var(--ink)}
+.field{display:flex; align-items:center; gap:10px; background:var(--sheet); border:1.5px solid var(--line); border-radius:12px; padding:0 14px}
+.field:focus-within{border-color:var(--blue)}
 .field input{flex:1; min-width:0; border:0; background:transparent; font:inherit; color:var(--ink); padding:13px 0; outline:none}
 .letters{display:flex; flex-wrap:wrap; gap:4px}
-.letters a{width:34px; height:34px; display:grid; place-items:center; border-radius:8px; text-decoration:none; font:700 .95rem var(--f-display); background:var(--sheet); border:1px solid var(--line)}
+.letters a{width:34px; height:34px; display:grid; place-items:center; border-radius:8px; text-decoration:none; font:400 1rem var(--f-display); border:1px solid var(--line)}
 .letters a:hover{background:var(--ink); color:var(--paper)}
-.abc{display:grid; gap:0}
 .abc details{border-bottom:1px solid var(--line)}
-.abc summary{cursor:pointer; list-style:none; display:flex; justify-content:space-between; gap:12px; align-items:center; padding:16px 2px; font:700 1.1rem var(--f-display)}
+.abc summary{cursor:pointer; list-style:none; display:flex; justify-content:space-between; gap:12px; align-items:center; padding:16px 2px; font:400 1.15rem var(--f-display)}
 .abc summary::-webkit-details-marker{display:none}
-.abc summary::after{content:"+"; font:800 1.4rem var(--f-display); color:var(--poppy); transition:transform .2s}
+.abc summary::after{content:"+"; font:400 1.5rem var(--f-body); color:var(--blue); transition:transform .2s}
 .abc details[open] summary::after{transform:rotate(45deg)}
 .abc details > div{padding:0 2px 18px; color:var(--ink-2); max-width:44em}
-.abc .initial{font:800 .8rem var(--f-body); letter-spacing:.14em; color:var(--poppy); padding-top:22px}
+.abc .initial{font-family:var(--f-hand); font-size:1.8rem; color:var(--poppy); padding-top:18px; line-height:1}
 mark{background:var(--sun-soft); color:inherit; border-radius:3px; padding:0 2px}
 
 /* Suche */
-dialog{border:0; padding:0; background:transparent; width:min(680px, calc(100vw - 32px)); max-height:min(640px, 80vh); margin:12vh auto auto}
-dialog::backdrop{background:rgb(10 15 30 / .5); backdrop-filter:blur(2px)}
-.sbox{background:var(--sheet); color:var(--ink); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; max-height:inherit}
+dialog{border:0; padding:0; background:transparent; width:min(660px, calc(100vw - 32px)); max-height:min(620px, 80vh); margin:12vh auto auto}
+dialog::backdrop{background:rgb(10 12 25 / .45); backdrop-filter:blur(2px)}
+.sbox{background:var(--sheet); color:var(--ink); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; max-height:inherit}
 .sbox .field{border:0; border-bottom:1px solid var(--line); border-radius:0; padding:4px 18px}
 .sres{overflow:auto; padding:8px}
 .sres a{display:block; padding:12px 14px; border-radius:10px; text-decoration:none}
-.sres a:hover, .sres a.on{background:var(--grid)}
+.sres a:hover, .sres a.on{background:var(--hair)}
 .sres b{display:block}
 .sres small{color:var(--ink-2); display:block; font-size:.88rem; line-height:1.4}
 .sres .empty{padding:18px; color:var(--ink-2)}
 
 .toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:999px; font-weight:700; z-index:90}
-.rise{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
-@keyframes rise{from{transform:translateY(8px)} to{transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{transform:translateY(10px)} to{transform:none}}
 </style>
 <!--HEAD-END-->
 </head>
@@ -308,36 +355,29 @@ dialog::backdrop{background:rgb(10 15 30 / .5); backdrop-filter:blur(2px)}
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#start" aria-label="Christian-Schad-Grundschule, Startseite">
-      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
-        <rect width="44" height="44" rx="12" fill="var(--ink)"/>
-        <circle cx="16" cy="18" r="7" fill="var(--poppy)"/>
-        <circle cx="28" cy="16" r="5" fill="var(--sun)"/>
-        <path d="M10 33c6-7 18-7 24 0" stroke="var(--leaf)" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
+        <circle cx="23" cy="23" r="22" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+        <path d="M23 34V20" stroke="var(--leaf)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M23 26c-4-1-6-4-6-7 3 0 6 2 6 5" fill="var(--leaf)"/>
+        <circle cx="23" cy="15" r="6.5" fill="var(--poppy)"/>
+        <circle cx="23" cy="15" r="2" fill="var(--ink)"/>
       </svg>
-      <span><b>Christian-Schad-Grundschule</b><small>Aschaffenburg-Nilkheim</small></span>
+      <span><b>Christian&#8209;Schad-Grundschule</b><small><span class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Aschaffenburg-Nilkheim</small></span>
     </a>
-    <nav class="nav" aria-label="Hauptnavigation">
-      <a href="#ueber-uns" data-area="schule">Schule</a>
-      <a href="#lernen" data-area="lernen">Lernen</a>
-      <a href="#ganztag" data-area="ganztag">Ganztag</a>
-      <a href="#abc" data-area="eltern">Eltern-ABC</a>
-      <a href="#termine" data-area="termine">Termine</a>
-      <a href="#kontakt" data-area="kontakt">Kontakt</a>
-    </nav>
+    <nav class="nav" id="nav" aria-label="Hauptnavigation"></nav>
     <div class="tools">
-      <button class="searchbtn" id="openSearch" type="button" aria-label="Suche öffnen">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <span>Suchen</span><kbd>/</kbd>
+      <button class="iconbtn" id="openSearch" type="button" aria-label="Suche öffnen (Taste /)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       </button>
       <button class="iconbtn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       </button>
-      <a class="btn btn-poppy" href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener" aria-label="Kind krankmelden (elternnachricht.de)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <a class="btn btn-blue" href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener" aria-label="Kind krankmelden (elternnachricht.de)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         <span>Krankmelden</span>
       </a>
-      <button class="iconbtn menubtn" id="menuBtn" type="button" aria-label="Menü öffnen" aria-expanded="false">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="iconbtn menubtn" id="menuBtn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="drawer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
       </button>
     </div>
   </div>
@@ -352,22 +392,23 @@ dialog::backdrop{background:rgb(10 15 30 / .5); backdrop-filter:blur(2px)}
 <footer>
   <div class="wrap">
     <div>
-      <h4>Christian-Schad-Grundschule</h4>
-      <p>Staatliche Grundschule Aschaffenburg-Nilkheim<br>Lindenweg 14, 63741 Aschaffenburg<br>Telefon 06021 4561090</p>
+      <p class="big">Christian-Schad-<br>Grundschule</p>
+      <p>Lindenweg 14<br>63741 Aschaffenburg-Nilkheim</p>
+      <p style="margin-top:10px">Telefon 06021 4561090<br>info@christian-schad-schule.de</p>
     </div>
     <div>
       <h4>Schule</h4>
-      <a href="#ueber-uns">Über uns</a><a href="#team">Team</a><a href="#elternbeirat">Elternbeirat</a><a href="#sozialarbeit">Schulsozialarbeit</a><a href="#hausordnung">Schulhausordnung</a>
+      <a href="#ueber-uns">Über uns</a><a href="#team">Team</a><a href="#schulleben">Schulleben</a><a href="#elternbeirat">Elternbeirat</a><a href="#sozialarbeit">Schulsozialarbeit</a>
     </div>
     <div>
       <h4>Für Eltern</h4>
-      <a href="#abc">Eltern-ABC</a><a href="#termine">Termine</a><a href="#beratung">Beratung &amp; Hilfe</a><a href="#shop">Schulkleidung</a><a href="#russisch">По-русски / Українською</a>
+      <a href="#abc">Eltern-ABC</a><a href="#termine">Termine</a><a href="#ganztag">Ganztag</a><a href="#beratung">Beratung &amp; Hilfe</a><a href="#russisch">По-русски / Українською</a>
     </div>
     <div>
-      <h4>Rechtliches</h4>
-      <a href="#impressum">Impressum</a><a href="#datenschutz">Datenschutz</a>
-      <p style="margin-top:12px; font-size:.82rem">© 2026 Christian-Schad-Grundschule</p>
+      <h4>Schnell erledigt</h4>
+      <a href="https://elternnachricht.de/fehlzeiten" target="_blank" rel="noopener">Kind krankmelden</a><a href="#kontakt">Kontakt &amp; Anfahrt</a><a href="#shop">Schulkleidung</a>
     </div>
+    <div class="legal"><span>© 2026 Christian-Schad-Grundschule · Hier wachsen Talente.</span><span><a href="#impressum">Impressum</a><a href="#datenschutz">Datenschutz</a></span></div>
   </div>
 </footer>
 
@@ -442,15 +483,16 @@ const ABC = [
 
 /* Schulleben (aus der Galerie) */
 const LEBEN = [
-  {m:"April 2026", t:"Fußballtag mit dem VfR", x:"Training mit dem VfR für die 1. und 2. Klassen, Turnier aller 3. und 4. Klassen. Schul-Siegerklasse: die 3aGT.", img:"2026/04/Alle-3.-und-4.-Klassen-spielen-gegeneinander-und-ermitteln-die-Schul-Siegerklasse.jpeg", c:"var(--leaf-soft)", k:"⚽"},
-  {m:"April 2026", t:"Sammelwoche für den Bund Naturschutz", x:"Die 2. Klassen sammeln für den BN. Schon im Herbst 2025 hat eine BN-Mitarbeiterin beim Unterrichtsgang zur Hecke vieles erklärt.", c:"var(--leaf-soft)", k:"BN"},
-  {m:"Schuljahr 2025/26", t:"Mathewettbewerb: unsere Schulsieger", x:"Die stolzen Schulsieger heißen Jannik und Noemi.", c:"var(--sun-soft)", k:"1+1"},
-  {m:"Januar 2026", t:"Schneetag", x:"Bei der Schulschließung am 12.1.26 bauen die Kinder in der Betreuung einen Schneemann.", c:"var(--sky-soft)", k:"❄"},
-  {m:"Dezember 2025", t:"Adventssingen mit den Kitas", x:"Unsere Erstklässler singen mit den Vorschulkindern der Nilkheimer Kitas. Leitung: Frau Grose und Musiklehrer Herr Oberhofer.", c:"var(--poppy-soft)", k:"♪"},
-  {m:"Dezember 2025", t:"Päckchen für das Sozialkaufhaus", x:"Spendenpäckchen-Aktion für das Diakonie-Sozialkaufhaus Aschaffenburg.", c:"var(--poppy-soft)", k:"♥"},
-  {m:"Dezember 2025", t:"Judokurs vor den Weihnachtsferien", x:"Kursleiter: Detlev Staffa.", c:"var(--sky-soft)", k:"柔"},
-  {m:"November 2025", t:"AG Jugend und Technik", x:"Gesponsert von der Firma Hörnig Bau, Kursleitung: Sebastian Kunkel.", c:"var(--sun-soft)", k:"⚙"},
-  {m:"Oktober 2025", t:"Schulobst für alle Klassen", x:"Regelmäßig frisches Obst aus dem EU-Schulobstprogramm. Danke an das Schnibbelteam des Elternbeirats!", c:"var(--leaf-soft)", k:"🍎"},
+  {m:"April 2026", t:"Fußballtag mit dem VfR", x:"Training mit dem VfR für die 1. und 2. Klassen, Turnier aller 3. und 4. Klassen. Schul-Siegerklasse: die 3aGT.", img:"2026/04/Alle-3.-und-4.-Klassen-spielen-gegeneinander-und-ermitteln-die-Schul-Siegerklasse.jpeg", c:"var(--leaf-soft)", k:"Tor!"},
+  {m:"April 2026", t:"Sammelwoche für den Bund Naturschutz", x:"Die 2. Klassen sammeln für den BN. Schon im Herbst 2025 hat eine BN-Mitarbeiterin beim Unterrichtsgang zur Hecke vieles erklärt.", c:"var(--leaf-soft)", k:"Natur"},
+  {m:"Schuljahr 2025/26", t:"Mathewettbewerb: unsere Schulsieger", x:"Die stolzen Schulsieger heißen Jannik und Noemi.", c:"var(--sun-soft)", k:"1 + 1 = 2"},
+  {m:"Januar 2026", t:"Schneetag", x:"Bei der Schulschließung am 12.1.26 bauen die Kinder in der Betreuung einen Schneemann.", c:"var(--sky-soft)", k:"Schnee!"},
+  {m:"Dezember 2025", t:"Adventssingen mit den Kitas", x:"Unsere Erstklässler singen mit den Vorschulkindern der Nilkheimer Kitas. Leitung: Frau Grose und Musiklehrer Herr Oberhofer.", c:"var(--poppy-soft)", k:"la la la"},
+  {m:"Dezember 2025", t:"Päckchen für das Sozialkaufhaus", x:"Spendenpäckchen-Aktion für das Diakonie-Sozialkaufhaus Aschaffenburg.", c:"var(--poppy-soft)", k:"Danke!"},
+  {m:"Dezember 2025", t:"Judokurs vor den Weihnachtsferien", x:"Kursleiter: Detlev Staffa.", c:"var(--sky-soft)", k:"Judo"},
+  {m:"November 2025", t:"AG Jugend und Technik", x:"Gesponsert von der Firma Hörnig Bau, Kursleitung: Sebastian Kunkel.", c:"var(--sun-soft)", k:"Technik"},
+  {m:"Oktober 2025", t:"Schulobst für alle Klassen", x:"Regelmäßig frisches Obst aus dem EU-Schulobstprogramm. Danke an das Schnibbelteam des Elternbeirats!", c:"var(--leaf-soft)", k:"Obst"},
+  {m:"März 2024", t:"Ausgezeichnet: „Unsere Schule singt und klingt“", x:"Das Kultusministerium zeichnet unsere Schule als musikbegeisterte Grundschule aus.", img:"2024/03/2024_03_06stmuk0394_-scaled.jpg", c:"var(--sun-soft)", k:"la la la"},
 ];
 
 /* Unterseiten */
@@ -641,6 +683,8 @@ ${tbl(["","Offener Ganztag","Gebundener Ganztag"],[
 ["Pflichten","Tage werden zu Schuljahresbeginn festgelegt; Fehlen schriftlich bei der Schulleitung entschuldigen","Schulpflicht an allen 4 Tagen bis 15:30 Uhr"],
 ["Ferien","Keine Ferienbetreuung","Keine Ferienbetreuung"],
 ])}
+<h2>Der Tag im Überblick</h2>
+<div id="dayband"></div>
 <h2>Welches Modell passt?</h2>
 <p>Der <b>offene Ganztag</b> ist flexibel und passt zu Familien, die Betreuung nach dem Unterricht brauchen, aber nicht jeden Tag bis zum Nachmittag. Der <b>gebundene Ganztag</b> ist fester strukturiert, an den Klassenunterricht gebunden und hilft besonders Kindern, die von einem klaren Tagesrhythmus profitieren.</p>
 <p class="note">Mittagessen bestellen: bis Mittwoch, 11 Uhr, der Vorwoche online bei ${ext("https://www.bantschow-kids.de","Bantschow Kids")}. Alle Modelle stellt die Schule auch beim Informationsabend zur Einschulung vor (<a href="#termine">Termine</a>).</p>`};
@@ -739,7 +783,7 @@ P["shop"] = {area:"eltern", title:"Schulkleidung und mehr", lead:"Im Sekretariat
 </div>
 <p>Der Förderverein finanziert damit Schulveranstaltungen, besondere Möbel und Fahrtkosten einzelner Kinder mit.</p>`};
 
-P["termine"] = {area:"termine", title:"Termine 2026/27", lead:"Elternabende, Feste, freie Tage und Informationsabende im Überblick.", body:`<div id="allDates"></div>`};
+P["termine"] = {area:"eltern", title:"Termine 2026/27", lead:"Elternabende, Feste, freie Tage und Informationsabende im Überblick.", body:`<div id="allDates"></div>`};
 
 P["schulleben"] = {area:"schule", title:"Schulleben", lead:"Was bei uns los ist. Aktuelle Beiträge erscheinen auch im Schul-Blog.", body:`<div class="life" id="allLife"></div><p>Weitere Beiträge: ${ext(S.blog,"Unser Blog auf TaskCards")}</p>`};
 
@@ -800,7 +844,7 @@ const AREAS = {
   schule:{label:"Schule", links:["ueber-uns","team","schulleben","elternbeirat","partnerschaft","sozialarbeit","hausordnung","pausenordnung","leitbild"]},
   lernen:{label:"Lernen", links:["lernen","lesen","musik","gemeinschaft","medien","umwelt","kita"]},
   ganztag:{label:"Ganztag", links:["ganztag"]},
-  eltern:{label:"Für Eltern", links:["abc","beratung","shop","russisch"]},
+  eltern:{label:"Für Eltern", links:["abc","termine","beratung","shop","russisch"]},
   termine:{label:"Termine", links:["termine"]},
   kontakt:{label:"Kontakt", links:["kontakt"]},
   recht:{label:"Rechtliches", links:["impressum","datenschutz"]},
@@ -863,7 +907,7 @@ function contactHTML(){
   return `<div class="contact">
   <div><span class="eyebrow">Sekretariat · Sandra Bilz</span><h3>Christian-Schad-Grundschule</h3><p class="muted">${S.addr}</p>
     <div class="kv">${row("Telefon", S.tel, S.tel)}${row("E-Mail", S.mail, S.mail)}${row("Fax", S.fax)}</div>
-    <div class="hero-actions"><a class="btn btn-ghost" href="tel:${S.telIntl}">Anrufen</a><a class="btn btn-ghost" href="${S.map}" target="_blank" rel="noopener">Route planen</a></div>
+    <div class="hero-actions"><a class="btn btn-line" href="tel:${S.telIntl}">Anrufen</a><a class="btn btn-line" href="${S.map}" target="_blank" rel="noopener">Route planen</a></div>
   </div>
   <div><span class="eyebrow">Schulleitung</span>
     <div class="kv">${row("Rektorin", "Doris Wolf")}${row("E-Mail", S.rektor, S.rektor)}${row("Konrektor", "Andreas Weniger")}${row("Hauswartin", "Zsuzsanna Zehnder")}</div>
@@ -874,7 +918,7 @@ function contactHTML(){
   </div></div>`;
 }
 
-/* Tagesband */
+/* Tagesband (auf der Ganztag-Seite) */
 const DAY = {from:7.5, to:16};
 const BANDS = [
   {k:"Frühbetreuung", a:7.5, b:7.75, c:"var(--sun)"},
@@ -884,102 +928,162 @@ const BANDS = [
   {k:"GGT Mo–Do", a:7.5, b:15.5, c:"var(--leaf)"},
 ];
 const pos = h => ((h - DAY.from) / (DAY.to - DAY.from) * 100);
+function bandHTML(){
+  const ticks = [8,10,12,14,16];
+  return `<div class="band" aria-label="Tagesablauf von 7:30 bis 16:00 Uhr">
+    <div class="band-rows">${BANDS.map(b=>`<div class="band-row"><span>${b.k}</span><div class="track"><i style="left:${pos(b.a)}%; width:${pos(b.b)-pos(b.a)}%; background:${b.fade?`linear-gradient(90deg, color-mix(in srgb, ${b.c} 30%, transparent), ${b.c} 35%)`:b.c}"></i></div></div>`).join("")}</div>
+    <div class="band-axis"><span></span><div>${ticks.map(t=>`<b style="left:${pos(t)}%">${t} Uhr</b>`).join("")}</div></div>
+  </div><p class="note">Ende des Unterrichts je nach Stundenplan. Der offene Ganztag beginnt nach dem Unterricht, der gebundene Ganztag läuft Montag bis Donnerstag.</p>`;
+}
+
+/* Heute-Leiste (Startseite) */
 function todayHTML(){
   const now = berlinNow(), wd = now.getDay(), h = now.getHours() + now.getMinutes()/60;
   const hhmm = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
-  const todayISO = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
-  const ev = TERMINE.find(e => e.d === todayISO);
-  const weekend = wd===0 || wd===6;
-  let st, cls="";
-  if(ev && ev.free){ st = `<b>Heute unterrichtsfrei.</b> ${ev.t.split(":")[0]}.`; cls="warn"; }
-  else if(weekend){ st = `<b>Wochenende.</b> Krankmeldungen für Montag bitte bis 7:40 Uhr.`; cls="warn"; }
-  else if(h < 7.5){ st = `<b>Gleich geht's los.</b> Frühbetreuung ab 7:30 Uhr im Pausenhof, Krankmeldung bis 7:40 Uhr.`; }
-  else if(h < 7.667){ st = `<b>Krankmeldung noch bis 7:40 Uhr</b> unter ${S.tel} oder online.`; cls="alert"; }
-  else if(h < 7.75){ st = `<b>Um 7:45 Uhr</b> holen die Lehrkräfte die Kinder im Pausenhof ab.`; }
-  else if(h < 16){ st = `<b>Schultag läuft.</b> Sekretariat erreichbar unter ${S.tel}.`; }
-  else { st = `<b>Schulschluss für heute.</b> Krankmeldungen für morgen bis 7:40 Uhr.`; cls="warn"; }
-  const next = TERMINE.find(e => parseD(e.d) >= dayStart(now));
-  const showNow = !weekend && h >= DAY.from && h <= DAY.to && !(ev && ev.free);
-  const ticks = [8,10,12,14,16];
+  const iso = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+  const ev = TERMINE.find(e => e.d === iso);
+  let st, cls = "";
+  if(ev && ev.free){ st = `Heute ist unterrichtsfrei: ${ev.t.split(":")[0]}.`; cls = "warn"; }
+  else if(wd === 0 || wd === 6){ st = `Schönes Wochenende! Krankmeldungen für Montag bitte bis 7:40 Uhr.`; cls = "warn"; }
+  else if(h < 7.5){ st = `Frühbetreuung ab 7:30 Uhr im Pausenhof. Krankmeldungen bis 7:40 Uhr.`; }
+  else if(h < 7.667){ st = `Krankmeldung noch bis 7:40 Uhr, telefonisch unter ${S.tel} oder online.`; cls = "alert"; }
+  else if(h < 7.75){ st = `Um 7:45 Uhr holen die Lehrkräfte die Kinder im Pausenhof ab.`; }
+  else if(h < 16){ st = `Der Schultag läuft. Das Sekretariat erreichen Sie unter ${S.tel}.`; }
+  else { st = `Schulschluss für heute. Krankmeldungen für morgen bitte bis 7:40 Uhr.`; cls = "warn"; }
+  const next = TERMINE.find(e => parseD(e.d) > dayStart(now)) ;
   const nd = next ? parseD(next.d) : null;
-  return `<div class="today-head"><div><span class="eyebrow">${WDL[wd]}, ${now.getDate()}. ${MON[now.getMonth()]}</span><h3>Der Schultag</h3></div><span class="clock" aria-label="Uhrzeit ${hhmm}">${hhmm}</span></div>
-  <div class="status ${cls}" role="status"><span class="dot"></span><p>${st}</p></div>
-  <div class="band" aria-label="Tagesablauf von 7:30 bis 16:00 Uhr">
-    <div class="band-rows">${BANDS.map(b=>`<div class="band-row"><span>${b.k}</span><div class="track"><i style="left:${pos(b.a)}%; width:${pos(b.b)-pos(b.a)}%; background:${b.fade?`linear-gradient(90deg, color-mix(in srgb, ${b.c} 35%, transparent), ${b.c} 30%)`:b.c}"></i></div></div>`).join("")}</div>
-    <div class="band-axis"><span></span><div>${ticks.map(t=>`<b style="left:${pos(t)}%">${t}</b>`).join("")}</div></div>
-    ${showNow?`<div class="now" style="left:calc(106px + (100% - 106px) * ${pos(h)/100})"></div>`:""}
-  </div>
-  <p class="muted" style="font-size:.82rem; margin-top:-6px">Unterrichtsende je nach Stundenplan. OGT nach Unterrichtsende, GGT Montag bis Donnerstag.</p>
-  ${next?`<a class="next" href="#termine"><span class="datechip"><b>${nd.getDate()}</b><small>${MON[nd.getMonth()]}</small></span><span><span class="eyebrow">Nächster Termin</span><br><b>${next.t}</b></span></a>`:""}`;
+  return `<div class="today-bar">
+    <div class="when"><span class="eyebrow">${WDL[wd]}, ${now.getDate()}. ${MON[now.getMonth()]}</span><b>${hhmm}</b></div>
+    <p class="msg ${cls}" role="status"><span class="dot"></span><span>${st}</span></p>
+    ${next ? `<a href="#termine">Nächster Termin: ${nd.getDate()}. ${MON[nd.getMonth()]} · ${next.t.split(":")[0].replace(/,.*$/,"")} →</a>` : ""}
+  </div>`;
 }
 
 /* ================= Ansichten ================= */
+const PH = (src, fb, alt="") => `${src?`<img src="${IMG}${src}" alt="${alt}" loading="lazy" onerror="this.remove()">`:""}<span class="fb" aria-hidden="true">${fb}</span>`;
 function viewStart(){
   return `
 <section class="hero"><div class="wrap">
   <div class="hero-copy rise">
-    <span class="eyebrow">Staatliche Grundschule · Aschaffenburg-Nilkheim</span>
+    <span class="eyebrow">Staatliche Grundschule in Aschaffenburg-Nilkheim</span>
     <h1>Hier wachsen <em>Talente.</em></h1>
-    <p class="lead">Rund 250 Kinder lernen bei uns in zwölf Klassen, mit Singklasse und Chor, Klassenrat, Leseförderung und zwei Ganztagsmodellen. Hier finden Eltern alles für den Schulalltag.</p>
+    <p class="lead">Rund 250 Kinder lernen, singen, malen und spielen bei uns in zwölf Klassen. Schön, dass Sie da sind.</p>
     <div class="hero-actions">
-      <a class="btn btn-poppy" href="${S.krank}" target="_blank" rel="noopener">Kind krankmelden</a>
-      <a class="btn btn-ghost" href="#abc">Eltern-ABC</a>
-      <a class="btn btn-ghost" href="#ganztag">Ganztag</a>
+      <a class="btn btn-blue" href="#ueber-uns">Unsere Schule kennenlernen</a>
+      <a class="btn btn-line" href="#abc">Eltern-ABC</a>
     </div>
-    <div class="facts"><span><b>12</b>Klassen</span><span><b>2</b>Ganztagsklassen</span><span><b>7:45</b>Unterrichtsbeginn</span><span><b>7:40</b>Krankmeldung bis</span></div>
   </div>
-  <aside class="today rise" id="today" aria-label="Heute an der Schule">${todayHTML()}</aside>
+  <figure class="exhibit rise">
+    <span class="hand" aria-hidden="true">von unseren Kindern gemalt!</span>
+    <div class="frame"><div class="ph" style="--c:var(--leaf-soft)">${PH("2021/06/Mohnbild_2-scaled.jpg","Mohnblumen","Mohnblumen, gemalt von Kindern der Christian-Schad-Grundschule")}</div></div>
+    <figcaption class="label"><b>Mohnblumen</b><small>Bilder unserer Kinder<br>aus der Schulgalerie</small></figcaption>
+  </figure>
 </div></section>
 
-<section class="quick" aria-label="Schnellzugriff"><div class="wrap"><div class="quick-grid">
-  ${[
-   ["#kontakt","Ansprechpartner","Sekretariat, Schulleitung und alle Kontakte","var(--sky-soft)","var(--sky)",'<path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/><circle cx="12" cy="8" r="4"/>'],
-   ["#termine","Termine","Elternabende, freie Tage, Infoabende","var(--sun-soft)","#9a6a00",'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'],
-   ["#abc","Eltern-ABC","Von Ankommen bis Zeugnis, durchsuchbar","var(--poppy-soft)","var(--poppy)",'<path d="M4 19 9 5l5 14M6 14h6M15 9h5l-5 8h5"/>'],
-   ["#beratung","Beratung & Hilfe","Schulpsychologie, Beratungsstellen, Notrufe","var(--leaf-soft)","var(--leaf)",'<path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/>'],
-   ["#elternbeirat","Elternbeirat","Ihre Vertretung an der Schule","var(--sky-soft)","var(--sky)",'<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c1-3 3.5-5 6-5s5 2 6 5M14 15c2.5 0 5 2 6 5"/>'],
-   ["#shop","Schulkleidung","Hoodies, Bandanas und Mappen im Sekretariat","var(--sun-soft)","#9a6a00",'<path d="M8 3 3 6l2 5 3-1v11h8V10l3 1 2-5-5-3a4 4 0 0 1-8 0z"/>'],
-  ].map(([h,t,x,bg,fg,ic])=>`<a class="qt" href="${h}"><span class="ic" style="background:${bg}; color:${fg}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg></span><span><b>${t}</b><small>${x}</small></span></a>`).join("")}
-</div></div></section>
+<section class="today" aria-label="Heute an der Schule"><div class="wrap" id="todayBar">${todayHTML()}</div></section>
 
-<section class="sec band-sheet"><div class="wrap">
-  <div class="sec-head"><div><span class="eyebrow">Schuljahr 2026/27</span><h2>Was als Nächstes ansteht</h2></div><a class="link" href="#termine">Alle Termine</a></div>
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">Für Eltern</span><h2>Schnell gefunden</h2></div></div>
+  <div class="ways">
+    <a class="way" href="${S.krank}" target="_blank" rel="noopener" style="--c:var(--poppy)"><span class="num">7:40</span><h3>Kind krankmelden</h3><p>Bis 7:40 Uhr online über Elternnachricht oder telefonisch unter ${S.tel}.</p></a>
+    <a class="way" href="#abc" style="--c:var(--sun)"><span class="num">A–Z</span><h3>Eltern-ABC</h3><p>Von Hausschuhen bis Zeugnis: alles zum Schulalltag, mit Suche.</p></a>
+    <a class="way" href="#ganztag" style="--c:var(--leaf)"><span class="num">15:30</span><h3>Ganztag</h3><p>Offener Ganztag bis 14 oder 16 Uhr, gebundener Ganztag bis 15:30 Uhr.</p></a>
+  </div>
+</div></section>
+
+<section class="sec" style="padding-top:0"><div class="wrap intro">
+  <div class="photo"><span class="tape" aria-hidden="true"></span><div class="ph" style="--c:var(--sky-soft)">${PH("2024/09/IMG_5253.jpg","Unser Pausenhof","Klettergerüst und Rutsche im Pausenhof")}</div></div>
+  <div class="txt">
+    <span class="eyebrow">Unsere Schule</span>
+    <h2>Ein Haus für die Kinder von Nilkheim</h2>
+    <p class="muted">Helle Räume im Neubau, große Klassenzimmer im Altbau, ein naturnaher Pausenhof mit Klettergerüst und Rutsche. Wir singen in Singklasse und Chor, lösen Konflikte im Klassenrat und lesen mit FiLBy. Benannt ist die Schule nach dem Maler Christian Schad, der ab 1942 in Aschaffenburg lebte.</p>
+    <div class="figs"><div><b>12</b><span>Klassen</span></div><div><b>2</b><span>Ganztagsklassen</span></div><div><b>80</b><span>iPads</span></div></div>
+    <p><a class="link" href="#ueber-uns">Mehr über uns →</a></p>
+  </div>
+</div></section>
+
+<section class="sec" style="padding-top:0"><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">Schuljahr 2026/27</span><h2>Termine</h2></div><a class="link" href="#termine">Alle Termine →</a></div>
   <div id="startDates"></div>
 </div></section>
 
-<section class="sec"><div class="wrap">
-  <div class="sec-head"><div><span class="eyebrow">Lernen bei uns</span><h2>Mehr als Lesen, Schreiben, Rechnen</h2><p class="muted">Unterricht nach dem LehrplanPlus, dazu Schwerpunkte, die unsere Schule ausmachen.</p></div></div>
-  ${learnHTML()}
-</div></section>
-
-<section class="sec band-sheet"><div class="wrap">
-  <div class="sec-head"><div><span class="eyebrow">Schulleben</span><h2>Zuletzt bei uns</h2></div><a class="link" href="#schulleben">Alle Beiträge</a></div>
+<section class="sec" style="padding-top:0"><div class="wrap">
+  <div class="sec-head"><div><span class="eyebrow">Schulleben</span><h2>Zuletzt bei uns <span class="hand" style="font-size:1.5rem">… was für ein Jahr!</span></h2></div><a class="link" href="#schulleben">Alle Beiträge →</a></div>
   <div class="life">${LEBEN.slice(0,3).map(storyHTML).join("")}</div>
-</div></section>
-
-<section class="sec"><div class="wrap">
-  <div class="sec-head"><div><span class="eyebrow">Kontakt</span><h2>So erreichen Sie uns</h2></div></div>
-  ${contactHTML()}
 </div></section>`;
 }
 
+const chev = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
 function viewPage(id){
   const p = P[id]; const a = AREAS[p.area];
   const siblings = a.links.filter(x => P[x]);
   return `
 <section class="page-head"><div class="wrap">
-  <div class="crumbs"><a href="#start">Start</a> / ${a.label}</div>
-  <h1 style="font-size:clamp(2rem,4.4vw,3.2rem)">${p.title}</h1>
+  <div class="crumbs"><a href="#start">Start</a><span aria-hidden="true">/</span>${a.label}</div>
+  <h1 style="font-size:clamp(2.2rem,4.6vw,3.4rem)">${p.title}</h1>
   ${p.lead?`<p class="lead">${p.lead}</p>`:""}
 </div></section>
 <div class="wrap"><div class="page">
   <article class="prose">${p.body}</article>
   <aside class="aside">
-    ${siblings.length>1?`<div class="box"><h4>${a.label}</h4>${siblings.map(x=>`<a href="#${x}" ${x===id?'aria-current="page" style="color:var(--poppy)"':""}>${P[x].title}</a>`).join("")}</div>`:""}
-    <div class="box"><h4>Schnell erledigt</h4><a href="${S.krank}" target="_blank" rel="noopener">Kind krankmelden (bis 7:40 Uhr)</a><a href="#abc">Eltern-ABC</a><a href="#termine">Termine</a><a href="${S.elterninfo}" target="_blank" rel="noopener">Elterninfos auf TaskCards</a></div>
+    ${siblings.length>1?`<div class="box"><h4>${a.label}</h4>${siblings.map(x=>`<a href="#${x}" ${x===id?'aria-current="page"':""}>${P[x].title}</a>`).join("")}</div>`:""}
+    <div class="box"><h4>Schnell erledigt</h4><a href="${S.krank}" target="_blank" rel="noopener">Kind krankmelden</a><a href="#abc">Eltern-ABC</a><a href="#termine">Termine</a><a href="${S.elterninfo}" target="_blank" rel="noopener">Elterninfos (TaskCards)</a></div>
     <div class="box"><h4>Sekretariat</h4><p><b>${S.tel}</b><br><span class="muted">${S.mail}</span></p></div>
   </aside>
 </div></div>`;
+}
+
+/* ================= Menü ================= */
+const MENU = [
+  {label:"Schule", area:"schule", two:true, items:[
+    ["ueber-uns","Über uns","Haus, Unterricht und Kollegium"],["team","Team","Schulleitung und Lehrkräfte 2026/27"],
+    ["schulleben","Schulleben","Feste, Projekte, Ausflüge"],["elternbeirat","Elternbeirat","Ihre Vertretung 2025–2027"],
+    ["partnerschaft","Elternhaus und Schule","Erziehungspartnerschaft"],["sozialarbeit","Schulsozialarbeit","Frau Gröpler-Braun, Sprechzeiten"],
+    ["hausordnung","Schulhausordnung","Regeln für unser Zusammenleben"],["pausenordnung","Pausenordnung","Damit die Pause allen Spaß macht"],
+    ["leitbild","Leitbild","Was uns wichtig ist"]]},
+  {label:"Lernen", area:"lernen", two:true, items:[
+    ["lernen","Überblick","Alle Schwerpunkte auf einen Blick"],["lesen","Lesen","Leseförderung mit FiLBy"],
+    ["musik","Musik","Singklasse, Chor und WIM"],["gemeinschaft","Gemeinschaft","Klassenrat und Pausenhelfer"],
+    ["medien","Medien","Digitale Bildung mit Augenmaß"],["umwelt","Umwelt","Grüne Meilen und Natur"],
+    ["kita","Von der Kita in die Schule","Übergang mit unseren Kitas"]]},
+  {label:"Ganztag", href:"ganztag", area:"ganztag"},
+  {label:"Für Eltern", area:"eltern", items:[
+    ["abc","Eltern-ABC","Alles zum Schulalltag von A bis Z"],["termine","Termine","Schuljahr 2026/27"],
+    ["beratung","Beratung und Hilfe","Ansprechpersonen und Notrufe"],["shop","Schulkleidung","Hoodies, Bandanas, Mappen"],
+    ["russisch","По-русски / Українською","Informationen für Familien"]]},
+  {label:"Kontakt", href:"kontakt", area:"kontakt"},
+];
+function buildMenus(){
+  $("#nav").innerHTML = MENU.map((m,i) => m.href
+    ? `<a href="#${m.href}" data-area="${m.area}">${m.label}</a>`
+    : `<div class="dd" data-area="${m.area}"><button type="button" aria-expanded="false" aria-controls="dd${i}" data-area="${m.area}">${m.label}${chev}</button>
+       <div class="panel ${m.two?"two":""}" id="dd${i}">${m.items.map(([h,t,s])=>`<a href="#${h}"><b>${t}</b><small>${s}</small></a>`).join("")}</div></div>`).join("");
+  $("#drawerNav").innerHTML = `<div class="dh"><a class="brand" href="#start"><b style="font:400 1.1rem var(--f-display)">Startseite</b></a><button class="iconbtn" type="button" id="closeMenu" aria-label="Menü schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`
+    + MENU.map(m => m.href ? `<a class="solo" href="#${m.href}">${m.label}</a>`
+      : `<details><summary>${m.label}${chev}</summary><div>${m.items.map(([h,t])=>`<a href="#${h}">${t}</a>`).join("")}</div></details>`).join("")
+    + `<a class="btn btn-blue" href="${S.krank}" target="_blank" rel="noopener">Kind krankmelden</a><button class="btn btn-line" type="button" id="themeBtn2" style="margin-top:10px">Hell / Dunkel umschalten</button>`;
+
+  const dds = [...document.querySelectorAll(".dd")];
+  const close = (except) => dds.forEach(d => { if(d !== except){ d.classList.remove("open"); d.querySelector("button").setAttribute("aria-expanded","false"); } });
+  const hover = matchMedia("(hover: hover) and (pointer: fine)");
+  dds.forEach(d => {
+    const b = d.querySelector("button");
+    const open = () => { close(d); d.classList.add("open"); b.setAttribute("aria-expanded","true"); };
+    b.addEventListener("click", () => d.classList.contains("open") ? close() : open());
+    let t;
+    d.addEventListener("mouseenter", () => { if(hover.matches){ clearTimeout(t); open(); } });
+    d.addEventListener("mouseleave", () => { if(hover.matches){ t = setTimeout(() => close(), 180); } });
+    d.addEventListener("keydown", e => {
+      const links = [...d.querySelectorAll(".panel a")];
+      if(e.key === "ArrowDown"){ e.preventDefault(); if(!d.classList.contains("open")) open(); const k = links.indexOf(document.activeElement); links[Math.min(k+1, links.length-1)].focus(); }
+      if(e.key === "ArrowUp"){ e.preventDefault(); const k = links.indexOf(document.activeElement); if(k <= 0) b.focus(); else links[k-1].focus(); }
+      if(e.key === "Escape"){ close(); b.focus(); }
+    });
+    d.addEventListener("focusout", e => { if(!d.contains(e.relatedTarget)) close(); });
+    d.querySelectorAll(".panel a").forEach(a => a.addEventListener("click", () => close()));
+  });
+  document.addEventListener("click", e => { if(!e.target.closest(".dd")) close(); });
+  window.addEventListener("hashchange", () => close());
 }
 
 /* ================= Router ================= */
@@ -991,7 +1095,8 @@ function render(){
   main.innerHTML = isStart ? viewStart() : viewPage(id);
   document.title = isStart ? "Christian-Schad-Grundschule Nilkheim" : `${P[id].title} · Christian-Schad-Grundschule`;
   const area = isStart ? null : P[id].area;
-  document.querySelectorAll(".nav a").forEach(a => { if(a.dataset.area===area) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  document.querySelectorAll(".nav > a, .dd > button").forEach(a => { if(a.dataset.area===area) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  if($("#dayband")) $("#dayband").innerHTML = bandHTML();
   if($("#startDates")){
     $("#startDates").innerHTML = datesHTML("upcoming");
     $("#startDates").querySelectorAll(".date").forEach((r,i) => { if(i>3) r.remove(); });
@@ -1061,22 +1166,25 @@ document.addEventListener("keydown", e => {
 });
 
 /* ================= Menü & Theme ================= */
+buildMenus();
 const drawer = $("#drawer"), menuBtn = $("#menuBtn");
-$("#drawerNav").innerHTML = `<a href="#start">Startseite</a>` + Object.values(AREAS).filter(a=>a.label!=="Rechtliches").map(a => `<h4>${a.label}</h4>` + a.links.map(x => `<a href="#${x}">${P[x].title}</a>`).join("")).join("");
-menuBtn.onclick = () => { drawer.hidden = false; menuBtn.setAttribute("aria-expanded","true"); drawer.querySelector("a").focus(); };
-drawer.addEventListener("click", e => { if(e.target === drawer || e.target.closest("a")){ drawer.hidden = true; menuBtn.setAttribute("aria-expanded","false"); } });
-document.addEventListener("keydown", e => { if(e.key === "Escape" && !drawer.hidden){ drawer.hidden = true; menuBtn.setAttribute("aria-expanded","false"); menuBtn.focus(); } });
+const closeDrawer = () => { drawer.hidden = true; menuBtn.setAttribute("aria-expanded","false"); };
+menuBtn.onclick = () => { drawer.hidden = false; menuBtn.setAttribute("aria-expanded","true"); $("#closeMenu").focus(); };
+drawer.addEventListener("click", e => { if(e.target === drawer || e.target.closest("a") || e.target.closest("#closeMenu")) closeDrawer(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !drawer.hidden){ closeDrawer(); menuBtn.focus(); } });
 
 const root = document.documentElement;
 try{ const t = localStorage.getItem("csgs-theme"); if(t) root.dataset.theme = t; }catch(e){}
-$("#themeBtn").onclick = () => {
+const toggleTheme = () => {
   const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   root.dataset.theme = dark ? "light" : "dark";
   try{ localStorage.setItem("csgs-theme", root.dataset.theme); }catch(e){}
 };
+$("#themeBtn").onclick = toggleTheme;
+$("#themeBtn2").onclick = toggleTheme;
 
 render();
-setInterval(() => { const t = $("#today"); if(t) t.innerHTML = todayHTML(); }, 30000);
+setInterval(() => { const t = $("#todayBar"); if(t) t.innerHTML = todayHTML(); }, 30000);
 </script>
 <!--BODY-END-->
 </body>

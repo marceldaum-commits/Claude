@@ -6,13 +6,15 @@ Entwurf für einen Neuauftritt von https://www.christian-schad-volksschule.de (b
 - **`inhalte/`** – gesicherte Inhalte der alten Website, eine Markdown-Datei pro Seite (mit Quell-URL). Viele Texte liegen nur sinngemäß vor, weil das Abrufwerkzeug lange Passagen nicht wörtlich ausgibt; Namen, Zeiten, Nummern sind exakt.
 
 ## Was neu ist
-- Startseite mit **„Der Schultag“**: Uhrzeit, Hinweis je nach Tageszeit (z. B. „Krankmeldung noch bis 7:40 Uhr“), Tagesband 7:30–16:00 (Frühbetreuung, Unterricht, OGT, GGT) und nächster Termin.
+- Ruhige Startseite im Galerie-Stil: Kinderbild als gerahmtes Exponat, Heute-Leiste (Hinweis je nach Tageszeit, nächster Termin), drei Wege für Eltern, kurzes „Über uns“, Termine, Schulleben.
+- Aufklapp-Menü (Desktop: Dropdowns mit Kurzbeschreibung, per Maus, Klick oder Pfeiltasten; Handy: aufklappbare Bereiche).
+- Tagesband 7:30–16:00 (Frühbetreuung, Unterricht, OGT, GGT) auf der Ganztag-Seite.
 - **Krankmelden** immer sichtbar oben rechts.
 - **Suche über alles** (Taste `/` oder Strg+K): Seiten, Eltern-ABC, Termine.
 - **Eltern-ABC** mit Sofortfilter und Buchstaben-Sprung.
 - **Termine** mit automatischer Markierung „Als Nächstes“, vergangene werden ausgeblendet.
 - Ganztag OGT/GGT als Gegenüberstellung, Team als Übersicht, Kopieren-Knöpfe für Telefon/E-Mail.
-- Hell/Dunkel, voll mobil, barrierearm (große, gut lesbare Schrift Atkinson Hyperlegible, Tastaturbedienung, Sprunglink).
+- Hell/Dunkel, voll mobil, barrierearm (Young Serif für Überschriften, gut lesbare Atkinson Hyperlegible für Text, Caveat für Handschrift-Notizen, Tastaturbedienung, Sprunglink).
 - 25 Unterseiten über `#anker` (z. B. `index.html#ganztag`).
 
 ## Pflege
