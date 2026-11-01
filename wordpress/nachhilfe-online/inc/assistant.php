@@ -1,6 +1,6 @@
 <?php
 /**
- * Einrichtungs-Assistent: Design → "Mathe mit Marcel einrichten".
+ * Einrichtungs-Assistent: Design → "Nachhilfe Online einrichten".
  *
  * Legt die Seiten aus content/ an (nur fehlende – bestehende Seiten werden
  * NICHT verändert), erstellt die Menüs und setzt auf Wunsch die Startseite.
@@ -12,7 +12,7 @@
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'admin_menu', function () {
-	add_theme_page( __( 'Mathe mit Marcel einrichten', 'mathe-mit-marcel' ), __( 'Mathe mit Marcel einrichten', 'mathe-mit-marcel' ), 'manage_options', 'mmm-einrichten', 'mmm_assistant_page' );
+	add_theme_page( __( 'Nachhilfe Online einrichten', 'nachhilfe-online' ), __( 'Nachhilfe Online einrichten', 'nachhilfe-online' ), 'manage_options', 'mmm-einrichten', 'mmm_assistant_page' );
 } );
 
 function mmm_manifest() {
@@ -40,7 +40,7 @@ function mmm_assistant_page() {
 	if ( isset( $_POST['mmm_einrichten'] ) && check_admin_referer( 'mmm_einrichten' ) ) {
 		$done = mmm_run_setup( ! empty( $_POST['mmm_startseite'] ), ! empty( $_POST['mmm_menues'] ) );
 	}
-	echo '<div class="wrap"><h1>' . esc_html__( 'Mathe mit Marcel einrichten', 'mathe-mit-marcel' ) . '</h1>';
+	echo '<div class="wrap"><h1>' . esc_html__( 'Nachhilfe Online einrichten', 'nachhilfe-online' ) . '</h1>';
 	if ( $done ) {
 		echo '<div class="notice notice-success"><ul style="list-style:disc;padding-left:20px">';
 		foreach ( $done as $d ) {
@@ -61,9 +61,9 @@ function mmm_assistant_page() {
 	wp_nonce_field( 'mmm_einrichten' );
 	echo '<p><label><input type="checkbox" name="mmm_menues" value="1" checked> Menüs „Hauptmenü“ und „Rechtliches“ anlegen und zuweisen (nur wenn noch keins zugewiesen ist)</label></p>';
 	echo '<p><label><input type="checkbox" name="mmm_startseite" value="1"> Neue Startseite als Startseite der Website festlegen (nur wenn sie neu angelegt wird)</label></p>';
-	submit_button( __( 'Jetzt einrichten', 'mathe-mit-marcel' ), 'primary', 'mmm_einrichten' );
+	submit_button( __( 'Jetzt einrichten', 'nachhilfe-online' ), 'primary', 'mmm_einrichten' );
 	echo '</form>';
-	echo '<h2>Danach</h2><ol><li>Design → Customizer → „Mathe mit Marcel“: Telefon, Antwortzeit, Google-Link prüfen.</li><li>Gelb markierte <code>[Platzhalter]</code> in den Seiten ersetzen.</li><li>Schriften in <code>assets/fonts/</code> legen (siehe LIESMICH.txt).</li><li>Probestunden-Formular einmal selbst ausfüllen und prüfen, ob die Mail ankommt.</li></ol></div>';
+	echo '<h2>Danach</h2><ol><li>Design → Customizer → „Nachhilfe Online“: Telefon, Antwortzeit, Google-Link prüfen.</li><li>Gelb markierte <code>[Platzhalter]</code> in den Seiten ersetzen.</li><li>Schriften in <code>assets/fonts/</code> legen (siehe LIESMICH.txt).</li><li>Probestunden-Formular einmal selbst ausfüllen und prüfen, ob die Mail ankommt.</li></ol></div>';
 }
 
 function mmm_run_setup( $set_front, $menus ) {
@@ -122,7 +122,7 @@ function mmm_setup_menus() {
 	$log       = array();
 	$locations = get_nav_menu_locations();
 	if ( empty( $locations['hauptmenue'] ) ) {
-		$menu_id = wp_create_nav_menu( 'Hauptmenü (Mathe mit Marcel)' );
+		$menu_id = wp_create_nav_menu( 'Hauptmenü (Nachhilfe Online)' );
 		if ( ! is_wp_error( $menu_id ) ) {
 			foreach ( mmm_default_menu() as $pos => $top ) {
 				$parent = wp_update_nav_menu_item( $menu_id, 0, array( 'menu-item-title' => $top[0], 'menu-item-url' => home_url( $top[1] ), 'menu-item-status' => 'publish', 'menu-item-position' => $pos ) );
@@ -135,7 +135,7 @@ function mmm_setup_menus() {
 		}
 	}
 	if ( empty( $locations['rechtliches'] ) ) {
-		$menu_id = wp_create_nav_menu( 'Rechtliches (Mathe mit Marcel)' );
+		$menu_id = wp_create_nav_menu( 'Rechtliches (Nachhilfe Online)' );
 		if ( ! is_wp_error( $menu_id ) ) {
 			foreach ( mmm_default_legal_menu() as $l ) {
 				wp_update_nav_menu_item( $menu_id, 0, array( 'menu-item-title' => $l[0], 'menu-item-url' => home_url( $l[1] ), 'menu-item-status' => 'publish' ) );

@@ -421,3 +421,20 @@ input:focus, select:focus, textarea:focus { outline: 3px solid var(--marker); ou
 /* Zwei weiße Abschnitte hintereinander: nicht doppelt Abstand */
 .section:not(.soft):not(.navy) + .section:not(.soft):not(.navy) { padding-top: 0; }
 body { font-size: 17.5px; }
+
+/* Fächer-Band (Startseite) */
+.faecher-band { background: var(--white); border-bottom: 1.5px solid var(--line); }
+.faecher-band .wrap { display: grid; gap: 14px; }
+.subject-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.subject-list a { display: inline-flex; align-items: center; min-height: 42px; padding: 0 16px; border: 1.5px solid var(--ink); border-radius: 999px; font-weight: 700; color: var(--ink); text-decoration: none; background: var(--white); }
+.subject-list a:hover { background: var(--marker); color: var(--ink); }
+.subject-list li:nth-child(3n+1) a { box-shadow: 3px 3px 0 var(--blue); }
+.subject-list li:nth-child(3n+2) a { box-shadow: 3px 3px 0 var(--red); }
+.subject-list li:nth-child(3n) a { box-shadow: 3px 3px 0 var(--marker); }
+
+/* Tafelbild mit Fach-Reitern */
+.boards { display: grid; gap: 14px; min-width: 0; }
+.board-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.board-tabs .chip { cursor: pointer; min-height: 42px; font-family: var(--body); }
+.board-tabs .chip[aria-selected="true"] { background: var(--ink); color: var(--white); }
+@media (max-width: 559px) { .board-steps .hand { font-size: 23px; } }

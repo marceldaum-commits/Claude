@@ -1,18 +1,18 @@
 /*
-Theme Name: Mathe mit Marcel
+Theme Name: Nachhilfe Online
 Theme URI: https://www.mathenachhilfe-online.com/
 Author: Marcel Daum
-Description: Theme "Das Heft" für Mathe mit Marcel – Online-Nachhilfe seit 2001. Karopapier, Königsblau, Rotstift, Textmarker. Mit Angebotsfinder, Tafelbild, Probestunden-Formular (inkl. Versand), Einrichtungs-Assistent und WooCommerce-Grundlage.
+Description: Theme "Das Heft" für Nachhilfe Online – Online-Nachhilfe in allen Fächern seit 2001. Karopapier, Königsblau, Rotstift, Textmarker. Mit Angebotsfinder, Tafelbild, Probestunden-Formular (inkl. Versand), Einrichtungs-Assistent und WooCommerce-Grundlage.
 Version: 1.0.0
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: mathe-mit-marcel
+Text Domain: nachhilfe-online
 */
 
-/* Mathe mit Marcel – Prototyp "Das Heft"
+/* Nachhilfe Online – Prototyp "Das Heft"
    Konzept: Die Website ist ein Mathe-Heft. Karopapier, roter Rand,
    Füller-Königsblau für Handlungen, Rotstift für Korrekturen und Haken,
    Textmarker-Gelb für das Wichtigste. Ergebnisse doppelt unterstrichen.
@@ -544,3 +544,21 @@ details.faq > :last-child:not(summary) { padding-bottom: 18px; }
 /* Korrekturen */
 .wp-block-button.arrow::after, .wp-block-button.ext::after { content: none; }
 .home-hero h1 .q { margin-left: .18em; }
+
+/* Fächer-Band und Tafelbild-Reiter */
+/* Fächer-Band (Startseite) */
+.faecher-band { background: var(--white); border-bottom: 1.5px solid var(--line); }
+.faecher-band .wrap { display: grid; gap: 14px; }
+.subject-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.subject-list a { display: inline-flex; align-items: center; min-height: 42px; padding: 0 16px; border: 1.5px solid var(--ink); border-radius: 999px; font-weight: 700; color: var(--ink); text-decoration: none; background: var(--white); }
+.subject-list a:hover { background: var(--marker); color: var(--ink); }
+.subject-list li:nth-child(3n+1) a { box-shadow: 3px 3px 0 var(--blue); }
+.subject-list li:nth-child(3n+2) a { box-shadow: 3px 3px 0 var(--red); }
+.subject-list li:nth-child(3n) a { box-shadow: 3px 3px 0 var(--marker); }
+
+/* Tafelbild mit Fach-Reitern */
+.boards { display: grid; gap: 14px; min-width: 0; }
+.board-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.board-tabs .chip { cursor: pointer; min-height: 42px; font-family: var(--body); }
+.board-tabs .chip[aria-selected="true"] { background: var(--ink); color: var(--white); }
+@media (max-width: 559px) { .board-steps .hand { font-size: 23px; } }

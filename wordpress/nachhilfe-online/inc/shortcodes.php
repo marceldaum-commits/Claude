@@ -4,7 +4,7 @@
  * "Shortcode" eingefügt, z. B. [mmm_finder].
  *
  *   [mmm_finder]              Angebotsfinder ("Aufgabe 1")
- *   [mmm_tafelbild]           Tafelbild Schritt für Schritt
+ *   [mmm_tafelbild]           Tafelbild Schritt für Schritt (Mathe, Deutsch, Englisch)
  *   [mmm_team]                Lehrkräfte; filter="ja" zeigt Fach-Filter,
  *                             auswahl="Marcel Daum,Jule Meyer" nur diese
  *   [mmm_probestunde]         Probestunden-Formular (mit Versand)
@@ -244,19 +244,63 @@ add_shortcode( 'mmm_finder', function () {
 
 /* ---------------------------------------------------------------- Tafelbild */
 
+/**
+ * Tafelbild-Beispiele je Fach. Eigene Beispiele: Eintrag ergänzen oder per
+ * Filter "mmm_tafelbilder" ändern. Am besten echte Tafelbilder aus dem Unterricht.
+ */
+function mmm_tafelbilder() {
+	return apply_filters(
+		'mmm_tafelbilder',
+		array(
+			array( 'mathe', 'Mathe', 'Beispiel · Prozentrechnung, Klasse 7', 'Eine Jacke kostet 80 €. Im Schlussverkauf wird sie um 25 % reduziert. Wie viel kostet sie jetzt?', array(
+				array( '1 · Gesucht', 'der neue Preis' ),
+				array( '2 · Gegeben', 'Grundwert 80 € · Rabatt 25 %' ),
+				array( '3 · Ansatz', '100 % − 25 % = 75 % bleiben' ),
+				array( '4 · Rechnen', '80 € · 0,75 = 60 €' ),
+				array( '5 · Prüfen', '25 % von 80 € = 20 € → 80 € − 20 € = 60 € ✓' ),
+			) ),
+			array( 'deutsch', 'Deutsch', 'Beispiel · das oder dass, Klasse 6', 'Ich hoffe, ___ das Wetter morgen gut wird.', array(
+				array( '1 · Frage', '„das“ oder „dass“?' ),
+				array( '2 · Test', '„dieses“ oder „welches“ einsetzen: „Ich hoffe, dieses das Wetter …“ – passt nicht' ),
+				array( '3 · Regel', 'Passt keins davon → Bindewort → dass' ),
+				array( '4 · Lösung', 'Ich hoffe, dass das Wetter morgen gut wird.' ),
+				array( '5 · Prüfen', 'Nebensatz mit dem Verb am Ende („wird“) ✓' ),
+			) ),
+			array( 'englisch', 'Englisch', 'Beispiel · Simple Past, Klasse 6', 'Yesterday I ___ (go) to the cinema.', array(
+				array( '1 · Gesucht', 'die richtige Zeitform' ),
+				array( '2 · Signalwort', 'yesterday → abgeschlossen, Vergangenheit' ),
+				array( '3 · Regel', 'Signalwort der Vergangenheit → Simple Past' ),
+				array( '4 · Lösung', 'go → went (unregelmäßig): Yesterday I went to the cinema.' ),
+				array( '5 · Prüfen', 'Nicht „have gone“ – das passt nicht zu yesterday ✓' ),
+			) ),
+		)
+	);
+}
+
 add_shortcode( 'mmm_tafelbild', function () {
-	return '<div class="board paper" data-board>'
-		. '<p class="board-tag">Beispiel · Prozentrechnung, Klasse 7</p>'
-		. '<p class="board-task">Eine Jacke kostet 80 €. Im Schlussverkauf wird sie um 25 % reduziert. Wie viel kostet sie jetzt?</p>'
-		. '<ol class="board-steps">'
-		. '<li><span class="lbl">1 · Gesucht</span><span class="hand">der neue Preis</span></li>'
-		. '<li><span class="lbl">2 · Gegeben</span><span class="hand">Grundwert 80 € · Rabatt 25 %</span></li>'
-		. '<li><span class="lbl">3 · Ansatz</span><span class="hand">100 % − 25 % = 75 % bleiben</span></li>'
-		. '<li><span class="lbl">4 · Rechnen</span><span class="hand">80 € · 0,75 = 60 €</span></li>'
-		. '<li><span class="lbl">5 · Prüfen</span><span class="hand">25 % von 80 € = 20 € → 80 € − 20 € = 60 € <b class="ok">✓</b></span></li>'
-		. '</ol>'
-		. '<div class="board-ctrl"><button class="btn btn-dark btn-small" type="button" data-board-next hidden>Nächster Schritt</button><span class="small" data-board-count aria-live="polite"></span><span class="board-aha hand" data-board-aha>Aha.</span></div>'
-		. '</div>';
+	$boards = mmm_tafelbilder();
+	$out    = '<div class="boards" data-boards><div class="board-tabs" role="tablist" aria-label="Fach wählen" hidden>';
+	foreach ( $boards as $i => $b ) {
+		$out .= sprintf( '<button type="button" role="tab" class="chip" data-board-tab="%1$s" aria-selected="%2$s" aria-controls="board-%1$s">%3$s</button>', esc_attr( $b[0] ), 0 === $i ? 'true' : 'false', esc_html( $b[1] ) );
+	}
+	$out .= '</div>';
+	foreach ( $boards as $b ) {
+		$steps = '';
+		foreach ( $b[4] as $st ) {
+			$txt    = esc_html( $st[1] );
+			$txt    = preg_replace( '/ ✓$/u', ' <b class="ok">✓</b>', $txt );
+			$steps .= '<li><span class="lbl">' . esc_html( $st[0] ) . '</span><span class="hand">' . $txt . '</span></li>';
+		}
+		$out .= sprintf(
+			'<div class="board paper" data-board data-board-key="%1$s" id="board-%1$s" role="tabpanel" aria-label="%2$s"><p class="board-tag">%3$s</p><p class="board-task">%4$s</p><ol class="board-steps">%5$s</ol><div class="board-ctrl"><button class="btn btn-dark btn-small" type="button" data-board-next hidden>Nächster Schritt</button><span class="small" data-board-count aria-live="polite"></span><span class="board-aha hand" data-board-aha>Aha.</span></div></div>',
+			esc_attr( $b[0] ),
+			esc_attr( $b[1] ),
+			esc_html( $b[2] ),
+			esc_html( $b[3] ),
+			$steps
+		);
+	}
+	return $out . '</div>';
 } );
 
 /* ---------------------------------------------------------------- Heftetikett */

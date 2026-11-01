@@ -40,11 +40,13 @@ SCHRIFTEN
 - Kalam: Handschrift, nur für Notizen, Rechnungen und Haken.
 
 MARKE
-- "Mathe mit Marcel" als Hauptname (Empfehlung aus der Analyse:
-  persönlich, einprägsam, passt zum Gründer). Unterzeile
-  "Online-Nachhilfe · seit 2001". Im Impressum bleibt der rechtliche
-  Name. Das ist die strittigste Entscheidung – andere Fächer sind
-  trotzdem sichtbar (Fächer-Seite, Finder, Team-Filter).
+- "Nachhilfe Online" mit Unterzeile "Alle Fächer · seit 2001".
+  (Zuerst war "Mathe mit Marcel" gewählt – geändert, weil alle Fächer
+  angeboten werden und der Name sonst nur Mathe verspricht. "Mathe mit
+  Marcel" bleibt Teil der Geschichte auf Marcels Profilseite.)
+- Startseite: Fächer-Band direkt unter dem Kopf (Mathe bis Geografie),
+  Tafelbild mit Reitern für Mathe, Deutsch und Englisch, Lehrkräfte-
+  Auswahl aus verschiedenen Fächern.
 
 BEWUSST NICHT
 - Kein Dunkelmodus: Papier ist hell, das Konzept lebt davon.

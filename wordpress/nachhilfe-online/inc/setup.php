@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 
 add_action( 'after_setup_theme', 'mmm_setup' );
 function mmm_setup() {
-	load_theme_textdomain( 'mathe-mit-marcel', MMM_DIR . '/languages' );
+	load_theme_textdomain( 'nachhilfe-online', MMM_DIR . '/languages' );
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'responsive-embeds' );
@@ -19,8 +19,8 @@ function mmm_setup() {
 
 	register_nav_menus(
 		array(
-			'hauptmenue'  => __( 'Hauptmenü (Kopf- und Fußzeile)', 'mathe-mit-marcel' ),
-			'rechtliches' => __( 'Rechtliches (Fußzeile unten)', 'mathe-mit-marcel' ),
+			'hauptmenue'  => __( 'Hauptmenü (Kopf- und Fußzeile)', 'nachhilfe-online' ),
+			'rechtliches' => __( 'Rechtliches (Fußzeile unten)', 'nachhilfe-online' ),
 		)
 	);
 }
@@ -31,7 +31,7 @@ function mmm_setup() {
 add_action( 'init', 'mmm_block_styles' );
 function mmm_block_styles() {
 	if ( function_exists( 'register_block_style' ) ) {
-		register_block_style( 'core/button', array( 'name' => 'dunkel', 'label' => __( 'Dunkel', 'mathe-mit-marcel' ) ) );
+		register_block_style( 'core/button', array( 'name' => 'dunkel', 'label' => __( 'Dunkel', 'nachhilfe-online' ) ) );
 	}
 }
 

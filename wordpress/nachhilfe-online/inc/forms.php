@@ -24,12 +24,12 @@ function mmm_register_anfragen() {
 		'mmm_anfrage',
 		array(
 			'labels'          => array(
-				'name'          => __( 'Anfragen', 'mathe-mit-marcel' ),
-				'singular_name' => __( 'Anfrage', 'mathe-mit-marcel' ),
-				'menu_name'     => __( 'Anfragen', 'mathe-mit-marcel' ),
-				'all_items'     => __( 'Alle Anfragen', 'mathe-mit-marcel' ),
-				'edit_item'     => __( 'Anfrage ansehen', 'mathe-mit-marcel' ),
-				'not_found'     => __( 'Noch keine Anfragen.', 'mathe-mit-marcel' ),
+				'name'          => __( 'Anfragen', 'nachhilfe-online' ),
+				'singular_name' => __( 'Anfrage', 'nachhilfe-online' ),
+				'menu_name'     => __( 'Anfragen', 'nachhilfe-online' ),
+				'all_items'     => __( 'Alle Anfragen', 'nachhilfe-online' ),
+				'edit_item'     => __( 'Anfrage ansehen', 'nachhilfe-online' ),
+				'not_found'     => __( 'Noch keine Anfragen.', 'nachhilfe-online' ),
 			),
 			'public'          => false,
 			'show_ui'         => true,
@@ -158,8 +158,8 @@ function mmm_handle_anfrage() {
 		if ( mmm_whatsapp_url() ) {
 			$body .= sprintf( "\nSchneller geht's per WhatsApp: %s\n", mmm_whatsapp_url() );
 		}
-		$body .= sprintf( "\nViele Grüße\nMathe mit Marcel\n%s\n%s\n", mmm_opt( 'telefon' ), home_url( '/' ) );
-		wp_mail( $f['kontakt'], 'kontakt' === $typ ? 'Deine Nachricht an Mathe mit Marcel' : 'Deine Anfrage zur Probestunde', $body, array( 'Content-Type: text/plain; charset=UTF-8' ) );
+		$body .= sprintf( "\nViele Grüße\n%s\n%s\n%s\n", get_bloginfo( "name" ), mmm_opt( "telefon" ), home_url( "/" ) );
+		wp_mail( $f['kontakt'], 'kontakt' === $typ ? 'Deine Nachricht an ' . get_bloginfo( 'name' ) : 'Deine Anfrage zur Probestunde', $body, array( 'Content-Type: text/plain; charset=UTF-8' ) );
 	}
 
 	// 7) Danke-Seite (Vorname nur kurz zwischengespeichert, nicht in der URL).
@@ -175,9 +175,9 @@ function mmm_handle_anfrage() {
 add_filter( 'manage_mmm_anfrage_posts_columns', function ( $cols ) {
 	return array(
 		'cb'          => $cols['cb'],
-		'title'       => __( 'Anfrage', 'mathe-mit-marcel' ),
-		'mmm_kontakt' => __( 'Kontakt', 'mathe-mit-marcel' ),
-		'mmm_mail'    => __( 'Mail', 'mathe-mit-marcel' ),
+		'title'       => __( 'Anfrage', 'nachhilfe-online' ),
+		'mmm_kontakt' => __( 'Kontakt', 'nachhilfe-online' ),
+		'mmm_mail'    => __( 'Mail', 'nachhilfe-online' ),
 		'date'        => $cols['date'],
 	);
 } );

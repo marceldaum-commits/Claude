@@ -134,7 +134,7 @@ function mmm_chevron() {
  */
 function mmm_render_desktop_nav() {
 	$tree = mmm_menu_tree();
-	echo '<nav class="main-nav" aria-label="' . esc_attr__( 'Hauptmenü', 'mathe-mit-marcel' ) . '"><ul class="nav-list">';
+	echo '<nav class="main-nav" aria-label="' . esc_attr__( 'Hauptmenü', 'nachhilfe-online' ) . '"><ul class="nav-list">';
 	foreach ( $tree as $i => $top ) {
 		$cls = mmm_section_current( $top ) ? 'nav-item current' : 'nav-item';
 		if ( empty( $top[2] ) ) {
@@ -150,7 +150,7 @@ function mmm_render_desktop_nav() {
 		);
 		if ( $top[1] && '#' !== $top[1] ) {
 			/* translators: %s: Name des Hauptpunkts */
-			printf( '<li class="overview"><a href="%s">%s →</a></li>', esc_url( $top[1] ), esc_html( sprintf( __( 'Alles zu %s', 'mathe-mit-marcel' ), $top[0] ) ) );
+			printf( '<li class="overview"><a href="%s">%s →</a></li>', esc_url( $top[1] ), esc_html( sprintf( __( 'Alles zu %s', 'nachhilfe-online' ), $top[0] ) ) );
 		}
 		foreach ( $top[2] as $k ) {
 			$cur = mmm_is_current( $k[1] ) ? ' aria-current="page"' : '';
@@ -173,7 +173,7 @@ function mmm_render_mobile_nav() {
 		printf( '<details%s><summary>%s</summary><ul>', mmm_section_current( $top ) ? ' open' : '', esc_html( $top[0] ) );
 		if ( $top[1] && '#' !== $top[1] ) {
 			/* translators: %s: Name des Hauptpunkts */
-			printf( '<li><a href="%s">%s</a></li>', esc_url( $top[1] ), esc_html( sprintf( __( '%s im Überblick', 'mathe-mit-marcel' ), $top[0] ) ) );
+			printf( '<li><a href="%s">%s</a></li>', esc_url( $top[1] ), esc_html( sprintf( __( '%s im Überblick', 'nachhilfe-online' ), $top[0] ) ) );
 		}
 		foreach ( $top[2] as $k ) {
 			$cur = mmm_is_current( $k[1] ) ? ' aria-current="page"' : '';
@@ -226,7 +226,7 @@ function mmm_render_cart_link() {
 		'<a class="icon-link cart-link" href="%1$s" aria-label="%2$s"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 11h11l2-8H6.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="9.5" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg><span class="cart-count">%3$d</span></a>',
 		esc_url( wc_get_cart_url() ),
 		/* translators: %d: Anzahl Artikel */
-		esc_attr( sprintf( _n( 'Warenkorb, %d Artikel', 'Warenkorb, %d Artikel', $n, 'mathe-mit-marcel' ), $n ) ),
+		esc_attr( sprintf( _n( 'Warenkorb, %d Artikel', 'Warenkorb, %d Artikel', $n, 'nachhilfe-online' ), $n ) ),
 		$n
 	);
 }

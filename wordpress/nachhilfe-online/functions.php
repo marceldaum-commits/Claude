@@ -1,6 +1,6 @@
 <?php
 /**
- * Theme "Mathe mit Marcel" – Funktionen.
+ * Theme "Nachhilfe Online" – Funktionen.
  *
  * Aufbau:
  *   inc/setup.php        Grundeinstellungen, Menüs, Skripte, Schriften
@@ -11,7 +11,7 @@
  *   inc/forms.php        Probestunden- und Kontaktformular mit Versand
  *   inc/seo.php          Titel, Beschreibung, Open Graph, Schema (falls kein SEO-Plugin)
  *   inc/woocommerce.php  WooCommerce-Grundlage
- *   inc/assistant.php    Einrichtungs-Assistent (Design → Mathe mit Marcel)
+ *   inc/assistant.php    Einrichtungs-Assistent (Design → Nachhilfe Online)
  *
  * @package MatheMitMarcel
  */

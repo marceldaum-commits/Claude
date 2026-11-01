@@ -128,6 +128,20 @@
     render(false);
   });
 
+  // ---------- Tafelbild: Fach-Reiter (ohne JS sind alle Beispiele untereinander sichtbar)
+  document.querySelectorAll("[data-boards]").forEach(function (wrap) {
+    var tabs = wrap.querySelectorAll("[data-board-tab]");
+    var boards = wrap.querySelectorAll("[data-board-key]");
+    if (!tabs.length) return;
+    wrap.querySelector(".board-tabs").hidden = false;
+    var pick = function (key) {
+      tabs.forEach(function (t) { t.setAttribute("aria-selected", String(t.getAttribute("data-board-tab") === key)); });
+      boards.forEach(function (b) { b.hidden = b.getAttribute("data-board-key") !== key; });
+    };
+    tabs.forEach(function (t) { t.addEventListener("click", function () { pick(t.getAttribute("data-board-tab")); }); });
+    pick(tabs[0].getAttribute("data-board-tab"));
+  });
+
   // ---------- Klebende Probestunden-Leiste (Handy)
   var bar = document.querySelector("[data-sticky]");
   if (bar && "IntersectionObserver" in window) {

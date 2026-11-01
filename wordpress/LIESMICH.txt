@@ -1,18 +1,21 @@
-WORDPRESS-THEME "MATHE MIT MARCEL" – Startbasis für den Umzug
+WORDPRESS-THEME "NACHHILFE ONLINE" – Startbasis für den Umzug
 =============================================================
 Stand: 01.11.2026. Grundlage: prototyp-neu/ ("Das Heft").
 Zum Ideen-Sammeln und als Startpunkt – in Plesk wird weitergebaut.
 
 INHALT
 ------
-mathe-mit-marcel.zip      Theme zum Hochladen (WordPress → Design → Themes)
-mathe-mit-marcel/         Quellcode des Themes
+nachhilfe-online.zip      Theme zum Hochladen (WordPress → Design → Themes)
+nachhilfe-online/         Quellcode des Themes
   content/                14 fertige Seiten als Gutenberg-Blöcke + manifest.json
   inc/                    Funktionen (siehe Kopf von functions.php)
   templates/design-seite.php   Vorlage für die Design-Seiten
 
 WAS DAS THEME KANN
 ------------------
+- Alle Fächer im Blick: Marke "Nachhilfe Online · Alle Fächer · seit 2001",
+  Fächer-Band auf der Startseite (Mathe bis Geografie), Tafelbild mit
+  Beispielen aus Mathe, Deutsch und Englisch, Finder mit allen Fächern.
 - Heft-Design mit Kopf-/Fußzeile, Menü (Desktop-Dropdowns, Handy-Menü,
   Probestunden-Button, Kunden-Symbol, Warenkorb-Symbol nur bei Inhalt).
 - Alle Seiten aus echten Blöcken – Texte im Editor normal änderbar.
@@ -25,7 +28,7 @@ WAS DAS THEME KANN
   automatisches Löschen nach Frist (Standard 180 Tage).
 - Vorbelegung: Finder, Team-Karten und Heftetikett tragen Fach, Klasse,
   Name, Lehrkraft direkt ins Probestunden-Formular ein.
-- Einstellungen zentral: Design → Customizer → "Mathe mit Marcel"
+- Einstellungen zentral: Design → Customizer → "Nachhilfe Online"
   (Telefon, WhatsApp, E-Mail, Antwortzeit, Bewertung, Google-Link …).
 - SEO ohne Plugin: Titel, Beschreibung, Open Graph, Schema (Organisation
   mit Bewertung, FAQ). Ist Yoast/Rank Math aktiv, übernimmt das Plugin;
@@ -40,8 +43,8 @@ SO KOMMT ES IN PLESK (empfohlen: erst auf einer Kopie)
 1. Plesk → WordPress Toolkit → bei der Website "Klonen" → Ziel z. B.
    staging.mathenachhilfe-online.com. (Vorher: "Sicherung" anlegen.)
 2. Auf der Kopie: WordPress-Admin → Design → Themes → Hochladen →
-   mathe-mit-marcel.zip → Aktivieren.
-3. Design → "Mathe mit Marcel einrichten" → "Jetzt einrichten".
+   nachhilfe-online.zip → Aktivieren.
+3. Design → "Nachhilfe Online einrichten" → "Jetzt einrichten".
    Legt fehlende Seiten und Menüs an. Bestehende Seiten werden NICHT
    verändert. Wer die neuen Inhalte auf einer bestehenden Seite will:
    Inhalt aus content/<seite>.html im Code-Editor einfügen (Editor →

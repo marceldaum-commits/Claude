@@ -1,6 +1,6 @@
 <?php
 /**
- * Einstellungen im Customizer: Design → Customizer → "Mathe mit Marcel".
+ * Einstellungen im Customizer: Design → Customizer → "Nachhilfe Online".
  * Alles, was sich ändern kann (Telefon, Bewertung, Antwortzeit …), steht hier
  * statt fest im Text.
  *
@@ -63,8 +63,8 @@ function mmm_customize( $wp_customize ) {
 	$wp_customize->add_section(
 		'mmm',
 		array(
-			'title'       => __( 'Mathe mit Marcel', 'mathe-mit-marcel' ),
-			'description' => __( 'Kontaktdaten, Bewertung und Formulare. Diese Werte erscheinen automatisch überall auf der Website.', 'mathe-mit-marcel' ),
+			'title'       => __( 'Nachhilfe Online', 'nachhilfe-online' ),
+			'description' => __( 'Kontaktdaten, Bewertung und Formulare. Diese Werte erscheinen automatisch überall auf der Website.', 'nachhilfe-online' ),
 			'priority'    => 30,
 		)
 	);
