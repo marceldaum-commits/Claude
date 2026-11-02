@@ -220,3 +220,31 @@ export function translateTree(node, T, special = () => null, path = '') {
     kid.data = s ?? T.lines(kid.data);
   }
 }
+
+// ---- Terminal-Meldungen (i18n/<sprache>/shell.json) ----------------------------------------------
+// Ganze Ausgabezeilen; {1}, {2} … = variable Teile. Übersetzt wird NUR die Anzeige im Terminal,
+// nie Daten in Pipes oder Dateien (die Shell rechnet weiter mit dem Original).
+export function makeLineT(dict) {
+  const d = dict || {}, tpl = [];
+  const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  for (const [k, v] of Object.entries(d)) {
+    if (!/\{\d\}/.test(k)) continue;
+    const order = [];
+    const src = reEsc(k).replace(/\\\{(\d)\\\}/g, (_, n) => { if (order.includes(n)) return `\\k<p${n}>`; order.push(n); return `(?<p${n}>.+?)`; });
+    tpl.push({ re: new RegExp('^' + src + '$'), v, lit: k.replace(/\{\d\}/g, '').length });
+  }
+  tpl.sort((a, b) => b.lit - a.lit); // spezifischere Muster zuerst
+  const line = (l) => {
+    if (!l || !/[A-Za-zÄÖÜäöü]/.test(l)) return l;
+    if (Object.hasOwn(d, l)) return d[l];
+    for (const { re, v } of tpl) { const m = l.match(re); if (m) return v.replace(/\{(\d)\}/g, (_, n) => m.groups['p' + n]); }
+    return l;
+  };
+  return Object.assign((text) => String(text ?? '').split('\n').map(line).join('\n'), { line });
+}
+let shellT = (s) => s;
+export const termT = (s) => shellT(s);
+export async function loadShellT() {
+  const l = currentLang(); if (l === 'de') return;
+  try { const r = await fetch(`i18n/${l}/shell.json`); if (r.ok) shellT = makeLineT(await r.json()); } catch { /* bleibt Deutsch */ }
+}

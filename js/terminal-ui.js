@@ -1,6 +1,7 @@
 // Terminal-Widget für die SANDBOX-SIMULATION (Touch + Tastatur)
 import { VFS } from './shell.js';
 
+import { termT } from './i18n.js';
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 export function mountTerminal(container, shell, opts = {}) {
@@ -8,13 +9,13 @@ export function mountTerminal(container, shell, opts = {}) {
   const el = document.createElement('div');
   el.className = 'term' + (opts.tall ? ' tall' : '');
   el.innerHTML = `
-    <div class="term-head"><span class="lights"><i></i><i></i><i></i></span><span class="title">${esc(opts.title || 'Sandbox-Terminal')}</span><span class="badge sim">Simulation</span></div>
-    <div class="term-banner">${esc(opts.banner || 'SANDBOX-SIMULATION · synthetische Dateien & Ausgaben · keine echte Shell, kein Netzwerk')}</div>
+    <div class="term-head"><span class="lights"><i></i><i></i><i></i></span><span class="title">${esc(opts.title || termT('Sandbox-Terminal'))}</span><span class="badge sim">Simulation</span></div>
+    <div class="term-banner">${esc(opts.banner || termT('SANDBOX-SIMULATION · synthetische Dateien & Ausgaben · keine echte Shell, kein Netzwerk'))}</div>
     <div class="term-out" role="log" aria-live="polite"></div>
     <div class="term-slot"></div>
     <form class="term-in" autocomplete="off">
       <span class="p"></span>
-      <input type="text" aria-label="Befehl eingeben" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" inputmode="text">
+      <input type="text" aria-label="${esc(termT('Befehl eingeben'))}" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" inputmode="text">
     </form>
     <div class="keys" aria-label="Sondertasten">
       ${['Tab', '↑', '↓', '|', '~', '/', '-', '>', '&', '.', '*', '"', 'clear'].map(k => `<button type="button" data-k="${esc(k)}">${esc(k)}</button>`).join('')}
@@ -52,8 +53,8 @@ export function mountTerminal(container, shell, opts = {}) {
     out.appendChild(c);
     const r = shell.exec(line);
     if (r.clear) out.innerHTML = '';
-    print(r.out);
-    print(r.err, 'err');
+    print(termT(r.out));
+    print(termT(r.err), 'err');
     setPrompt();
     hIdx = shell.history.length;
     scroll();

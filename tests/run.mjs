@@ -13,7 +13,7 @@ import { STORY1 } from '../js/content/story1.js';
 import { LEVELS } from '../js/content/curriculum.js';
 import { ROOMS, BADGES } from '../js/content/rooms.js';
 import { EXTERN } from '../js/content/extern.js';
-import { makeT, translateTree, codeify } from '../js/i18n.js';
+import { makeT, translateTree, codeify, makeLineT } from '../js/i18n.js';
 import { flagFor } from '../js/flags.js';
 import { streak, markActivity } from '../js/state.js';
 import { spawn, execFileSync } from 'node:child_process';
@@ -646,6 +646,16 @@ t('Serie (Streak)', () => {
   eq(streak(s, now), 2, 'bis gestern'); markActivity(s, now); eq(streak(s, now), 3);
 });
 
+t('Terminal-Meldungen EN/UK (shell.json)', () => {
+  for (const lang of ['en', 'uk']) {
+    const T = makeLineT(JSON.parse(readFileSync(join(ROOT, `i18n/${lang}/shell.json`), 'utf8')));
+    const s = new Shell({ fs: baseFS() });
+    const e = s.exec('cat nix').err.trim(); const tr = T(e);
+    ok(tr !== e && tr.includes('nix'), `${lang}: ${e} → ${tr}`);
+    ok(T('ls -l zeigt 3 Dateien') === 'ls -l zeigt 3 Dateien', 'Fremdtext bleibt');
+    eq(s.exec('cat nix 2>&1 | wc -l').out.trim(), '1', 'Pipes rechnen mit dem Original');
+  }
+});
 if (offen.length) console.log(`\nℹ ${offen.length} Nachtfalter-Tipps noch ohne Handübersetzung (Google übersetzt):\n  ` + offen.join('\n  '));
 console.log(`\n${pass} bestanden, ${fail} fehlgeschlagen`);
 process.exit(fail ? 1 : 0);
