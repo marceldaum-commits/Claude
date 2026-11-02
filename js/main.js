@@ -11,7 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
-import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang } from './i18n.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -472,7 +472,7 @@ views.uebung = (id) => {
         const u = used();
         const last = u === tips.length - 1 && /^Lösung/.test(tips[tips.length - 1]);
         $('#hintstate', root).textContent = repeat ? 'Wiederholung – Tipps kostenlos' : u ? `noch ${left(u)} von ${e.xp} Punkten` : `${e.xp} Punkte`;
-        $('#hinttext', root).innerHTML = tips.slice(0, u).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${tips.length}:</b> ${esc(h)}</div>`).join('') +
+        $('#hinttext', root).innerHTML = tips.slice(0, u).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${tips.length}:</b> ${codeify(h)}</div>`).join('') +
           (u < tips.length && !run.taskOk ? `<button class="btn small ghost" id="hint">💡 ${last ? 'Lösung zeigen' : (u ? 'Nächster Tipp' : 'Tipp') + ` ${u + 1}/${tips.length}`}${repeat ? '' : ` · danach noch ${left(u + 1)} P.`}</button>` : '');
         const b = $('#hint', root);
         if (b) b.onclick = () => {
@@ -926,7 +926,7 @@ views.extern = () => {
         <p class="small">${esc(pf.was)}</p>
         <p class="small muted">💶 ${esc(pf.kosten)}</p>
         <p class="small"><a href="${pf.url}" target="_blank" rel="noopener noreferrer">↗ Zur Plattform</a></p>
-        <details class="small"><summary>So startest du</summary><ol style="padding-left:1.2rem;margin:.4rem 0">${pf.start.map(x => `<li>${esc(x)}</li>`).join('')}</ol></details>
+        <details class="small"><summary>So startest du</summary><ol style="padding-left:1.2rem;margin:.4rem 0">${pf.start.map(x => `<li>${codeify(x)}</li>`).join('')}</ol></details>
         ${pf.gruppen.map(g => `<h4 style="margin:.8rem 0 .3rem">${esc(g.name)}</h4>
           <ul class="list">${g.schritte.map(x => {
             const key = `${pf.id}.${x.id}`, ok = done(key), prep = ROOM[x.prep];
@@ -1348,7 +1348,7 @@ function questionHTML(r, t, q) {
   }
   return `<div class="q" id="q-${id}" style="margin:.7rem 0">
     ${q.repeat ? `<span class="badge plain" title="Wiederholung">🔁 Wiederholung · ${esc(q.repeat)}</span>` : ''}
-    <div class="row between"><b class="small">${ok ? '✓ ' : ''}${esc(q.q)}</b><span class="small muted" data-pts="${key}">${pointsLabel(r, t, q)}</span></div>
+    <div class="row between"><b class="small">${ok ? '✓ ' : ''}${codeify(q.q)}</b><span class="small muted" data-pts="${key}">${pointsLabel(r, t, q)}</span></div>
     ${input}<div class="qfb small" data-fb="${key}"></div><div class="tips" data-tips="${key}">${tipsHTML(r, q, key)}</div></div>`;
 }
 
@@ -1361,7 +1361,7 @@ function pointsLabel(r, t, q) {
 function tipsHTML(r, q, key) {
   const all = hintsOf(q); if (!all.length) return '';
   const used = Math.min(hintsUsed(r.id, key), all.length);
-  const shown = all.slice(0, used).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${all.length}:</b> ${esc(h)}</div>`).join('');
+  const shown = all.slice(0, used).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${all.length}:</b> ${codeify(h)}</div>`).join('');
   const ok = qOk(r.id, key);
   const after = Math.max(1, Math.round(q.points - (used + 1) * hintCost(q)));
   const last = used === all.length - 1 && /^Lösung/i.test(all[all.length - 1]);
@@ -1399,7 +1399,7 @@ views.raum = (id) => {
       const done = t.questions.every(q => qOk(r.id, qKey(t, q)));
       return `<details class="card" ${done ? '' : (i === r.tasks.findIndex(tt => !tt.questions.every(q => qOk(r.id, qKey(tt, q)))) ? 'open' : '')}>
         <summary><span class="state ${done ? 'done' : ''}" style="display:inline-grid;margin-right:.5rem;vertical-align:middle">${done ? '✓' : i + 1}</span>Task ${i + 1}: ${esc(t.title)}</summary>
-        <p style="white-space:pre-line">${esc(t.body)}</p>
+        <p style="white-space:pre-line">${codeify(t.body)}</p>
         ${t.questions.map(q => questionHTML(r, t, q)).join('')}
       </details>`;
     }).join('')}</div>
@@ -1505,7 +1505,7 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Start
-initLang();
+initLang(); protectCodes();
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
 onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
