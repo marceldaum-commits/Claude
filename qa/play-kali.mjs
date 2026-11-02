@@ -10,9 +10,9 @@ const URL_ = process.env.KALI_URL || 'http://127.0.0.1:8766';
 const OUT = process.argv[2] || 'qa-out'; mkdirSync(OUT, { recursive: true });
 const VIEWS = { handy: { width: 390, height: 844 }, pc: { width: 1366, height: 768 } };
 const EXPECT = { // je Sprache ein paar Texte, die von Hand übersetzt sein müssen
-  de: { welcome: 'Willkommen!', home: 'Hallo', liesmich: 'Dieses Handy hast du im Zug gefunden', err: 'Datei oder Verzeichnis nicht gefunden', unlock: 'Richtig!', turm: 'RADIO TALHEIM', lesson: 'Terminal, Prompt und Benutzer' },
-  en: { welcome: 'Welcome!', home: 'Hello', liesmich: 'You found this phone on a train', err: 'No such file or directory', unlock: 'Correct!', turm: 'internship, day 1', lesson: 'Terminal, prompt and user' },
-  uk: { welcome: 'Ласкаво просимо!', home: 'Привіт', liesmich: 'Цей телефон лежав у потязі', err: 'Немає такого файла або каталогу', unlock: 'Правильно!', turm: 'практика, день 1', lesson: 'Термінал, запрошення і користувач' },
+  de: { story: 'Der stille Alarm', welcome: 'Willkommen!', home: 'Hallo', liesmich: 'Dieses Handy hast du im Zug gefunden', err: 'Datei oder Verzeichnis nicht gefunden', unlock: 'Richtig!', turm: 'RADIO TALHEIM', lesson: 'Terminal, Prompt und Benutzer' },
+  en: { story: 'The Silent Alarm', welcome: 'Welcome!', home: 'Hello', liesmich: 'You found this phone on a train', err: 'No such file or directory', unlock: 'Correct!', turm: 'internship, day 1', lesson: 'Terminal, prompt and user' },
+  uk: { story: 'Тиха тривога', welcome: 'Ласкаво просимо!', home: 'Привіт', liesmich: 'Цей телефон лежав у потязі', err: 'Немає такого файла або каталогу', unlock: 'Правильно!', turm: 'практика, день 1', lesson: 'Термінал, запрошення і користувач' },
 };
 // Typische Google-Fehlübersetzungen, die wir schon kennen
 const BAD = { uk: ['Чайові', 'Військова гра', 'молі', ' с.'], en: ['Tip money'] };
@@ -95,6 +95,11 @@ for (const lang of ['de', 'en', 'uk']) for (const [vn, vp] of Object.entries(VIE
   await p.goto(URL_ + '/#/uebung/e1-01s'); await p.waitForTimeout(700);
   if (await p.locator('.term-in input').count()) { await term(['pwd', 'whoami']); const c = p.locator('#check'); if (await c.count()) { await c.click(); await p.waitForTimeout(400); } }
   await shot('uebung');
+
+  // 4b. Story s1 (anfangs gesperrt: Titel, Teaser, Rolle müssen übersetzt sein)
+  await p.goto(URL_ + '/#/story/s1'); await p.waitForTimeout(800);
+  t = await shot('story');
+  if (!t.includes(X.story)) note(`${lang}/${vn}: Story-Titel nicht in ${lang}`);
 
   // 5. Sprachwechsel unter „Mehr“ (nur einmal je Sprache, am Handy)
   if (vn === 'handy') {

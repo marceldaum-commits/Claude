@@ -1211,8 +1211,8 @@ function roomCard(r) {
   const lock = roomLock(r), pct = roomPct(r.id);
   return `<a class="card tight ${roomDone(r.id) ? 'lime' : ''}" href="#/raum/${r.id}" style="display:block;text-decoration:none;color:inherit;margin-bottom:.6rem">
     <div class="row between"><span>${typeBadge(r)} ${r.stufe ? `<span class="badge plain">${esc(r.stufe)}</span>` : ''} ${machineBadge(r)}</span><span class="small muted">~${r.minutes} min</span></div>
-    <b style="display:block;margin-top:.4rem">${lock.length ? '🔒 ' : ''}${esc(r.title)}</b>
-    <span class="small muted">${esc(r.desc)}</span>
+    <b style="display:block;margin-top:.4rem">${lock.length ? '🔒 ' : ''}${roomText(r, 'title')}</b>
+    <span class="small muted">${roomText(r, 'desc')}</span>
     <div class="bar" style="margin-top:.5rem"><i style="width:${pct}%"></i></div>
     <span class="small muted">${pct} % · ${roomPoints(r.id)} Punkte${lock.length ? ' · gesperrt: ' + esc(lock[0]) : ''}</span>
   </a>`;
