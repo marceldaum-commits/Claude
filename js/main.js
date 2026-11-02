@@ -11,7 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
-import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT } from './i18n.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -39,6 +39,8 @@ function save() { saveState(state); schedulePush(getState, applyState); }
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+let L1 = makeT(null);
+const L1h = (x, fmt = esc) => L1.h(x, fmt);
 const tok = (s) => String(s || '').replaceAll('{{TOKEN}}', state.labToken);
 
 function toast(msg, ms = 2600) {
@@ -91,7 +93,7 @@ function levelProgress() {
 
 function nextStep() {
   // Erst hacken: offene Räume zuerst. Lektionen sind Nachschlagewerk, wenn du feststeckst.
-  for (const r of ROOMS) if (!roomDone(r.id) && !roomLock(r).length) return { kind: 'room', title: 'Raum: ' + r.title, href: `#/raum/${r.id}` };
+  for (const r of ROOMS) if (!roomDone(r.id) && !roomLock(r).length) return { kind: 'room', titleHTML: U('Raum: {title}', { title: r.title }), title: 'Raum: ' + r.title, href: `#/raum/${r.id}` };
   for (const l of LESSONS) {
     if (!lessonDone(l.id)) return { kind: 'lesson', id: l.id, title: l.title, href: `#/lektion/${l.id}` };
     for (const eid of l.exercises) {
@@ -120,7 +122,7 @@ function renderTop() {
   $('#top').innerHTML = `
     <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Kali <b>Level Up</b></span></a>
     <span class="spacer"></span>
-    <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + esc(loc.short) : '📍 Lernort?'}</button>
+    <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + U(loc.short) : '📍 Lernort?'}</button>
     <a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`;
   $('#locChip').onclick = () => locationModal(true);
 }
@@ -138,11 +140,11 @@ function locationModal(force = false) {
   if (!force && state.location && state.locationDay === today()) return;
   const m = document.createElement('div');
   m.className = 'modal';
-  m.innerHTML = `<div class="box" role="dialog" aria-label="Lernort wählen">
+  m.innerHTML = `<div class="box" role="dialog" aria-label="${Ut('Lernort wählen')}">
     ${state.location ? '' : langPickerHTML()}
-    ${state.location ? '<h2>Wo lernst du heute?</h2>' : '<h2>Willkommen! 👋</h2><p>Hier lernst du Linux und Hacking Schritt für Schritt – mit Rätseln, Geschichten und Tipps, wenn du festhängst.</p><p class="small"><b>Neu hier?</b> Nimm „Nur im Browser“ – du brauchst nichts zu installieren.</p><label class="small">Wie sollen wir dich nennen? (freiwillig)</label><input type="text" id="wname" maxlength="30" placeholder="Name oder Spitzname" style="margin-bottom:.6rem">'}
-    <p class="muted small">Anleitungen, Befehle und Grenzen werden an deinen Lernort angepasst. Du kannst ihn oben jederzeit ändern.</p>
-    ${Object.entries(LOCATIONS).map(([k, l]) => `<button class="loc-opt ${state.location === k ? 'on' : ''}" data-k="${k}"><span class="ic">${l.icon}</span><span><b>${esc(l.label)}</b><br><span class="small muted">${esc(l.desc)}</span></span></button>`).join('')}
+    ${state.location ? `<h2>${U('Wo lernst du heute?')}</h2>` : `<h2>${U('Willkommen! 👋')}</h2><p>${U('Hier lernst du Linux und Hacking Schritt für Schritt – mit Rätseln, Geschichten und Tipps, wenn du festhängst.')}</p><p class="small"><b>${U('Neu hier?')}</b> ${U('Nimm „Nur im Browser“ – du brauchst nichts zu installieren.')}</p><label class="small">${U('Wie sollen wir dich nennen? (freiwillig)')}</label><input type="text" id="wname" maxlength="30" placeholder="${esc(Ut('Name oder Spitzname'))}" style="margin-bottom:.6rem">`}
+    <p class="muted small">${U('Anleitungen, Befehle und Grenzen werden an deinen Lernort angepasst. Du kannst ihn oben jederzeit ändern.')}</p>
+    ${Object.entries(LOCATIONS).map(([k, l]) => `<button class="loc-opt ${state.location === k ? 'on' : ''}" data-k="${k}"><span class="ic">${l.icon}</span><span><b>${U(l.label)}</b><br><span class="small muted">${U(l.desc)}</span></span></button>`).join('')}
   </div>`;
   document.body.appendChild(m);
   bindLangPicker(m);
@@ -203,7 +205,7 @@ function continueRoom() {
 function miniRoom(r, phone = false) {
   const pct = roomPct(r.id);
   return `<li><a href="#/raum/${r.id}"><span class="state ${roomDone(r.id) ? 'done' : ''}">${roomDone(r.id) ? '✓' : pct ? pct + '%' : '▶'}</span>
-    <span class="grow"><span class="t">${esc(r.title)}</span><span class="s">${r.type === 'wargame' ? '🎮 Wargame' : 'Level ' + LEVELS.find(l => l.id === r.level).n + ' · ' + esc(LEVELS.find(l => l.id === r.level).title)}${phone && r.machine.kind === 'target' ? ' · mit Termux' : ''}</span></span></a></li>`;
+    <span class="grow"><span class="t">${roomText(r, 'title')}</span><span class="s">${r.type === 'wargame' ? '<span translate="no">🎮 Wargame</span>' : 'Level ' + LEVELS.find(l => l.id === r.level).n + ' · ' + esc(LEVELS.find(l => l.id === r.level).title)}${phone && r.machine.kind === 'target' ? ' · mit Termux' : ''}</span></span></a></li>`;
 }
 
 views.heute = () => {
@@ -220,39 +222,39 @@ views.heute = () => {
   return {
     html: `
     <section class="stack">
-      ${PREVIEW ? `<div class="card warn small"><b>Handy-Vorschau.</b> Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus.</div>` : ''}
+      ${PREVIEW ? `<div class="card warn small"><b>${U('Handy-Vorschau.')}</b> ${U('Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus.')}</div>` : ''}
       <div class="card violet">
-        <div class="row between"><span class="badge real">Ziel: eJPT</span><a class="small" href="#/profil" style="color:inherit">${earnedBadges().length} Abzeichen →</a></div>
-        <h1 style="margin:.5rem 0 .3rem">Hallo${state.profile.name ? ' ' + esc(state.profile.name) : ''}!</h1>
-        <div class="bar" aria-label="${done} von ${ROOMS.length} geknackt"><i style="width:${Math.round(done / ROOMS.length * 100)}%"></i></div>
-        <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>Tage in Folge</span></div></div>
+        <div class="row between"><span class="badge real">${U('Ziel: eJPT')}</span><a class="small" href="#/profil" style="color:inherit">${U('{n} Abzeichen →', { n: earnedBadges().length })}</a></div>
+        <h1 style="margin:.5rem 0 .3rem">${state.profile.name ? U('Hallo {name}!', { name: state.profile.name }) : U('Hallo!')}</h1>
+        <div class="bar" aria-label="${esc(Ut('{done} von {all} geknackt', { done, all: ROOMS.length }))}"><i style="width:${Math.round(done / ROOMS.length * 100)}%"></i></div>
+        <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>${U('Tage in Folge')}</span></div></div>
       </div>
 
       ${!cont && (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0] ? (() => { const f = (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0]; return `<a class="card lime" href="#/raum/${f.id}" style="display:block;text-decoration:none;color:inherit">
-        <span class="badge real">Los geht’s</span>
-        <h2 style="margin:.4rem 0 .2rem">${esc(f.title)}</h2>
-        <span class="small muted">${esc(f.desc)} →</span>
+        <span class="badge real">${U('Los geht’s')}</span>
+        <h2 style="margin:.4rem 0 .2rem">${roomText(f, 'title')}</h2>
+        <span class="small muted">${roomText(f, 'desc')} →</span>
       </a>`; })() : cont ? `<a class="card lime" href="#/raum/${cont.id}" style="display:block;text-decoration:none;color:inherit">
-        <span class="badge real">Weitermachen</span>
-        <h2 style="margin:.4rem 0 .2rem">${esc(cont.title)}</h2>
+        <span class="badge real">${U('Weitermachen')}</span>
+        <h2 style="margin:.4rem 0 .2rem">${roomText(cont, 'title')}</h2>
         <div class="bar"><i style="width:${roomPct(cont.id)}%"></i></div>
-        <span class="small muted">${roomPct(cont.id)} % geschafft · ${cont.machine.kind === 'sandbox' ? '📱 geht überall' : '🖥️ Kali-VM'} →</span>
+        <span class="small muted">${U('{n} % geschafft', { n: roomPct(cont.id) })} · ${cont.machine.kind === 'sandbox' ? U('📱 geht überall') : U('🖥️ Kali-VM')} →</span>
       </a>` : `<a class="card lime" href="${nx.href}" style="display:block;text-decoration:none;color:inherit">
-        <span class="badge real">Los geht’s</span>
-        <h2 style="margin:.4rem 0 .2rem">${esc(nx.title)}</h2>
-        <span class="small muted">Feststecken ist normal – jede Frage hat Tipps →</span>
+        <span class="badge real">${U('Los geht’s')}</span>
+        <h2 style="margin:.4rem 0 .2rem">${nx.titleHTML || esc(nx.title)}</h2>
+        <span class="small muted">${U('Feststecken ist normal – jede Frage hat Tipps →')}</span>
       </a>`}
 
-      ${loc === 'browser' ? section('🌐', 'Direkt hier im Browser', browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.</div>` : loc === 'pc' ? section('🖥️', 'Jetzt am PC', pcList) + section('📱', 'Für unterwegs', phoneList) : loc === 'phone' ? section('📱', 'Jetzt am Handy', phoneList) + section('🖥️', 'Wenn du am PC bist', pcList) : section('📱', 'Am Handy', phoneList) + section('🖥️', 'Am PC (Kali)', pcList)}
+      ${loc === 'browser' ? section('🌐', U('Direkt hier im Browser'), browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">${U('🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.')}</div>` : loc === 'pc' ? section('🖥️', U('Jetzt am PC'), pcList) + section('📱', U('Für unterwegs'), phoneList) : loc === 'phone' ? section('📱', U('Jetzt am Handy'), phoneList) + section('🖥️', U('Wenn du am PC bist'), pcList) : section('📱', U('Am Handy'), phoneList) + section('🖥️', U('Am PC (Kali)'), pcList)}
 
-      <a class="card" href="#/pfad" style="display:block;text-decoration:none;color:inherit"><b>Alles ansehen →</b><br><span class="small muted">Alle Wargames, Räume und Level bis zum eJPT</span></a>
+      <a class="card" href="#/pfad" style="display:block;text-decoration:none;color:inherit"><b>${U('Alles ansehen →')}</b><br><span class="small muted">${U('Alle Wargames, Räume und Level bis zum eJPT')}</span></a>
 
       <details class="card">
-        <summary><b>Außerhalb der App weitertrainieren</b></summary>
+        <summary><b>${U('Außerhalb der App weitertrainieren')}</b></summary>
         <ul class="list" style="margin-top:.4rem">
-          ${EXTERNAL.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener noreferrer"><span class="state">↗</span><span class="grow"><span class="t">${esc(x.name)}</span><span class="s">${esc(x.why)}</span></span><span class="badge ${x.free ? 'ok' : 'plain'}">${x.free ? 'gratis' : 'teils gratis'}</span></a></li>`).join('')}
+          ${EXTERNAL.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener noreferrer"><span class="state">↗</span><span class="grow"><span class="t" translate="no">${esc(x.name)}</span><span class="s">${U(x.why)}</span></span><span class="badge ${x.free ? 'ok' : 'plain'}">${x.free ? U('gratis') : U('teils gratis')}</span></a></li>`).join('')}
         </ul>
-        <p class="small muted">Alles legale Übungsumgebungen. Hacke nur Ziele, die dir gehören oder für die du ausdrücklich eine Erlaubnis hast.</p>
+        <p class="small muted">${U('Alles legale Übungsumgebungen. Hacke nur Ziele, die dir gehören oder für die du ausdrücklich eine Erlaubnis hast.')}</p>
       </details>
     </section>`,
   };
@@ -338,7 +340,7 @@ views.level = (id) => {
       <div class="card tight">
         <a href="#/lektion/${ls.id}" class="row" style="text-decoration:none;color:inherit">
           <span class="state ${lessonDone(ls.id) ? 'done' : ''}">${lessonDone(ls.id) ? '✓' : i + 1}</span>
-          <span class="grow"><b>${esc(ls.title)}</b><br><span class="small muted">Lektion · ca. ${ls.minutes} min</span></span>
+          <span class="grow"><b>${L1h(ls.title)}</b><br><span class="small muted">Lektion · ca. ${ls.minutes} min</span></span>
         </a>
         <ul class="list" style="margin-left:2.2rem">${ls.exercises.map(id => exItem(id)).join('')}</ul>
       </div>`).join('')}
@@ -357,16 +359,16 @@ views.lektion = (id) => {
   return {
     html: `<a class="back" href="#/level/L1">← Spickzettel</a>
     <span class="badge plain">Lektion ${idx + 1} / ${LESSONS.length}</span>
-    <h1 style="margin-top:.4rem">${esc(l.title)}</h1>
-    <p>${esc(l.intro)}</p>
+    <h1 style="margin-top:.4rem">${L1h(l.title)}</h1>
+    <p>${L1h(l.intro)}</p>
     <div class="stack">${l.concepts.map(c => `
       <div class="card concept">
-        <h2>${esc(c.name)}</h2>
-        <dl><dt>Zweck</dt><dd>${esc(c.zweck)}</dd><dt>Syntax</dt><dd><pre class="syntax">${esc(c.syntax)}</pre></dd>
-        <dt>Argumente</dt><dd><table class="args">${c.args.map(([a, d]) => `<tr><td>${esc(a)}</td><td>${esc(d)}</td></tr>`).join('')}</table></dd>
-        <dt>Wirkung</dt><dd>${esc(c.wirkung)}</dd>
-        <dt>Typische Fehler</dt><dd><ul style="margin:0;padding-left:1.1rem">${c.fehler.map(f => `<li>${esc(f)}</li>`).join('')}</ul></dd></dl>
-        <div class="rule">${esc(c.regel)}</div>
+        <h2>${L1h(c.name)}</h2>
+        <dl><dt>Zweck</dt><dd>${L1h(c.zweck)}</dd><dt>Syntax</dt><dd><pre class="syntax">${esc(c.syntax)}</pre></dd>
+        <dt>Argumente</dt><dd><table class="args">${c.args.map(([a, d]) => `<tr><td translate="no"><code>${esc(a)}</code></td><td>${L1h(d)}</td></tr>`).join('')}</table></dd>
+        <dt>Wirkung</dt><dd>${L1h(c.wirkung)}</dd>
+        <dt>Typische Fehler</dt><dd><ul style="margin:0;padding-left:1.1rem">${c.fehler.map(f => `<li>${L1h(f)}</li>`).join('')}</ul></dd></dl>
+        <div class="rule">${L1h(c.regel)}</div>
       </div>`).join('')}
       <div class="card">
         <p class="small muted">Probier die Befehle frei im <a href="#/terminal">Terminal</a> aus – oder spring direkt in eine Übung. Jede Übung hat Tipps bis zur Lösung.</p>
@@ -415,7 +417,7 @@ function evidenceForm(prefix = 'ev', ex = {}) {
 }
 
 function resultsHTML(res) {
-  return `<ul class="results">${res.results.map(r => `<li class="${r.ok ? 'ok' : 'no'}">${esc(r.label)}${!r.ok && r.rueckfrage ? `<span class="q">${esc(r.rueckfrage)}</span>` : ''}</li>`).join('')}</ul>`;
+  return `<ul class="results">${res.results.map(r => `<li class="${r.ok ? 'ok' : 'no'}">${L1h(r.label)}${!r.ok && r.rueckfrage ? `<span class="q">${L1h(r.rueckfrage)}</span>` : ''}</li>`).join('')}</ul>`;
 }
 
 views.uebung = (id) => {
@@ -429,15 +431,15 @@ views.uebung = (id) => {
   const tipCost = e.xp / tips.length;
   const isReal = e.kind === 'real';
   return {
-    html: `<a class="back" href="#/lektion/${e.lesson}">← Spickzettel: ${esc(LESSON[e.lesson].title)}</a>
+    html: `<a class="back" href="#/lektion/${e.lesson}">← Spickzettel: ${L1h(LESSON[e.lesson].title)}</a>
     <div class="row">${isReal ? '<span class="badge real">Echter Auftrag · deine Kali-VM / Termux</span>' : '<span class="badge sim">Sandbox-Simulation</span>'}<span class="badge plain">${esc(kindLabel(e))}</span>${repeat ? '<span class="badge ok">bestanden · Wiederholung ohne Punkte</span>' : `<span class="badge plain">${e.xp} Punkte</span>`}</div>
-    <h1 style="margin-top:.5rem">${esc(e.title)}</h1>
+    <h1 style="margin-top:.5rem">${L1h(e.title)}</h1>
     <div class="stack">
       <div class="task-meta">
-        <div><b>Lernziel</b>${esc(e.ziel)}</div>
-        <div><b>Arbeitsauftrag</b><span class="auftrag">${esc(e.auftrag)}</span></div>
-        <div><b>Scope</b>${esc(e.scope)}</div>
-        <div><b>Verlangter Beleg</b>${esc(e.beleg)}</div>
+        <div><b>Lernziel</b>${L1h(e.ziel)}</div>
+        <div><b>Arbeitsauftrag</b><span class="auftrag">${L1h(e.auftrag)}</span></div>
+        <div><b>Scope</b>${L1h(e.scope)}</div>
+        <div><b>Verlangter Beleg</b>${L1h(e.beleg)}</div>
       </div>
       ${isReal ? `
       <div class="card lime stack">
@@ -472,7 +474,7 @@ views.uebung = (id) => {
         const u = used();
         const last = u === tips.length - 1 && /^Lösung/.test(tips[tips.length - 1]);
         $('#hintstate', root).textContent = repeat ? 'Wiederholung – Tipps kostenlos' : u ? `noch ${left(u)} von ${e.xp} Punkten` : `${e.xp} Punkte`;
-        $('#hinttext', root).innerHTML = tips.slice(0, u).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${tips.length}:</b> ${codeify(h)}</div>`).join('') +
+        $('#hinttext', root).innerHTML = tips.slice(0, u).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${tips.length}:</b> ${L1h(h, codeify)}</div>`).join('') +
           (u < tips.length && !run.taskOk ? `<button class="btn small ghost" id="hint">💡 ${last ? 'Lösung zeigen' : (u ? 'Nächster Tipp' : 'Tipp') + ` ${u + 1}/${tips.length}`}${repeat ? '' : ` · danach noch ${left(u + 1)} P.`}</button>` : '');
         const b = $('#hint', root);
         if (b) b.onclick = () => {
@@ -487,6 +489,7 @@ views.uebung = (id) => {
         $('#termwrap', root).innerHTML = '';
         shell = new Shell({ fs: baseFS() });
         e.sandbox.setup(shell);
+        if (L1.active) translateTree(shell.fs.get(HOME + '/lab'), L1);
         term = mountTerminal($('#termwrap', root), shell, { title: `Sandbox · ${e.title}`, welcome: 'Übungsumgebung bereit. Tipp: help, man BEFEHL, Tab ergänzt Namen.' });
       };
       if (!isReal) {
@@ -509,7 +512,7 @@ views.uebung = (id) => {
         } else {
           const r = e.sandbox.check(shell);
           ok = r.ok;
-          html = `<div class="feedback ${ok ? 'ok' : 'no'}">${esc(r.msg)}</div>`;
+          html = `<div class="feedback ${ok ? 'ok' : 'no'}">${L1h(r.msg)}</div>`;
         }
         if (!ok) { run.fails++; st.failed = (st.failed || 0) + 1; }
         save();
@@ -522,8 +525,8 @@ views.uebung = (id) => {
         const k = e.knobel;
         const opts = shuffle(k.options.map((o, i) => ({ ...o, i })));
         const box = $('#knobel', root);
-        box.innerHTML = `<div class="card violet"><h3>Knobelfrage</h3><p>${esc(k.q)}</p>
-          ${opts.map(o => `<button class="opt" data-i="${o.i}">${esc(o.t)}</button>`).join('')}
+        box.innerHTML = `<div class="card violet"><h3>Knobelfrage</h3><p>${L1h(k.q)}</p>
+          ${opts.map(o => `<button class="opt" data-i="${o.i}">${L1h(o.t)}</button>`).join('')}
           <div id="kfb"></div></div>`;
         box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         $$('.opt', box).forEach(b => b.onclick = () => {
@@ -533,7 +536,7 @@ views.uebung = (id) => {
             b.classList.add('right'); run.knobelOk = true; finish();
           } else {
             b.classList.add('wrong');
-            $('#kfb', box).innerHTML = `<div class="feedback no">${esc(o.why || 'Prüfe deine Annahme noch einmal.')}</div>`;
+            $('#kfb', box).innerHTML = `<div class="feedback no">${L1h(o.why || 'Prüfe deine Annahme noch einmal.')}</div>`;
           }
         });
       };
@@ -546,8 +549,8 @@ views.uebung = (id) => {
         save();
         const n = e.nach;
         $('#debrief', root).innerHTML = `<div class="card lime debrief"><h3>Nachbesprechung</h3><dl>
-          <dt>Beobachtung</dt><dd>${esc(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${esc(n.schluss)}</dd>
-          <dt>Grenzen</dt><dd>${esc(n.grenzen)}</dd><dt>Möglicher nächster Test</dt><dd>${esc(n.naechster)}</dd></dl>
+          <dt>Beobachtung</dt><dd>${L1h(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${L1h(n.schluss)}</dd>
+          <dt>Grenzen</dt><dd>${L1h(n.grenzen)}</dd><dt>Möglicher nächster Test</dt><dd>${L1h(n.naechster)}</dd></dl>
           <p class="small">${first ? `✓ Bestanden · +${(st.tips || 0) ? left(Math.min(st.tips, tips.length)) : e.xp} Punkte${st.tips ? ` (${st.tips} Tipp${st.tips > 1 ? 's' : ''} genutzt)` : ''}` : '✓ Wiederholung erfolgreich (ohne Punkte)'}</p>
           ${nextAfter(e)}</div>`;
         $('#debrief', root).scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -797,8 +800,8 @@ views.pruefung = (lv = 'L1') => {
   const pre = examPrereqs(lv);
   const attempts = state.exams[lv]?.attempts || [];
   const passed = examPassed(state, lv, ex.items.length);
-  const intro = `<a class="back" href="#/level/${lv}">← Level 1</a><h1>${esc(ex.title)}</h1>
-    <div class="card"><p>${esc(ex.rules)}</p><p class="small muted">${ex.items.length} Aufgaben · davon ${ex.items.filter(i => i.mandatory).length} Pflicht (★) · ${ex.items.filter(i => i.type === 'sandbox').length} Praxisaufgaben in der Sandbox</p>
+  const intro = `<a class="back" href="#/level/${lv}">← Level 1</a><h1>${L1h(ex.title)}</h1>
+    <div class="card"><p>${L1h(ex.rules)}</p><p class="small muted">${ex.items.length} Aufgaben · davon ${ex.items.filter(i => i.mandatory).length} Pflicht (★) · ${ex.items.filter(i => i.type === 'sandbox').length} Praxisaufgaben in der Sandbox</p>
     ${attempts.length ? `<p class="small">Bisherige Versuche: ${attempts.map(a => `${Math.round(a.score * 100)} % ${a.passed ? '✓' : '✗'}`).join(' · ')}</p>` : ''}</div>`;
   if (!pre.ok) {
     return { html: intro + `<div class="card warn"><b>🔒 Prüfung gesperrt.</b> Voraussetzungen: alle Lektionen gelesen und alle Pflichtübungen bestanden (inkl. echter Kali-Aufträge).
@@ -823,8 +826,8 @@ function runExam(root, lv, ex) {
   box.innerHTML = `<div class="stack">${items.map((it, k) => `
     <div class="card" id="q-${it.id}">
       <div class="row between"><b>Aufgabe ${k + 1}/${items.length}${it.mandatory ? ' ★' : ''}</b><span class="badge ${it.type === 'sandbox' ? 'sim' : 'plain'}">${it.type === 'sandbox' ? 'Praxis · Sandbox' : it.type === 'input' ? 'Eingabe' : 'Auswahl'}</span></div>
-      <p>${esc(it.q)}</p>
-      ${it.type === 'mc' ? it.order.map(i => `<button class="opt" data-q="${it.id}" data-i="${i}">${esc(it.options[i])}</button>`).join('') : ''}
+      <p>${L1h(it.q)}</p>
+      ${it.type === 'mc' ? it.order.map(i => `<button class="opt" data-q="${it.id}" data-i="${i}">${L1h(it.options[i])}</button>`).join('') : ''}
       ${it.type === 'input' ? `<input type="text" data-in="${it.id}" autocapitalize="off" autocorrect="off" spellcheck="false">` : ''}
       ${it.type === 'sandbox' ? `<div data-term="${it.id}"></div>` : ''}
     </div>`).join('')}
@@ -833,6 +836,7 @@ function runExam(root, lv, ex) {
   for (const it of items.filter(i => i.type === 'sandbox')) {
     const sh = new Shell({ fs: baseFS() });
     it.setup(sh);
+    if (L1.active) translateTree(sh.fs.get(HOME + '/pruefung'), L1);
     shells[it.id] = sh;
     mountTerminal($(`[data-term="${it.id}"]`, box), sh, { title: 'Prüfungs-Sandbox', banner: 'SANDBOX-SIMULATION · Prüfungsaufgabe · keine Hinweise' });
   }
@@ -1499,7 +1503,7 @@ views.profil = () => {
   const days = [...Array(28)].map((_, i) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - 27 + i); return today(d); });
   return {
     html: `<a class="back" href="#/mehr">← Mehr</a><h1>${state.profile.name ? esc(state.profile.name) + 's Profil' : 'Dein Profil'}</h1>
-    <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>Tage in Folge</span></div></div>
+    <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>${U('Tage in Folge')}</span></div></div>
     <div class="card" style="margin-top:.8rem"><h3>Letzte 4 Wochen</h3>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
     <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${esc(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
@@ -1510,7 +1514,7 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Start
-initLang(); protectCodes(); loadShellT();
+initLang(); protectCodes(); loadShellT(); await loadUI(); L1 = makeT(await loadLevel1());
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
 onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
