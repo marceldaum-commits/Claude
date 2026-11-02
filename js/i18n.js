@@ -79,7 +79,8 @@ const STOP = new Set(('und oder zeigt gibt zählt ist sind scheitert liest mit f
   'findet sucht geht macht kann will braucht als aus an zu nicht auch sortiert filtert öffnet listet schreibt sagt wird werden ' +
   'hat haben einen eine ein einer reicht klappt funktioniert prüft vergleicht dreht entfernt zerlegt schneidet ändert startet ' +
   'verbindet läuft lassen lässt holt druckt ersetzt erzeugt liefert nimmt kommt bringt passt fehlt so wie wo was hier da noch schon ' +
-  'immer jetzt mal bis vom zum zur beim nach vor über unter um bei ohne gegen durch alle alles jede jeder jedes').split(' '));
+  'immer jetzt mal bis vom zum zur beim nach vor über unter um bei ohne gegen durch alle alles jede jeder jedes ' +
+  'weiter dafür damit dazu davon darauf daran darin dort selbst zuerst danach gern einfach auch nochmal wieder sofort').split(' '));
 const PATTERNS = [
   /KLY\{[^}\n]{0,40}\}/y, /KLY-(?:[0-9A-F]{6}|X{6})/y, /entsperren\s+\S+/y,
   /(?:~|\.{1,2})?\/[\w.\-*/~]*/y,                      // Pfade: /etc/passwd, ./-datei, ~/turm
@@ -96,11 +97,11 @@ function cmdSpan(s, i) {
   const m = /[a-z][\w-]*/y; m.lastIndex = i; const w = m.exec(s);
   if (!w || !CMDS.has(w[0])) return 0;
   const after = s[i + w[0].length];
-  if (after !== undefined && !/[\s.,;:)]/.test(after)) return 0;
+  if (after !== undefined && !/[\s.,;:)?!“”]/.test(after)) return 0;
   if ((w[0] === 'for' || w[0] === 'while') && /^ \S/.test(s.slice(end0(i, w), end0(i, w) + 2))) {
     const d = s.indexOf('done', i); if (d > 0 && !/[.!?]\s+[A-ZÄÖÜ]/.test(s.slice(i, d))) return d + 4 - i;
   }
-  let end = i + w[0].length, j = end, first = true;
+  let end = i + w[0].length, j = end, first = true, prevTok = w[0];
   const sub = SUBCMD.has(w[0]);
   while (j < s.length && s[j] === ' ') {
     let k = j + 1, tok = '';
@@ -110,7 +111,9 @@ function cmdSpan(s, i) {
     if (!/^['"]/.test(tok)) { const p = /[.,;:!?)“”]+$/.exec(tok); if (p && !/^\.+\/?$/.test(tok)) { core = tok.slice(0, p.index); trail = true; } }
     if (!core) break;
     const word = first && /^[a-zäöüß]+$/.test(core) && !STOP.has(core) && !isCodeTok(core) && !(core.length > 5 && /(en|st)$/.test(core));
-    const ok = core === '|' || core === '&&' || core === ';' || isCodeTok(core) || word;
+    // Bloßes Wort vor Satzzeichen („Hier hilft help weiter.“) nur, wenn es nach Datei/Ordner aussieht
+    if (word && trail && !sub && (core.length > 8 || /(ig|lich|bar|ung|heit)$/.test(core))) break;
+    const ok = core === '|' || core === '&&' || core === ';' || isCodeTok(core) || word || (/^-/.test(prevTok) && /^[a-z]$/i.test(core));
     if (!ok || /^[„“]/.test(core)) break;
     // Ein bloßes Wort als Argument (cat notizen) nur, wenn danach Satzende oder weiterer Code folgt –
     // sonst ist es wohl deutscher Text („ls siehst du“).
@@ -118,7 +121,7 @@ function cmdSpan(s, i) {
       const nx = /\s+(\S+)/y; nx.lastIndex = k + core.length; const r = nx.exec(s);
       if (!r || !(isCodeTok(r[1].replace(/[.,;:!?)]+$/, '')) || /^[|→–—\/]$/.test(r[1]))) break;
     }
-    end = k + core.length; j = end; first = core === '|' || core === '&&';
+    end = k + core.length; j = end; first = core === '|' || core === '&&'; prevTok = core;
     if (trail) break;
   }
   return end - i;
@@ -127,7 +130,7 @@ function cmdSpan(s, i) {
 const escH = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export function codeify(text) {
   const s = String(text ?? ''); let out = '', plain = '', i = 0;
-  const flush = () => { out += escH(plain); plain = ''; };
+  const flush = () => { out += escH(plain).replace(/ → /g, ' – danach: '); plain = ''; };
   while (i < s.length) {
     const prev = s[i - 1];
     const boundary = i === 0 || /[\s(„"“:,]/.test(prev);

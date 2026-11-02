@@ -54,7 +54,7 @@ const W5 = makeLadder({
         c.put('funk.log', lines.join('\n') + '\n');
         c.put('hinweis.txt', 'Vier Zeilen enthalten TEIL=NUMMER und WERT=STÜCK. Nach Nummer sortiert und zusammengesetzt ergibt sich der Code.\n');
       },
-      hints: ['grep TEIL funk.log zeigt die vier Zeilen.', 'sort -t= -k2 -n sortiert nach dem Teil hinter dem ersten =, als Zahl.', "sed 's/.*WERT=//' schneidet alles bis WERT= weg. tr -d \"\\n\" klebt zusammen.", "Lösung: grep TEIL funk.log | sort -t= -k2 -n | sed 's/.*WERT=//' | tr -d \"\\n\""],
+      hints: ['Nur wenige Zeilen gehören zum Code, und sie stehen durcheinander. Alle enthalten das Wort TEIL – welches Werkzeug zeigt nur Zeilen mit einem bestimmten Wort?', 'sort -t= -k2 -n sortiert nach Feld 2 – das ist der Teil zwischen dem ersten und dem zweiten = – und zwar als Zahl. (-n nimmt dabei die Zahl am Anfang des Feldes.)', "sed 's/.*WERT=//' schneidet alles bis WERT= weg.", 'Jetzt steht jedes Stück in einer eigenen Zeile. tr -d "\\n" löscht die Zeilenumbrüche und klebt alles zusammen.', "Lösung: grep TEIL funk.log | sort -t= -k2 -n | sed 's/.*WERT=//' | tr -d \"\\n\""],
       solve: (run) => run("grep TEIL funk.log | sort -t= -k2 -n | sed 's/.*WERT=//' | tr -d \"\\n\"") },
     { t: 'Gestern und heute', pts: 15, rep: 'Funkturm Etage 7 (diff)',
       body: 'Zwei Ordner mit Fahrplandateien: gestern/ und heute/. Heute ist eine Datei dazugekommen.',
