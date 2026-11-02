@@ -389,9 +389,9 @@ function vorausHTML(real) {
   const v = real.voraus || {};
   let html = '';
   if (loc === 'windows') html += `<div class="feedback no small">Heute ist „Windows/PowerShell“ gewählt. Dieser Auftrag braucht Kali (VM) oder Termux – wechsle den Lernort oder erledige ihn später.</div>`;
-  if (loc === 'pc' || loc === 'windows') html += `<p><b>🖥️ PC (Kali-VM):</b> ${esc(v.pc)}</p>`;
-  if (loc === 'phone') html += `<p><b>📱 Handy (Termux/NetHunter Rootless):</b> ${esc(v.phone)}</p>`;
-  if (loc === 'both') html += `<p><b>🖥️ PC:</b> ${esc(v.pc)}</p><p><b>📱 Handy:</b> ${esc(v.phone)}</p>`;
+  if (loc === 'pc' || loc === 'windows') html += `<p><b>🖥️ PC (Kali-VM):</b> ${L1h(v.pc)}</p>`;
+  if (loc === 'phone') html += `<p><b>📱 Handy (Termux/NetHunter Rootless):</b> ${L1h(v.phone)}</p>`;
+  if (loc === 'both') html += `<p><b>🖥️ PC:</b> ${L1h(v.pc)}</p><p><b>📱 Handy:</b> ${L1h(v.phone)}</p>`;
   return html;
 }
 
@@ -594,8 +594,8 @@ views.story = (id = 's1') => {
   const missing = lockedList(s);
   if (missing.length) {
     return {
-      html: `<h1>Story-Lab: ${esc(s.title)}</h1>
-      <div class="card"><p>${esc(s.teaser)}</p><p class="small muted">Rolle: ${esc(s.role)} · Werkzeuge: ${s.tools.map(esc).join(', ')}</p></div>
+      html: `<h1>Story-Lab: ${L1h(s.title)}</h1>
+      <div class="card"><p>${L1h(s.teaser)}</p><p class="small muted">Rolle: ${L1h(s.role)} · Werkzeuge: <span translate="no">${s.tools.map(esc).join(', ')}</span></p></div>
       <div class="card warn"><b>🔒 Noch gesperrt.</b> Die Mission verlangt diese Grundlagen – sonst wird sie zum Raten:
       <ul class="list">${missing.map(m => exItem(m)).join('')}</ul></div>`,
     };
@@ -603,8 +603,8 @@ views.story = (id = 's1') => {
   const ss = state.story[s.id] || (state.story[s.id] = { scene: 0, attempts: {}, hintUsed: {}, evidence: {}, answers: {}, report: {}, progress: {} });
   ss.progress = ss.progress || {};
   return {
-    html: `<div class="row between"><h1 style="margin:0">Story-Lab: ${esc(s.title)}</h1>${ss.done ? '<span class="badge ok">abgeschlossen</span>' : ''}</div>
-    <p class="small muted">${esc(s.role)}</p>
+    html: `<div class="row between"><h1 style="margin:0">Story-Lab: ${L1h(s.title)}</h1>${ss.done ? '<span class="badge ok">abgeschlossen</span>' : ''}</div>
+    <p class="small muted">${L1h(s.role)}</p>
     <div class="grid">
       <div class="card tight" id="scenecard"></div>
       <div id="tw"></div>
@@ -615,6 +615,7 @@ views.story = (id = 's1') => {
     mount(root) {
       const sh = new Shell({ fs: baseFS() });
       s.sandbox.setup(sh);
+      if (L1.active) translateTree(sh.fs.get(HOME + '/fall-0417'), L1);
       let term;
       const scene = () => s.scenes[Math.min(ss.scene, s.scenes.length - 1)];
       const prog = () => (ss.progress[scene().id] = ss.progress[scene().id] || {});
@@ -628,27 +629,27 @@ views.story = (id = 's1') => {
       };
       const showScene = (resume) => {
         const sc = scene();
-        term.printHTML(`<span class="good">━━ Szene ${ss.scene + 1}/${s.scenes.length}: ${esc(sc.title)} ${sc.kind === 'real' ? '· ECHTER AUFTRAG' : sc.kind === 'sim' ? '· SIMULATION' : ''} ━━</span>`);
+        term.printHTML(`<span class="good">━━ Szene ${ss.scene + 1}/${s.scenes.length}: ${esc(L1.t(sc.title))} ${sc.kind === 'real' ? '· ECHTER AUFTRAG' : sc.kind === 'sim' ? '· SIMULATION' : ''} ━━</span>`);
         if (resume) say('sys', '(Fortsetzung – dein Fortschritt wurde gespeichert)');
-        sc.chat.forEach(([w, t]) => say(w, t));
-        term.printHTML(`<span class="warn">AUFTRAG: ${esc(sc.auftrag)}</span>`);
+        sc.chat.forEach(([w, t]) => say(L1.t(w), L1.t(t)));
+        term.printHTML(`<span class="warn">AUFTRAG: ${esc(L1.t(sc.auftrag))}</span>`);
         if (sc.options && (!needs(sc).ev || prog().ev) && (!needs(sc).rep || prog().rep)) printOptions(sc);
         term.printHTML('<span class="sys">Befehle: auftrag · akte · beleg · antwort … · hinweis · scope · status · weiter · story-hilfe</span>');
       };
       const printOptions = (sc) => {
-        term.printHTML(`<span class="story">${esc(sc.optionsPrompt || sc.auftrag)}</span>`);
-        sc.options.forEach(o => term.printHTML(`<span class="story">  ${o.key}) ${esc(o.t)}</span>`));
+        term.printHTML(`<span class="story">${esc(L1.t(sc.optionsPrompt || sc.auftrag))}</span>`);
+        sc.options.forEach(o => term.printHTML(`<span class="story">  ${o.key}) ${esc(L1.t(o.t))}</span>`));
       };
 
       const stepDone = (sc) => {
         if (complete(sc)) {
           say('sys', '✓ Szene abgeschlossen.');
-          say('Mara (Schichtleitung)', sc.debrief.replace(/^Mara: /, '').replace(/^„|“$/g, ''));
+          say(L1.t('Mara (Schichtleitung)'), L1.t(sc.debrief).replace(/^(Mara|Мара): /, '').replace(/^["„«]|["“»]$/g, ''));
           if (ss.scene < s.scenes.length - 1) term.printHTML('<span class="good">Weiter mit: weiter</span>');
           else {
             if (!ss.done) { ss.done = true; ss.doneAt = Date.now(); }
             term.printHTML(`<span class="good">★ Mission abgeschlossen · +${s.points} Punkte</span>`);
-            term.printHTML(`<span class="warn">${esc(tok(s.finalCleanup))}</span>`);
+            term.printHTML(`<span class="warn">${esc(tok(L1.t(s.finalCleanup)))}</span>`);
           }
           save(); renderCard(); renderTL();
         } else if (sc.options && !prog().opt) printOptions(sc);
@@ -683,7 +684,7 @@ views.story = (id = 's1') => {
         if (sc.kind !== 'report') { term.print('Der Bericht kommt in der letzten Szene.', 'sys'); return; }
         const r = ss.report || {};
         term.slot.innerHTML = `<div class="term-paste"><b>Übergabebericht SOC-0417</b>
-          ${sc.reportFields.map(([k, t, ph]) => `<label for="rp-${k}">${esc(t)}</label><textarea id="rp-${k}" style="min-height:70px;font-family:var(--sans)" placeholder="${esc(ph)}">${esc(r[k] || '')}</textarea>`).join('')}
+          ${sc.reportFields.map(([k, t, ph]) => `<label for="rp-${k}">${L1h(t)}</label><textarea id="rp-${k}" style="min-height:70px;font-family:var(--sans)" placeholder="${esc(L1.t(ph))}">${esc(r[k] || '')}</textarea>`).join('')}
           <div class="row"><button class="btn go small" id="rpok">Bericht abgeben</button><button class="btn ghost small" id="rpx">Schließen</button><button class="btn ghost small" id="rpdl">Als Textdatei sichern</button></div><div id="rpfb"></div></div>`;
         const collect = () => Object.fromEntries(sc.reportFields.map(([k]) => [k, $('#rp-' + k, root).value.trim()]));
         $('#rpx', root).onclick = () => { ss.report = collect(); save(); term.slot.innerHTML = ''; };
@@ -695,7 +696,7 @@ views.story = (id = 's1') => {
         $('#rpok', root).onclick = () => {
           const v = collect(); ss.report = v;
           const short = sc.reportFields.filter(([k]) => v[k].length < 25);
-          const grenzenOk = /(nicht|offen|unklar|nachbau|original|log)/i.test(v.grenzen);
+          const grenzenOk = /(nicht|offen|unklar|nachbau|original|log|not|unknown|unclear|replica|open|не|невідом|неясн|відтвор|оригінал|лог)/i.test(v.grenzen);
           if (short.length || !grenzenOk) {
             fail(sc);
             $('#rpfb', root).innerHTML = `<div class="feedback no">${short.length ? 'Zu knapp: ' + short.map(x => x[1]).join(', ') + '. Ein Kollege muss den Bericht ohne Rückfrage verstehen.' : ''} ${!grenzenOk ? 'Grenzen: Was weißt du ausdrücklich NICHT? Und worin unterscheidet sich dein Nachbau vom Original?' : ''}</div>`;
@@ -709,8 +710,8 @@ views.story = (id = 's1') => {
       };
 
       const cmds = {
-        auftrag: () => { const sc = scene(); term.printHTML(`<span class="warn">AUFTRAG: ${esc(sc.auftrag)}</span>`); return { out: '', code: 0 }; },
-        scope: () => ({ out: 'SCOPE: ' + scene().scope + '\n', code: 0 }),
+        auftrag: () => { const sc = scene(); term.printHTML(`<span class="warn">AUFTRAG: ${esc(L1.t(sc.auftrag))}</span>`); return { out: '', code: 0 }; },
+        scope: () => ({ out: 'SCOPE: ' + L1.t(scene().scope) + '\n', code: 0 }),
         akte: (a, { sh: x }) => x.exec('ls -l ~/fall-0417'),
         status: () => {
           const sc = scene(), n = needs(sc), p = prog();
@@ -720,10 +721,10 @@ views.story = (id = 's1') => {
         hinweis: () => {
           const sc = scene();
           const a = ss.attempts[sc.id] || 0;
-          if (ss.hintUsed[sc.id]) return { out: `HINWEIS (bereits genutzt): ${sc.hinweis}\n`, code: 0 };
+          if (ss.hintUsed[sc.id]) return { out: `HINWEIS (bereits genutzt): ${L1.t(sc.hinweis)}\n`, code: 0 };
           if (a < 2) return { out: '', err: `Noch kein Hinweis: erst nach 2 eigenen Versuchen in dieser Szene (${a}/2). Was hast du bisher geprüft?\n`, code: 1 };
           ss.hintUsed[sc.id] = true; save();
-          return { out: `HINWEIS: ${sc.hinweis}\n`, code: 0 };
+          return { out: `HINWEIS: ${L1.t(sc.hinweis)}\n`, code: 0 };
         },
         beleg: () => { openEvidence(); return { out: '', code: 0 }; },
         bericht: () => { openReport(); return { out: '', code: 0 }; },
@@ -736,7 +737,7 @@ views.story = (id = 's1') => {
           if (n.ans && !p.ans) {
             const r = sc.answer.check(ans, sh, ss.evidence[sc.id]);
             ss.answers[sc.id] = ans;
-            if (!r.ok) { fail(sc); return { out: '', err: (r.msg || 'Noch nicht.') + '\n', code: 1 }; }
+            if (!r.ok) { fail(sc); return { out: '', err: L1.t(r.msg || 'Noch nicht.') + '\n', code: 1 }; }
             p.ans = true; save();
             term.printHTML('<span class="good">✓ Antwort belegt.</span>');
             stepDone(sc);
@@ -745,7 +746,7 @@ views.story = (id = 's1') => {
           if (n.opt && !p.opt) {
             const o = sc.options.find(x => x.key === ans);
             if (!o) return { out: '', err: `Antworte mit ${sc.options.map(x => x.key).join(' / ')}\n`, code: 1 };
-            if (!o.ok) { fail(sc); return { out: '', err: (o.why || 'Nicht ganz.') + '\n', code: 1 }; }
+            if (!o.ok) { fail(sc); return { out: '', err: L1.t(o.why || 'Nicht ganz.') + '\n', code: 1 }; }
             p.opt = true; ss.answers[sc.id + '-opt'] = ans; save();
             term.printHTML('<span class="good">✓ Entscheidung begründet.</span>');
             stepDone(sc);
@@ -770,9 +771,9 @@ views.story = (id = 's1') => {
         const p = ss.progress[sc.id] || {};
         const a = ss.attempts[sc.id] || 0;
         $('#scenecard', root).innerHTML = `
-          <div class="row between"><span>${sc.kind === 'real' ? '<span class="badge real">Echter Auftrag</span>' : sc.kind === 'sim' ? '<span class="badge sim">Simulation</span>' : sc.kind === 'report' ? '<span class="badge plain">Bericht</span>' : '<span class="badge plain">Entscheidung</span>'} <b>Szene ${ss.scene + 1}/${s.scenes.length}: ${esc(sc.title)}</b></span><span class="small muted">Versuche: ${a}</span></div>
-          <div class="task-meta" style="margin-top:.6rem"><div><b>Lernziel</b>${esc(sc.ziel)}</div><div><b>Auftrag</b>${esc(sc.auftrag)}</div><div><b>Scope</b>${esc(sc.scope)}</div></div>
-          ${sc.kind === 'real' ? `<details ${p.ev ? '' : 'open'} style="margin-top:.6rem"><summary>Anleitung für dein echtes Terminal</summary>${vorausHTML(sc.real)}${scriptBlock('Setup (Lab-Nachbau):', sc.real.setup)}<p class="small muted">Lab-Token: <code>${esc(state.labToken)}</code> · ${esc(sc.real.cleanup)}</p></details>
+          <div class="row between"><span>${sc.kind === 'real' ? '<span class="badge real">Echter Auftrag</span>' : sc.kind === 'sim' ? '<span class="badge sim">Simulation</span>' : sc.kind === 'report' ? '<span class="badge plain">Bericht</span>' : '<span class="badge plain">Entscheidung</span>'} <b>Szene ${ss.scene + 1}/${s.scenes.length}: ${L1h(sc.title)}</b></span><span class="small muted">Versuche: ${a}</span></div>
+          <div class="task-meta" style="margin-top:.6rem"><div><b>Lernziel</b>${L1h(sc.ziel)}</div><div><b>Auftrag</b>${L1h(sc.auftrag)}</div><div><b>Scope</b>${L1h(sc.scope)}</div></div>
+          ${sc.kind === 'real' ? `<details ${p.ev ? '' : 'open'} style="margin-top:.6rem"><summary>Anleitung für dein echtes Terminal</summary>${vorausHTML(sc.real)}${scriptBlock('Setup (Lab-Nachbau):', sc.real.setup)}<p class="small muted">Lab-Token: <code>${esc(state.labToken)}</code> · ${L1h(sc.real.cleanup)}</p></details>
           <div class="row" style="margin-top:.5rem"><button class="btn go small" id="evbtn" ${p.ev ? 'disabled' : ''}>${p.ev ? '✓ Beleg geprüft' : 'Beleg einfügen (= beleg)'}</button></div>` : ''}
           ${sc.kind === 'report' ? `<div class="row" style="margin-top:.5rem"><button class="btn go small" id="rpbtn">${p.rep ? '✓ Bericht abgegeben – ansehen' : 'Bericht schreiben (= bericht)'}</button></div>` : ''}
           ${complete(sc) && ss.scene < s.scenes.length - 1 ? '<div class="row" style="margin-top:.5rem"><button class="btn primary small" id="nxbtn">Nächste Szene (= weiter)</button></div>' : ''}`;
@@ -782,7 +783,7 @@ views.story = (id = 's1') => {
         const nxb = $('#nxbtn', root); if (nxb) nxb.onclick = () => term.run('weiter');
       }
       function renderTL() {
-        $('#tl', root).innerHTML = s.scenes.map((sc, i) => `<li><span class="state ${complete(sc) ? 'done' : i === ss.scene ? '' : 'lock'}">${complete(sc) ? '✓' : i + 1}</span>${esc(sc.title)} ${sc.kind === 'real' ? '<span class="badge real">echt</span>' : ''}</li>`).join('');
+        $('#tl', root).innerHTML = s.scenes.map((sc, i) => `<li><span class="state ${complete(sc) ? 'done' : i === ss.scene ? '' : 'lock'}">${complete(sc) ? '✓' : i + 1}</span>${L1h(sc.title)} ${sc.kind === 'real' ? '<span class="badge real">echt</span>' : ''}</li>`).join('');
       }
 
       term = mountTerminal($('#tw', root), sh, { tall: true, title: 'SOC-0417 · Fallakte (Sandbox) + Story', banner: 'SIMULIERTE Fallakte · echte Schritte machst du in deiner Kali-VM/Termux und belegst sie hier mit „beleg“' });
@@ -1344,7 +1345,7 @@ function questionHTML(r, t, q) {
   const id = `${t.id}-${q.id}`;
   let input = '';
   if (q.type === 'mc') {
-    input = shuffle(q.options.map((o, i) => ({ o, i })), [...key].reduce((n, c) => n + c.charCodeAt(0), 7)).map(({ o, i }) => `<button class="opt ${ok && i === q.answer ? 'right' : ''}" data-k="${key}" data-i="${i}" ${ok ? 'disabled' : ''}>${esc(o)}</button>`).join('');
+    input = shuffle(q.options.map((o, i) => ({ o, i })), [...key].reduce((n, c) => n + c.charCodeAt(0), 7)).map(({ o, i }) => `<button class="opt ${ok && i === q.answer ? 'right' : ''}" data-k="${key}" data-i="${i}" ${ok ? 'disabled' : ''}>${makeT(handDict(r.id)).h(o, esc)}</button>`).join('');
   } else if (q.type === 'confirm') {
     input = `<button class="btn small ${ok ? '' : 'go'}" data-k="${key}" data-confirm ${ok ? 'disabled' : ''}>${ok ? U('✓ Erledigt') : U('Erledigt')}</button>`;
   } else {

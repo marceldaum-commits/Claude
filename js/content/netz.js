@@ -172,6 +172,8 @@ export const NETZ_ROOMS = [
     welcome: 'Netzwerk-Simulation bereit. Start: cat AUFTRAG.txt · nmap --help',
     flags: ['devport', 'kamera'],
     setup: netzSetup,
+    // Handübersetzung: Auftrag und Übergabe-Notiz; inventar.csv bleibt original (grep auf IPs)
+    translateFS(sh, T, translateTree) { translateTree(sh.fs.get(`${HOME}/auftrag`), T, (name, data) => (name.endsWith('.csv') ? data : null)); },
     commands: ({ F }) => ({ nmap: nmapCmd(F), nc: ncCmd(F), netcat: ncCmd(F), ...textTools() }),
     tasks: [
       {
