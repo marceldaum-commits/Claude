@@ -156,5 +156,16 @@
   "getent: in der Sandbox nur „getent hosts NAME“": "getent: in the sandbox only \"getent hosts NAME\"",
   "curl 8.x (SANDBOX-SIMULATION – kein echter Netzwerkzugriff)": "curl 8.x (SANDBOX SIMULATION – no real network access)",
   "SANDBOX-SCOPE: {1} ({2}) liegt außerhalb des erlaubten Übungsziels. Es wurde nichts gesendet.": "SANDBOX SCOPE: {1} ({2}) is outside the allowed practice target. Nothing was sent.",
-  "Erlaubt sind nur 127.0.0.1/localhost und ausdrücklich genannte Lab-Ziele.": "Only 127.0.0.1/localhost and lab targets that are named explicitly are allowed."
+  "Erlaubt sind nur 127.0.0.1/localhost und ausdrücklich genannte Lab-Ziele.": "Only 127.0.0.1/localhost and lab targets that are named explicitly are allowed.",
+  "Aufruf: suche BEGRIFF   (durchsucht die Schwachstellen-Datenbank, wie searchsploit)": "Usage: suche TERM   (searches the vulnerability database, like searchsploit)",
+  "Keine Treffer.": "No matches.",
+  "Aufruf: xor SCHLÜSSEL DATEI   (DATEI enthält Hex, Ausgabe ist Text)": "Usage: xor KEY FILE   (FILE contains hex, output is text)",
+  "Aufruf: nc ZIEL PORT   (Beispiel: nc 10.10.20.42 23)": "Usage: nc TARGET PORT   (example: nc 10.10.20.42 23)",
+  "(verbunden – der Dienst sendet nichts von sich aus. Für Webseiten: curl)": "(connected – the service sends nothing by itself. For web pages: curl)",
+  "nmap: Ungültige Portangabe. Beispiele: -p 80  ·  -p 1-1000  ·  -p 22,80,443  ·  -p-": "nmap: invalid port specification. Examples: -p 80  ·  -p 1-1000  ·  -p 22,80,443  ·  -p-",
+  "nmap: Ungültige Portangabe.": "nmap: invalid port specification.",
+  "nmap: -oN braucht einen Dateinamen.": "nmap: -oN needs a file name.",
+  "nmap: Option {1} kennt diese Simulation nicht. nmap --help zeigt, was geht.": "nmap: this simulation does not know option {1}. nmap --help shows what works.",
+  "nmap: Kein Ziel angegeben. Beispiel: nmap -sn 10.10.20.0/24": "nmap: no target given. Example: nmap -sn 10.10.20.0/24",
+  "SCOPE: {1} gehört nicht zum Auftrag. Erlaubt ist nur 10.10.20.0/24. Es wurde nichts gescannt.": "SCOPE: {1} is not part of the task. Only 10.10.20.0/24 is allowed. Nothing was scanned."
 }

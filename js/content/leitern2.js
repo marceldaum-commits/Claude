@@ -356,6 +356,13 @@ const P8 = makeLadder({
 const KS = ['portal.kantor.sim', '10.110.0.10'];
 const P10 = makeLadder({
   id: 'p10', title: 'Die Abschlussprüfung', level: 'L10', dir: 'abschluss', prefix: 'aufgabe', seed: 1010, minutes: 120,
+  // Übersetzung: notiz.txt ist Hex(Base64(Text)) – entpacken, übersetzen, wieder verpacken (eine Zeile)
+  i18nSpecial(name, data, T) {
+    if (name !== 'notiz.txt' || !/^[0-9a-f\s]+$/.test(data)) return null;
+    const bytes = new Uint8Array(data.trim().match(/../g).map(h => parseInt(h, 16)));
+    const txt = new TextDecoder().decode(Uint8Array.from(atob(new TextDecoder().decode(bytes)), c => c.charCodeAt(0)));
+    return hex(b64(T.t(txt))) + '\n';
+  },
   tools: ['Alles'],
   desc: 'Level 10: Ein vollständiger (erfundener) Prüfauftrag – Auftrag lesen, aufklären, Lecks finden, Linux prüfen, Logs auswerten, priorisieren. Keine neuen Werkzeuge: alles, was du kannst.',
   ziel: 'Selbstständig einen ganzen Prüffall durcharbeiten – Methodik vor Werkzeug.',

@@ -156,5 +156,16 @@
   "getent: in der Sandbox nur „getent hosts NAME“": "getent: у пісочниці лише «getent hosts NAME»",
   "curl 8.x (SANDBOX-SIMULATION – kein echter Netzwerkzugriff)": "curl 8.x (СИМУЛЯЦІЯ-ПІСОЧНИЦЯ – без справжнього доступу до мережі)",
   "SANDBOX-SCOPE: {1} ({2}) liegt außerhalb des erlaubten Übungsziels. Es wurde nichts gesendet.": "МЕЖІ ПІСОЧНИЦІ: {1} ({2}) поза дозволеною навчальною ціллю. Нічого не надіслано.",
-  "Erlaubt sind nur 127.0.0.1/localhost und ausdrücklich genannte Lab-Ziele.": "Дозволено лише 127.0.0.1/localhost і явно названі лабораторні цілі."
+  "Erlaubt sind nur 127.0.0.1/localhost und ausdrücklich genannte Lab-Ziele.": "Дозволено лише 127.0.0.1/localhost і явно названі лабораторні цілі.",
+  "Aufruf: suche BEGRIFF   (durchsucht die Schwachstellen-Datenbank, wie searchsploit)": "Використання: suche ТЕРМІН   (шукає в базі вразливостей, як searchsploit)",
+  "Keine Treffer.": "Нічого не знайдено.",
+  "Aufruf: xor SCHLÜSSEL DATEI   (DATEI enthält Hex, Ausgabe ist Text)": "Використання: xor КЛЮЧ ФАЙЛ   (ФАЙЛ містить hex, вивід – текст)",
+  "Aufruf: nc ZIEL PORT   (Beispiel: nc 10.10.20.42 23)": "Використання: nc ЦІЛЬ PORT   (приклад: nc 10.10.20.42 23)",
+  "(verbunden – der Dienst sendet nichts von sich aus. Für Webseiten: curl)": "(з’єднано – сервіс сам нічого не надсилає. Для вебсторінок: curl)",
+  "nmap: Ungültige Portangabe. Beispiele: -p 80  ·  -p 1-1000  ·  -p 22,80,443  ·  -p-": "nmap: недійсне задання портів. Приклади: -p 80  ·  -p 1-1000  ·  -p 22,80,443  ·  -p-",
+  "nmap: Ungültige Portangabe.": "nmap: недійсне задання портів.",
+  "nmap: -oN braucht einen Dateinamen.": "nmap: -oN потребує назви файлу.",
+  "nmap: Option {1} kennt diese Simulation nicht. nmap --help zeigt, was geht.": "nmap: ця симуляція не знає опції {1}. nmap --help показує, що працює.",
+  "nmap: Kein Ziel angegeben. Beispiel: nmap -sn 10.10.20.0/24": "nmap: ціль не вказано. Приклад: nmap -sn 10.10.20.0/24",
+  "SCOPE: {1} gehört nicht zum Auftrag. Erlaubt ist nur 10.10.20.0/24. Es wurde nichts gescannt.": "МЕЖІ (SCOPE): {1} не входить у завдання. Дозволено лише 10.10.20.0/24. Нічого не скановано."
 }
