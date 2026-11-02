@@ -167,5 +167,19 @@
   "nmap: -oN braucht einen Dateinamen.": "nmap: -oN потребує назви файлу.",
   "nmap: Option {1} kennt diese Simulation nicht. nmap --help zeigt, was geht.": "nmap: ця симуляція не знає опції {1}. nmap --help показує, що працює.",
   "nmap: Kein Ziel angegeben. Beispiel: nmap -sn 10.10.20.0/24": "nmap: ціль не вказано. Приклад: nmap -sn 10.10.20.0/24",
-  "SCOPE: {1} gehört nicht zum Auftrag. Erlaubt ist nur 10.10.20.0/24. Es wurde nichts gescannt.": "МЕЖІ (SCOPE): {1} не входить у завдання. Дозволено лише 10.10.20.0/24. Нічого не скановано."
+  "SCOPE: {1} gehört nicht zum Auftrag. Erlaubt ist nur 10.10.20.0/24. Es wurde nichts gescannt.": "МЕЖІ (SCOPE): {1} не входить у завдання. Дозволено лише 10.10.20.0/24. Нічого не скановано.",
+  "Nmap (SIMULATION) – unterstützt:": "Nmap (СИМУЛЯЦІЯ) – підтримує:",
+  "  nmap -sn 10.10.20.0/24        Welche Rechner sind da? (Ping-Scan)": "  nmap -sn 10.10.20.0/24        Які комп’ютери є? (ping-сканування)",
+  "  nmap ZIEL                     häufigste 1000 TCP-Ports": "  nmap ЦІЛЬ                     1000 найпоширеніших TCP-портів",
+  "  nmap -p- ZIEL                 alle 65535 TCP-Ports": "  nmap -p- ЦІЛЬ                 усі 65535 TCP-портів",
+  "  nmap -p 22,80 ZIEL            bestimmte Ports": "  nmap -p 22,80 ЦІЛЬ            певні порти",
+  "  nmap -sV ZIEL                 Dienst-Versionen erkennen": "  nmap -sV ЦІЛЬ                 визначити версії сервісів",
+  "  nmap -sU ZIEL                 UDP-Ports (langsam!)": "  nmap -sU ЦІЛЬ                 UDP-порти (повільно!)",
+  "  nmap -sC ZIEL / -A            Standard-Skripte (z. B. Webseitentitel)": "  nmap -sC ЦІЛЬ / -A            стандартні скрипти (напр. заголовок сторінки)",
+  "  -oN DATEI                     Ergebnis zusätzlich in Datei speichern": "  -oN ФАЙЛ                      додатково зберегти результат у файл",
+  "Starting Nmap 7.94 ( https://nmap.org ) – SIMULATION, kein echter Netzwerkverkehr": "Starting Nmap 7.94 ( https://nmap.org ) – СИМУЛЯЦІЯ, без справжнього мережевого трафіку",
+  "Hinweis: Viele Ziele – erst mit -sn herausfinden, welche überhaupt da sind, spart Zeit.": "Порада: багато цілей – спершу з’ясуй через -sn, які з них узагалі є, це заощадить час.",
+  "nc: {1}: Keine Antwort (Rechner nicht erreichbar)": "nc: {1}: немає відповіді (комп’ютер недоступний)",
+  "SCOPE: {1} gehört nicht zum Auftrag. Es wurde nichts gesendet.": "МЕЖІ (SCOPE): {1} не входить у завдання. Нічого не надіслано.",
+  "(Verbindung beendet – SIMULATION)": "(з’єднання завершено – СИМУЛЯЦІЯ)"
 }

@@ -1344,7 +1344,7 @@ function questionHTML(r, t, q) {
   const id = `${t.id}-${q.id}`;
   let input = '';
   if (q.type === 'mc') {
-    input = shuffle(q.options.map((o, i) => ({ o, i })), [...key].reduce((n, c) => n + c.charCodeAt(0), 7)).map(({ o, i }) => `<button class="opt ${ok && i === q.answer ? 'right' : ''}" data-k="${key}" data-i="${i}" ${ok ? 'disabled' : ''}>${esc(o)}</button>`).join('');
+    input = shuffle(q.options.map((o, i) => ({ o, i })), [...key].reduce((n, c) => n + c.charCodeAt(0), 7)).map(({ o, i }) => `<button class="opt ${ok && i === q.answer ? 'right' : ''}" data-k="${key}" data-i="${i}" ${ok ? 'disabled' : ''}>${makeT(handDict(r.id)).h(o, esc)}</button>`).join('');
   } else if (q.type === 'confirm') {
     input = `<button class="btn small ${ok ? '' : 'go'}" data-k="${key}" data-confirm ${ok ? 'disabled' : ''}>${ok ? U('✓ Erledigt') : U('Erledigt')}</button>`;
   } else {

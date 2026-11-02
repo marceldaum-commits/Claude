@@ -19,7 +19,6 @@ const enxor = (s) => xor(Buffer.from(s, 'utf8')).toString('hex');
 const unletzte = (d) => unhex(rot13(rev(unb64(d).trim())));
 const DATA = /\.(conf|md5|jwt|log|jpg)$|^(ftp-mitschnitt|gedicht|schluessel-hinweis)\.txt$/;
 export default {
-  allow: ["cut -d' ' -f1 · aus vpn.log: das letzte Wort – awk '"], // codeify greift über zwei Befehle hinweg (Fehlerkennung)
   decode(name, data) {
     if (name === 'botschaft.txt') return unb64url(data);
     if (name === 'geheim.hex') return unxor(data);

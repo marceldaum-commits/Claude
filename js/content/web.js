@@ -65,6 +65,8 @@ export const WEB_ROOMS = [
     welcome: 'Web-Analyse · Sandbox bereit. Start: cat LIESMICH.txt',
     flags: ['cookie', 'api'],
     setup: webSetup,
+    // Handübersetzung: nur LIESMICH.txt, die Mitschnitte bleiben original (Antworten werden darin gesucht)
+    translateFS(sh, T, translateTree) { translateTree(sh.fs.get(`${HOME}/web`), T, (name, data) => (name === 'LIESMICH.txt' ? null : data)); },
     commands: () => textTools(),
     tasks: [
       {
