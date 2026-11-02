@@ -12,6 +12,12 @@ export const b64url = (s) => b64(s).replace(/=+$/, '').replace(/\+/g, '-').repla
 export const hex = (s) => [...new TextEncoder().encode(s)].map(x => x.toString(16).padStart(2, '0')).join('');
 export const rot13 = (s) => s.replace(/[A-Za-z]/g, c => String.fromCharCode((c <= 'Z' ? 65 : 97) + ((c.charCodeAt(0) - (c <= 'Z' ? 65 : 97) + 13) % 26)));
 export const rev = (s) => [...s].reverse().join('');
+// Rückwandlung (für Handübersetzungen verpackter Dateien), browser- und node-tauglich
+const utf8 = (bytes) => new TextDecoder().decode(bytes);
+export const unb64 = (s) => utf8(Uint8Array.from(atob(String(s).replace(/\s+/g, '')), c => c.charCodeAt(0)));
+export const unb64url = (s) => { let x = String(s).trim().replace(/-/g, '+').replace(/_/g, '/'); while (x.length % 4) x += '='; return unb64(x); };
+export const hexBytes = (s) => new Uint8Array((String(s).replace(/\s+/g, '').match(/../g) || []).map(h => parseInt(h, 16)));
+export const unhex = (s) => utf8(hexBytes(s));
 export function rng(seed) { let x = seed >>> 0 || 1; return () => (x = (x * 1664525 + 1013904223) >>> 0) / 2 ** 32; }
 export const page = (title, body) => `<!DOCTYPE html>\n<html><head><title>${title}</title></head>\n<body>\n${body}\n</body></html>\n`;
 

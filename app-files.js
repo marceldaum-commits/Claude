@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '2.10.5';
+self.KLY_VERSION = '2.11.0';
 self.KLY_FILES = [
   'index.html',
   'manifest.webmanifest',
@@ -45,4 +45,4 @@ self.KLY_FILES = [
   'icons/apple-touch-icon.png',
 ];
 // Zusätzliche Dateien nur für den App-Download (nicht offline gecacht)
-self.KLY_EXTRA = ['i18n/en/w1.json', 'i18n/uk/w1.json', 'i18n/en/shell.json', 'i18n/uk/shell.json', 'i18n/en/w4.json', 'i18n/uk/w4.json', 'i18n/en/ui.json', 'i18n/uk/ui.json', 'i18n/en/level1.json', 'i18n/uk/level1.json', 'i18n/en/w5.json', 'i18n/uk/w5.json', 'i18n/en/w3.json', 'i18n/uk/w3.json', 'i18n/en/w8.json', 'i18n/uk/w8.json', 'i18n/en/p5.json', 'i18n/uk/p5.json', 'i18n/en/p6.json', 'i18n/uk/p6.json', 'i18n/en/p7.json', 'i18n/uk/p7.json', 'i18n/en/p8.json', 'i18n/uk/p8.json', 'i18n/en/p10.json', 'i18n/uk/p10.json', 'README.md', 'supabase/schema.sql', 'docs/SUPABASE-SETUP.md', 'docs/CLOUDFLARE-DEPLOY.md'];
+self.KLY_EXTRA = ['i18n/en/w1.json', 'i18n/uk/w1.json', 'i18n/en/shell.json', 'i18n/uk/shell.json', 'i18n/en/w4.json', 'i18n/uk/w4.json', 'i18n/en/ui.json', 'i18n/uk/ui.json', 'i18n/en/level1.json', 'i18n/uk/level1.json', 'i18n/en/w5.json', 'i18n/uk/w5.json', 'i18n/en/w3.json', 'i18n/uk/w3.json', 'i18n/en/w8.json', 'i18n/uk/w8.json', 'i18n/en/p5.json', 'i18n/uk/p5.json', 'i18n/en/p6.json', 'i18n/uk/p6.json', 'i18n/en/p7.json', 'i18n/uk/p7.json', 'i18n/en/p8.json', 'i18n/uk/p8.json', 'i18n/en/p10.json', 'i18n/uk/p10.json', 'i18n/en/w6.json', 'i18n/uk/w6.json', 'i18n/en/w7.json', 'i18n/uk/w7.json', 'i18n/en/w9.json', 'i18n/uk/w9.json', 'README.md', 'supabase/schema.sql', 'docs/SUPABASE-SETUP.md', 'docs/CLOUDFLARE-DEPLOY.md'];

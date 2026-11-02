@@ -3,13 +3,15 @@
 // w8 Der Tresorraum (Linux schwer) · w9 Das Phantom (Hacking schwer)
 // „Hacking“ heißt hier: CTF-Disziplinen Aufklärung, Datenlecks finden, Kodierungen knacken, Spurensicherung.
 
-import { makeLadder, T, p2, b64, b64url, hex, rot13, rev, page } from './leiter.js';
+import { makeLadder, T, p2, b64, b64url, hex, rot13, rev, page, unb64, unb64url, unhex, hexBytes } from './leiter.js';
 
 const code = (t) => (String(t).match(/KLY\{[0-9a-f]{16}\}/) || [''])[0];
 const noise = (R, n) => Array.from({ length: n }, () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(R() * 36)]).join('');
 const binNoise = (R, n) => Array.from({ length: n }, () => String.fromCharCode(Math.floor(R() * 31) + (R() < 0.5 ? 0 : 1))).join('');
 
 // ============================================================================ w5 – Das Stellwerk (Linux, schwerer)
+const W9_KEY = 'nebelkrähe'; // XOR-Schlüssel Spur 6 (auch für die Übersetzung)
+
 const W5 = makeLadder({
   id: 'w5', title: 'Das Stellwerk', level: 'L4', dir: 'stellwerk', prefix: 'posten', seed: 5151, minutes: 120,
   // Übersetzung: signal.hex erst zurückwandeln, übersetzen, wieder als Hex (40 Zeichen pro Zeile)
@@ -139,6 +141,8 @@ import { sha256hexSync as shaSync } from '../shell.js';
 const K = 'karriere.kristall.sim', KIP = '10.77.0.10';
 const W6 = makeLadder({
   id: 'w6', title: 'Die Bewerbung', level: 'L3', dir: 'bewerbung', prefix: 'runde', seed: 6161, minutes: 90,
+  // Übersetzung: Wortliste (= Pfade), Prüfsumme und Foto bleiben original
+  i18nSpecial(name, data) { return name.endsWith('.jpg') || name === 'wort.sha256' || name === 'woerter.txt' ? data : null; },
   tools: ['curl', 'curl -I', 'robots.txt', 'base64', 'xxd -r -p', 'sha256sum', 'strings', 'Schleifen'],
   desc: 'Hacking-Leiter (leicht): Die (erfundene) Sicherheitsfirma Kristall Security stellt nur ein, wer ihren Bewerbungs-CTF knackt. Zehn Runden auf ihrer Karriereseite.',
   ziel: 'Webseiten wie ein Pentester lesen: Quelltext, versteckte Pfade, Header, Cookies, Skripte, Sicherungen, Konfigurationslecks.',
@@ -232,6 +236,11 @@ const W6 = makeLadder({
 const NEB = { dev: ['dev.nebelwerk.sim', '10.88.0.20'], api: ['api.nebelwerk.sim', '10.88.0.30'], portal: ['portal.nebelwerk.sim', '10.88.0.40'], bericht: ['bericht.nebelwerk.sim', '10.88.0.50'] };
 const W7 = makeLadder({
   id: 'w7', title: 'Operation Nebel', level: 'L3', dir: 'nebel', prefix: 'phase', seed: 7171, minutes: 120,
+  // Übersetzung: nachricht.txt = Base64(ROT13(Hex(Text))) entpacken, übersetzen, verpacken; Daten bleiben original
+  i18nSpecial(name, data, T) {
+    if (name === 'nachricht.txt') return b64(rot13(hex(T.t(unhex(rot13(unb64(data))))))) + '\n';
+    return /^(zone|token|woerter|mitschnitt)\.txt$|^nginx-.*\.conf$|^zugriffe\.log$/.test(name) ? data : null;
+  },
   tools: ['Zonendatei', 'Verzeichnissuche', 'JWT', 'JSON/API', 'Git-Verlauf', 'diff', 'Kodierungsketten', 'Mitschnitte', 'Logs'],
   desc: 'Hacking-Leiter (mittel): Ein autorisierter Pentest bei der (erfundenen) Nebelwerk GmbH. Zehn Phasen von der Aufklärung bis zum Bericht.',
   ziel: 'Methodische Aufklärung: Hosts finden, Pfade suchen, Tokens und APIs lesen, Lecks in Git und Konfiguration, Mitschnitte und Logs auswerten.',
@@ -476,6 +485,18 @@ const W8 = makeLadder({
 const PH = ['phantom-dev.sim', '10.99.0.13'];
 const W9 = makeLadder({
   id: 'w9', title: 'Das Phantom', level: 'L9', dir: 'phantom', prefix: 'spur', seed: 9191, minutes: 150,
+  // Übersetzung: verpackte Spuren entpacken, übersetzen, verpacken. Prüfsummen, Logs, Gedicht (cut -c1) bleiben original.
+  i18nSpecial(name, data, T) {
+    const k = new TextEncoder().encode(W9_KEY);
+    const xorHex = (bytes) => [...bytes].map((b, i) => (b ^ k[i % k.length]).toString(16).padStart(2, '0')).join('');
+    if (name === 'botschaft.txt') return b64url(T.t(unb64url(data))) + '\n';
+    if (name === 'geheim.hex') {
+      const plain = new TextDecoder().decode(Uint8Array.from(hexBytes(data), (b, i) => b ^ k[i % k.length]));
+      return xorHex(new TextEncoder().encode(T.t(plain))) + '\n';
+    }
+    if (name === 'letzte.txt') return b64(rev(rot13(hex(T.t(unhex(rot13(rev(unb64(data).trim())))))))) + '\n';
+    return /\.(conf|md5|jwt|log|jpg)$|^(ftp-mitschnitt|gedicht|schluessel-hinweis)\.txt$/.test(name) ? data : null;
+  },
   tools: ['Base64url', 'Hex', 'JWT', 'Mitschnitte', 'md5sum', 'uniq -d', 'xor', 'Akrostichon', 'Mehrfach-Kodierung'],
   desc: 'Hacking-Leiter (schwer): Ein Unbekannter – „das Phantom“ – hinterlässt in Talheim digitale Rätsel. Zehn Spuren, jede baut auf der vorigen auf.',
   ziel: 'CTF auf hohem Niveau: Spuren über mehrere Quellen verfolgen, Kodierungen erkennen und kombinieren, Daten korrelieren.',
@@ -547,7 +568,7 @@ const W9 = makeLadder({
     { t: 'XOR', pts: 25,
       body: 'Die nächste Nachricht ist mit XOR verschlüsselt. Den Schlüssel hat das Phantom rückwärts geschrieben in schluessel-hinweis.txt hinterlassen.',
       build(c) {
-        const key = 'nebelkrähe';
+        const key = W9_KEY;
         const msg = new TextEncoder().encode(`XOR geknackt. Code: ${c.code}`); const k = new TextEncoder().encode(key);
         c.put('geheim.hex', [...msg].map((b, i) => (b ^ k[i % k.length]).toString(16).padStart(2, '0')).join('') + '\n');
         c.put('schluessel-hinweis.txt', rev(key) + '\n');
