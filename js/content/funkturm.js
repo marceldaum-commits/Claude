@@ -221,6 +221,16 @@ export const FUNKTURM = [
     welcome: 'Funkturm · Sandbox bereit. Start: cat LIESMICH.txt · help zeigt Befehle.',
     flags: Array.from({ length: N }, (_, n) => `l${n}`),
     setup, commands,
+    // Handübersetzung: doppelt verpackte Texte (Etage 10, 11) erst auspacken, übersetzen, wieder einpacken
+    translateFS(sh, T, translateTree) {
+      const unb64 = (x) => (typeof atob === 'function' ? decodeURIComponent(escape(atob(x))) : Buffer.from(x, 'base64').toString('utf8'));
+      const rev = (x) => [...x].reverse().join('');
+      translateTree(sh.fs.get(B), T, (name, data) => {
+        if (name === 'nachricht.b64') return b64(b64(T.t(unb64(unb64(data.trim()))))) + '\n';
+        if (name === 'spiegel.txt') return rev(rot13(T.t(rot13(rev(data.trim()))))) + '\n';
+        return null;
+      });
+    },
     onSolve(sh, flag) { openFloor(sh, +flag.slice(1) + 1); },
     tasks: [
       tk(0, 'Der Eingang', 'Willkommen im Turm. Die Begrüßung hat einen Namen mit Leerzeichen.', [
