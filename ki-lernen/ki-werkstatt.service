@@ -1,0 +1,23 @@
+# systemd-Dienst für die KI-Werkstatt.
+# Installieren:  sudo cp ki-werkstatt.service /etc/systemd/system/
+#                sudo systemctl daemon-reload && sudo systemctl enable --now ki-werkstatt
+# BENUTZER unten durch den Linux-Benutzer ersetzen, dem ~/ki-lernen gehört.
+[Unit]
+Description=KI-Werkstatt (Lernprogramm, Port 8100)
+After=network-online.target
+
+[Service]
+Type=simple
+User=BENUTZER
+WorkingDirectory=/home/BENUTZER/ki-lernen
+ExecStart=/usr/bin/node --env-file=.env server.js
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/BENUTZER/ki-lernen/data
+PrivateTmp=true
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target
