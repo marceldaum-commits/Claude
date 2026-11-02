@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "node tests/run.mjs",
-    "check": "for f in js/*.js js/content/*.js; do node --check $f || exit 1; done && node tests/run.mjs && node qa/check-i18n.mjs w1 && node qa/check-i18n.mjs w4 && node qa/check-i18n.mjs w5 && node qa/check-i18n-level1.mjs",
+    "check": "for f in js/*.js js/content/*.js; do node --check $f || exit 1; done && node tests/run.mjs && node qa/check-i18n.mjs w1 && node qa/check-i18n.mjs w4 && node qa/check-i18n.mjs w5 && node qa/check-i18n.mjs w3 && node qa/check-i18n-level1.mjs",
     "start": "python3 -m http.server 8000 --bind 127.0.0.1"
   }
 }

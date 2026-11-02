@@ -102,6 +102,31 @@ const ROOMDEF = {
       return null;
     },
   },
+  w3: {
+    base: HOME + '/kollektiv',
+    decode(name, data) { return name === 'abgefangen.txt' ? rot13(data.trim()) : null; },
+    special(name, data, T) {
+      if (name === 'abgefangen.txt') return rot13(T.t(rot13(data.trim()))) + '\n';
+      if (name.endsWith('.log') || name.endsWith('.csv')) return data; // Daten nie anfassen (grep -c ALARM, CODE/XX)
+      return null;
+    },
+    solve(run, step) {
+      const st = (n, cmds) => { run(`cd ~/kollektiv/stufe${n}`); let out = ''; for (const c of cmds) out = run(c); step(n, null, out); };
+      st(0, ['A=$(cat teil1); B=$(cat teil2); C=$(cat teil3); echo "$A$B$C"']);
+      st(1, ['for f in funk/*; do tail -n 1 $f; done | tr -d "\\n"']);
+      st(2, ["cat abgefangen.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'"]);
+      st(3, ["grep CODE protokoll.log | sed 's/XX//g'"]);
+      run('cd ~/kollektiv/stufe4'); const sum = run("awk -F';' '$1==\"falter\" {s+=$3} END {print s}' einsaetze.csv").trim();
+      st(4, [`cat tresor/${sum}.txt`]);
+      st(5, ['chmod +x entschluessler.sh', './entschluessler.sh']);
+      st(6, ['while read n; do [ -f archiv/$n ] && cat archiv/$n; done < kandidaten.txt']);
+      st(7, ['for d in knoten/*; do if [ "$(cat $d/version)" = "1.2" ]; then cat $d/teil; fi; done | tr -d "\\n"']);
+      run('cd ~/kollektiv/stufe8'); run(`echo 'for f in wachen/*.log; do echo "$(grep -c ALARM $f) $f"; done | sort -nr' > wachbericht.sh`); run('chmod +x wachbericht.sh');
+      const top = run('./wachbericht.sh | head -1').trim().split(' ')[1] || '';
+      st(8, [`cat schluessel/${top.replace('wachen/', '').replace('.log', '')}.txt`]);
+      if (!run('cat ~/kollektiv/finale/nachricht.txt').includes('Level 9')) err('Finale: „Level 9“ fehlt');
+    },
+  },
 };
 
 // ---------------------------------------------------------------- Originaltexte sammeln
@@ -165,8 +190,8 @@ for (const lang of ['en', 'uk']) {
   if (r.translateFS) r.translateFS(s, T, translateTree);
   else { console.log('  (Raum hat noch kein translateFS – nutze Vorschlag aus qa/check-i18n.mjs)'); translateTree(s.fs.get(def.base), T, def.special || (() => null)); }
   const run = (c) => { const x = s.exec(c); return (x.out || '') + (x.err || ''); };
-  const step = (n, cmd) => {
-    const out = run(cmd); const c = (out.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
+  const step = (n, cmd, given) => {
+    const out = given ?? run(cmd); const c = (out.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
     if (c !== F['l' + n]) return err(`Stufe/Etage ${n}: kein Code über „${cmd}“ → ${JSON.stringify(out.slice(0, 140))}`);
     if (!/🔓/.test(run('entsperren ' + c))) err(`${n}: entsperren klappt nicht`);
   };
