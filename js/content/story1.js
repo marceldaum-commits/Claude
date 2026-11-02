@@ -239,7 +239,7 @@ export const STORY1 = {
         { key: 'c', t: 'Weil kill manchmal Fehler ausgibt.', why: 'Mara: „Und wenn kill KEINEN Fehler ausgibt – ist der Prozess dann sicher weg?“' },
       ],
       optionsPrompt: 'Mara: „Warum bestehe ich auf dem Retest?“  antwort a | b | c',
-      hinweis: 'PID aus Szene 3 (prüfe sie neu mit ps!). chmod numerisch: 6-0-0.',
+      hinweis: 'PID aus Szene 4 (prüfe sie neu mit ps!). chmod numerisch: 6-0-0.',
       debrief: 'Mara: „Dienst weg, Sicherung geschützt, beides belegt. Jetzt der Bericht.“',
     },
     {
