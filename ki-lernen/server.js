@@ -32,14 +32,18 @@ const budget = new Budget(path.join(here, 'data', 'usage.json'), MODEL, BUDGET_U
 const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
 
 // Grundregel für jede KI-Antwort: Sie läuft in einem Lernprogramm.
+const SPRACHEN = { de: 'Deutsch', en: 'Englisch', uk: 'Ukrainisch' };
+const sprache = (body) => SPRACHEN[body?.lang] || SPRACHEN.de;
 const BASE_SYSTEM =
-  'Du bist Teil der „KI-Werkstatt“, eines deutschsprachigen Lernprogramms, in dem Menschen spielerisch ' +
-  'lernen, wie man mit KI-Assistenten umgeht. Antworte auf Deutsch, freundlich und knapp (höchstens etwa ' +
+  'Du bist Teil der „KI-Werkstatt“, eines Lernprogramms, in dem Menschen spielerisch ' +
+  'lernen, wie man mit KI-Assistenten umgeht. Antworte freundlich und knapp (höchstens etwa ' +
   '150 Wörter), außer die Aufgabe verlangt ausdrücklich etwas anderes. Unter den Lernenden können Kinder sein: ' +
   'Bleib altersgerecht, frag nie nach Namen, Adressen, Schulen, Fotos oder anderen persönlichen Daten und rate davon ab, ' +
   'solche Daten einzugeben. Beginne deine sichtbare Antwort sofort, ohne lange Vorrede.';
 
 // ---------- kleine Helfer ----------
+// Markiert Texte, die der Browser zeigt; tools/i18n-keys.mjs sammelt sie für die Übersetzung.
+const msg = (s) => s;
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -67,13 +71,13 @@ async function readBody(req, limit = 64 * 1024) {
   const chunks = [];
   for await (const c of req) {
     size += c.length;
-    if (size > limit) throw Object.assign(new Error('Anfrage zu groß'), { status: 413 });
+    if (size > limit) throw Object.assign(new Error(msg('Anfrage zu groß')), { status: 413 });
     chunks.push(c);
   }
   try {
     return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
   } catch {
-    throw Object.assign(new Error('Ungültiges JSON'), { status: 400 });
+    throw Object.assign(new Error(msg('Ungültiges JSON')), { status: 400 });
   }
 }
 
@@ -155,16 +159,16 @@ function cleanMessages(raw) {
 }
 
 function describeError(err) {
-  if (err instanceof Anthropic.AuthenticationError) return 'Der API-Schlüssel auf dem Server ist ungültig.';
-  if (err instanceof Anthropic.RateLimitError) return 'Die KI ist gerade überlastet. Bitte gleich nochmal versuchen.';
-  if (err instanceof Anthropic.BadRequestError) return 'Die KI konnte diese Anfrage nicht bearbeiten.';
-  if (err instanceof Anthropic.APIError) return `KI-Fehler (${err.status ?? 'Netz'}).`;
-  return err.message || 'Unbekannter Fehler';
+  if (err instanceof Anthropic.AuthenticationError) return msg('Der API-Schlüssel auf dem Server ist ungültig.');
+  if (err instanceof Anthropic.RateLimitError) return msg('Die KI ist gerade überlastet. Bitte gleich nochmal versuchen.');
+  if (err instanceof Anthropic.BadRequestError) return msg('Die KI konnte diese Anfrage nicht bearbeiten.');
+  if (err instanceof Anthropic.APIError) return msg('Die KI ist gerade nicht erreichbar. Bitte später nochmal.');
+  return err.status ? err.message : msg('Unbekannter Fehler');
 }
 
 function refusalText(msg) {
   if (msg.stop_reason !== 'refusal') return null;
-  return 'Die KI hat diese Anfrage abgelehnt. Auch das gehört zum Lernen: KI-Assistenten haben Schutzregeln.';
+  return msg('Die KI hat diese Anfrage abgelehnt. Auch das gehört zum Lernen: KI-Assistenten haben Schutzregeln.');
 }
 
 // ---------- KI-Endpunkte ----------
@@ -173,11 +177,12 @@ function refusalText(msg) {
 async function handleChat(req, res, user) {
   const body = await readBody(req);
   const messages = cleanMessages(body.messages);
-  if (!messages) return sendJson(res, 400, { error: 'Ungültiger Gesprächsverlauf.' });
+  if (!messages) return sendJson(res, 400, { error: msg('Ungültiger Gesprächsverlauf.') });
   const persona = String(body.system || '').slice(0, 3000).trim();
+  const base = `${BASE_SYSTEM}\nAntworte auf ${sprache(body)}, außer die lernende Person schreibt in einer anderen Sprache.`;
   const system = persona
-    ? `${BASE_SYSTEM}\n\nDie lernende Person hat dir folgende Rolle gegeben. Spiele sie, solange sie harmlos ist:\n<rolle>\n${persona}\n</rolle>`
-    : BASE_SYSTEM;
+    ? `${base}\n\nDie lernende Person hat dir folgende Rolle gegeben. Spiele sie, solange sie harmlos ist:\n<rolle>\n${persona}\n</rolle>`
+    : base;
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream; charset=utf-8',
@@ -227,8 +232,8 @@ async function handleChat(req, res, user) {
     const final = await stream.finalMessage();
     const left = book(final.usage, final.model);
     const refusal = refusalText(final);
-    if (refusal) send('text', '\n\n' + refusal);
-    if (final.stop_reason === 'max_tokens') send('text', ' …\n\n(Antwort gekürzt – frag nach, wenn du mehr willst.)');
+    if (refusal) send('note', refusal);
+    if (final.stop_reason === 'max_tokens') send('note', msg('(Antwort gekürzt – frag nach, wenn du mehr willst.)'));
     send('done', { budgetLeft: left, stop: final.stop_reason });
   } catch (err) {
     console.error('Chat-Fehler:', err.message);
@@ -261,7 +266,7 @@ async function handleJudge(req, res, user) {
   const body = await readBody(req);
   const task = String(body.task || '').slice(0, 800);
   const prompt = String(body.prompt || '').slice(0, 2000).trim();
-  if (!prompt) return sendJson(res, 400, { error: 'Bitte zuerst einen Prompt schreiben.' });
+  if (!prompt) return sendJson(res, 400, { error: msg('Bitte zuerst einen Prompt schreiben.') });
 
   const msg = await client.beta.messages.create({
     model: MODEL,
@@ -272,7 +277,8 @@ async function handleJudge(req, res, user) {
     system:
       BASE_SYSTEM +
       '\n\nDu bist jetzt Prompt-Trainer. Bewerte den Prompt der lernenden Person für die gestellte Aufgabe. ' +
-      'Sei ermutigend, aber ehrlich. Bewerte nur den Prompt, führe ihn nicht aus. Lob und Tipp je ein Satz, auf Deutsch.',
+      'Sei ermutigend, aber ehrlich. Bewerte nur den Prompt, führe ihn nicht aus. ' +
+      `Lob, Tipp und verbesserter Prompt je kurz, auf ${sprache(body)}.`,
     messages: [
       {
         role: 'user',
@@ -288,7 +294,7 @@ async function handleJudge(req, res, user) {
   try {
     result = JSON.parse(text);
   } catch {
-    return sendJson(res, 502, { error: 'Die Bewertung kam unvollständig zurück. Bitte nochmal.' });
+    return sendJson(res, 502, { error: msg('Die Bewertung kam unvollständig zurück. Bitte nochmal.') });
   }
   sendJson(res, 200, { result, budgetLeft: left });
 }
@@ -297,7 +303,7 @@ async function handleJudge(req, res, user) {
 async function handleTokens(req, res) {
   const body = await readBody(req);
   const text = String(body.text || '').slice(0, 5000);
-  if (!text.trim()) return sendJson(res, 400, { error: 'Bitte Text eingeben.' });
+  if (!text.trim()) return sendJson(res, 400, { error: msg('Bitte Text eingeben.') });
   const r = await client.messages.countTokens({ model: MODEL, messages: [{ role: 'user', content: text }] });
   // Grundlast der Nachricht (Rollen-Markierungen) abziehen, damit nur der Text zählt.
   const base = await baseTokens();
@@ -320,21 +326,21 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { ok: true, ki: Boolean(client), model: MODEL });
       }
       const user = auth(req);
-      if (user?.blocked) return sendJson(res, 429, { error: 'Zu viele falsche Codes. Bitte in 15 Minuten nochmal.' });
-      if (!user) return sendJson(res, 401, { error: 'Bitte einen gültigen Einladungscode eingeben.' });
+      if (user?.blocked) return sendJson(res, 429, { error: msg('Zu viele falsche Codes. Bitte in 15 Minuten nochmal.') });
+      if (!user) return sendJson(res, 401, { error: msg('Bitte einen gültigen Einladungscode eingeben.') });
       if (url.pathname === '/api/me') {
         return sendJson(res, 200, { name: user.name, budgetLeft: budget.left(user.code), budget: BUDGET_USD });
       }
-      if (req.method !== 'POST') return sendJson(res, 405, { error: 'Nur POST.' });
-      if (!client) return sendJson(res, 503, { error: 'Auf dem Server ist noch kein API-Schlüssel eingetragen.' });
-      if (rateLimited(user.code)) return sendJson(res, 429, { error: 'Langsam! Höchstens 12 Anfragen pro Minute.' });
+      if (req.method !== 'POST') return sendJson(res, 405, { error: msg('Nur POST.') });
+      if (!client) return sendJson(res, 503, { error: msg('Auf dem Server ist noch kein API-Schlüssel eingetragen.') });
+      if (rateLimited(user.code)) return sendJson(res, 429, { error: msg('Langsam! Höchstens 12 Anfragen pro Minute.') });
       if (url.pathname === '/api/tokens') return await handleTokens(req, res);
       const handler = { '/api/chat': handleChat, '/api/judge': handleJudge }[url.pathname];
-      if (!handler) return sendJson(res, 404, { error: 'Unbekannt.' });
+      if (!handler) return sendJson(res, 404, { error: msg('Unbekannt.') });
       if (budget.left(user.code) <= 0) {
-        return sendJson(res, 402, { error: 'Das KI-Budget für diesen Monat ist aufgebraucht.' });
+        return sendJson(res, 402, { error: msg('Das KI-Budget für diesen Monat ist aufgebraucht.') });
       }
-      if (!acquire(user.code)) return sendJson(res, 429, { error: 'Bitte warte, bis die laufenden Antworten fertig sind.' });
+      if (!acquire(user.code)) return sendJson(res, 429, { error: msg('Bitte warte, bis die laufenden Antworten fertig sind.') });
       try {
         return await handler(req, res, user);
       } finally {
@@ -350,7 +356,13 @@ const server = http.createServer(async (req, res) => {
 });
 
 function serveStatic(pathname, res) {
-  const rel = pathname === '/' ? '/index.html' : decodeURIComponent(pathname);
+  let rel;
+  try {
+    rel = pathname === '/' ? '/index.html' : decodeURIComponent(pathname);
+  } catch {
+    res.writeHead(400, SECURITY_HEADERS);
+    return res.end();
+  }
   const file = path.normalize(path.join(PUBLIC, rel));
   if (!file.startsWith(PUBLIC + path.sep)) {
     res.writeHead(403, SECURITY_HEADERS);

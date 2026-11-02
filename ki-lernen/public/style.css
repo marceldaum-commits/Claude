@@ -65,3 +65,6 @@ textarea { min-height: 110px; resize: vertical; }
   padding: 10px 18px; border-radius: 999px; font-weight: 600; z-index: 5; }
 .hidden { display: none; }
 .back { display: inline-block; margin-bottom: 8px; text-decoration: none; }
+.right { display: flex; align-items: center; gap: 10px; }
+select { font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; max-width: 100%; }
+select.lang { padding: 4px 6px; font-size: 14px; }

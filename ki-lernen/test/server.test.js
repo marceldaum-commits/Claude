@@ -44,7 +44,7 @@ before(async () => {
   await new Promise((r) => mock.listen(0, '127.0.0.1', r));
   process.env.ANTHROPIC_BASE_URL = `http://127.0.0.1:${mock.address().port}`;
   process.env.ANTHROPIC_API_KEY = 'test-key';
-  process.env.INVITE_CODES = 'GUT:Tina';
+  process.env.INVITE_CODES = 'GUT:Tina,ZWEI:Zara';
   process.env.BUDGET_USD_PER_CODE = '0.05';
   process.env.KI_MODEL = 'claude-opus-5-5';
   // Budget-Datei in ein Temp-Verzeichnis umleiten
@@ -127,9 +127,20 @@ test('Fehlermeldung verrät keine API-Details', async () => {
   assert.equal(r.status, 404);
 });
 
+test('Antwortsprache folgt der gewählten Oberfläche', async () => {
+  await post('/api/chat', { messages: [{ role: 'user', content: 'Привіт' }], lang: 'uk' }, 'ZWEI');
+  const call = seen.findLast((s) => s.url.startsWith('/v1/messages') && s.json.stream);
+  assert.equal(call.json.messages[0].content, 'Привіт');
+  assert.match(call.json.system, /Antworte auf Ukrainisch/);
+});
+
 test('nach 10 falschen Codes wird die IP gesperrt – auch für richtige Codes', async () => {
   // Test 3 hat schon einen falschen Code geschickt → 9 weitere ergeben 10
   for (let i = 0; i < 9; i++) assert.equal((await post('/api/tokens', { text: 'x' }, 'RATEN-' + i)).status, 401);
   const r = await post('/api/tokens', { text: 'x' }, 'GUT');
   assert.equal(r.status, 429);
+});
+
+test('kaputtes %-Encoding ergibt 400 statt 500', async () => {
+  assert.equal((await fetch(base + '/%E0%A4%A')).status, 400);
 });
