@@ -15,7 +15,7 @@ function rid(n = 6) {
 export function defaultState() {
   return {
     schema: SCHEMA,
-    profile: { name: 'Seppi' },
+    profile: { name: '' },
     deviceId: 'dev-' + rid(4),
     labToken: 'KLY-' + rid(3),
     location: null,           // 'pc' | 'phone' | 'both' | 'windows'

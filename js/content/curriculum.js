@@ -97,8 +97,9 @@ export const PFADE = {
 };
 
 export const LOCATIONS = {
-  pc: { label: 'Kali am PC', short: 'PC', icon: '🖥️', desc: 'Kali-VM unter Windows – App und Terminal nebeneinander.' },
-  phone: { label: 'Handy (Termux / NetHunter Rootless)', short: 'Handy', icon: '📱', desc: 'Galaxy S23, nicht gerootet. Manche Werkzeuge sind eingeschränkt.' },
+  browser: { label: 'Nur im Browser (kein Kali)', short: 'Browser', icon: '🌐', desc: 'Zum Reinschnuppern: Alles läuft hier in der App – nichts installieren. Über 130 Stufen warten.' },
+  pc: { label: 'Kali am PC', short: 'PC', icon: '🖥️', desc: 'Eigene Kali-VM – App und Terminal nebeneinander, dazu echte Labs.' },
+  phone: { label: 'Handy mit Termux', short: 'Handy', icon: '📱', desc: 'Android mit Termux oder NetHunter Rootless (ohne Root). Manche Werkzeuge sind eingeschränkt.' },
   both: { label: 'PC und Handy', short: 'Beides', icon: '🔁', desc: 'App am Handy, Terminal am PC – oder umgekehrt.' },
   windows: { label: 'Windows / PowerShell', short: 'Windows', icon: '🪟', desc: 'Nur für Windows-Level sinnvoll. Linux-Aufgaben laufen dann nur in der Sandbox.' },
 };

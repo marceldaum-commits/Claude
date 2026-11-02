@@ -136,7 +136,7 @@ function locationModal(force = false) {
   const m = document.createElement('div');
   m.className = 'modal';
   m.innerHTML = `<div class="box" role="dialog" aria-label="Lernort wählen">
-    <h2>Wo lernst du heute?</h2>
+    ${state.location ? '<h2>Wo lernst du heute?</h2>' : '<h2>Willkommen! 👋</h2><p>Hier lernst du Linux und Hacking Schritt für Schritt – mit Rätseln, Geschichten und Tipps, wenn du festhängst.</p><p class="small"><b>Neu hier?</b> Nimm „Nur im Browser“ – du brauchst nichts zu installieren.</p><label class="small">Wie sollen wir dich nennen? (freiwillig)</label><input type="text" id="wname" maxlength="30" placeholder="Name oder Spitzname" style="margin-bottom:.6rem">'}
     <p class="muted small">Anleitungen, Befehle und Grenzen werden an deinen Lernort angepasst. Du kannst ihn oben jederzeit ändern.</p>
     ${Object.entries(LOCATIONS).map(([k, l]) => `<button class="loc-opt ${state.location === k ? 'on' : ''}" data-k="${k}"><span class="ic">${l.icon}</span><span><b>${esc(l.label)}</b><br><span class="small muted">${esc(l.desc)}</span></span></button>`).join('')}
   </div>`;
@@ -145,6 +145,7 @@ function locationModal(force = false) {
     const b = e.target.closest('.loc-opt');
     if (b) {
       state.location = b.dataset.k; state.locationDay = today(); state.locationAt = Date.now();
+      const wn = m.querySelector('#wname'); if (wn && wn.value.trim()) state.profile.name = wn.value.trim().slice(0, 30);
       save(); m.remove(); render();
     } else if (e.target === m && state.location) { state.locationDay = today(); save(); m.remove(); }
   });
@@ -173,6 +174,13 @@ function render() {
 // Gesamtpunkte: eine einzige Währung (Räume/Wargames + Übungen + Story)
 const EXTERN_POINTS = 10;
 function totalPoints() { return roomPointsTotal() + computeXp(state, EX) + (state.story.s1?.done ? STORY.s1.points : 0) + Object.keys(state.extern || {}).length * EXTERN_POINTS; }
+// „Nur Browser“: Räume, die eine eigene Kali-VM/Termux brauchen, werden ausgeblendet (eingeklappt)
+const browserOnly = () => state.location === 'browser';
+const needsKali = (r) => r.machine.kind !== 'sandbox';
+const visible = (r) => !(browserOnly() && needsKali(r));
+// Einstiegsreihenfolge für Neue ohne Kali: erst die Story, dann aufbauend
+const BROWSER_ORDER = ['w1', 'r0', 'w4', 'h1', 'n1', 'w6', 'w3', 'w5', 'w7', 'b1', 'p5', 'w8', 'p6', 'w9', 'p7', 'p8', 'p10'];
+const browserPicks = () => ROOMS.filter(r => !needsKali(r) && !roomDone(r.id)).sort((a, b) => (BROWSER_ORDER.indexOf(a.id) + 1 || 99) - (BROWSER_ORDER.indexOf(b.id) + 1 || 99));
 // Wo spielbar? sandbox = überall (Browser), target = PC (Docker) oder Handy (Termux), ssh/ext = nur PC
 const onPhone = (r) => r.machine.kind === 'sandbox' || r.machine.kind === 'target';
 const onPC = (r) => r.machine.kind !== 'sandbox';
@@ -208,12 +216,12 @@ views.heute = () => {
       ${PREVIEW ? `<div class="card warn small"><b>Handy-Vorschau.</b> Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus.</div>` : ''}
       <div class="card violet">
         <div class="row between"><span class="badge real">Ziel: eJPT</span><a class="small" href="#/profil" style="color:inherit">${earnedBadges().length} Abzeichen →</a></div>
-        <h1 style="margin:.5rem 0 .3rem">Hallo ${esc(state.profile.name)}!</h1>
+        <h1 style="margin:.5rem 0 .3rem">Hallo${state.profile.name ? ' ' + esc(state.profile.name) : ''}!</h1>
         <div class="bar" aria-label="${done} von ${ROOMS.length} geknackt"><i style="width:${Math.round(done / ROOMS.length * 100)}%"></i></div>
         <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>Tage in Folge</span></div></div>
       </div>
 
-      ${!cont && (loc === 'pc' ? pcList : phoneList)[0] ? (() => { const f = (loc === 'pc' ? pcList : phoneList)[0]; return `<a class="card lime" href="#/raum/${f.id}" style="display:block;text-decoration:none;color:inherit">
+      ${!cont && (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0] ? (() => { const f = (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0]; return `<a class="card lime" href="#/raum/${f.id}" style="display:block;text-decoration:none;color:inherit">
         <span class="badge real">Los geht’s</span>
         <h2 style="margin:.4rem 0 .2rem">${esc(f.title)}</h2>
         <span class="small muted">${esc(f.desc)} →</span>
@@ -228,7 +236,7 @@ views.heute = () => {
         <span class="small muted">Feststecken ist normal – jede Frage hat Tipps →</span>
       </a>`}
 
-      ${loc === 'pc' ? section('🖥️', 'Jetzt am PC', pcList) + section('📱', 'Für unterwegs', phoneList) : loc === 'phone' ? section('📱', 'Jetzt am Handy', phoneList) + section('🖥️', 'Wenn du am PC bist', pcList) : section('📱', 'Am Handy', phoneList) + section('🖥️', 'Am PC (Kali)', pcList)}
+      ${loc === 'browser' ? section('🌐', 'Direkt hier im Browser', browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.</div>` : loc === 'pc' ? section('🖥️', 'Jetzt am PC', pcList) + section('📱', 'Für unterwegs', phoneList) : loc === 'phone' ? section('📱', 'Jetzt am Handy', phoneList) + section('🖥️', 'Wenn du am PC bist', pcList) : section('📱', 'Am Handy', phoneList) + section('🖥️', 'Am PC (Kali)', pcList)}
 
       <a class="card" href="#/pfad" style="display:block;text-decoration:none;color:inherit"><b>Alles ansehen →</b><br><span class="small muted">Alle Wargames, Räume und Level bis zum eJPT</span></a>
 
@@ -271,12 +279,12 @@ views.pfad = () => {
     </a>
     <h2 style="margin-top:1rem">🎮 Leitern</h2>
     <p class="small muted">Rätsel-Ketten mit Story: Jede Lösung öffnet die nächste Stufe. Fang oben an und arbeite dich hoch.</p>
-    ${[['linux', '🐧 Linux-Leitern', ['Einstieg', 'mittel', 'Skripte', 'schwerer', 'schwer']], ['hacking', '🏴 Hacking-Leitern (CTF)', ['leicht', 'mittel', 'schwer']], ['purple', '🟣 Purple-Team-Leitern (prüfen, finden, absichern)', ['Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 10']], ['kali', '🖥️ In deiner Kali-VM', ['echtes SSH']]].map(([tr, title, order]) => `
+    ${[['linux', '🐧 Linux-Leitern', ['Einstieg', 'mittel', 'Skripte', 'schwerer', 'schwer']], ['hacking', '🏴 Hacking-Leitern (CTF)', ['leicht', 'mittel', 'schwer']], ['purple', '🟣 Purple-Team-Leitern (prüfen, finden, absichern)', ['Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 10']], ['kali', '🖥️ In deiner Kali-VM', ['echtes SSH']]].filter(([tr]) => ROOMS.some(r => r.track === tr && visible(r))).map(([tr, title, order]) => `
       <h3 style="margin:.9rem 0 .4rem">${title}</h3>
-      ${ROOMS.filter(r => r.track === tr).sort((a, b) => order.indexOf(a.stufe) - order.indexOf(b.stufe)).map(roomCard).join('')}`).join('')}
+      ${ROOMS.filter(r => r.track === tr && visible(r)).sort((a, b) => order.indexOf(a.stufe) - order.indexOf(b.stufe)).map(roomCard).join('')}`).join('')}
     ${withRooms.map(l => `<h2 style="margin-top:1.2rem">Level ${l.n} · ${esc(l.title)}</h2>
       <p class="small muted" style="margin-top:-.2rem">${esc(l.goal)}</p>
-      ${ROOMS.filter(r => inLevel(r, l)).map(roomCard).join('')}
+      ${ROOMS.filter(r => inLevel(r, l) && visible(r)).map(roomCard).join('')}
       ${ROOMS.filter(r => r.level === l.id && r.type === 'wargame' && l.id !== 'L1').map(r => `<a class="small" href="#/raum/${r.id}" style="display:block;margin:.2rem 0 .6rem">🎮 Passende Leiter: <b>${esc(r.title)}</b> →</a>`).join('')}
       ${l.id === 'L1' ? `<div class="grid two">
         <a class="card tight" href="#/level/L1" style="display:block;text-decoration:none;color:inherit"><b>📖 Linux-Spickzettel</b><br><span class="small muted">${LESSONS.length} Kapitel zum Nachschlagen + Übungen</span></a>
@@ -284,6 +292,9 @@ views.pfad = () => {
       </div>` : ''}
       ${l.id === 'L2' ? `<a class="card tight" href="#/level/L2" style="display:block;text-decoration:none;color:inherit"><b>🎯 Lernpfad: echte Scans ohne Abo</b><br><span class="small muted">Eigene Zielmaschine + kostenlose Hack-The-Box-Maschinen</span></a>` : ''}
       ${l.id === 'L3' ? `<a class="card tight" href="#/level/L3" style="display:block;text-decoration:none;color:inherit"><b>🌐 Lernpfad PortSwigger</b><br><span class="small muted">Kostenlose Web-Hacking-Labs, in sinnvoller Reihenfolge</span></a>` : ''}`).join('')}
+    ${browserOnly() ? `<details class="card" style="margin-top:1.2rem"><summary><b>🖥️ Braucht eine eigene Kali-VM (${ROOMS.filter(needsKali).length} Räume)</b></summary>
+      <p class="small muted">Diese Räume arbeiten mit echten Programmen auf deinem eigenen Rechner. Wenn du so weit bist: Lernort auf „Kali am PC“ stellen.</p>
+      ${ROOMS.filter(needsKali).map(roomCard).join('')}</details>` : ''}
     ${later.length ? `<h2 style="margin-top:1.2rem">Demnächst</h2>
     <p class="small muted">Für diese Level gibt es noch keine eigenen Räume – aber einen Lernpfad mit kostenlosen Übungsquellen.</p>
     <ul class="list card">${later.map(l => `<li><a href="#/level/${l.id}"><span class="state">${l.n}</span><span class="grow"><span class="t">${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span>${PFADE[l.id] ? '<span class="badge plain">Lernpfad</span>' : ''}</a></li>`).join('')}</ul>` : ''}`,
@@ -1463,12 +1474,14 @@ views.profil = () => {
   const got = new Set(earnedBadges().map(b => b.id));
   const days = [...Array(28)].map((_, i) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - 27 + i); return today(d); });
   return {
-    html: `<a class="back" href="#/mehr">← Mehr</a><h1>${esc(state.profile.name)}s Profil</h1>
+    html: `<a class="back" href="#/mehr">← Mehr</a><h1>${state.profile.name ? esc(state.profile.name) + 's Profil' : 'Dein Profil'}</h1>
     <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>Tage in Folge</span></div></div>
     <div class="card" style="margin-top:.8rem"><h3>Letzte 4 Wochen</h3>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
     <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${esc(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
+    <div class="card"><h3>Name</h3><div class="row" style="flex-wrap:nowrap"><input type="text" id="pname" maxlength="30" value="${esc(state.profile.name)}" placeholder="Name oder Spitzname"><button class="btn small primary" id="psave">Speichern</button></div></div>
     <p class="honest">Punkte, Abzeichen und Serien sind Motivation – sie schalten keine Prüfung und kein Level frei.</p>`,
+    mount(root) { $('#psave', root).onclick = () => { state.profile.name = $('#pname', root).value.trim().slice(0, 30); save(); render(); toast('Gespeichert.'); }; },
   };
 };
 
