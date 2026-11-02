@@ -232,14 +232,14 @@ export const FUNKTURM = [
         'Sag der Shell, dass es ein Pfad ist: ./ davor bedeutet „im aktuellen Ordner“.',
         'Lösung: cat ./-funkzettel'], 5),
       tk(2, 'Zeile 777', '1000 Zeilen Protokoll – aber nur eine zählt.', [
-        'head -n 777 zeigt die ersten 777 Zeilen. Davon brauchst du nur die letzte.',
-        'head -n 777 sendeprotokoll.log | tail -n 1',
+        'Du brauchst nur Zeile 777. Kannst du erst die ersten 777 Zeilen nehmen – und davon nur die letzte?',
+        'head -n 777 zeigt die ersten 777 Zeilen, tail -n 1 davon nur die letzte. Verbinde beide mit | (die Ausgabe fließt in den nächsten Befehl): head -n 777 sendeprotokoll.log | tail -n 1',
         "Kürzer mit sed: sed -n '777p' gibt genau Zeile 777 aus.",
         "Lösung: sed -n '777p' sendeprotokoll.log"], 10),
       tk(3, 'Das richtige Band', '15 Bandaufnahmen. Eine hat genau 42 Zeilen.', [
-        'wc -l DATEI zählt Zeilen. wc -l baender/* zählt alle auf einmal.',
+        'wc -l DATEI zählt Zeilen (-l wie „lines“, Zeilen). Das * in baender/* heißt „alle Dateien im Ordner“ – so zählt wc alle auf einmal.',
         'In der Ausgabe nach „ 42 “ suchen: wc -l baender/* | grep " 42 "',
-        'Lösung: wc -l baender/* | grep " 42 " → cat baender/band-NN.txt (letzte Zeile)'], 10),
+        'Lösung: wc -l baender/* | grep " 42 " – danach: cat baender/band-NN.txt (der Code steht in der letzten Zeile)'], 10),
       tk(4, 'Genau 73 Bytes', '40 alte Notizen, über viele Ordner verteilt.', [
         'find kann nach Größe suchen: -size. Die Einheit c steht für Bytes.',
         'find archiv -size 73c',
@@ -257,7 +257,7 @@ export const FUNKTURM = [
         'diff DATEI1 DATEI2 zeigt nur die Zeilen, die sich unterscheiden (< alt, > neu).',
         'Lösung: diff sender-alt.cfg sender-neu.cfg'], 15),
       tk(8, 'Der heißeste Raum', 'Eine Temperaturtabelle mit 60 Messungen.', [
-        "Die Tabelle hat Spalten, getrennt durch ;. sort kann nach einer bestimmten Spalte sortieren: -t';' -k3",
+        "Die Tabelle hat Spalten, getrennt durch ;. sort kann nach einer bestimmten Spalte sortieren: -t';' heißt „das Trennzeichen ist ;“, -k3 heißt „nimm Spalte 3“ (die Temperatur).",
         "Dazu -n (als Zahl) und -r (absteigend): sort -t';' -k3 -nr",
         "Lösung: sort -t';' -k3 -nr temperaturen.csv | head -1 → cat raeume/RAUM.txt"], 15),
       tk(9, 'Zeichensalat', 'Der Code steckt mitten in einer Zeile.', [
@@ -270,11 +270,11 @@ export const FUNKTURM = [
         'Lösung: base64 -d nachricht.b64 | base64 -d'], 15, 'Nachtfalter Stufe 6 (base64)'),
       tk(11, 'Spiegel und Verschiebung', 'Zwei Tricks auf einmal.', [
         'rev dreht jede Zeile um. Danach ist der Text noch ROT13-verschoben.',
-        "ROT13 rückgängig: tr 'A-Za-z' 'N-ZA-Mn-za-m'",
+        "ROT13 schiebt jeden Buchstaben 13 Stellen weiter (A wird N, B wird O …). Das Alphabet hat 26 Buchstaben, also macht nochmal 13 Schieben alles rückgängig. tr tauscht Zeichen aus: tr 'A-Za-z' 'N-ZA-Mn-za-m'",
         "Lösung: rev spiegel.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'"], 15, 'Nachtfalter Stufe 7 + Kollektiv Stufe 2'),
       tk(12, 'Der Wartungsschacht', 'Versteckt und abgesperrt.', [
         'Versteckte Dinge beginnen mit einem Punkt: ls -la',
-        'Der Schacht gehört dir, hat aber keine Rechte (d---------). Ordner brauchen r und x.',
+        'Der Schacht gehört dir, hat aber keine Rechte (d--------- : d heißt Ordner, die Striche heißen „nichts erlaubt“). Um in einen Ordner hineinzuschauen, brauchst du r (lesen) und x (betreten) – wie in Nachtfalter Stufe 5.',
         'Lösung: chmod u+rx .wartungsschacht → chmod u+r .wartungsschacht/schalter.txt → cat .wartungsschacht/schalter.txt'], 15, 'Nachtfalter Stufe 1 + 5 (ls -a, chmod)'),
       tk(13, 'Die geschützte Statusdatei', '30 Geräte, eins ist anders geschützt.', [
         'Der Ordner .anlagen ist versteckt – ls -a zeigt ihn.',
@@ -282,12 +282,12 @@ export const FUNKTURM = [
         'Lösung: find .anlagen -perm 600 → cat auf den Pfad'], 15, 'Nachtfalter Stufe 8 (find -perm)'),
       tk(14, 'Das Zahlenschloss', '30 Messwerte, eine Summe.', [
         'Alle Zahlen auf einmal ausgeben: cat messungen/*',
-        "Summieren mit awk: awk '{s+=$1} END {print s}'",
+        "Summieren mit awk: awk '{s+=$1} END {print s}' – für jede Zeile wird die Zahl ($1 = erstes Wort der Zeile) auf s draufgezählt, am Ende (END) wird s ausgegeben.",
         'Oder mit Schleife: s=0; for f in messungen/*; do s=$((s + $(cat $f))); done; echo $s',
         "Lösung: cat messungen/* | awk '{s+=$1} END {print s}' → cat schloss/SUMME.txt"], 20, 'Kollektiv Stufe 4 (awk)'),
       tk(15, 'Der richtige Weg', '35 Wege, nur einer existiert.', [
-        'Lies wegbeschreibung.txt Zeile für Zeile: while read W; do …; done < wegbeschreibung.txt',
-        '[ -f $W ] prüft, ob es die Datei gibt. && cat $W zeigt sie dann.',
+        'Lies wegbeschreibung.txt Zeile für Zeile: while read w; do …; done < wegbeschreibung.txt – jede Zeile landet nacheinander in der Variablen w, das < füttert die Datei in die Schleife.',
+        '[ -f $w ] prüft, ob es die Datei gibt. && heißt „nur wenn das geklappt hat“: && cat $w zeigt sie dann.',
         'Lösung: while read w; do [ -f $w ] && cat $w; done < wegbeschreibung.txt'], 20, 'Kollektiv Stufe 6 (while read)'),
       tk(16, 'Das Tor', 'Ein Skript will eine Zahl.', [
         'Lies das Skript mit cat tor.sh. Wichtig ist die Zeile mit if.',
@@ -296,12 +296,12 @@ export const FUNKTURM = [
         'Lösung: ./tor.sh 43'], 20),
       tk(17, 'Albers’ Tagebuch', 'Der Code steht zwischen zwei Markierungen.', [
         'grep -n zeigt die Zeilennummern: grep -n GEHEIM tagebuch.txt',
-        "sed -n 'VON,BISp' gibt einen Bereich von Zeilen aus.",
-        'Die Zeilen zwischen den Markierungen ergeben zusammen den Code. tr -d "\\n" fügt sie zusammen.',
+        "sed -n 'VON,BISp' gibt einen Bereich von Zeilen aus. Du willst nur die Zeilen ZWISCHEN den Markierungen: VON = Nummer der ersten Markierung + 1, BIS = Nummer der zweiten Markierung − 1.",
+        'Die Zeilen zwischen den Markierungen ergeben zusammen den Code. \\n ist das Zeichen für „neue Zeile“; tr -d "\\n" löscht diese Umbrüche und klebt die Stücke zusammen.',
         "Lösung: grep -n GEHEIM tagebuch.txt → z. B. 150 und 155 → sed -n '151,154p' tagebuch.txt | tr -d \"\\n\""], 20),
       tk(18, 'Wer kommt nachts?', 'Ein Anmeldeprotokoll mit 234 Einträgen.', [
-        'Nachts heißt hier 02:00 bis 03:59. Solche Zeilen beginnen mit 02 oder 03: grep "^0[23]:"',
-        'Den Benutzernamen ausschneiden: cut -d= -f2',
+        'Nachts heißt hier 02:00 bis 03:59. Solche Zeilen beginnen mit 02 oder 03: grep "^0[23]:" – ^ heißt „am Zeilenanfang“, [23] heißt „eine 2 oder eine 3“.',
+        'Den Benutzernamen ausschneiden: Er steht hinter dem = (z. B. user=albers). cut -d= -f2 trennt die Zeile am = und nimmt das zweite Stück.',
         'Zählen: sort | uniq -c | sort -nr',
         'Lösung: grep "^0[23]:" anmeldungen.log | cut -d= -f2 | sort | uniq -c | sort -nr | head -1 → cat spinde/NAME.txt'], 25, 'Nachtfalter Stufe 4 + Kollektiv'),
       tk(19, 'Der Sender', 'Die letzte Etage. Alles, was du gelernt hast.', [
