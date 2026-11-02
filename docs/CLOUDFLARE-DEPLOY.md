@@ -149,3 +149,11 @@ Danach funktionieren die Links in Bestätigungsmails.
 | curl in Kali bekommt HTML-Anmeldeseite statt `server.py` | Teil B3 fehlt oder Pfad falsch (`labs/` ohne führenden Schrägstrich). |
 | Bestätigungsmail führt zu `localhost` | Teil C fehlt. |
 | App zeigt alte Version | Seite schließen und neu öffnen (Service Worker aktualisiert sich beim nächsten Start). |
+
+
+## Freigabe-Ablauf (Vorschau → live)
+
+1. Claude arbeitet auf dem Arbeits-Branch. Jeder Push wird geprüft (`npm run check`) und landet auf der **Vorschau**: https://vorschau.kali-level-up.pages.dev. Sie ist wie die echte App durch Cloudflare Access geschützt (Regel `*.kali-level-up.pages.dev`), oben steht ein Chip „VORSCHAU 2.x.y“.
+2. Marcel schaut sich die Vorschau am Handy an und schreibt im Chat „ok“.
+3. Erst dann schiebt Claude den geprüften Stand auf den Branch `live` (`git push origin HEAD:live`). Der Workflow veröffentlicht ihn auf https://kali-level-up.pages.dev.
+4. Zurück zu einem früheren Stand: Claude schiebt einen älteren Commit auf `live`. Alternativ in Cloudflare unter Pages → kali-level-up → Deployments einen früheren Stand „Rollback“.

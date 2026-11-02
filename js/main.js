@@ -122,6 +122,7 @@ function renderTop() {
   $('#top').innerHTML = `
     <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Kali <b>Level Up</b></span></a>
     <span class="spacer"></span>
+    ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben">VORSCHAU ${esc(self.KLY_VERSION || '')}</span>` : ''}
     <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + U(loc.short) : '📍 Lernort?'}</button>
     <a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`;
   $('#locChip').onclick = () => locationModal(true);

@@ -1,15 +1,18 @@
-# Veröffentlicht die App automatisch auf https://kali-level-up.pages.dev
+# Veröffentlicht die App automatisch (Freigabe-Ablauf):
+#   Push auf den Arbeits-Branch  → VORSCHAU  https://vorschau.kali-level-up.pages.dev (Cloudflare Access wie live)
+#   Push auf den Branch „live“   → ECHTE APP https://kali-level-up.pages.dev
+# „live“ wird nur nach Marcels „ok“ im Chat aktualisiert.
 # Voraussetzung: Repository-Secrets CLOUDFLARE_API_TOKEN (Recht: Cloudflare Pages – Edit)
 # und CLOUDFLARE_ACCOUNT_ID. Siehe docs/CLOUDFLARE-DEPLOY.md, Abschnitt „Automatisch veröffentlichen“.
 name: Veröffentlichen
 
 on:
   push:
-    branches: [main, ccr-63912bdd-xpv8bk]
+    branches: [live, ccr-63912bdd-xpv8bk]
   workflow_dispatch:
 
 concurrency:
-  group: deploy
+  group: deploy-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -30,4 +33,4 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx -y wrangler@3 pages deploy dist --project-name=kali-level-up --branch=main --commit-dirty=true
+        run: npx -y wrangler@3 pages deploy dist --project-name=kali-level-up --branch=${{ github.ref_name == 'live' && 'main' || 'vorschau' }} --commit-dirty=true
