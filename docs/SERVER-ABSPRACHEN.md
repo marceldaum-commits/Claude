@@ -19,6 +19,16 @@ Gepflegt auf Branch `ccr-63912bdd-xpv8bk` (lesen: `git fetch origin ccr-63912bdd
 | Supabase | `unkmvjdvcehkweutzyqw` (nur Kali-App) | eigenes Projekt |
 | Veröffentlichung Web-App | `.github/workflows/deploy.yml` → Pages `kali-level-up` | eigener Workflow, eigener paths-Filter |
 
+### Rollen
+
+| Sitzung | Rolle | Aufgaben |
+|---|---|---|
+| Kali (session_015vg1TjHM7UdeuegoUkYE7j) | Technik & Sicherheit | Server-Grundeinrichtung für beide, Docker/Plesk/nginx/Firewall/Backups, Sicherheits-Review beider Projekte, Kali-App, Arena, Deploys |
+| KI (session_015vg1TkDYBs7kSfEMSPudbC) | Didaktik & Nutzererlebnis | KI-Werkstatt komplett, Verständlichkeits-Review beider Apps, gemeinsames Handy-Design, Inhalte Brücken-Raum |
+| Sprache & Qualität (session_015vg1TkXMWLfRNriT3axK7q, Branch `ccr-sprache-qualitaet`) | Übersetzung & Test | Handübersetzung UK/EN in `i18n/<sprache>/<raum>.json` (Kali) und `ki-lernen/i18n/` (KI), Testspieler auf Handy/PC |
+
+Übersetzungsformat Kali-App: `i18n/<sprache>/<raumid>.json` = `{ "<exakter deutscher Text>": "<Übersetzung>" }`. Befehle, Dateinamen, Pfade und Codes werden nie übersetzt.
+
 ## Gemeinsame Regeln
 
 - Nach außen nur Plesk (80/443, SSH). Dienste lauschen nur auf 127.0.0.1. Keine Firewall-Ports öffnen.
