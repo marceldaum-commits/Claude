@@ -199,7 +199,7 @@ function lastActivity(r) {
   return Math.max(rs.startedAt || 0, ...Object.values(rs.answers || {}).map(a => a.at || 0), ...Object.values(rs.answers || {}).map(a => (a.attempts ? 1 : 0)));
 }
 function continueRoom() {
-  const open = ROOMS.filter(r => !roomDone(r.id) && lastActivity(r) > 0);
+  const open = ROOMS.filter(r => !roomDone(r.id) && lastActivity(r) > 0 && visible(r)); // im Browser-Modus nur spielbare Räume
   open.sort((a, b) => lastActivity(b) - lastActivity(a));
   return open[0] || null;
 }
