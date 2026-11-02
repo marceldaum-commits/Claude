@@ -277,5 +277,8 @@ export const roomText = (r, field) => {
 // Level 1 (Spickzettel + Übungen): i18n/<sprache>/level1.json
 export async function loadLevel1() {
   const l = currentLang(); if (l === 'de') return null;
-  try { const r = await fetch(`i18n/${l}/level1.json`); return r.ok ? await r.json() : null; } catch { return null; }
+  // Level 1 + Story „Der stille Alarm“ (s1) teilen sich die Ansichten (Belege, Anleitungen) → ein Wörterbuch
+  const get = async (f) => { try { const r = await fetch(`i18n/${l}/${f}.json`); return r.ok ? await r.json() : {}; } catch { return {}; } };
+  const [a, b] = await Promise.all([get('level1'), get('s1')]);
+  return Object.keys(a).length || Object.keys(b).length ? { ...a, ...b } : null;
 }
