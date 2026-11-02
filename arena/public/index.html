@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Arena · Kali Level Up</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.css">
+<link rel="stylesheet" href="arena.css">
+</head>
+<body>
+  <header>
+    <b>Kali <span class="lime">Level Up</span> · Arena</b>
+    <span id="info" class="muted"></span>
+    <button id="ende" class="btn ghost" hidden>Beenden</button>
+  </header>
+  <main id="start" class="card">
+    <h1 id="titel">Online-Lab</h1>
+    <p>Hier läuft ein <b>echter Linux-Server nur für dich</b> – direkt im Browser, ohne Kali und ohne Installation.
+      Er ist vom Internet und von anderen Spielern abgeschottet und wird nach spätestens 2 Stunden automatisch gelöscht.</p>
+    <label>Einladungscode (Beta)<input id="code" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <label>Dein Lab-Token (steht in der App)<input id="token" placeholder="KLY-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+    <button id="los" class="btn">▶ Lab starten</button>
+    <p id="msg" class="muted"></p>
+    <p class="small muted">Codes, die du hier findest, trägst du wie gewohnt in der App ein.</p>
+  </main>
+  <section id="termbox" hidden>
+    <div id="term" translate="no"></div>
+    <nav id="keys" translate="no">
+      <button data-k="tab">Tab</button><button data-k="ctrlc">Strg+C</button><button data-k="up">↑</button><button data-k="down">↓</button>
+      <button data-k="left">←</button><button data-k="right">→</button><button data-s="|">|</button><button data-s="~">~</button>
+      <button data-s="/">/</button><button data-s="-">-</button><button data-s="&quot;">"</button><button data-s="$">$</button>
+    </nav>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.js"></script>
+  <script src="arena.js"></script>
+</body>
+</html>

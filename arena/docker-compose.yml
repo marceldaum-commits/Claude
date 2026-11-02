@@ -1,0 +1,27 @@
+# Arena + Caddy (automatisches HTTPS über Let's Encrypt).
+# Vorher: Abbild kly-keller bauen (siehe README) und .env aus .env.example anlegen.
+services:
+  arena:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      TRUST_PROXY: "1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # root-ähnlicher Zugriff – nur auf einem eigenen Lab-Server!
+    networks: [web]
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      ARENA_DOMAIN: ${ARENA_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    networks: [web]
+networks:
+  web: {}
+volumes:
+  caddy-data: {}

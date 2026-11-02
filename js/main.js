@@ -166,6 +166,8 @@ function render() {
   const r = v(arg) || {};
   main.innerHTML = r.html || '';
   main.classList.toggle('wide', !!r.wide);
+  // Browser-Übersetzung (z. B. Google Translate): Befehle, Codes und Terminals NICHT übersetzen
+  main.querySelectorAll('pre, code, .script, .syntax, input, textarea, [data-copy]').forEach(e => e.setAttribute('translate', 'no'));
   if (r.mount) cleanup = r.mount(main) || null;
   if (!r.keepScroll) window.scrollTo(0, 0);
 }
@@ -176,7 +178,7 @@ const EXTERN_POINTS = 10;
 function totalPoints() { return roomPointsTotal() + computeXp(state, EX) + (state.story.s1?.done ? STORY.s1.points : 0) + Object.keys(state.extern || {}).length * EXTERN_POINTS; }
 // „Nur Browser“: Räume, die eine eigene Kali-VM/Termux brauchen, werden ausgeblendet (eingeklappt)
 const browserOnly = () => state.location === 'browser';
-const needsKali = (r) => r.machine.kind !== 'sandbox';
+const needsKali = (r) => r.machine.kind !== 'sandbox' && !(r.machine.kind === 'ssh' && arenaLink(r.machine));
 const visible = (r) => !(browserOnly() && needsKali(r));
 // Einstiegsreihenfolge für Neue ohne Kali: erst die Story, dann aufbauend
 const BROWSER_ORDER = ['w1', 'r0', 'w4', 'h1', 'n1', 'w6', 'w3', 'w5', 'w7', 'b1', 'p5', 'w8', 'p6', 'w9', 'p7', 'p8', 'p10'];
@@ -1227,6 +1229,14 @@ function earnedBadges() {
   return BADGES.filter(b => map[b.id]);
 }
 
+// Online-Arena (eigener Lab-Server): Link mit Lab-Name und persönlichem Token
+const ARENA_LABS = { 'kly-keller': 'keller' };
+function arenaLink(m) {
+  const base = (globalThis.KLY_CONFIG || {}).arenaUrl;
+  const lab = ARENA_LABS[m.lab];
+  return base && lab ? `${base.replace(/\/$/, '')}/?lab=${lab}&token=${encodeURIComponent(state.labToken)}` : '';
+}
+
 function sshMachineHTML(r) {
   const m = r.machine;
   const base = location.origin + location.pathname.replace(/[^/]*$/, '') + `labs/${m.lab}/`;
@@ -1235,8 +1245,9 @@ function sshMachineHTML(r) {
   return `<div class="card lime stack" id="machine">
     <div class="row between"><h3 style="margin:0">Server ${esc(m.name)}</h3><span class="badge real">echt · nur 127.0.0.1</span></div>
     <p class="small">SSH-Port <code>127.0.0.1:${m.port}</code> · Token: <code>${esc(state.labToken)}</code> · Nur am PC (Kali-VM mit Docker).</p>
+    ${arenaLink(m) ? `<a class="btn go" href="${arenaLink(m)}" target="_blank" rel="noopener">🌐 Online spielen – ohne Kali (Beta)</a><p class="small muted" style="margin:-.3rem 0 0">Ein eigener Server nur für dich, direkt im Browser. Oder klassisch in deiner Kali-VM:</p>` : ''}
     <a class="btn small" href="#/handy-labs" style="align-self:flex-start">📱 Vom Handy spielen (über deine Kali-VM)</a>
-    ${roomState(r.id).startedAt ? '' : '<button class="btn go" id="startm">▶ Server starten – Anleitung anzeigen</button>'}
+    ${roomState(r.id).startedAt ? '' : '<button class="btn ghost" id="startm">▶ In Kali starten – Anleitung anzeigen</button>'}
     <div id="mhow" ${roomState(r.id).startedAt ? '' : 'hidden'}>
       <details><summary>Einmalig: Docker prüfen / einrichten</summary>
         ${scriptBlock('Prüfen:', 'command -v docker && docker info --format "Docker {{.ServerVersion}} läuft"')}

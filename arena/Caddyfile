@@ -1,0 +1,9 @@
+{$ARENA_DOMAIN} {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
+	reverse_proxy arena:8090
+}

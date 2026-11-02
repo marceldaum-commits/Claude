@@ -5,4 +5,6 @@
 window.KLY_CONFIG = {
   supabaseUrl: 'https://unkmvjdvcehkweutzyqw.supabase.co',
   supabaseAnonKey: 'sb_publishable_Q3xnTS5dXfL3osWHp6evKA_WSIdwTDl',
+  // Online-Labs (Arena, siehe arena/README.md). Leer = Knopf „Online spielen“ ausgeblendet.
+  arenaUrl: '',
 };

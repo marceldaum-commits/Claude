@@ -21,6 +21,13 @@ neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schri
 - **Werkzeugkasten:** zeigt die Kali-Werkzeuge, mit denen du schon wirklich Flags gefunden hast.
 - **Externe Übungsplattformen** (Bandit, TryHackMe, PortSwigger Academy, Hack The Box) direkt verlinkt.
 
+## Arena: Online-Labs ohne Kali (ab 2.7.0, Gerüst)
+
+`arena/` startet pro Spieler einen abgeschotteten Kellerserver-Container (Netzwerk „none“, Grenzen, Auto-Löschen)
+mit Terminal im Browser. Einrichtung auf einem eigenen Lab-Server: [arena/README.md](arena/README.md).
+Sobald `arenaUrl` in `config.js` gesetzt ist, zeigt der Kellerserver-Raum „Online spielen“.
+Außerdem: Befehle, Codes und Terminals sind als `translate="no"` markiert, damit die Browser-Übersetzung nur Texte übersetzt.
+
 ## Externe Lernpfade (ab 2.4.0)
 
 Lernen → 🌍 Externe Lernpfade: Checklisten für Hack The Box Starting Point (Tier 0–2), OWASP Juice Shop

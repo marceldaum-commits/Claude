@@ -1,0 +1,10 @@
+{
+  "name": "kly-arena",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kali Level Up Arena – startet pro Spieler einen abgeschotteten Lab-Container und verbindet ihn mit einem Terminal im Browser",
+  "type": "module",
+  "main": "server.js",
+  "scripts": { "start": "node server.js", "test": "node test/smoke.mjs" },
+  "dependencies": { "dockerode": "4.0.2", "ws": "8.18.0" }
+}

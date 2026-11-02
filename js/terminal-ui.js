@@ -4,6 +4,7 @@ import { VFS } from './shell.js';
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 export function mountTerminal(container, shell, opts = {}) {
+  container.setAttribute('translate', 'no'); // Terminal nie übersetzen (Browser-Übersetzung)
   const el = document.createElement('div');
   el.className = 'term' + (opts.tall ? ' tall' : '');
   el.innerHTML = `
