@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '2.7.0';
+self.KLY_VERSION = '2.8.0';
 self.KLY_FILES = [
   'index.html',
   'manifest.webmanifest',
@@ -13,6 +13,7 @@ self.KLY_FILES = [
   'js/verify.js',
   'js/state.js',
   'js/sync.js',
+  'js/i18n.js',
   'js/export.js',
   'js/flags.js',
   'js/content/curriculum.js',

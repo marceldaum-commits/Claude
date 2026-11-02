@@ -11,6 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -117,7 +118,7 @@ function renderTop() {
   const loc = LOCATIONS[state.location];
   const st = syncStatus();
   $('#top').innerHTML = `
-    <a class="brand" href="#/heute"><img src="icons/icon.svg" alt=""><span>Kali <b>Level Up</b></span></a>
+    <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Kali <b>Level Up</b></span></a>
     <span class="spacer"></span>
     <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + esc(loc.short) : '📍 Lernort?'}</button>
     <a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`;
@@ -125,9 +126,11 @@ function renderTop() {
 }
 
 function renderNav(route) {
-  const items = [['heute', '⌂', 'Start'], ['pfad', '◆', 'Lernen'], ['terminal', '>_', 'Terminal'], ['mehr', '≡', 'Mehr']];
+  const L = NAV[currentLang()] || NAV.de;
+  const items = [['heute', '⌂', L[0]], ['pfad', '◆', L[1]], ['terminal', '>_', L[2]], ['mehr', '≡', L[3]]];
   const map = { extern: 'pfad', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad' };
   const on = map[route] || route;
+  $('#nav').setAttribute('translate', 'no');
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
 }
 
@@ -136,11 +139,13 @@ function locationModal(force = false) {
   const m = document.createElement('div');
   m.className = 'modal';
   m.innerHTML = `<div class="box" role="dialog" aria-label="Lernort wählen">
+    ${state.location ? '' : langPickerHTML()}
     ${state.location ? '<h2>Wo lernst du heute?</h2>' : '<h2>Willkommen! 👋</h2><p>Hier lernst du Linux und Hacking Schritt für Schritt – mit Rätseln, Geschichten und Tipps, wenn du festhängst.</p><p class="small"><b>Neu hier?</b> Nimm „Nur im Browser“ – du brauchst nichts zu installieren.</p><label class="small">Wie sollen wir dich nennen? (freiwillig)</label><input type="text" id="wname" maxlength="30" placeholder="Name oder Spitzname" style="margin-bottom:.6rem">'}
     <p class="muted small">Anleitungen, Befehle und Grenzen werden an deinen Lernort angepasst. Du kannst ihn oben jederzeit ändern.</p>
     ${Object.entries(LOCATIONS).map(([k, l]) => `<button class="loc-opt ${state.location === k ? 'on' : ''}" data-k="${k}"><span class="ic">${l.icon}</span><span><b>${esc(l.label)}</b><br><span class="small muted">${esc(l.desc)}</span></span></button>`).join('')}
   </div>`;
   document.body.appendChild(m);
+  bindLangPicker(m);
   m.addEventListener('click', (e) => {
     const b = e.target.closest('.loc-opt');
     if (b) {
@@ -164,7 +169,7 @@ function render() {
   const main = $('#main');
   const v = views[route] || views.heute;
   const r = v(arg) || {};
-  main.innerHTML = r.html || '';
+  main.innerHTML = langNoteHTML() + (r.html || '');
   main.classList.toggle('wide', !!r.wide);
   // Browser-Übersetzung (z. B. Google Translate): Befehle, Codes und Terminals NICHT übersetzen
   main.querySelectorAll('pre, code, .script, .syntax, input, textarea, [data-copy]').forEach(e => e.setAttribute('translate', 'no'));
@@ -1021,6 +1026,8 @@ views.mehr = () => {
   return {
     html: `<h1>Mehr</h1>
     <div class="stack">
+      <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language · Мова</h3>${langPickerHTML()}
+        <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch werden automatisch von Google übersetzt (die Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
       <div class="card"><ul class="list">
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
@@ -1092,6 +1099,7 @@ views.mehr = () => {
       <p class="small dim">Kali Level Up ${esc(self.KLY_VERSION || '')} · Geräte-ID ${esc(state.deviceId)} · Lab-Token ${esc(state.labToken)}</p>
     </div>`,
     mount(root) {
+      bindLangPicker(root);
       $('#loc', root).onclick = () => locationModal(true);
       $('#exp', root).onclick = () => exportStateJSON(state);
       $('#copystate', root).onclick = async () => {
@@ -1185,7 +1193,7 @@ function roomLock(r) {
 }
 
 function typeBadge(r) {
-  return r.type === 'wargame' ? '<span class="badge real">Wargame</span>' : r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>';
+  return r.type === 'wargame' ? '<span class="badge real" translate="no">Wargame</span>' : r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>';
 }
 function machineBadge(r) {
   return r.machine.kind === 'ssh' ? '<span class="badge real">🖥️ Kali · echtes SSH</span>' : r.machine.kind === 'ext' ? '<span class="badge real">🖥️ Kali · Übungs-App</span>' : r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">📱 Sandbox</span>';
@@ -1497,6 +1505,7 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Start
+initLang();
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
 onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
