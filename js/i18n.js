@@ -4,8 +4,8 @@
 
 export const LANGS = {
   de: { name: 'Deutsch', flag: '🇩🇪', note: '' },
-  en: { name: 'English', flag: '🇬🇧', note: 'Machine-translated (Google). Commands and terminals stay in the original – type them exactly as shown.' },
-  uk: { name: 'Українська', flag: '🇺🇦', note: 'Машинний переклад (Google). Команди й термінал залишаються в оригіналі – вводьте їх саме так, як показано.' },
+  en: { name: 'English', flag: '🇬🇧', note: 'Partly translated by hand, the rest by Google. Commands and the terminal stay in the original – type them exactly as shown.' },
+  uk: { name: 'Українська', flag: '🇺🇦', note: 'Частково перекладено вручну, решту – Google. Команди й термінал залишаються в оригіналі – вводь їх саме так, як показано.' },
 };
 const KEY = 'kly.lang';
 // Wenige feste Begriffe übersetzen wir selbst (zuverlässiger als die Maschine)

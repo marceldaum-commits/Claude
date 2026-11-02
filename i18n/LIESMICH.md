@@ -60,3 +60,7 @@ uebungsTipps(), Prosa-Zeilen der Sandbox-Dateien, EXAM title/rules/topic/q/optio
 
 Prüfen: `node qa/check-i18n-level1.mjs` (Schlüssel, Befehle per codeify, alle 16 Sandbox-Übungen + 3 Praxisaufgaben der Prüfung
 mit übersetzten Dateien und Musterlösung lösbar).
+
+ui.json enthält außerdem die Bedienelemente der Raumseite und der Übungsseite (Tipp-Knopf, Punkte, Rückmeldungen,
+Feldnamen), weil Google dort falsch übersetzte („Tipp“ → „Чайові“ = Trinkgeld, „5 P.“ → „5 с.“, „Beleg“ → „Dokument“).
+Muster mit Platzhaltern wie `💡 Tipp {i}/{n} · danach noch {p} P.`, `noch {a} von {b} P.`, `Task {n}: {title}`, `Raum · {title}`.

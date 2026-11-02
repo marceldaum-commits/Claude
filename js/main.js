@@ -271,7 +271,7 @@ function exItem(id, showRepeat) {
   </a></li>`;
 }
 function kindLabel(e) {
-  return { sandbox: 'Sandbox-Übung', real: 'Echter Kali-Auftrag', review: 'Wiederholungsrunde', drill: 'Kurz-Drill (optional)' }[e.kind] + (e.required ? '' : ' · optional');
+  return Ut({ sandbox: 'Sandbox-Übung', real: 'Echter Kali-Auftrag', review: 'Wiederholungsrunde', drill: 'Kurz-Drill (optional)' }[e.kind]) + (e.required ? '' : Ut(' · optional'));
 }
 
 // ---------------------------------------------------------------- Lernpfad
@@ -431,32 +431,32 @@ views.uebung = (id) => {
   const tipCost = e.xp / tips.length;
   const isReal = e.kind === 'real';
   return {
-    html: `<a class="back" href="#/lektion/${e.lesson}">← Spickzettel: ${L1h(LESSON[e.lesson].title)}</a>
-    <div class="row">${isReal ? '<span class="badge real">Echter Auftrag · deine Kali-VM / Termux</span>' : '<span class="badge sim">Sandbox-Simulation</span>'}<span class="badge plain">${esc(kindLabel(e))}</span>${repeat ? '<span class="badge ok">bestanden · Wiederholung ohne Punkte</span>' : `<span class="badge plain">${e.xp} Punkte</span>`}</div>
+    html: `<a class="back" href="#/lektion/${e.lesson}">${U('← Spickzettel: {title}', { title: L1.t(LESSON[e.lesson].title) })}</a>
+    <div class="row">${isReal ? `<span class="badge real">${U('Echter Auftrag · deine Kali-VM / Termux')}</span>` : `<span class="badge sim">${U('Sandbox-Simulation')}</span>`}<span class="badge plain">${esc(kindLabel(e))}</span>${repeat ? '<span class="badge ok">bestanden · Wiederholung ohne Punkte</span>' : `<span class="badge plain">${e.xp} Punkte</span>`}</div>
     <h1 style="margin-top:.5rem">${L1h(e.title)}</h1>
     <div class="stack">
       <div class="task-meta">
-        <div><b>Lernziel</b>${L1h(e.ziel)}</div>
-        <div><b>Arbeitsauftrag</b><span class="auftrag">${L1h(e.auftrag)}</span></div>
-        <div><b>Scope</b>${L1h(e.scope)}</div>
-        <div><b>Verlangter Beleg</b>${L1h(e.beleg)}</div>
+        <div><b>${U('Lernziel')}</b>${L1h(e.ziel)}</div>
+        <div><b>${U('Arbeitsauftrag')}</b><span class="auftrag">${L1h(e.auftrag)}</span></div>
+        <div><b>${U('Scope')}</b>${L1h(e.scope)}</div>
+        <div><b>${U('Verlangter Beleg')}</b>${L1h(e.beleg)}</div>
       </div>
       ${isReal ? `
       <div class="card lime stack">
-        <h3>Im echten Terminal</h3>
+        <h3>${U('Im echten Terminal')}</h3>
         ${vorausHTML(e.real)}
-        ${scriptBlock('Setup (vorbereitend – nicht die Lösung):', e.real.setup)}
-        <p class="small muted">Dein persönlicher Lab-Token: <code>${esc(state.labToken)}</code></p>
+        ${scriptBlock(Ut('Setup (vorbereitend – nicht die Lösung):'), e.real.setup)}
+        <p class="small muted">${U('Dein persönlicher Lab-Token:')} <code>${esc(state.labToken)}</code></p>
         <div id="evbox">${evidenceForm('ev', st.evidence)}</div>
-        <button class="btn go block" id="check">Beleg prüfen</button>
+        <button class="btn go block" id="check">${U('Beleg prüfen')}</button>
         <div id="fb"></div>
-        <details><summary>Abbruch / Aufräumen</summary><pre class="syntax">${esc(tok(e.real.cleanup))}</pre></details>
+        <details><summary>${U('Abbruch / Aufräumen')}</summary><pre class="syntax">${esc(tok(e.real.cleanup))}</pre></details>
       </div>` : `
       <div id="termwrap"></div>
-      <div class="row"><button class="btn go" id="check">Ergebnis prüfen</button><button class="btn ghost" id="reset">Übung neu starten</button></div>
+      <div class="row"><button class="btn go" id="check">${U('Ergebnis prüfen')}</button><button class="btn ghost" id="reset">${U('Übung neu starten')}</button></div>
       <div id="fb"></div>`}
       <div class="card" id="hintcard">
-        <div class="row between"><b>💡 Tipps</b><span class="small muted" id="hintstate"></span></div>
+        <div class="row between"><b>${U('💡 Tipps')}</b><span class="small muted" id="hintstate"></span></div>
         <div class="tips" id="hinttext"></div>
       </div>
       <div id="knobel"></div>
@@ -473,12 +473,12 @@ views.uebung = (id) => {
       const updateHint = () => {
         const u = used();
         const last = u === tips.length - 1 && /^Lösung/.test(tips[tips.length - 1]);
-        $('#hintstate', root).textContent = repeat ? 'Wiederholung – Tipps kostenlos' : u ? `noch ${left(u)} von ${e.xp} Punkten` : `${e.xp} Punkte`;
+        $('#hintstate', root).textContent = repeat ? Ut('Wiederholung – Tipps kostenlos') : u ? Ut('noch {a} von {b} Punkten', { a: left(u), b: e.xp }) : Ut('{n} Punkte', { n: e.xp });
         $('#hinttext', root).innerHTML = tips.slice(0, u).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${tips.length}:</b> ${L1h(h, codeify)}</div>`).join('') +
-          (u < tips.length && !run.taskOk ? `<button class="btn small ghost" id="hint">💡 ${last ? 'Lösung zeigen' : (u ? 'Nächster Tipp' : 'Tipp') + ` ${u + 1}/${tips.length}`}${repeat ? '' : ` · danach noch ${left(u + 1)} P.`}</button>` : '');
+          (u < tips.length && !run.taskOk ? `<button class="btn small ghost" id="hint">${repeat ? (last ? U('💡 Lösung zeigen') : U(u ? '💡 Nächster Tipp {i}/{n}' : '💡 Tipp {i}/{n}', { i: u + 1, n: tips.length })) : (last ? U('💡 Lösung zeigen · danach noch {p} P.', { p: left(u + 1) }) : U(u ? '💡 Nächster Tipp {i}/{n} · danach noch {p} P.' : '💡 Tipp {i}/{n} · danach noch {p} P.', { i: u + 1, n: tips.length, p: left(u + 1) }))}</button>` : '');
         const b = $('#hint', root);
         if (b) b.onclick = () => {
-          if (last && !twoTap(b, 'Wirklich die Lösung zeigen?')) return;
+          if (last && !twoTap(b, Ut('Wirklich die Lösung zeigen?'))) return;
           if (repeat) shownFree++; else { st.tips = (st.tips || 0) + 1; st.hintUsed = true; save(); }
           updateHint();
         };
@@ -490,7 +490,7 @@ views.uebung = (id) => {
         shell = new Shell({ fs: baseFS() });
         e.sandbox.setup(shell);
         if (L1.active) translateTree(shell.fs.get(HOME + '/lab'), L1);
-        term = mountTerminal($('#termwrap', root), shell, { title: `Sandbox · ${e.title}`, welcome: 'Übungsumgebung bereit. Tipp: help, man BEFEHL, Tab ergänzt Namen.' });
+        term = mountTerminal($('#termwrap', root), shell, { title: Ut('Sandbox · {title}', { title: L1.t(e.title) }), welcome: Ut('Übungsumgebung bereit. Tipp: help, man BEFEHL, Tab ergänzt Namen.') });
       };
       if (!isReal) {
         start();
@@ -516,7 +516,7 @@ views.uebung = (id) => {
         }
         if (!ok) { run.fails++; st.failed = (st.failed || 0) + 1; }
         save();
-        fb.innerHTML = (ok ? '<div class="feedback ok"><b>Beleg geprüft.</b> Jetzt die Knobelfrage – sie prüft, ob du das Ergebnis richtig deutest.</div>' : '') + html;
+        fb.innerHTML = (ok ? `<div class="feedback ok"><b>${U('Beleg geprüft.')}</b> ${U('Jetzt die Knobelfrage – sie prüft, ob du das Ergebnis richtig deutest.')}</div>` : '') + html;
         updateHint();
         if (ok) { run.taskOk = true; showKnobel(); }
       };
@@ -525,7 +525,7 @@ views.uebung = (id) => {
         const k = e.knobel;
         const opts = shuffle(k.options.map((o, i) => ({ ...o, i })));
         const box = $('#knobel', root);
-        box.innerHTML = `<div class="card violet"><h3>Knobelfrage</h3><p>${L1h(k.q)}</p>
+        box.innerHTML = `<div class="card violet"><h3>${U('Knobelfrage')}</h3><p>${L1h(k.q)}</p>
           ${opts.map(o => `<button class="opt" data-i="${o.i}">${L1h(o.t)}</button>`).join('')}
           <div id="kfb"></div></div>`;
         box.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -548,10 +548,10 @@ views.uebung = (id) => {
         else st.repeats = (st.repeats || 0) + 1;
         save();
         const n = e.nach;
-        $('#debrief', root).innerHTML = `<div class="card lime debrief"><h3>Nachbesprechung</h3><dl>
+        $('#debrief', root).innerHTML = `<div class="card lime debrief"><h3>${U('Nachbesprechung')}</h3><dl>
           <dt>Beobachtung</dt><dd>${L1h(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${L1h(n.schluss)}</dd>
-          <dt>Grenzen</dt><dd>${L1h(n.grenzen)}</dd><dt>Möglicher nächster Test</dt><dd>${L1h(n.naechster)}</dd></dl>
-          <p class="small">${first ? `✓ Bestanden · +${(st.tips || 0) ? left(Math.min(st.tips, tips.length)) : e.xp} Punkte${st.tips ? ` (${st.tips} Tipp${st.tips > 1 ? 's' : ''} genutzt)` : ''}` : '✓ Wiederholung erfolgreich (ohne Punkte)'}</p>
+          <dt>${U('Grenzen')}</dt><dd>${L1h(n.grenzen)}</dd><dt>${U('Möglicher nächster Test')}</dt><dd>${L1h(n.naechster)}</dd></dl>
+          <p class="small">${first ? (st.tips ? U('✓ Bestanden · +{p} Punkte ({n} Tipps genutzt)', { p: left(Math.min(st.tips, tips.length)), n: st.tips }) : U('✓ Bestanden · +{p} Punkte', { p: e.xp })) : U('✓ Wiederholung erfolgreich (ohne Punkte)')}</p>
           ${nextAfter(e)}</div>`;
         $('#debrief', root).scrollIntoView({ behavior: 'smooth', block: 'start' });
       };
@@ -562,9 +562,9 @@ views.uebung = (id) => {
 function nextAfter(e) {
   const l = LESSON[e.lesson];
   const i = l.exercises.indexOf(e.id);
-  if (i < l.exercises.length - 1) return `<a class="btn primary" href="#/uebung/${l.exercises[i + 1]}">Nächste Übung →</a>`;
+  if (i < l.exercises.length - 1) return `<a class="btn primary" href="#/uebung/${l.exercises[i + 1]}">${U('Nächste Übung →')}</a>`;
   const li = LESSONS.indexOf(l);
-  if (li < LESSONS.length - 1) return `<a class="btn primary" href="#/lektion/${LESSONS[li + 1].id}">Nächste Lektion →</a>`;
+  if (li < LESSONS.length - 1) return `<a class="btn primary" href="#/lektion/${LESSONS[li + 1].id}">${U('Nächste Lektion →')}</a>`;
   return `<a class="btn primary" href="#/story/s1">Zur Story-Mission →</a>`;
 }
 
@@ -1200,7 +1200,7 @@ function typeBadge(r) {
   return r.type === 'wargame' ? '<span class="badge real" translate="no">Wargame</span>' : r.type === 'challenge' ? '<span class="badge warn">Challenge</span>' : '<span class="badge plain">Walkthrough</span>';
 }
 function machineBadge(r) {
-  return r.machine.kind === 'ssh' ? '<span class="badge real">🖥️ Kali · echtes SSH</span>' : r.machine.kind === 'ext' ? '<span class="badge real">🖥️ Kali · Übungs-App</span>' : r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : '<span class="badge sim">📱 Sandbox</span>';
+  return r.machine.kind === 'ssh' ? '<span class="badge real">🖥️ Kali · echtes SSH</span>' : r.machine.kind === 'ext' ? '<span class="badge real">🖥️ Kali · Übungs-App</span>' : r.machine.kind === 'target' ? '<span class="badge real">Zielmaschine</span>' : `<span class="badge sim">${U('📱 Sandbox')}</span>`;
 }
 
 function roomCard(r) {
@@ -1346,31 +1346,31 @@ function questionHTML(r, t, q) {
   if (q.type === 'mc') {
     input = shuffle(q.options.map((o, i) => ({ o, i })), [...key].reduce((n, c) => n + c.charCodeAt(0), 7)).map(({ o, i }) => `<button class="opt ${ok && i === q.answer ? 'right' : ''}" data-k="${key}" data-i="${i}" ${ok ? 'disabled' : ''}>${esc(o)}</button>`).join('');
   } else if (q.type === 'confirm') {
-    input = `<button class="btn small ${ok ? '' : 'go'}" data-k="${key}" data-confirm ${ok ? 'disabled' : ''}>${ok ? '✓ Erledigt' : 'Erledigt'}</button>`;
+    input = `<button class="btn small ${ok ? '' : 'go'}" data-k="${key}" data-confirm ${ok ? 'disabled' : ''}>${ok ? U('✓ Erledigt') : U('Erledigt')}</button>`;
   } else {
-    input = `<div class="row" style="flex-wrap:nowrap"><input type="text" id="in-${id}" data-k="${key}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${q.type === 'flag' ? 'KLY{…}' : 'Antwort'}" ${ok ? 'disabled value="✓ gelöst"' : ''}><button class="btn small primary" data-k="${key}" data-send ${ok ? 'disabled' : ''}>Senden</button></div>`;
+    input = `<div class="row" style="flex-wrap:nowrap"><input type="text" id="in-${id}" data-k="${key}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${q.type === 'flag' ? 'KLY{…}' : esc(Ut('Antwort'))}" ${ok ? `disabled value="${esc(Ut('✓ gelöst'))}"` : ''}><button class="btn small primary" data-k="${key}" data-send ${ok ? 'disabled' : ''}>${U('Senden')}</button></div>`;
   }
   return `<div class="q" id="q-${id}" style="margin:.7rem 0">
-    ${q.repeat ? `<span class="badge plain" title="Wiederholung">🔁 Wiederholung · ${makeT(handDict(r.id)).h(q.repeat, esc)}</span>` : ''}
+    ${q.repeat ? `<span class="badge plain" title="${esc(Ut('Wiederholung'))}">${U('🔁 Wiederholung · {text}', { text: makeT(handDict(r.id)).t(q.repeat) })}</span>` : ''}
     <div class="row between"><b class="small">${ok ? '✓ ' : ''}${makeT(handDict(r.id)).h(q.q)}</b><span class="small muted" data-pts="${key}">${pointsLabel(r, t, q)}</span></div>
     ${input}<div class="qfb small" data-fb="${key}"></div><div class="tips" data-tips="${key}">${tipsHTML(r, q, key)}</div></div>`;
 }
 
 function pointsLabel(r, t, q) {
   const key = qKey(t, q), used = hintsUsed(r.id, key);
-  if (qOk(r.id, key)) return `${earned(r.id, { q, key })} P.`;
-  return used ? `noch ${Math.max(1, Math.round(q.points - used * hintCost(q)))} von ${q.points} P.` : `${q.points} P.`;
+  if (qOk(r.id, key)) return Ut('{n} P.', { n: earned(r.id, { q, key }) });
+  return used ? Ut('noch {a} von {b} P.', { a: Math.max(1, Math.round(q.points - used * hintCost(q))), b: q.points }) : Ut('{n} P.', { n: q.points });
 }
 
 function tipsHTML(r, q, key) {
   const all = hintsOf(q); if (!all.length) return '';
   const used = Math.min(hintsUsed(r.id, key), all.length);
   const T = makeT(handDict(r.id));
-  const shown = all.slice(0, used).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${all.length}:</b> ${T.h(h)}</div>`).join('');
+  const shown = all.slice(0, used).map((h, i) => `<div class="feedback info small"><b>${U('Tipp {i}/{n}:', { i: i + 1, n: all.length })}</b> ${T.h(h)}</div>`).join('');
   const ok = qOk(r.id, key);
   const after = Math.max(1, Math.round(q.points - (used + 1) * hintCost(q)));
   const last = used === all.length - 1 && /^Lösung/i.test(all[all.length - 1]);
-  const btn = !ok && used < all.length ? `<button class="btn small ghost" data-tip="${key}">💡 ${last ? 'Lösung zeigen' : (used ? 'Nächster Tipp' : 'Tipp') + ` ${used + 1}/${all.length}`} · danach noch ${after} P.</button>` : '';
+  const btn = !ok && used < all.length ? `<button class="btn small ghost" data-tip="${key}">${last ? U('💡 Lösung zeigen · danach noch {p} P.', { p: after }) : U(used ? '💡 Nächster Tipp {i}/{n} · danach noch {p} P.' : '💡 Tipp {i}/{n} · danach noch {p} P.', { i: used + 1, n: all.length, p: after })}</button>` : '';
   return shown + btn;
 }
 
@@ -1381,32 +1381,32 @@ views.raum = (id) => {
   if (hasHand(id) && handDict(id) === undefined) { loadHand(id).then(() => { if (location.hash.includes(id)) render(); }); return { html: '<p class="muted">…</p>' }; }
   const T = makeT(handDict(id));
   const lock = roomLock(r);
-  const head = `<a class="back" href="#/pfad">← Lernen</a>
-    <div class="row">${typeBadge(r)}<span class="badge plain">Level ${LEVELS.find(l => l.id === r.level).n}</span>${machineBadge(r)}<span class="small muted">~${r.minutes} min</span></div>
-    <h1 style="margin-top:.5rem" translate="no">${esc(r.title)}</h1><p>${T.h(r.desc)}</p>`;
-  if (lock.length) return { html: head + `<div class="card warn"><b>🔒 Gesperrt</b><ul>${lock.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` };
+  const head = `<a class="back" href="#/pfad">${U('← Lernen')}</a>
+    <div class="row">${typeBadge(r)}<span class="badge plain">${U('Level {n}', { n: LEVELS.find(l => l.id === r.level).n })}</span>${machineBadge(r)}<span class="small muted">~${r.minutes} min</span></div>
+    <h1 style="margin-top:.5rem">${roomText(r, 'title')}</h1><p>${T.h(r.desc)}</p>`;
+  if (lock.length) return { html: head + `<div class="card warn"><b>${U('🔒 Gesperrt')}</b><ul>${lock.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` };
   const rs = roomState(r.id);
   return {
     html: head + `
-    <div class="card tight"><div class="bar"><i style="width:${roomPct(r.id)}%" id="rbar"></i></div><span class="small muted" id="rstat">${roomPct(r.id)} % · ${roomPoints(r.id)} Punkte</span>
-      <p class="small" style="margin:.4rem 0 0">🎯 <b>Erlaubt:</b> ${T.h(r.scope)}</p>
-      <details class="small" style="margin-top:.3rem"><summary class="muted">Mehr Infos: Lernziel, Regeln, Werkzeuge</summary>
+    <div class="card tight"><div class="bar"><i style="width:${roomPct(r.id)}%" id="rbar"></i></div><span class="small muted" id="rstat">${U('{pct} % · {p} Punkte', { pct: roomPct(r.id), p: roomPoints(r.id) })}</span>
+      <p class="small" style="margin:.4rem 0 0">🎯 <b>${U('Erlaubt:')}</b> ${T.h(r.scope)}</p>
+      <details class="small" style="margin-top:.3rem"><summary class="muted">${U('Mehr Infos: Lernziel, Regeln, Werkzeuge')}</summary>
         <div class="task-meta" style="margin-top:.5rem">
-          <div><b>Lernziel</b>${T.h(r.ziel)}</div><div><b>Stopp-Regel</b>${T.h(r.stop)}</div><div><b>Aufräumen</b>${T.h(r.cleanup)}</div>
-          <div><b>Werkzeuge</b>${r.tools.map(esc).join(', ')}</div>
+          <div><b>${U('Lernziel')}</b>${T.h(r.ziel)}</div><div><b>${U('Stopp-Regel')}</b>${T.h(r.stop)}</div><div><b>${U('Aufräumen')}</b>${T.h(r.cleanup)}</div>
+          <div><b>${U('Werkzeuge')}</b><span translate="no">${r.tools.map(esc).join(', ')}</span></div>
         </div>
       </details>
     </div>
     <div class="room-grid">
     <div class="room-side">
     ${machineHTML(r)}
-    ${r.machine.kind === 'sandbox' ? '<div id="rterm"></div><button class="btn ghost small" id="rreset" style="margin-top:.4rem">Raum-Terminal neu starten</button>' : ''}
+    ${r.machine.kind === 'sandbox' ? `<div id="rterm"></div><button class="btn ghost small" id="rreset" style="margin-top:.4rem">${U('Raum-Terminal neu starten')}</button>` : ''}
     </div>
     <div class="room-tasks">
     <div class="stack">${r.tasks.map((t, i) => {
       const done = t.questions.every(q => qOk(r.id, qKey(t, q)));
       return `<details class="card" ${done ? '' : (i === r.tasks.findIndex(tt => !tt.questions.every(q => qOk(r.id, qKey(tt, q)))) ? 'open' : '')}>
-        <summary><span class="state ${done ? 'done' : ''}" style="display:inline-grid;margin-right:.5rem;vertical-align:middle">${done ? '✓' : i + 1}</span>Task ${i + 1}: ${T.h(t.title, esc)}</summary>
+        <summary><span class="state ${done ? 'done' : ''}" style="display:inline-grid;margin-right:.5rem;vertical-align:middle">${done ? '✓' : i + 1}</span>${U('Task {n}: {title}', { n: i + 1, title: T.t(t.title) })}</summary>
         <p style="white-space:pre-line">${T.h(t.body)}</p>
         ${t.questions.map(q => questionHTML(r, t, q)).join('')}
       </details>`;
@@ -1432,7 +1432,7 @@ views.raum = (id) => {
         sh = new Shell({ fs: baseFS(), commands: r.commands ? r.commands({ F, solve }) : {} });
         r.setup(sh, F, solved);
         if (T.active && r.translateFS) r.translateFS(sh, T, translateTree);
-        mountTerminal($('#rterm', root), sh, { title: `Raum · ${r.title}`, welcome: T.t(r.welcome) || 'Raum-Sandbox bereit. Arbeitsordner: ~/raum0 · help zeigt Befehle.' });
+        mountTerminal($('#rterm', root), sh, { title: Ut('Raum · {title}', { title: T.t(r.title) }), welcome: T.t(r.welcome) || Ut('Raum-Sandbox bereit. Arbeitsordner: ~/raum0 · help zeigt Befehle.') });
       };
       if (r.machine.kind === 'sandbox') { startSandbox(); $('#rreset', root).onclick = startSandbox; }
 
@@ -1440,11 +1440,11 @@ views.raum = (id) => {
       const fbOf = (key) => root.querySelector(`[data-fb="${CSS.escape(key)}"]`);
       const showDone = () => {
         $('#rbar', root).style.width = roomPct(r.id) + '%';
-        $('#rstat', root).textContent = `${roomPct(r.id)} % · ${roomPoints(r.id)} Punkte`;
+        $('#rstat', root).textContent = Ut('{pct} % · {p} Punkte', { pct: roomPct(r.id), p: roomPoints(r.id) });
         if (roomDone(r.id)) {
-          if (!rs.doneAt) { rs.doneAt = Date.now(); save(); toast(`Raum „${r.title}“ gemeistert!`); }
+          if (!rs.doneAt) { rs.doneAt = Date.now(); save(); toast(Ut('Raum „{title}“ gemeistert!', { title: T.t(r.title) })); }
           const n = r.nach;
-          $('#rdone', root).innerHTML = `<div class="card lime debrief"><h3>✓ Raum abgeschlossen · ${roomPoints(r.id)} Punkte</h3><dl><dt>Beobachtung</dt><dd>${T.h(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${T.h(n.schluss)}</dd><dt>Grenzen</dt><dd>${T.h(n.grenzen)}</dd><dt>Nächster Schritt</dt><dd>${T.h(n.naechster)}</dd></dl><p class="small">Aufräumen nicht vergessen: <code>${esc(r.cleanup)}</code></p></div>`;
+          $('#rdone', root).innerHTML = `<div class="card lime debrief"><h3>${U('✓ Raum abgeschlossen · {p} Punkte', { p: roomPoints(r.id) })}</h3><dl><dt>${U('Beobachtung')}</dt><dd>${T.h(n.beobachtung)}</dd><dt>${U('Schlussfolgerung')}</dt><dd>${T.h(n.schluss)}</dd><dt>${U('Grenzen')}</dt><dd>${T.h(n.grenzen)}</dd><dt>${U('Nächster Schritt')}</dt><dd>${T.h(n.naechster)}</dd></dl><p class="small">${U('Aufräumen nicht vergessen:')} <code>${esc(r.cleanup)}</code></p></div>`;
         }
       };
       const verdict = async (key, value) => {
@@ -1462,7 +1462,7 @@ views.raum = (id) => {
           ans.ok = true; ans.at = Date.now(); markActivity(state); save();
           if (r.onSolve && sh && q.type === 'flag') r.onSolve(sh, q.flag);
           const got = earned(r.id, { q, key });
-          fb.innerHTML = `<span style="color:var(--lime)">✓ Richtig · +${got} Punkte${got < q.points ? ` (von ${q.points}, Tipps genutzt)` : ''}</span>`;
+          fb.innerHTML = `<span style="color:var(--lime)">${got < q.points ? U('✓ Richtig · +{p} Punkte (von {q}, Tipps genutzt)', { p: got, q: q.points }) : U('✓ Richtig · +{p} Punkte', { p: got })}</span>`;
           refreshQ(key);
           const det = fb.closest('details');
           if (det && [...det.querySelectorAll('[data-fb]')].every(x => qOk(r.id, x.dataset.fb))) {
@@ -1473,7 +1473,7 @@ views.raum = (id) => {
           showDone();
         } else {
           save();
-          fb.innerHTML = `<span style="color:var(--red)">✗ Nicht korrekt (${ans.attempts}. Versuch).</span> ${q.type === 'flag' && !/^KLY\{[0-9a-f]{16}\}$/.test(normFlag(value)) ? 'Flags haben das Format KLY{16 Hex-Zeichen}. ' : ''}${hintsOf(q).length && hintsUsed(r.id, key) < hintsOf(q).length ? '<span class="muted">Feststecken ist normal – hol dir unten einen Tipp.</span>' : ''}`;
+          fb.innerHTML = `<span style="color:var(--red)">${U('✗ Nicht korrekt ({n}. Versuch).', { n: ans.attempts })}</span> ${q.type === 'flag' && !/^KLY\{[0-9a-f]{16}\}$/.test(normFlag(value)) ? U('Flags haben das Format KLY{16 Hex-Zeichen}.') + ' ' : ''}${hintsOf(q).length && hintsUsed(r.id, key) < hintsOf(q).length ? `<span class="muted">${U('Feststecken ist normal – hol dir unten einen Tipp.')}</span>` : ''}`;
           if (q.type === 'mc') { const b = root.querySelector(`[data-k="${CSS.escape(key)}"][data-i="${value}"]`); b && b.classList.add('wrong'); }
         }
       };
@@ -1486,7 +1486,7 @@ views.raum = (id) => {
         const b = e.target.closest('[data-tip]'); if (!b) return;
         const key = b.dataset.tip, { q } = find(key), all = hintsOf(q), used = hintsUsed(r.id, key);
         if (used >= all.length) return;
-        if (used === all.length - 1 && /^Lösung/i.test(all[used]) && !twoTap(b, 'Wirklich die Lösung zeigen?')) return;
+        if (used === all.length - 1 && /^Lösung/i.test(all[used]) && !twoTap(b, Ut('Wirklich die Lösung zeigen?'))) return;
         rs.hints[key] = used + 1; save(); refreshQ(key);
       });
       $$('[data-send]', root).forEach(b => b.onclick = () => verdict(b.dataset.k, root.querySelector(`input[data-k="${CSS.escape(b.dataset.k)}"]`).value));
