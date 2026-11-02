@@ -48,7 +48,7 @@ const P5 = makeLadder({
         c.put('suid-ist.txt', [...std.slice(0, 6), '/opt/backup/sicherungstool', ...std.slice(6)].sort(() => c.R() - 0.5).join('\n') + '\n');
         c.put('befunde/sicherungstool.txt', `Befund: unbekanntes SUID-Programm läuft mit root-Rechten. Fix: chmod u-s, prüfen ob nötig. Code: ${c.code}\n`);
       },
-      hints: ['SUID heißt: Das Programm läuft mit den Rechten des Besitzers – oft root. Unbekannte SUID-Programme sind ein Klassiker für Rechteausweitung.', 'Beide Listen sortieren und mit diff vergleichen.', 'Lösung: sort suid-soll.txt > a; sort suid-ist.txt > b; diff a b → cat befunde/sicherungstool.txt (basename)'],
+      hints: ['SUID heißt: Das Programm läuft mit den Rechten des Besitzers – oft root. Unbekannte SUID-Programme sind ein Klassiker für Rechteausweitung.', 'Beide Listen sortieren und mit diff vergleichen.', 'Lösung: sort suid-soll.txt > a; sort suid-ist.txt > b; diff a b – danach: cat befunde/sicherungstool.txt (nur der Programmname, ohne den Ordner davor)'],
       solve: (run) => { run('sort suid-soll.txt > a; sort suid-ist.txt > b'); return run(`cat befunde/$(basename ${run('diff a b').match(/> (\S+)/)[1]}).txt`); } },
     { t: 'Zu viel sudo', pts: 15, body: 'sudoers.txt: Wer darf was mit sudo? Ein Benutzer darf ALLES ohne Passwort.',
       build(c) {
@@ -73,7 +73,7 @@ const P5 = makeLadder({
         c.put('profile-root.txt', T('# ~/.profile von root', 'umask 022', 'export PATH=/tmp:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'export EDITOR=nano', ''));
         c.put('befunde/tmp.txt', `Befund: /tmp vorne im PATH von root – ein Angreifer legt dort z. B. ein falsches „ls“ ab. Fix: /tmp entfernen. Code: ${c.code}\n`);
       },
-      hints: ['PATH ist die Liste der Ordner, in denen die Shell Programme sucht – von links nach rechts.', 'grep PATH profile-root.txt. Welcher Ordner ist für alle beschreibbar?', 'Lösung: grep PATH profile-root.txt → /tmp → cat befunde/tmp.txt'],
+      hints: ['PATH ist die Liste der Ordner, in denen die Shell Programme sucht – von links nach rechts.', 'grep PATH profile-root.txt. Welcher Ordner ist für alle beschreibbar?', 'Lösung: grep PATH profile-root.txt (der verdächtige Ordner ist /tmp) – danach: cat befunde/tmp.txt'],
       solve: (run) => run(`cat befunde/${run("grep PATH profile-root.txt | cut -d= -f2 | cut -d: -f1").trim().replace('/', '')}.txt`) },
     { t: 'SSH für root', pts: 15, body: 'sshd_config.txt: Eine aktive Einstellung erlaubt die direkte Anmeldung als root.',
       build(c) {
@@ -163,7 +163,7 @@ const P6 = makeLadder({
         c.put('neue-db.txt', `kasse:${salt}:${sha(salt + w)}\nbuero:${noise(c.R, 8)}:${noise(c.R, 64)}\n`);
         c.put(`befunde/${w}.txt`, `Standardpasswort gefunden – sofort ändern lassen! Code: ${c.code}\n`);
       },
-      hints: ['Salt und Hash von kasse: grep kasse neue-db.txt | cut -d: -f2 bzw. -f3', 'Für jedes Wort: echo -n "${SALT}$w" | sha256sum', 'Lösung: S=$(grep kasse neue-db.txt | cut -d: -f2); H=$(grep kasse neue-db.txt | cut -d: -f3); for w in $(cat woerter.txt); do echo -n "$S$w" | sha256sum | grep -q $H && echo $w; done → cat befunde/WORT.txt'],
+      hints: ['Salt und Hash von kasse: grep kasse neue-db.txt | cut -d: -f2 bzw. -f3', 'Für jedes Wort w: echo -n "$S$w" | sha256sum – erst der Salt, direkt dahinter das Wort.', 'Lösung: S=$(grep kasse neue-db.txt | cut -d: -f2); H=$(grep kasse neue-db.txt | cut -d: -f3); for w in $(cat woerter.txt); do echo -n "$S$w" | sha256sum | grep -q $H && echo $w; done → cat befunde/WORT.txt'],
       solve: (run) => run(`cat befunde/${run('S=$(grep kasse neue-db.txt | cut -d: -f2); H=$(grep kasse neue-db.txt | cut -d: -f3); for w in $(cat woerter.txt); do echo -n "$S$w" | sha256sum | grep -q $H && echo $w; done').trim()}.txt`) },
     { t: 'Im Leak?', pts: 15, body: 'Eine (erfundene) Liste geleakter E-Mail-Adressen und die Mitarbeiterliste. Wer aus der Verwaltung steht im Leak und muss sein Passwort ändern?',
       build(c) {
@@ -237,7 +237,7 @@ const P7 = makeLadder({
         c.put('versionen/mx1', '7.1\n'); c.put('versionen/mx2', '7.3\n'); c.put('versionen/mx3', '7.1\n');
         c.put('befunde/mx2.txt', `Fehlalarm: Banner zeigt 7.1, installiert ist 7.3. Gegenprobe macht den Unterschied. Code: ${c.code}\n`);
       },
-      hints: ['Ein Banner ist eine Selbstauskunft – nicht zwingend die Wahrheit.', 'grep -L 7.1 versionen/* zeigt Dateien, die 7.1 NICHT enthalten. Oder: grep 7.3 versionen/*', 'Lösung: grep -l 7.3 versionen/* → cat befunde/mx2.txt'],
+      hints: ['Ein Banner ist eine Selbstauskunft – nicht zwingend die Wahrheit.', 'grep -l 7.3 versionen/* zeigt die Namen der Dateien, in denen 7.3 steht (-l = nur Dateinamen auflisten).', 'Lösung: grep -l 7.3 versionen/* → cat befunde/mx2.txt'],
       solve: (run) => run(`cat befunde/$(basename ${run('grep -l 7.3 versionen/*').trim()}).txt`) },
     { t: 'Nicht aktualisiert', pts: 15, rep: 'Stellwerk Posten 3 (diff)', body: 'pakete-vorher.txt und pakete-nachher.txt: Paketlisten vor und nach dem Update-Tag. Ein Paket hat seine Version NICHT geändert.',
       build(c) {
@@ -370,7 +370,7 @@ const P10 = makeLadder({
         c.put('auftrag.txt', T('Auftraggeber: Kantor Logistik (erfunden)', 'IN SCOPE:', `  ${KS[0]}`, '  intranet.kantor.sim', 'OUT OF SCOPE (nicht anfassen!):', '  partner.spedition.sim', ''));
         c.put('befunde/partner.txt', `Richtig: Partnersysteme sind tabu, auch wenn man sie „leicht“ erreicht. Code: ${c.code}\n`);
       },
-      hints: ['Der Teil unter „OUT OF SCOPE“ ist verboten.', 'Die verbotene Domain steht ganz unten: tail -n 1 auftrag.txt', 'Lösung: tail -n 1 auftrag.txt → partner.spedition.sim → cat befunde/partner.txt'],
+      hints: ['Der Teil unter „OUT OF SCOPE“ ist verboten.', 'Die verbotene Domain steht ganz unten: tail -n 1 auftrag.txt', 'Lösung: tail -n 1 auftrag.txt (zeigt partner.spedition.sim) – danach: cat befunde/partner.txt'],
       solve: (run) => run(`cat befunde/${run('tail -n 1 auftrag.txt').trim().split('.')[0]}.txt`) },
     { t: 'Erster Blick', pts: 10, rep: 'Bewerbung Runde 0–2', body: 'Was verrät die Startseite des Portals über die eingesetzte Software? Ein Header nennt sie.',
       build(c) {
@@ -412,7 +412,7 @@ const P10 = makeLadder({
       },
       hints: ['grep kunden.csv access.log', 'Deine eigene IP mit grep -v herausfiltern.', "Lösung: grep kunden.csv access.log | grep -v 10.110.9.9 | cut -d' ' -f1 → cat befunde/IP.txt"],
       solve: (run) => run(`cat befunde/${run("grep kunden.csv access.log | grep -v 10.110.9.9 | cut -d' ' -f1").trim()}.txt`) },
-    { t: 'Verschlüsselte Notiz', pts: 15, rep: 'Phantom (Kodierungen)', body: 'Im Export lag noch eine Notiz der Entwickler – Hex, darin Base64.',
+    { t: 'Verpackte Notiz', pts: 15, rep: 'Phantom (Kodierungen)', body: 'Im Export lag noch eine Notiz der Entwickler – Hex, darin Base64.',
       build(c) { c.put('notiz.txt', hex(b64(`Entwicklernotiz: Export sollte nur intern sein. Code: ${c.code}`)) + '\n'); },
       hints: ['Nur 0–9 und a–f: das ist Hex.', 'Erst Hex zurückwandeln (xxd -r -p), dann Base64 (base64 -d).', 'Lösung: xxd -r -p notiz.txt | base64 -d'],
       solve: (run) => run('xxd -r -p notiz.txt | base64 -d') },

@@ -159,23 +159,23 @@ const W6 = makeLadder({
         c.sh.web[`${KIP}:80`].routes['/robots.txt'] = { status: 200, headers: { 'Content-Type': 'text/plain' }, body: 'User-agent: *\nDisallow: /bewerber-intern/\n' };
         c.sh.web[`${KIP}:80`].routes['/bewerber-intern/'] = { status: 200, headers: {}, body: page('Intern', `<p>Hier sollte niemand sein. Code: ${c.code}</p>`) };
       },
-      hints: ['robots.txt liegt immer direkt unter der Adresse: /robots.txt', 'Der Pfad hinter Disallow ist interessant.', 'Lösung: curl http://karriere.kristall.sim/robots.txt → curl http://karriere.kristall.sim/bewerber-intern/'],
+      hints: ['robots.txt ist ein Zettel für Suchmaschinen: Dort steht, welche Seiten sie NICHT anschauen sollen – also oft genau die spannenden. Er liegt immer direkt unter der Adresse: /robots.txt', 'Disallow heißt „nicht erlaubt“. Den Pfad dahinter hängst du an die Adresse an und rufst ihn mit curl ab.', 'Lösung: curl http://karriere.kristall.sim/robots.txt → curl http://karriere.kristall.sim/bewerber-intern/'],
       solve: (run) => run(`curl -s http://${K}/bewerber-intern/`) },
     { t: 'Der Header', pts: 10, body: 'Die Seite /start schickt mehr als nur HTML.',
       build(c) { c.sh.web[`${KIP}:80`].routes['/start'] = { status: 200, headers: { 'Content-Type': 'text/html', 'X-Bewerber-Code': c.code }, body: page('Start', '<p>Los gehts.</p>') }; },
-      hints: ['curl -I zeigt nur die Kopfzeilen (Header) der Antwort.', 'Eigene Header beginnen oft mit X-.', 'Lösung: curl -I http://karriere.kristall.sim/start'],
+      hints: ['Ein Webserver schickt vor der eigentlichen Seite unsichtbare Kopfzeilen mit, die Header – wie ein Umschlag um einen Brief. Wie könntest du nur den Umschlag ansehen?', 'curl -I zeigt nur die Header. Selbst erfundene Header beginnen oft mit X-.', 'Lösung: curl -I http://karriere.kristall.sim/start'],
       solve: (run) => run(`curl -s -I http://${K}/start`) },
     { t: 'Das Cookie', pts: 10, rep: 'Was die Webseite verrät',
       body: 'Die Anmeldeseite /login setzt ein Cookie.',
       build(c) { c.sh.web[`${KIP}:80`].routes['/login'] = { status: 200, headers: { 'Set-Cookie': `profil=${b64(JSON.stringify({ rolle: 'bewerber', code: c.code }))}; Path=/` }, body: page('Login', '<form>…</form>') }; },
-      hints: ['curl -I http://karriere.kristall.sim/login zeigt Set-Cookie.', 'Der Wert hinter profil= ist Base64.', "Lösung: curl -I http://karriere.kristall.sim/login | grep Set-Cookie | cut -d= -f2 | cut -d';' -f1 | base64 -d"],
+      hints: ['Ein Cookie ist ein kleiner Datenzettel, den die Webseite deinem Browser mitgibt. Er kommt in einem Header namens Set-Cookie – den siehst du wie in Runde 2 mit curl -I.', 'Der Wert hinter profil= (bis zum ;) ist Base64.', "Ausschneiden in zwei Schritten: cut -d= -f2 nimmt das Stück nach dem ersten =, danach nimmt cut -d';' -f1 davon das Stück vor dem ;.", "Lösung: curl -I http://karriere.kristall.sim/login | grep Set-Cookie | cut -d= -f2 | cut -d';' -f1 | base64 -d"],
       solve: (run) => run(`curl -s -I http://${K}/login | grep Set-Cookie | cut -d= -f2 | cut -d';' -f1 | base64 -d`) },
     { t: 'Das Skript', pts: 15, body: 'Die Seite /bewerben lädt eine JavaScript-Datei. Entwickler vergessen gern Dinge darin.',
       build(c) {
         c.sh.web[`${KIP}:80`].routes['/bewerben'] = { status: 200, headers: {}, body: page('Bewerben', '<script src="/js/form.js"></script>') };
         c.sh.web[`${KIP}:80`].routes['/js/form.js'] = { status: 200, headers: { 'Content-Type': 'application/javascript' }, body: `// Formular\nconst api = "/api/v1";\n// TODO entfernen!\nconst testCode = "${hex(c.code)}";\n` };
       },
-      hints: ['curl …/bewerben zeigt, welche Datei geladen wird.', 'In form.js steht ein Wert aus lauter 0–9 und a–f: Hex.', 'Lösung: curl http://karriere.kristall.sim/js/form.js | grep testCode | cut -d\'"\' -f2 | xxd -r -p'],
+      hints: ['curl …/bewerben zeigt, welche Datei geladen wird.', 'In form.js steht ein Wert aus lauter 0–9 und a–f: Hex. Dabei wird jedes Zeichen als zwei Hex-Ziffern geschrieben (4b = K).', 'Der Wert steht zwischen zwei Anführungszeichen. cut -d\'"\' -f2 trennt am " und nimmt das Stück dazwischen.', 'xxd -r -p wandelt reines Hex zurück in Text.', 'Lösung: curl http://karriere.kristall.sim/js/form.js | grep testCode | cut -d\'"\' -f2 | xxd -r -p'],
       solve: (run) => run(`curl -s http://${K}/js/form.js | grep testCode | cut -d'"' -f2 | xxd -r -p`) },
     { t: 'Die Sicherungskopie', pts: 10, body: 'Editoren und Admins hinterlassen gern Sicherungskopien mit der Endung .bak.',
       build(c) { c.sh.web[`${KIP}:80`].routes['/index.html.bak'] = { status: 200, headers: { 'Content-Type': 'text/plain' }, body: page('ALT', `<!-- alter Bewerber-Code: ${c.code} -->`) }; },
@@ -193,7 +193,7 @@ const W6 = makeLadder({
         c.sh.web[`${KIP}:80`].routes[`/raum/${w}`] = { status: 200, headers: {}, body: page('Raum', `<p>Richtiges Wort. Code: ${c.code}</p>`) };
         c.put('wort.sha256', `__WORT__${w}\n`);
       },
-      hints: ['echo -n WORT | sha256sum berechnet die Prüfsumme eines Wortes (-n: ohne Zeilenumbruch).', 'Für jedes Wort: for w in $(cat woerter.txt); do echo "$(echo -n $w | sha256sum) $w"; done', 'Mit grep $(cat wort.sha256) findest du die passende Zeile.', 'Lösung: for w in $(cat woerter.txt); do echo "$(echo -n $w | sha256sum) $w"; done | grep $(cat wort.sha256) → curl http://karriere.kristall.sim/raum/WORT'],
+      hints: ['echo -n WORT | sha256sum berechnet die Prüfsumme eines Wortes (-n: ohne Zeilenumbruch).', 'Eine Prüfsumme ist wie ein Fingerabdruck: Gleiches Wort ergibt immer dieselbe Prüfsumme, aber zurückrechnen geht nicht. Du kannst aber für JEDES Wort aus woerter.txt die Prüfsumme ausrechnen und vergleichen.', 'Für jedes Wort die Prüfsumme UND das Wort in eine Zeile schreiben: for w in $(cat woerter.txt); do echo "$(echo -n $w | sha256sum) $w"; done', 'Mit grep $(cat wort.sha256) findest du die passende Zeile.', 'Lösung: for w in $(cat woerter.txt); do echo "$(echo -n $w | sha256sum) $w"; done | grep $(cat wort.sha256) → curl http://karriere.kristall.sim/raum/WORT'],
       solve: (run) => run(`curl -s http://${K}/raum/${run('for w in $(cat woerter.txt); do echo "$(echo -n $w | sha256sum) $w"; done | grep $(cat wort.sha256)').trim().split(/\s+/).pop()}`) },
     { t: 'Das Bewerbungsfoto', pts: 15, rep: 'Stellwerk Posten 6 (strings)',
       body: 'Im Foto eines früheren Bewerbers stecken Metadaten (ein Kommentar).',
@@ -208,7 +208,7 @@ const W6 = makeLadder({
         c.sh.web[`${KIP}:80`].routes['/sitemap.xml'] = { status: 200, headers: { 'Content-Type': 'application/xml' }, body: `<?xml version="1.0"?>\n<urlset>\n${ps.map(x => `  <url><loc>http://${K}${x}</loc></url>`).join('\n')}\n</urlset>\n` };
         c.sh.web[`${KIP}:80`].routes[live] = { status: 200, headers: {}, body: page('Finale', `<p>Letzte Runde geschafft. Code: ${c.code}</p>`) };
       },
-      hints: ['curl …/sitemap.xml zeigt alle Adressen. grep -o "/seite-[^<]*" schneidet die Pfade heraus.', 'Für jeden Pfad prüfen: curl -s -I http://karriere.kristall.sim$p | head -1', 'In einer Schleife und mit grep 200 filtern.', 'Lösung: for p in $(curl -s http://karriere.kristall.sim/sitemap.xml | grep -o "/seite-[^<]*"); do echo "$p $(curl -s -I http://karriere.kristall.sim$p | head -1)"; done | grep 200 → curl auf den Pfad'],
+      hints: ['Eine Sitemap ist ein Inhaltsverzeichnis der Webseite für Suchmaschinen. curl http://karriere.kristall.sim/sitemap.xml zeigt alle Adressen.', 'grep -o "/seite-[^<]*" schneidet nur die Pfade heraus (-o = nur den Treffer, [^<]* = alle Zeichen bis zum nächsten <).', 'Ob eine Seite existiert, zeigt die erste Header-Zeile: curl -s -I ADRESSE | head -1 meldet 200 (gibt es) oder 404 (gibt es nicht).', 'Pack beides in eine Schleife: for p in $(…); do echo "$p $(curl -s -I …$p | head -1)"; done – und filtere am Ende mit grep 200.', 'Lösung: for p in $(curl -s http://karriere.kristall.sim/sitemap.xml | grep -o "/seite-[^<]*"); do echo "$p $(curl -s -I http://karriere.kristall.sim$p | head -1)"; done | grep 200 → curl auf den Pfad'],
       solve: (run) => run(`curl -s http://${K}${run(`for p in $(curl -s http://${K}/sitemap.xml | grep -o "/seite-[^<]*"); do echo "$p $(curl -s -I http://${K}$p | head -1)"; done | grep 200`).trim().split(' ')[0]}`) },
   ],
 });
@@ -235,7 +235,7 @@ const W7 = makeLadder({
   finale: T('Bericht abgegeben. Nebelwerk schließt jetzt: offene Sicherungen, Tokens mit Geheimnissen, alte Git-Einträge,', 'unverschlüsselte Logins und eine vergessene Wartungsseite. Gute Arbeit!', ''),
   nach: { beobachtung: 'Zonendatei, Pfadsuche, JWT, API, Git, Konfig-Diff, Kodierungskette, Mitschnitt, Log-Korrelation.', schluss: 'Aufklärung ist der wichtigste Teil eines Pentests – und meistens der längste.', grenzen: 'Simulation mit erfundenen Hosts.', naechster: 'Das Phantom – Hacking schwer.' },
   floors: [
-    { t: 'Die Zonendatei', pts: 10, body: 'Nebelwerk hat dir seine DNS-Zonendatei gegeben. Ein TXT-Eintrag enthält etwas Codiertes.',
+    { t: 'Die Zonendatei', pts: 10, body: 'Nebelwerk hat dir seine DNS-Zonendatei gegeben – das „Telefonbuch“ der Firma: Welcher Name gehört zu welcher IP-Adresse. Ein TXT-Eintrag (freier Text) enthält etwas Codiertes.',
       build(c) {
         const rec = [];
         for (let i = 0; i < 25; i++) rec.push(`${c.pick(['www', 'mail', 'vpn', 'cdn', 'shop', 'kb', 'ns1', 'ns2', 'git', 'ci'])}${i}.nebelwerk.sim.  3600 IN A 10.88.${Math.floor(c.R() * 9)}.${Math.floor(c.R() * 250)}`);
@@ -254,7 +254,7 @@ const W7 = makeLadder({
         c.put('woerter.txt', ws.join('\n') + '\n');
         c.web(...NEB.dev, { '/': page('Dev', '<p>Entwicklungsserver</p>'), [`/${hit}/`]: page('Index of /release/', '<a href="notizen.txt">notizen.txt</a>'), [`/${hit}/notizen.txt`]: { status: 200, headers: { 'Content-Type': 'text/plain' }, body: `Release-Notizen (intern)\nCode: ${c.code}\n` } });
       },
-      hints: ['Für jedes Wort prüfen, ob /WORT/ existiert: curl -s -I http://dev.nebelwerk.sim/WORT/ | head -1', 'In einer Schleife: for w in $(cat woerter.txt); do …; done – mit grep -q 200 && echo $w', 'Lösung: for w in $(cat woerter.txt); do curl -s -I http://dev.nebelwerk.sim/$w/ | head -1 | grep -q 200 && echo $w; done → curl http://dev.nebelwerk.sim/release/ → notizen.txt'],
+      hints: ['Für jedes Wort prüfen, ob /WORT/ existiert: curl -s -I http://dev.nebelwerk.sim/WORT/ | head -1', 'In einer Schleife: for w in $(cat woerter.txt); do …; done – grep -q 200 sucht still (q = quiet) und meldet nur „gefunden ja/nein“; && echo $w gibt das Wort dann aus.', 'Lösung: for w in $(cat woerter.txt); do curl -s -I http://dev.nebelwerk.sim/$w/ | head -1 | grep -q 200 && echo $w; done → curl http://dev.nebelwerk.sim/release/ → notizen.txt'],
       solve: (run) => { const w = run('for w in $(cat woerter.txt); do curl -s -I http://dev.nebelwerk.sim/$w/ | head -1 | grep -q 200 && echo $w; done').trim(); return run(`curl -s http://dev.nebelwerk.sim/${w}/notizen.txt`); } },
     { t: 'Das Token', pts: 15, body: 'In den Release-Notizen lag ein Anmelde-Token (JWT). JWTs sind nicht verschlüsselt – nur codiert.',
       build(c) {
@@ -262,7 +262,7 @@ const W7 = makeLadder({
         c.put('token.txt', jwt + '\n');
         c.put('hinweis.txt', 'Ein JWT hat drei Teile, getrennt durch Punkte: Kopf.Inhalt.Signatur. Der mittlere Teil ist Base64url (- und _ statt + und /).\n');
       },
-      hints: ['cut -d. -f2 token.txt gibt den mittleren Teil.', "Base64url → Base64: tr '_-' '/+'", "Lösung: cut -d. -f2 token.txt | tr '_-' '/+' | base64 -d"],
+      hints: ['cut -d. -f2 token.txt gibt den mittleren Teil.', "Aus Base64url wird normales Base64, wenn du _ durch / und - durch + ersetzt: tr '_-' '/+'", "Lösung: cut -d. -f2 token.txt | tr '_-' '/+' | base64 -d"],
       solve: (run) => run("cut -d. -f2 token.txt | tr '_-' '/+' | base64 -d") },
     { t: 'Die gesprächige API', pts: 15, rep: 'Was die Webseite verrät (API)',
       body: 'http://api.nebelwerk.sim/v1/mitarbeiter liefert mehr Felder, als die Webseite anzeigt.',
@@ -281,7 +281,7 @@ const W7 = makeLadder({
         l.splice(30, 0, `commit ${noise(c.R, 40)}`, 'Author: Dev <dev@nebelwerk.sim>', 'Date:   2026-10-14', '', '    Passwort aus Konfiguration entfernt', '', 'diff --git a/deploy.cfg b/deploy.cfg', '@@ -2,1 +2,1 @@', `-deploy_passwort=${c.code}`, '+deploy_passwort=', '');
         c.put('git-log.txt', l.join('\n') + '\n');
       },
-      hints: ['Im Git-Verlauf bedeutet - eine entfernte Zeile, + eine hinzugefügte.', 'grep "^-.*passwort" git-log.txt', 'Lösung: grep "^-.*passwort" git-log.txt'],
+      hints: ['Im Git-Verlauf bedeutet - eine entfernte Zeile, + eine hinzugefügte.', 'Gesucht sind Zeilen, die mit - beginnen und später „passwort“ enthalten. ^- heißt „beginnt mit -“, .* heißt „beliebige Zeichen dazwischen“: grep "^-.*passwort" git-log.txt', 'Lösung: grep "^-.*passwort" git-log.txt'],
       solve: (run) => run('grep "^-.*passwort" git-log.txt') },
     { t: 'Die vergessene Wartungsseite', pts: 15, rep: 'Stellwerk Posten 3 (diff)',
       body: 'Zwei Versionen der Webserver-Konfiguration. In der neuen ist ein Bereich dazugekommen – öffentlich erreichbar.',
@@ -448,7 +448,7 @@ const W8 = makeLadder({
           c.put(`codes/r${p2(i)}`, i === hit ? `Code: ${c.code}\n` : 'nein\n');
         }
       },
-      hints: ["Summe einer Datei: awk '{s+=$1} END {print s}' DATEI", 'Für alle: for f in reihen/*; do echo "$(awk \'{s+=$1} END {print s}\' $f) $f"; done', 'Mit grep "^1000 " die richtige finden. Den Namen ohne Ordner liefert basename.', 'Lösung: for f in reihen/*; do echo "$(awk \'{s+=$1} END {print s}\' $f) $f"; done | grep "^1000 " → cat codes/rNN'],
+      hints: ["Summe einer Datei: awk '{s+=$1} END {print s}' DATEI", 'Für alle: for f in reihen/*; do echo "$(awk \'{s+=$1} END {print s}\' $f) $f"; done', 'Mit grep "^1000 " die richtige finden. Hinter der 1000 steht der Pfad, z. B. reihen/r07 – für codes/ brauchst du nur den Namen dahinter (r07).', 'Lösung: for f in reihen/*; do echo "$(awk \'{s+=$1} END {print s}\' $f) $f"; done | grep "^1000 " → cat codes/rNN'],
       solve: (run) => run(`cat codes/${run('for f in reihen/*; do echo "$(awk \'{s+=$1} END {print s}\' $f) $(basename $f)"; done | grep "^1000 "').trim().split(' ')[1]}`) },
     { t: 'Die letzte Kammer', pts: 30, rep: 'Alles',
       body: 'Unter tief/ gibt es viele Dateien mit Rechten 600. Nur EINE davon ist kleiner als 1024 Bytes UND enthält das Wort TRESOR.',
