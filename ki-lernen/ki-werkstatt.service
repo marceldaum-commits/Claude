@@ -3,7 +3,7 @@
 #                sudo systemctl daemon-reload && sudo systemctl enable --now ki-werkstatt
 # BENUTZER unten durch den Linux-Benutzer ersetzen, dem ~/ki-lernen gehört.
 [Unit]
-Description=KI-Werkstatt (Lernprogramm, Port 8100)
+Description=Nachtfalter KI-Werkstatt (Lernprogramm, Port 8100)
 After=network-online.target
 
 [Service]

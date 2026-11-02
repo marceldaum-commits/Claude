@@ -35,7 +35,7 @@ const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
 const SPRACHEN = { de: 'Deutsch', en: 'Englisch', uk: 'Ukrainisch' };
 const sprache = (body) => SPRACHEN[body?.lang] || SPRACHEN.de;
 const BASE_SYSTEM =
-  'Du bist Teil der „KI-Werkstatt“, eines Lernprogramms, in dem Menschen spielerisch ' +
+  'Du bist Teil der „Nachtfalter KI-Werkstatt“, eines Lernprogramms, in dem Menschen spielerisch ' +
   'lernen, wie man mit KI-Assistenten umgeht. Antworte freundlich und knapp (höchstens etwa ' +
   '150 Wörter), außer die Aufgabe verlangt ausdrücklich etwas anderes. Unter den Lernenden können Kinder sein: ' +
   'Bleib altersgerecht, frag nie nach Namen, Adressen, Schulen, Fotos oder anderen persönlichen Daten und rate davon ab, ' +
@@ -384,7 +384,7 @@ function serveStatic(pathname, res) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   server.listen(PORT, HOST, () => {
-    console.log(`KI-Werkstatt läuft auf http://${HOST}:${PORT} (Modell ${MODEL}, ${CODES.size} Codes)`);
+    console.log(`Nachtfalter KI-Werkstatt läuft auf http://${HOST}:${PORT} (Modell ${MODEL}, ${CODES.size} Codes)`);
     if (!client) console.log('Hinweis: ANTHROPIC_API_KEY fehlt – nur die Offline-Missionen funktionieren.');
   });
 }

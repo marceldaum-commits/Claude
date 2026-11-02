@@ -2,7 +2,7 @@
   "name": "ki-werkstatt",
   "version": "0.1.0",
   "private": true,
-  "description": "KI-Werkstatt – spielerisch lernen, wie man mit KI umgeht",
+  "description": "Nachtfalter KI-Werkstatt – spielerisch lernen, wie man mit KI umgeht",
   "type": "module",
   "main": "server.js",
   "engines": { "node": ">=20" },

@@ -56,7 +56,7 @@ function renderHeader() {
     renderHeader(); route();
   });
   document.getElementById('brandname').textContent = t('KI-Werkstatt');
-  document.title = t('KI-Werkstatt');
+  document.title = `Nachtfalter ${t('KI-Werkstatt')}`;
   document.getElementById('xp').replaceChildren(
     h('div', {}, h('b', {}, t(name)), ` · ${state.xp} XP`), bar);
   document.getElementById('langbox').replaceChildren(sel);
