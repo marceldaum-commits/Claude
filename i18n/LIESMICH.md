@@ -14,3 +14,19 @@ Regeln für den Loader:
   (z. B. `Treffpunkt`, `GEHEIM` – in Texten steht dann eine Erklärung in Klammern).
 
 Prüfen: `node qa/check-i18n-w1.mjs` (Schlüssel gegen Original, geschützte Teile, Raum mit Muster-Loader komplett durchspielen).
+
+## shell.json (Terminal-Meldungen, gilt in allen Räumen)
+
+`i18n/<sprache>/shell.json`: ganze Ausgabezeilen (ohne `\n`) aus js/shell.js, js/terminal-ui.js und den
+entsperren-Befehlen (Nachtfalter, Kollektiv, Funkturm, Leitern).
+- `{1}`, `{2}` … = variable Teile (Befehl, Pfad, Zahl). Sie bleiben unübersetzt und dürfen im Wert umgestellt werden.
+  Kommt derselbe Platzhalter zweimal vor (z. B. `cd ../{1}`), muss er beide Male gleich sein.
+- Reihenfolge beim Vergleichen: erst exakte Zeile, dann Muster – spezifische Muster (mehr fester Text) zuerst,
+  sonst schluckt z. B. `{1}: {2}: Datei oder Verzeichnis nicht gefunden` die ls-Meldung.
+- Nur die Anzeige übersetzen, nie Daten in Pipes, Umleitungen oder Dateien (sonst brechen grep/cut-Rätsel).
+- Absichtlich nicht enthalten: Monatsnamen in `ls -l` (Okt …), Job-Zustände (Läuft/Fertig), `stat -c %F`,
+  raumeigene Werkzeuge (nmap, nc, xor, suche …) – kommen mit den jeweiligen Räumen.
+- Englisch und Ukrainisch folgen den echten Linux-Meldungen (z. B. „No such file or directory“ /
+  „Немає такого файла або каталогу“), damit man sie später im echten Kali wiedererkennt.
+
+Prüfen: `node qa/check-i18n-shell.mjs` (löst ca. 70 echte Fehler aus und prüft, dass jede deutsche Zeile übersetzt wird).
