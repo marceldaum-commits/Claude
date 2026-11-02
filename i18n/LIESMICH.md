@@ -39,3 +39,9 @@ Prüfen: `node qa/check-i18n-shell.mjs` (löst ca. 70 echte Fehler aus und prüf
 - translateFS nötig für: `etage10/nachricht.b64` (zweimal Base64: zweimal entpacken, übersetzen, zweimal einpacken)
   und `etage11/spiegel.txt` (erst umdrehen, dann ROT13 zurück, übersetzen, wieder ROT13 und umdrehen).
   ROT13 verschiebt nur A–Z/a–z, kyrillischer Text bleibt dabei lesbar; der Code wird trotzdem korrekt verschoben.
+
+## ui.json (Willkommens-Dialog, Lernort, Startseite)
+
+Reine Sätze und Beschriftungen ohne HTML aus js/main.js (locationModal, views.heute, EXTERNAL[].why) und
+js/content/curriculum.js (LOCATIONS label/short/desc). Zusammengesetzte Stellen als Muster mit benannten Platzhaltern:
+`Hallo {name}!` (ohne Namen: `Hallo!`), `{n} Abzeichen →`, `{done} von {all} geknackt`, `{n} % geschafft`, `Raum: {title}`.
