@@ -80,6 +80,15 @@ export const LEVEL9_ROOMS = [
     welcome: 'Spurensicherung · Sandbox bereit. Start: cat LIESMICH.txt',
     flags: ['spur'],
     setup,
+    // Handübersetzung: Logs bleiben original; in verlauf.txt nur die Base64-Nachricht (echo "…" > /tmp/.gruss)
+    translateFS(sh, T, translateTree) {
+      const enc = (x) => btoa(String.fromCharCode(...new TextEncoder().encode(x)));
+      const dec = (x) => new TextDecoder().decode(Uint8Array.from(atob(x), c => c.charCodeAt(0)));
+      translateTree(sh.fs.get(`${HOME}/spuren`), T, (name, data) => {
+        if (name === 'verlauf.txt') return data.split('\n').map(l => { const m = l.match(/^echo "([^"]+)" > \/tmp\/\.gruss$/); return m ? `echo "${enc(T.t(dec(m[1])))}" > /tmp/.gruss` : l; }).join('\n');
+        return name.endsWith('.log') ? data : null;
+      });
+    },
     commands: () => textTools(),
     tasks: [
       {
