@@ -11,7 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
-import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, Ut, roomText, loadLevel1 } from './i18n.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -281,7 +281,7 @@ views.pfad = () => {
   const later = LEVELS.filter(l => !withRooms.includes(l));
   return {
     html: `<h1>Lernen</h1>
-    <p class="muted small">Vom Linux-Anfänger bis zum <b>eJPT</b>. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
+    <p class="muted small">Vom Linux-Anfänger bis zum eJPT. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
     <a class="card lime" href="#/extern" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <b>🌍 Externe Lernpfade</b> <span class="badge plain">${Object.keys(state.extern || {}).length} abgehakt</span><br>
       <span class="small muted">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF, Metasploitable – hier lernst du das Ausnutzen, legal. Mit Checklisten.</span>
@@ -1035,7 +1035,7 @@ views.mehr = () => {
     html: `<h1>Mehr</h1>
     <div class="stack">
       <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language · Мова</h3>${langPickerHTML()}
-        <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch werden automatisch von Google übersetzt (die Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
+        <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
       <div class="card"><ul class="list">
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
@@ -1510,7 +1510,7 @@ views.profil = () => {
     <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>${U('Tage in Folge')}</span></div></div>
     <div class="card" style="margin-top:.8rem"><h3>Letzte 4 Wochen</h3>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
-    <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${esc(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
+    <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${UN(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
     <div class="card"><h3>Name</h3><div class="row" style="flex-wrap:nowrap"><input type="text" id="pname" maxlength="30" value="${esc(state.profile.name)}" placeholder="Name oder Spitzname"><button class="btn small primary" id="psave">Speichern</button></div></div>
     <p class="honest">Punkte, Abzeichen und Serien sind Motivation – sie schalten keine Prüfung und kein Level frei.</p>`,
     mount(root) { $('#psave', root).onclick = () => { state.profile.name = $('#pname', root).value.trim().slice(0, 30); save(); render(); toast('Gespeichert.'); }; },

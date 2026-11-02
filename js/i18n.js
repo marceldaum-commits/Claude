@@ -154,6 +154,7 @@ export function codeify(text) {
 const CODE_TXT = /KLY\{[^}\n]{0,40}\}|KLY-(?:[0-9A-F]{6}|X{6})/g;
 function protect(root) {
   if (root.nodeType !== 1) return;
+  autoUI(root);
   root.querySelectorAll?.('pre, code, kbd, samp, .script, .syntax, input, textarea, [data-copy], .xterm').forEach(e => e.setAttribute('translate', 'no'));
   const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const hits = [];
@@ -261,12 +262,49 @@ export async function loadUI() {
   const wait = (ms) => new Promise(r => setTimeout(r, ms));
   try {
     const r = await Promise.race([fetch(`i18n/${l}/ui.json`), wait(3000).then(() => null)]);
-    if (r && r.ok) UI = await r.json();
+    if (r && r.ok) { UI = await r.json(); compileUI(); }
   } catch { /* bleibt Deutsch, Google übersetzt */ }
   await Promise.all((HAND[l] || []).map(loadHand)); // Raumtitel/-texte für die Karten
 }
+// Automatische Übersetzung sichtbarer Texte: Ein Textknoten, der genau einem ui.json-Satz entspricht
+// (oder einem Muster wie „Level {n} · {title}“), wird ersetzt. Platzhalter-Werte werden selbst nachgeschlagen.
+let UI_TPL = [];
+function compileUI() {
+  const reEsc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  UI_TPL = Object.entries(UI).filter(([k]) => /\{\w+\}/.test(k)).map(([k, v]) => {
+    const names = [];
+    const src = reEsc(k).replace(/\\\{(\w+)\\\}/g, (_, n) => { names.push(n); return '(.+?)'; });
+    return { re: new RegExp('^' + src + '$', 's'), v, names, lit: k.replace(/\{\w+\}/g, '').length };
+  }).filter(t => t.lit >= 2).sort((a, b) => b.lit - a.lit);
+}
+function uiAuto(text) {
+  if (!UI) return null;
+  if (Object.hasOwn(UI, text)) return UI[text]; // auch identische Werte (Eigennamen) vor Google schützen
+  for (const t of UI_TPL) {
+    const m = text.match(t.re); if (!m) continue;
+    const vals = {}; t.names.forEach((n, i) => { const x = m[i + 1]; vals[n] = Object.hasOwn(UI, x) ? UI[x] : x; });
+    return t.v.replace(/\{(\w+)\}/g, (mm, n) => (n in vals ? vals[n] : mm));
+  }
+  return null;
+}
+const SKIP = 'code, pre, kbd, samp, script, style, textarea, [translate="no"], .xterm, .term';
+function autoUI(root) {
+  if (!UI || root.nodeType !== 1 || root.closest?.(SKIP)) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement?.closest(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+  const todo = [];
+  for (let n = w.nextNode(); n; n = w.nextNode()) { const t = n.data.trim(); if (t.length > 1 && /[A-Za-zÄÖÜäöüß]/.test(t)) { const r = uiAuto(t); if (r) todo.push([n, t, r]); } }
+  for (const [n, t, r] of todo) {
+    const i = n.data.indexOf(t), sp = document.createElement('span'); sp.setAttribute('translate', 'no'); sp.textContent = r;
+    n.replaceWith(n.data.slice(0, i), sp, n.data.slice(i + t.length));
+  }
+  for (const el of root.querySelectorAll('[placeholder], [title], [aria-label]')) for (const at of ['placeholder', 'title', 'aria-label']) {
+    const v = el.getAttribute(at); if (v) { const r = uiAuto(v.trim()); if (r) el.setAttribute(at, r); }
+  }
+}
 const fill = (s, v) => (v ? s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m)) : s);
 export const Ut = (s, v) => fill(UI && Object.hasOwn(UI, s) ? UI[s] : s, v);
+// Eigenname: übersetzen, falls in ui.json, sonst unverändert und vor Google geschützt
+export const UN = (s) => (UI && Object.hasOwn(UI, s) ? U(s) : `<span translate="no">${escH(s)}</span>`);
 export const U = (s, v) => (UI && Object.hasOwn(UI, s) ? `<span translate="no">${escH(fill(UI[s], v))}</span>` : escH(fill(s, v)));
 // Raumtitel und Kurzbeschreibung aus der Handübersetzung (für Karten außerhalb des Raums)
 export const roomText = (r, field) => {
