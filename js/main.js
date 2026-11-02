@@ -11,7 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
-import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, Ut, roomText } from './i18n.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -39,6 +39,8 @@ function save() { saveState(state); schedulePush(getState, applyState); }
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+let L1 = makeT(null);
+const L1h = (x, fmt = esc) => L1.h(x, fmt);
 const tok = (s) => String(s || '').replaceAll('{{TOKEN}}', state.labToken);
 
 function toast(msg, ms = 2600) {
@@ -338,7 +340,7 @@ views.level = (id) => {
       <div class="card tight">
         <a href="#/lektion/${ls.id}" class="row" style="text-decoration:none;color:inherit">
           <span class="state ${lessonDone(ls.id) ? 'done' : ''}">${lessonDone(ls.id) ? '✓' : i + 1}</span>
-          <span class="grow"><b>${esc(ls.title)}</b><br><span class="small muted">Lektion · ca. ${ls.minutes} min</span></span>
+          <span class="grow"><b>${L1h(ls.title)}</b><br><span class="small muted">Lektion · ca. ${ls.minutes} min</span></span>
         </a>
         <ul class="list" style="margin-left:2.2rem">${ls.exercises.map(id => exItem(id)).join('')}</ul>
       </div>`).join('')}
@@ -357,16 +359,16 @@ views.lektion = (id) => {
   return {
     html: `<a class="back" href="#/level/L1">← Spickzettel</a>
     <span class="badge plain">Lektion ${idx + 1} / ${LESSONS.length}</span>
-    <h1 style="margin-top:.4rem">${esc(l.title)}</h1>
-    <p>${esc(l.intro)}</p>
+    <h1 style="margin-top:.4rem">${L1h(l.title)}</h1>
+    <p>${L1h(l.intro)}</p>
     <div class="stack">${l.concepts.map(c => `
       <div class="card concept">
-        <h2>${esc(c.name)}</h2>
-        <dl><dt>Zweck</dt><dd>${esc(c.zweck)}</dd><dt>Syntax</dt><dd><pre class="syntax">${esc(c.syntax)}</pre></dd>
-        <dt>Argumente</dt><dd><table class="args">${c.args.map(([a, d]) => `<tr><td>${esc(a)}</td><td>${esc(d)}</td></tr>`).join('')}</table></dd>
-        <dt>Wirkung</dt><dd>${esc(c.wirkung)}</dd>
-        <dt>Typische Fehler</dt><dd><ul style="margin:0;padding-left:1.1rem">${c.fehler.map(f => `<li>${esc(f)}</li>`).join('')}</ul></dd></dl>
-        <div class="rule">${esc(c.regel)}</div>
+        <h2>${L1h(c.name)}</h2>
+        <dl><dt>Zweck</dt><dd>${L1h(c.zweck)}</dd><dt>Syntax</dt><dd><pre class="syntax">${esc(c.syntax)}</pre></dd>
+        <dt>Argumente</dt><dd><table class="args">${c.args.map(([a, d]) => `<tr><td translate="no"><code>${esc(a)}</code></td><td>${L1h(d)}</td></tr>`).join('')}</table></dd>
+        <dt>Wirkung</dt><dd>${L1h(c.wirkung)}</dd>
+        <dt>Typische Fehler</dt><dd><ul style="margin:0;padding-left:1.1rem">${c.fehler.map(f => `<li>${L1h(f)}</li>`).join('')}</ul></dd></dl>
+        <div class="rule">${L1h(c.regel)}</div>
       </div>`).join('')}
       <div class="card">
         <p class="small muted">Probier die Befehle frei im <a href="#/terminal">Terminal</a> aus – oder spring direkt in eine Übung. Jede Übung hat Tipps bis zur Lösung.</p>
@@ -415,7 +417,7 @@ function evidenceForm(prefix = 'ev', ex = {}) {
 }
 
 function resultsHTML(res) {
-  return `<ul class="results">${res.results.map(r => `<li class="${r.ok ? 'ok' : 'no'}">${esc(r.label)}${!r.ok && r.rueckfrage ? `<span class="q">${esc(r.rueckfrage)}</span>` : ''}</li>`).join('')}</ul>`;
+  return `<ul class="results">${res.results.map(r => `<li class="${r.ok ? 'ok' : 'no'}">${L1h(r.label)}${!r.ok && r.rueckfrage ? `<span class="q">${L1h(r.rueckfrage)}</span>` : ''}</li>`).join('')}</ul>`;
 }
 
 views.uebung = (id) => {
@@ -429,15 +431,15 @@ views.uebung = (id) => {
   const tipCost = e.xp / tips.length;
   const isReal = e.kind === 'real';
   return {
-    html: `<a class="back" href="#/lektion/${e.lesson}">← Spickzettel: ${esc(LESSON[e.lesson].title)}</a>
+    html: `<a class="back" href="#/lektion/${e.lesson}">← Spickzettel: ${L1h(LESSON[e.lesson].title)}</a>
     <div class="row">${isReal ? '<span class="badge real">Echter Auftrag · deine Kali-VM / Termux</span>' : '<span class="badge sim">Sandbox-Simulation</span>'}<span class="badge plain">${esc(kindLabel(e))}</span>${repeat ? '<span class="badge ok">bestanden · Wiederholung ohne Punkte</span>' : `<span class="badge plain">${e.xp} Punkte</span>`}</div>
-    <h1 style="margin-top:.5rem">${esc(e.title)}</h1>
+    <h1 style="margin-top:.5rem">${L1h(e.title)}</h1>
     <div class="stack">
       <div class="task-meta">
-        <div><b>Lernziel</b>${esc(e.ziel)}</div>
-        <div><b>Arbeitsauftrag</b><span class="auftrag">${esc(e.auftrag)}</span></div>
-        <div><b>Scope</b>${esc(e.scope)}</div>
-        <div><b>Verlangter Beleg</b>${esc(e.beleg)}</div>
+        <div><b>Lernziel</b>${L1h(e.ziel)}</div>
+        <div><b>Arbeitsauftrag</b><span class="auftrag">${L1h(e.auftrag)}</span></div>
+        <div><b>Scope</b>${L1h(e.scope)}</div>
+        <div><b>Verlangter Beleg</b>${L1h(e.beleg)}</div>
       </div>
       ${isReal ? `
       <div class="card lime stack">
@@ -472,7 +474,7 @@ views.uebung = (id) => {
         const u = used();
         const last = u === tips.length - 1 && /^Lösung/.test(tips[tips.length - 1]);
         $('#hintstate', root).textContent = repeat ? 'Wiederholung – Tipps kostenlos' : u ? `noch ${left(u)} von ${e.xp} Punkten` : `${e.xp} Punkte`;
-        $('#hinttext', root).innerHTML = tips.slice(0, u).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${tips.length}:</b> ${codeify(h)}</div>`).join('') +
+        $('#hinttext', root).innerHTML = tips.slice(0, u).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${tips.length}:</b> ${L1h(h, codeify)}</div>`).join('') +
           (u < tips.length && !run.taskOk ? `<button class="btn small ghost" id="hint">💡 ${last ? 'Lösung zeigen' : (u ? 'Nächster Tipp' : 'Tipp') + ` ${u + 1}/${tips.length}`}${repeat ? '' : ` · danach noch ${left(u + 1)} P.`}</button>` : '');
         const b = $('#hint', root);
         if (b) b.onclick = () => {
@@ -487,6 +489,7 @@ views.uebung = (id) => {
         $('#termwrap', root).innerHTML = '';
         shell = new Shell({ fs: baseFS() });
         e.sandbox.setup(shell);
+        if (L1.active) translateTree(shell.fs.get(HOME + '/lab'), L1);
         term = mountTerminal($('#termwrap', root), shell, { title: `Sandbox · ${e.title}`, welcome: 'Übungsumgebung bereit. Tipp: help, man BEFEHL, Tab ergänzt Namen.' });
       };
       if (!isReal) {
@@ -509,7 +512,7 @@ views.uebung = (id) => {
         } else {
           const r = e.sandbox.check(shell);
           ok = r.ok;
-          html = `<div class="feedback ${ok ? 'ok' : 'no'}">${esc(r.msg)}</div>`;
+          html = `<div class="feedback ${ok ? 'ok' : 'no'}">${L1h(r.msg)}</div>`;
         }
         if (!ok) { run.fails++; st.failed = (st.failed || 0) + 1; }
         save();
@@ -522,8 +525,8 @@ views.uebung = (id) => {
         const k = e.knobel;
         const opts = shuffle(k.options.map((o, i) => ({ ...o, i })));
         const box = $('#knobel', root);
-        box.innerHTML = `<div class="card violet"><h3>Knobelfrage</h3><p>${esc(k.q)}</p>
-          ${opts.map(o => `<button class="opt" data-i="${o.i}">${esc(o.t)}</button>`).join('')}
+        box.innerHTML = `<div class="card violet"><h3>Knobelfrage</h3><p>${L1h(k.q)}</p>
+          ${opts.map(o => `<button class="opt" data-i="${o.i}">${L1h(o.t)}</button>`).join('')}
           <div id="kfb"></div></div>`;
         box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         $$('.opt', box).forEach(b => b.onclick = () => {
@@ -533,7 +536,7 @@ views.uebung = (id) => {
             b.classList.add('right'); run.knobelOk = true; finish();
           } else {
             b.classList.add('wrong');
-            $('#kfb', box).innerHTML = `<div class="feedback no">${esc(o.why || 'Prüfe deine Annahme noch einmal.')}</div>`;
+            $('#kfb', box).innerHTML = `<div class="feedback no">${L1h(o.why || 'Prüfe deine Annahme noch einmal.')}</div>`;
           }
         });
       };
@@ -546,8 +549,8 @@ views.uebung = (id) => {
         save();
         const n = e.nach;
         $('#debrief', root).innerHTML = `<div class="card lime debrief"><h3>Nachbesprechung</h3><dl>
-          <dt>Beobachtung</dt><dd>${esc(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${esc(n.schluss)}</dd>
-          <dt>Grenzen</dt><dd>${esc(n.grenzen)}</dd><dt>Möglicher nächster Test</dt><dd>${esc(n.naechster)}</dd></dl>
+          <dt>Beobachtung</dt><dd>${L1h(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${L1h(n.schluss)}</dd>
+          <dt>Grenzen</dt><dd>${L1h(n.grenzen)}</dd><dt>Möglicher nächster Test</dt><dd>${L1h(n.naechster)}</dd></dl>
           <p class="small">${first ? `✓ Bestanden · +${(st.tips || 0) ? left(Math.min(st.tips, tips.length)) : e.xp} Punkte${st.tips ? ` (${st.tips} Tipp${st.tips > 1 ? 's' : ''} genutzt)` : ''}` : '✓ Wiederholung erfolgreich (ohne Punkte)'}</p>
           ${nextAfter(e)}</div>`;
         $('#debrief', root).scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -797,8 +800,8 @@ views.pruefung = (lv = 'L1') => {
   const pre = examPrereqs(lv);
   const attempts = state.exams[lv]?.attempts || [];
   const passed = examPassed(state, lv, ex.items.length);
-  const intro = `<a class="back" href="#/level/${lv}">← Level 1</a><h1>${esc(ex.title)}</h1>
-    <div class="card"><p>${esc(ex.rules)}</p><p class="small muted">${ex.items.length} Aufgaben · davon ${ex.items.filter(i => i.mandatory).length} Pflicht (★) · ${ex.items.filter(i => i.type === 'sandbox').length} Praxisaufgaben in der Sandbox</p>
+  const intro = `<a class="back" href="#/level/${lv}">← Level 1</a><h1>${L1h(ex.title)}</h1>
+    <div class="card"><p>${L1h(ex.rules)}</p><p class="small muted">${ex.items.length} Aufgaben · davon ${ex.items.filter(i => i.mandatory).length} Pflicht (★) · ${ex.items.filter(i => i.type === 'sandbox').length} Praxisaufgaben in der Sandbox</p>
     ${attempts.length ? `<p class="small">Bisherige Versuche: ${attempts.map(a => `${Math.round(a.score * 100)} % ${a.passed ? '✓' : '✗'}`).join(' · ')}</p>` : ''}</div>`;
   if (!pre.ok) {
     return { html: intro + `<div class="card warn"><b>🔒 Prüfung gesperrt.</b> Voraussetzungen: alle Lektionen gelesen und alle Pflichtübungen bestanden (inkl. echter Kali-Aufträge).
@@ -823,8 +826,8 @@ function runExam(root, lv, ex) {
   box.innerHTML = `<div class="stack">${items.map((it, k) => `
     <div class="card" id="q-${it.id}">
       <div class="row between"><b>Aufgabe ${k + 1}/${items.length}${it.mandatory ? ' ★' : ''}</b><span class="badge ${it.type === 'sandbox' ? 'sim' : 'plain'}">${it.type === 'sandbox' ? 'Praxis · Sandbox' : it.type === 'input' ? 'Eingabe' : 'Auswahl'}</span></div>
-      <p>${esc(it.q)}</p>
-      ${it.type === 'mc' ? it.order.map(i => `<button class="opt" data-q="${it.id}" data-i="${i}">${esc(it.options[i])}</button>`).join('') : ''}
+      <p>${L1h(it.q)}</p>
+      ${it.type === 'mc' ? it.order.map(i => `<button class="opt" data-q="${it.id}" data-i="${i}">${L1h(it.options[i])}</button>`).join('') : ''}
       ${it.type === 'input' ? `<input type="text" data-in="${it.id}" autocapitalize="off" autocorrect="off" spellcheck="false">` : ''}
       ${it.type === 'sandbox' ? `<div data-term="${it.id}"></div>` : ''}
     </div>`).join('')}
@@ -833,6 +836,7 @@ function runExam(root, lv, ex) {
   for (const it of items.filter(i => i.type === 'sandbox')) {
     const sh = new Shell({ fs: baseFS() });
     it.setup(sh);
+    if (L1.active) translateTree(sh.fs.get(HOME + '/pruefung'), L1);
     shells[it.id] = sh;
     mountTerminal($(`[data-term="${it.id}"]`, box), sh, { title: 'Prüfungs-Sandbox', banner: 'SANDBOX-SIMULATION · Prüfungsaufgabe · keine Hinweise' });
   }
@@ -1510,7 +1514,7 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Start
-initLang(); protectCodes(); loadShellT(); await loadUI();
+initLang(); protectCodes(); loadShellT(); await loadUI(); L1 = makeT(await loadLevel1());
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
 onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });

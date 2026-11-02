@@ -270,3 +270,8 @@ export const roomText = (r, field) => {
   // Raumnamen sind Eigennamen: bei handübersetzten Räumen nie von Google übersetzen lassen
   return field === 'title' && DICTS[r.id] && !out.startsWith('<span translate') ? `<span translate="no">${out}</span>` : out;
 };
+// Level 1 (Spickzettel + Übungen): i18n/<sprache>/level1.json
+export async function loadLevel1() {
+  const l = currentLang(); if (l === 'de') return null;
+  try { const r = await fetch(`i18n/${l}/level1.json`); return r.ok ? await r.json() : null; } catch { return null; }
+}
