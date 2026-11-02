@@ -1,0 +1,257 @@
+================================================================================
+  WÖCHENTLICHER SEO-CHECK: www.mathenachhilfe-online.com
+  Montag, 02.11.2026 – Bericht Nr. 1
+================================================================================
+
+KURZFAZIT
+---------
+Die Website ist seit Sonntag, 01.11.2026, ca. 5 Uhr NICHT ERREICHBAR, also
+seit über 24 Stunden. Heute um 5:49 Uhr habe ich erneut von 11 Standorten
+weltweit geprüft: kein Ping, keine Antwort auf Port 443 (HTTPS), keine
+Website. DNS ist in Ordnung (Domain zeigt weiter auf 81.169.165.64).
+
+Deshalb konnte der Technik-/Onpage-Teil dieses Checks (Titel, Meta,
+Überschriften, Links, Ladezeit) NICHT durchgeführt werden. Ein Vergleich mit
+der Analyse vom 31.10. ist ebenfalls nicht möglich.
+
+Durchgeführt wurden: Suchbegriff-Recherche (Google-Vorschläge), Blick auf
+die Konkurrenz und daraus abgeleitete Maßnahmen für die Zeit nach dem
+Ausfall.
+
+Wichtigste Aufgabe dieser Woche: Server wieder online bringen. Jeder weitere
+Tag Ausfall kostet Rankings (siehe Punkt 1).
+
+
+================================================================================
+ 1. DER AUSFALL UND SEINE FOLGEN FÜR GOOGLE
+================================================================================
+
+Was passiert, wenn eine Seite länger down ist:
+- Googlebot bekommt bei jedem Besuch keine Antwort (Zeitüberschreitung).
+- In den ersten Stunden passiert meist nichts.
+- Hält der Ausfall mehrere Tage an, drosselt Google die Besuche und kann
+  Seiten vorübergehend aus den Suchergebnissen nehmen.
+- Nach der Rückkehr erholen sich Rankings in der Regel innerhalb von Tagen
+  bis wenigen Wochen, wenn die Seite danach stabil läuft.
+
+Stand der Ursache (siehe Gespräch vom 01.11.):
+- Auch das Strato-Rettungssystem war nicht erreichbar. Das spricht klar für
+  ein Netzwerk- oder Hardwareproblem bei Strato, nicht für ein Problem mit
+  WordPress oder den Änderungen an der Website.
+- Auf Störungsseiten gab es ab ca. 6 Uhr gehäufte Meldungen zu Strato.
+
+-> HEUTE: Strato-Support anrufen, falls noch nicht geschehen, und nach
+   Ursache, voraussichtlicher Dauer und Gutschrift fragen.
+   Servernummer h3015268, IP 81.169.165.64.
+
+
+================================================================================
+ 2. SUCHBEGRIFFE – WAS ELTERN UND SCHÜLER SUCHEN
+================================================================================
+
+Quelle: Google-Vorschläge (Autocomplete, Deutschland), abgefragt am
+02.11.2026. Die Vorschläge zeigen, WAS oft gesucht wird, aber nicht WIE OFT.
+Echte Suchvolumen und Positionen gibt es nur in der Google Search Console.
+
+Gute Nachrichten zur Marke:
+- "mathe nachhilfe online" schlägt Google als 5. Vorschlag vor:
+  "mathe nachhilfe online marcel daum"
+- "mathe mit marcel" schlägt vor:
+  "mathenachhilfe online by mathe mit marcel rezensionen"
+  "mathenachhilfe online by mathe mit marcel fotos"
+- "marcel daum" schlägt vor: "marcel daum nachhilfe"
+  -> Dein Name und der Name des Google-Profils werden gezielt gesucht.
+
+Relevante Suchbegriffe nach Thema:
+
+  Online-Nachhilfe allgemein
+    online nachhilfe mathe gymnasium / realschule / oberstufe / abitur
+    online nachhilfe mathe klasse 8 / klasse 9 / 11 klasse
+    mathe nachhilfe online sofort
+    mathe nachhilfe online kostenlos
+
+  Kosten
+    mathe nachhilfe kosten pro stunde
+    nachhilfe kosten pro stunde privat
+    nachhilfe kosten pro monat
+    mathe nachhilfe einzelunterricht kosten
+
+  Prüfungen (jetzt mit Jahreszahl 2026 UND 2027 – die Planung beginnt)
+    abschlussprüfung mathe realschule bayern 2027
+    abschlussprüfung mathe realschule hessen 2026 themen
+    quali mathe bayern 2026
+    mittlere reife mathe themen
+    mathe abitur bayern 2027
+    abitur mathe vorbereitungskurs
+
+  Lernthemen (hohes Interesse, gut für Ratgeber-Seiten)
+    bruchrechnung einfach erklärt / regeln / klasse 6
+    prozentrechnung formel / einfach erklärt / dreisatz
+    textaufgaben mathe klasse 5 / klasse 5 gymnasium
+
+  Lokal
+    nachhilfe aschaffenburg / mathe nachhilfe aschaffenburg
+    nachhilfe aschaffenburg damm
+
+
+================================================================================
+ 3. KONKURRENZ
+================================================================================
+
+Lokal Aschaffenburg (laut Branchenverzeichnissen):
+  - Schülerhilfe (Duccastraße), Studienkreis (Frohsinnstraße),
+    Die Lernhilfe (Frohsinnstraße), Abacus Nachhilfe, Kumon (Nilkheim)
+  - Einzelne Privatlehrer über Superprof, teils ab ca. 10 €/Std. online
+  - Dein Angebot ist dort als "Mathe-Nachhilfe Online by Mathe mit Marcel"
+    in Nilkheim gelistet.
+
+Überregional (Suche "mathe nachhilfe online …"):
+  - Die Ergebnisse werden von Vermittlungsportalen dominiert (v. a.
+    Superprof mit Tausenden Ortsseiten). Gegen diese Masse kommt man über
+    allgemeine Begriffe kaum an.
+  -> Chancen liegen bei: Marke (Marcel Daum / Mathe mit Marcel), lokal
+     (Aschaffenburg + Umgebung), Prüfungsthemen Bayern/Hessen und
+     Erklärseiten zu konkreten Mathe-Themen.
+
+Dein Vorteil gegenüber Portalen und Ketten:
+  5,0 ★ bei 623 Bewertungen, Nachhilfe seit 2001, eigene Mathebücher,
+  Familien-Stundenkonto. Das sollte überall sichtbar sein (siehe Analyse
+  B3).
+
+
+================================================================================
+ 4. KORREKTUREN UND MASSNAHMEN DIESER WOCHE (max. 10)
+================================================================================
+
+Reihenfolge = Priorität.
+
+1. SERVER ZURÜCK + ABSICHERN
+   - Strato-Support anrufen (siehe oben).
+   - Danach: kostenlosen externen Überwachungsdienst einrichten, z. B.
+     UptimeRobot (Prüfung alle 5 Min., Alarm per E-Mail/App). Strato-
+     Monitoring allein reicht nicht, es war beim Ausfall im Wartungsmodus.
+   - In Plesk -> Backup-Manager: tägliches Backup auf EXTERNEN Speicher
+     (z. B. HiDrive, Google Drive, S3) einrichten.
+
+2. NACH DER RÜCKKEHR: GOOGLE SEARCH CONSOLE PRÜFEN
+   - Search Console -> Indexierung -> Seiten: Gibt es neue Fehler
+     ("Serverfehler 5xx", "nicht gefunden")?
+   - Einstellungen -> Crawling-Statistiken: Ab wann gingen die Anfragen
+     zurück, und erholen sie sich?
+   - Startseite und die 5 wichtigsten Seiten über "URL-Prüfung" ->
+     "Indexierung beantragen" neu einreichen.
+   - Sitemap (https://www.mathenachhilfe-online.com/wp-sitemap.xml) unter
+     "Sitemaps" erneut einreichen.
+
+3. MARKENNAME AN DAS GOOGLE-PROFIL ANGLEICHEN
+   Google kennt dich als "Mathe-Nachhilfe Online by Mathe mit Marcel"
+   (Google-Profil) bzw. "mathenachhilfe online by mathe mit marcel"
+   (Suchvorschläge). Auf der Website heißt die Marke "Nachhilfe – Online".
+   -> Name, Adresse und Telefonnummer müssen auf Website, Google-Profil und
+      Verzeichnissen identisch sein (wichtig für die lokale Suche).
+   VORHER (Seitentitel-Zusatz): " | Nachhilfe Online" bzw.
+                                " – Nachhilfe – Online"
+   NACHHER: " | Mathe mit Marcel"
+   (Oder das Google-Profil umbenennen – Hauptsache einheitlich.
+    Siehe Analyse C3.)
+
+4. STARTSEITEN-TITEL MIT MARKE
+   VORHER:  "Online-Nachhilfe in vielen Fächern | Nachhilfe Online"
+   NACHHER: "Mathe-Nachhilfe online mit Marcel Daum | seit 2001 · 5,0 ★"
+   (59 Zeichen. Greift die Suche "mathe nachhilfe online marcel daum" auf.)
+
+   Meta-Beschreibung Startseite:
+   NACHHER: "Persönliche Online-Nachhilfe in Mathe & mehr – von Marcel Daum
+            und Team, seit 2001. 5,0 ★ bei 623 Google-Bewertungen.
+            Kostenlose Probestunde anfragen."
+
+5. PRÜFUNGSSEITE FÜR BAYERN UND HESSEN SCHÄRFEN
+   Gesucht wird schon "… 2027". Die Seite /angebot/abschlusspruefungen/
+   sollte die konkreten Prüfungen nennen.
+   - H1 VORHER:  "In die Prüfung mit Sicherheit."
+     H1 NACHHER: "Mathe-Abschlussprüfung 2027 sicher vorbereiten"
+   - Titel NACHHER: "Mathe-Abschlussprüfung 2027: Realschule, Quali & Abi |
+                    Mathe mit Marcel"
+   - Abschnitte ergänzen (H2):
+       Realschulabschluss Bayern 2027 – Termin [Termin prüfen]
+       Qualifizierender Abschluss (Quali) Bayern 2027
+       Realschulabschluss Hessen 2027
+       Abitur Bayern / Hessen 2027
+   - Hinweis aus den eigenen Bedingungen nutzen, aber positiv formulieren:
+     "Probestunde für Abschlussklassen bis spätestens 3 Monate vor der
+      Prüfung – für Juni-Prüfungen also bis [Datum ausrechnen]."
+     Das schafft Dringlichkeit.
+
+6. NEUE RATGEBER-SEITE: "WAS KOSTET MATHE-NACHHILFE?"
+   Ziel-Begriffe: "mathe nachhilfe kosten pro stunde", "nachhilfe kosten
+   pro monat", "einzelunterricht kosten".
+   Gliederung:
+     H1  Was kostet Mathe-Nachhilfe? Preise im Überblick
+     H2  Nachhilfe-Institut, Privatlehrer, Online – was ist der Unterschied?
+     H2  Was kostet eine Stunde bei uns? (ab 23,50 € im 20-Stunden-Paket)
+     H2  Was kostet Nachhilfe pro Monat? (Rechenbeispiel 1x/Woche)
+     H2  Worauf ihr beim Preisvergleich achten solltet
+         (Vertragslaufzeit, Anmeldegebühr, Verfall von Stunden)
+     H2  Kostenlose Probestunde
+   Nur eigene, belegbare Preise nennen. Für fremde Anbieter keine Zahlen
+   erfinden, allgemein bleiben.
+
+7. ERKLÄRSEITEN ZU MATHE-THEMEN (eine pro Woche)
+   Diese Begriffe werden sehr oft gesucht. Jede Seite verlinkt am Ende auf
+   das passende E-Book und die Probestunde.
+   Start mit:
+     "Bruchrechnung einfach erklärt – Regeln, Beispiele, Aufgaben"
+       H2 Was ist ein Bruch? / Erweitern und Kürzen / Addieren und
+          Subtrahieren / Multiplizieren und Dividieren / Übungsaufgaben mit
+          Lösungen
+       -> Link auf "Mathematik verstehen – Klasse 6"
+   Danach: "Prozentrechnung einfach erklärt (Formel + Dreisatz)",
+           "Textaufgaben Klasse 5 – so findest du den Ansatz"
+           (-> kostenloser Textaufgaben-Kompass).
+
+8. LOKALE LANDINGPAGE ASCHAFFENBURG (aus Analyse D9)
+   Ziel-Begriffe: "nachhilfe aschaffenburg", "mathe nachhilfe aschaffenburg".
+   Titel: "Mathe-Nachhilfe für Aschaffenburg – online, persönlich |
+          Mathe mit Marcel"
+   Inhalt: Bezug zu Schulen und Abschlusskursen im Landkreis, Vorteil
+   "kein Fahrweg", Bewertungen, Probestunde. Von der Startseite und dem
+   Footer verlinken.
+
+9. GOOGLE-PROFIL PFLEGEN
+   Gesucht wird "mathenachhilfe online by mathe mit marcel fotos" und
+   "… rezensionen".
+   -> Im Google-Unternehmensprofil aktuelle Fotos hochladen (Unterricht,
+      Tafelbild, Team), auf neue Bewertungen antworten und die Website-URL
+      prüfen.
+   -> Falls der Ausfall länger dauert: im Profil einen Beitrag mit
+      Telefonnummer/WhatsApp posten, damit Eltern dich trotzdem erreichen.
+
+10. "SOFORT"-SUCHEN BEDIENEN
+    Gesucht wird "mathe nachhilfe online sofort". Der Fragenpass bzw. die
+    Fragen per WhatsApp passen genau dazu.
+    -> Auf /produkt/fragenpass-fragenflat/ und /angebot/online-nachhilfe/
+       einen Abschnitt "Schnelle Hilfe – heute noch" mit Link ergänzen.
+       Nur zusagen, was ihr wirklich leisten könnt ([Antwortzeit]).
+
+
+================================================================================
+ 5. VERBESSERT / VERSCHLECHTERT SEIT LETZTER WOCHE
+================================================================================
+
+  Verschlechtert:  Website seit 01.11. ca. 5 Uhr komplett offline.
+  Verbessert:      Strato-Monitoring wieder aktiv (Wartungsmodus aus).
+  Unbekannt:       Umsetzung der Analyse-Punkte vom 31.10. – wird geprüft,
+                   sobald die Seite wieder erreichbar ist.
+
+
+================================================================================
+ NÄCHSTER CHECK
+================================================================================
+
+Montag, 09.11.2026, 5:47 Uhr. Ist die Seite vorher wieder online, sag kurz
+Bescheid – dann mache ich den Technik-Teil sofort nach.
+
+Hinweis: Für echte Positionen, Klicks und Suchvolumen wäre ein Export aus
+der Google Search Console (Leistung -> Exportieren) sehr hilfreich.
+
+================================================================================
