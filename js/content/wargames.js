@@ -175,6 +175,16 @@ const WARGAMES_RAW = [
     welcome: 'Nachtfalter · Sandbox bereit. Start: cat LIESMICH.txt · help zeigt Befehle.',
     flags: Array.from({ length: STUFEN }, (_, n) => `l${n}`),
     setup: nachtfalterSetup,
+    // Handübersetzung (i18n/<sprache>/w1.json): verpackte Texte erst entpacken, übersetzen, wieder einpacken
+    translateFS(sh, T, translateTree) {
+      const rev = (x) => [...x].reverse().join('');
+      translateTree(sh.fs.get(NF), T, (name, data) => {
+        if (name.endsWith('.b64')) return b64(T.lines(unb64(data.replace(/\s+/g, '')))).replace(/(.{60})/g, '$1\n') + '\n';
+        if (name === 'spiegel.txt') return data.split('\n').map(l => rev(T.t(rev(l)))).join('\n');
+        if (name === 'protokoll.log') return data.split('\n').map(l => { const f = l.split(' '); return f[1] === 'GEHEIM' ? [f[0], f[1], b64(T.t(unb64(f[2])))].join(' ') : l; }).join('\n');
+        return null;
+      });
+    },
     commands: nachtfalterCommands,
     onSolve(sh, flag) { const n = +flag.slice(1); openStufe(sh, n + 1); },
     tasks: [

@@ -11,7 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
-import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes } from './i18n.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -1348,7 +1348,7 @@ function questionHTML(r, t, q) {
   }
   return `<div class="q" id="q-${id}" style="margin:.7rem 0">
     ${q.repeat ? `<span class="badge plain" title="Wiederholung">🔁 Wiederholung · ${esc(q.repeat)}</span>` : ''}
-    <div class="row between"><b class="small">${ok ? '✓ ' : ''}${codeify(q.q)}</b><span class="small muted" data-pts="${key}">${pointsLabel(r, t, q)}</span></div>
+    <div class="row between"><b class="small">${ok ? '✓ ' : ''}${makeT(handDict(r.id)).h(q.q)}</b><span class="small muted" data-pts="${key}">${pointsLabel(r, t, q)}</span></div>
     ${input}<div class="qfb small" data-fb="${key}"></div><div class="tips" data-tips="${key}">${tipsHTML(r, q, key)}</div></div>`;
 }
 
@@ -1361,7 +1361,8 @@ function pointsLabel(r, t, q) {
 function tipsHTML(r, q, key) {
   const all = hintsOf(q); if (!all.length) return '';
   const used = Math.min(hintsUsed(r.id, key), all.length);
-  const shown = all.slice(0, used).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${all.length}:</b> ${codeify(h)}</div>`).join('');
+  const T = makeT(handDict(r.id));
+  const shown = all.slice(0, used).map((h, i) => `<div class="feedback info small"><b>Tipp ${i + 1}/${all.length}:</b> ${T.h(h)}</div>`).join('');
   const ok = qOk(r.id, key);
   const after = Math.max(1, Math.round(q.points - (used + 1) * hintCost(q)));
   const last = used === all.length - 1 && /^Lösung/i.test(all[all.length - 1]);
@@ -1372,19 +1373,22 @@ function tipsHTML(r, q, key) {
 views.raum = (id) => {
   const r = ROOM[id];
   if (!r) return views.raeume();
+  // Handübersetzung zuerst laden (nur EN/UK und nur, wenn es eine gibt)
+  if (hasHand(id) && handDict(id) === undefined) { loadHand(id).then(() => { if (location.hash.includes(id)) render(); }); return { html: '<p class="muted">…</p>' }; }
+  const T = makeT(handDict(id));
   const lock = roomLock(r);
   const head = `<a class="back" href="#/pfad">← Lernen</a>
     <div class="row">${typeBadge(r)}<span class="badge plain">Level ${LEVELS.find(l => l.id === r.level).n}</span>${machineBadge(r)}<span class="small muted">~${r.minutes} min</span></div>
-    <h1 style="margin-top:.5rem">${esc(r.title)}</h1><p>${esc(r.desc)}</p>`;
+    <h1 style="margin-top:.5rem" translate="no">${esc(r.title)}</h1><p>${T.h(r.desc)}</p>`;
   if (lock.length) return { html: head + `<div class="card warn"><b>🔒 Gesperrt</b><ul>${lock.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` };
   const rs = roomState(r.id);
   return {
     html: head + `
     <div class="card tight"><div class="bar"><i style="width:${roomPct(r.id)}%" id="rbar"></i></div><span class="small muted" id="rstat">${roomPct(r.id)} % · ${roomPoints(r.id)} Punkte</span>
-      <p class="small" style="margin:.4rem 0 0">🎯 <b>Erlaubt:</b> ${esc(r.scope)}</p>
+      <p class="small" style="margin:.4rem 0 0">🎯 <b>Erlaubt:</b> ${T.h(r.scope)}</p>
       <details class="small" style="margin-top:.3rem"><summary class="muted">Mehr Infos: Lernziel, Regeln, Werkzeuge</summary>
         <div class="task-meta" style="margin-top:.5rem">
-          <div><b>Lernziel</b>${esc(r.ziel)}</div><div><b>Stopp-Regel</b>${esc(r.stop)}</div><div><b>Aufräumen</b>${esc(r.cleanup)}</div>
+          <div><b>Lernziel</b>${T.h(r.ziel)}</div><div><b>Stopp-Regel</b>${T.h(r.stop)}</div><div><b>Aufräumen</b>${T.h(r.cleanup)}</div>
           <div><b>Werkzeuge</b>${r.tools.map(esc).join(', ')}</div>
         </div>
       </details>
@@ -1398,8 +1402,8 @@ views.raum = (id) => {
     <div class="stack">${r.tasks.map((t, i) => {
       const done = t.questions.every(q => qOk(r.id, qKey(t, q)));
       return `<details class="card" ${done ? '' : (i === r.tasks.findIndex(tt => !tt.questions.every(q => qOk(r.id, qKey(tt, q)))) ? 'open' : '')}>
-        <summary><span class="state ${done ? 'done' : ''}" style="display:inline-grid;margin-right:.5rem;vertical-align:middle">${done ? '✓' : i + 1}</span>Task ${i + 1}: ${esc(t.title)}</summary>
-        <p style="white-space:pre-line">${codeify(t.body)}</p>
+        <summary><span class="state ${done ? 'done' : ''}" style="display:inline-grid;margin-right:.5rem;vertical-align:middle">${done ? '✓' : i + 1}</span>Task ${i + 1}: ${T.h(t.title, esc)}</summary>
+        <p style="white-space:pre-line">${T.h(t.body)}</p>
         ${t.questions.map(q => questionHTML(r, t, q)).join('')}
       </details>`;
     }).join('')}</div>
@@ -1423,7 +1427,8 @@ views.raum = (id) => {
         const solve = (flag, value) => { const x = allQs(r).find(y => y.q.flag === flag); if (x) verdict(x.key, value); };
         sh = new Shell({ fs: baseFS(), commands: r.commands ? r.commands({ F, solve }) : {} });
         r.setup(sh, F, solved);
-        mountTerminal($('#rterm', root), sh, { title: `Raum · ${r.title}`, welcome: r.welcome || 'Raum-Sandbox bereit. Arbeitsordner: ~/raum0 · help zeigt Befehle.' });
+        if (T.active && r.translateFS) r.translateFS(sh, T, translateTree);
+        mountTerminal($('#rterm', root), sh, { title: `Raum · ${r.title}`, welcome: T.t(r.welcome) || 'Raum-Sandbox bereit. Arbeitsordner: ~/raum0 · help zeigt Befehle.' });
       };
       if (r.machine.kind === 'sandbox') { startSandbox(); $('#rreset', root).onclick = startSandbox; }
 
@@ -1435,7 +1440,7 @@ views.raum = (id) => {
         if (roomDone(r.id)) {
           if (!rs.doneAt) { rs.doneAt = Date.now(); save(); toast(`Raum „${r.title}“ gemeistert!`); }
           const n = r.nach;
-          $('#rdone', root).innerHTML = `<div class="card lime debrief"><h3>✓ Raum abgeschlossen · ${roomPoints(r.id)} Punkte</h3><dl><dt>Beobachtung</dt><dd>${esc(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${esc(n.schluss)}</dd><dt>Grenzen</dt><dd>${esc(n.grenzen)}</dd><dt>Nächster Schritt</dt><dd>${esc(n.naechster)}</dd></dl><p class="small">Aufräumen nicht vergessen: <code>${esc(r.cleanup)}</code></p></div>`;
+          $('#rdone', root).innerHTML = `<div class="card lime debrief"><h3>✓ Raum abgeschlossen · ${roomPoints(r.id)} Punkte</h3><dl><dt>Beobachtung</dt><dd>${T.h(n.beobachtung)}</dd><dt>Schlussfolgerung</dt><dd>${T.h(n.schluss)}</dd><dt>Grenzen</dt><dd>${T.h(n.grenzen)}</dd><dt>Nächster Schritt</dt><dd>${T.h(n.naechster)}</dd></dl><p class="small">Aufräumen nicht vergessen: <code>${esc(r.cleanup)}</code></p></div>`;
         }
       };
       const verdict = async (key, value) => {
