@@ -1,0 +1,52 @@
+diff --git a/js/content/story1.js b/js/content/story1.js
+index 1996236..8c62479 100644
+--- a/js/content/story1.js
++++ b/js/content/story1.js
+@@ -175,8 +175,8 @@ export const STORY1 = {
+       },
+       options: [
+         { key: 'a', t: 'Der Dienst liefert eine DB-Sicherung ohne Anmeldung an jeden aus, der ihn erreicht.', ok: true },
+-        { key: 'b', t: 'Daten wurden gestohlen.', why: 'Mara: „Zeigt dein Beleg einen FREMDEN Zugriff? Oder nur, dass es möglich wäre?“' },
+-        { key: 'c', t: 'Der Server wurde gehackt.', why: 'Mara: „Jonas hat ihn selbst gestartet. Was spricht für einen Angriff – was dagegen?“' },
++        { key: 'b', t: 'Ein Angreifer hat die DB-Sicherung über /backup/ heruntergeladen und besitzt die Daten jetzt.', why: 'Mara: „Zeigt dein Beleg einen FREMDEN Zugriff? Oder nur, dass es möglich wäre?“' },
++        { key: 'c', t: 'Jemand ist in den Server eingebrochen und hat die Sicherung dort im Ordner /backup/ abgelegt.', why: 'Mara: „Jonas hat ihn selbst gestartet. Was spricht für einen Angriff – was dagegen?“' },
+       ],
+       optionsPrompt: 'Maras Frage: Was genau belegt dein Fund?  antwort a | b | c',
+       hinweis: 'Erst die Ordneransicht /backup/ abrufen, dann den Dateinamen an die URL hängen.',
+@@ -205,8 +205,8 @@ export const STORY1 = {
+       },
+       options: [
+         { key: 'a', t: 'Nein. Der Nachbau zeigt nur MEINE Zugriffe seit dem Start. Für die echte lab-vm-07 (0.0.0.0!) brauchen wir deren eigene Logs.', ok: true },
+-        { key: 'b', t: 'Ja, alle Zugriffe kommen von 127.0.0.1 – also war niemand Fremdes da.', why: 'Mara: „Das sind die Logs DEINES Nachbaus. Lauschte das Original auch nur lokal?“' },
+-        { key: 'c', t: 'Ja, weil der Server keine Fehler zeigt.', why: 'Mara: „Was haben Fehler mit fremden Zugriffen zu tun?“' },
++        { key: 'b', t: 'Ja. Alle Zeilen im Log kommen von 127.0.0.1, also hat niemand von außen die Sicherung auf lab-vm-07 geladen.', why: 'Mara: „Das sind die Logs DEINES Nachbaus. Lauschte das Original auch nur lokal?“' },
++        { key: 'c', t: 'Ja. Das Log zeigt nur Status 200 und keinen einzigen Fehler, also gab es keine fremden Zugriffe auf die Sicherung.', why: 'Mara: „Was haben Fehler mit fremden Zugriffen zu tun?“' },
+       ],
+       optionsPrompt: 'Mara: „Beweist das, dass auf lab-vm-07 niemand Fremdes die Sicherung geladen hat?“  antwort a | b | c',
+       hinweis: 'Die Zeilen haben das Format: IP - - [Zeit] "METHODE PFAD PROTOKOLL" STATUS -',
+@@ -235,11 +235,11 @@ export const STORY1 = {
+       },
+       options: [
+         { key: 'a', t: 'Weil erst der Retest belegt, dass die Maßnahme wirkt – nicht nur, dass ich sie ausgeführt habe.', ok: true },
+-        { key: 'b', t: 'Weil Mara es verlangt.', why: 'Mara: „Und wenn ich es nicht verlangen würde – woran würdest du sehen, dass kill funktioniert hat?“' },
+-        { key: 'c', t: 'Weil kill manchmal Fehler ausgibt.', why: 'Mara: „Und wenn kill KEINEN Fehler ausgibt – ist der Prozess dann sicher weg?“' },
++        { key: 'b', t: 'Weil die Schichtleitung jede Maßnahme abzeichnen muss und den Retest dafür als Nachweis in der Akte braucht.', why: 'Mara: „Und wenn ich es nicht verlangen würde – woran würdest du sehen, dass kill funktioniert hat?“' },
++        { key: 'c', t: 'Weil man so sieht, ob kill eine Fehlermeldung ausgegeben hat – ohne Meldung ist der Server sicher beendet.', why: 'Mara: „Und wenn kill KEINEN Fehler ausgibt – ist der Prozess dann sicher weg?“' },
+       ],
+       optionsPrompt: 'Mara: „Warum bestehe ich auf dem Retest?“  antwort a | b | c',
+-      hinweis: 'PID aus Szene 3 (prüfe sie neu mit ps!). chmod numerisch: 6-0-0.',
++      hinweis: 'PID aus Szene 4 (prüfe sie neu mit ps!). chmod numerisch: 6-0-0.',
+       debrief: 'Mara: „Dienst weg, Sicherung geschützt, beides belegt. Jetzt der Bericht.“',
+     },
+     {
+@@ -259,8 +259,8 @@ export const STORY1 = {
+       ],
+       options: [
+         { key: 'a', t: 'Plattform-Team: Logs der echten lab-vm-07 sichern und auf Fremdzugriffe prüfen; Dev-Server nur lokal gebunden und ohne Backups starten.', ok: true },
+-        { key: 'b', t: 'Die IPs aus dem Log zurückscannen, um Angreifer zu finden.', why: 'Mara: „Welche IPs? Und wer hat das freigegeben?“' },
+-        { key: 'c', t: 'Ticket schließen – der Dienst ist ja aus.', why: 'Mara: „Und die offene Frage, ob jemand die Sicherung geladen hat?“' },
++        { key: 'b', t: 'Die IP-Adressen aus dem Log mit nmap zurückscannen, um die Angreifer zu finden und ihre Rechner genauer zu prüfen.', why: 'Mara: „Welche IPs? Und wer hat das freigegeben?“' },
++        { key: 'c', t: 'Ticket schließen: Der Dienst ist beendet, die Sicherung geschützt, und der Retest zeigt, dass nichts mehr erreichbar ist.', why: 'Mara: „Und die offene Frage, ob jemand die Sicherung geladen hat?“' },
+       ],
+       optionsPrompt: 'Abschluss: Was ist der nächste sichere Schritt?  antwort a | b | c',
+       hinweis: 'Grenzen: Nachbau ≠ Original; Logs nur seit Start; addr=0.0.0.0 im Original.',

@@ -619,6 +619,8 @@ views.story = (id = 's1') => {
       let term;
       const scene = () => s.scenes[Math.min(ss.scene, s.scenes.length - 1)];
       const prog = () => (ss.progress[scene().id] = ss.progress[scene().id] || {});
+      // Antwort-Optionen pro Spieler stabil gemischt (Seed aus Lab-Token + Szene), angezeigt als a/b/c
+      const shown = (sc) => shuffle(sc.options, [...(state.labToken + sc.id)].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7)).map((o, i) => ({ ...o, key: 'abc'[i] }));
       const needs = (sc) => ({ ev: sc.kind === 'real', ans: !!sc.answer, opt: !!sc.options, rep: sc.kind === 'report' });
       const complete = (sc) => { const n = needs(sc), p = ss.progress[sc.id] || {}; return (!n.ev || p.ev) && (!n.ans || p.ans) && (!n.opt || p.opt) && (!n.rep || p.rep); };
       const fail = (sc) => { ss.attempts[sc.id] = (ss.attempts[sc.id] || 0) + 1; save(); renderCard(); };
@@ -638,7 +640,7 @@ views.story = (id = 's1') => {
       };
       const printOptions = (sc) => {
         term.printHTML(`<span class="story">${esc(L1.t(sc.optionsPrompt || sc.auftrag))}</span>`);
-        sc.options.forEach(o => term.printHTML(`<span class="story">  ${o.key}) ${esc(L1.t(o.t))}</span>`));
+        shown(sc).forEach(o => term.printHTML(`<span class="story">  ${o.key}) ${esc(L1.t(o.t))}</span>`));
       };
 
       const stepDone = (sc) => {
@@ -744,8 +746,8 @@ views.story = (id = 's1') => {
             return { out: '', code: 0 };
           }
           if (n.opt && !p.opt) {
-            const o = sc.options.find(x => x.key === ans);
-            if (!o) return { out: '', err: `Antworte mit ${sc.options.map(x => x.key).join(' / ')}\n`, code: 1 };
+            const o = shown(sc).find(x => x.key === ans);
+            if (!o) return { out: '', err: `Antworte mit ${shown(sc).map(x => x.key).join(' / ')}\n`, code: 1 };
             if (!o.ok) { fail(sc); return { out: '', err: L1.t(o.why || 'Nicht ganz.') + '\n', code: 1 }; }
             p.opt = true; ss.answers[sc.id + '-opt'] = ans; save();
             term.printHTML('<span class="good">✓ Entscheidung begründet.</span>');
