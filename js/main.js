@@ -1,4 +1,4 @@
-// Kali Level Up – App
+// Nachtfalter Hacklab (früher „Kali Level Up“) – App
 import { Shell, baseFS, HOME } from './shell.js';
 import { mountTerminal } from './terminal-ui.js';
 import { verifyEvidence, normAnswer } from './verify.js';
@@ -120,7 +120,7 @@ function renderTop() {
   const loc = LOCATIONS[state.location];
   const st = syncStatus();
   $('#top').innerHTML = `
-    <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Kali <b>Level Up</b></span></a>
+    <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter <b>Hacklab</b></span></a>
     <span class="spacer"></span>
     ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben">VORSCHAU ${esc(self.KLY_VERSION || '')}</span>` : ''}
     <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + U(loc.short) : '📍 Lernort?'}</button>
@@ -1105,7 +1105,7 @@ views.mehr = () => {
         <label for="rst">Zum Bestätigen ZURÜCKSETZEN eintippen</label><input type="text" id="rst" autocapitalize="characters">
         <button class="btn danger" id="reset" style="margin-top:.5rem">Lokalen Lernstand zurücksetzen</button>
       </div>
-      <p class="small dim">Kali Level Up ${esc(self.KLY_VERSION || '')} · Geräte-ID ${esc(state.deviceId)} · Lab-Token ${esc(state.labToken)}</p>
+      <p class="small dim">Nachtfalter Hacklab ${esc(self.KLY_VERSION || '')} · Geräte-ID ${esc(state.deviceId)} · Lab-Token ${esc(state.labToken)}</p>
     </div>`,
     mount(root) {
       bindLangPicker(root);

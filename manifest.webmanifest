@@ -1,7 +1,7 @@
 {
-  "name": "Kali Level Up",
-  "short_name": "Kali LvlUp",
-  "description": "Vom Linux-Anfänger zum Purple Team – Sandbox-Simulation und echte Kali-Aufträge.",
+  "name": "Nachtfalter Hacklab",
+  "short_name": "Nachtfalter",
+  "description": "Vom Linux-Anfänger zum Purple Team – Rätsel, Story und Sandbox im Browser, echte Aufträge in Kali Linux.",
   "lang": "de",
   "id": "./",
   "start_url": "./#/heute",

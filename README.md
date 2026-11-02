@@ -1,4 +1,6 @@
-# Kali Level Up
+# Nachtfalter Hacklab
+
+(früher „Kali Level Up“ – umbenannt, weil „Kali“ eine Marke von OffSec ist. Kali Linux bleibt das Werkzeug, mit dem man hier lernt.)
 
 Interaktive Lern-App **vom Linux-Anfänger zum Pentester** (Endziel: bereit für das eJPT) – mobile-first (Galaxy S23) und am PC
 neben einer Kali-VM nutzbar. Installierbare PWA, offlinefähig, ohne Build-Schritt.
