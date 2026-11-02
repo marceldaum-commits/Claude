@@ -130,9 +130,17 @@ const ROOMDEF = {
 };
 
 // ---------------------------------------------------------------- Originaltexte sammeln
-const def = ROOMDEF[ROOM];
-if (!def) { console.log(`Für ${ROOM} gibt es noch keinen Steckbrief in qa/check-i18n.mjs.`); process.exit(2); }
 const r = ROOMS.find(x => x.id === ROOM);
+if (!r) { console.log(`Raum ${ROOM} gibt es nicht.`); process.exit(2); }
+// Steckbrief: hier in ROOMDEF, sonst qa/i18n-rooms/<raum>.mjs (export default { decode, special, web, solve? }).
+// Leitern (makeLadder) brauchen nur decode/special – gelöst wird automatisch über floors[].solve.
+let def = ROOMDEF[ROOM];
+if (!def) {
+  const ext = await import(`./i18n-rooms/${ROOM}.mjs`).then(m => m.default).catch(() => ({}));
+  if (!r.floors && !ext.solve) { console.log(`Für ${ROOM} fehlt ein Steckbrief (qa/i18n-rooms/${ROOM}.mjs).`); process.exit(2); }
+  const first = r.dirOf ? r.dirOf(0) : '';
+  def = { decode: () => null, ...ext, base: ext.base || first.replace(/\/[^/]+$/, ''), ladder: ext.ladder ?? (r.floors ? first.split('/').pop().replace(/\d+$/, '') : undefined) };
+}
 const F = {}; for (const f of r.flags) F[f] = await flagFor('KLY-QA-TEST', ROOM, f);
 
 function roomStrings() {
@@ -188,7 +196,7 @@ for (const lang of ['en', 'uk']) {
   const s = new Shell({ fs: baseFS(), commands: r.commands({ F, solve: (f) => solved.push(f) }) });
   r.setup(s, F, new Set());
   if (r.translateFS) r.translateFS(s, T, translateTree);
-  else { console.log('  (Raum hat noch kein translateFS – nutze Vorschlag aus qa/check-i18n.mjs)'); translateTree(s.fs.get(def.base), T, def.special || (() => null)); }
+  else { console.log('  (Raum hat noch kein translateFS – nutze Vorschlag aus dem Steckbrief)'); translateTree(s.fs.get(def.base), T, def.special || (() => null)); if (def.web) def.web(s, T); }
   const run = (c) => { const x = s.exec(c); return (x.out || '') + (x.err || ''); };
   const step = (n, cmd, given) => {
     const out = given ?? run(cmd); const c = (out.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
