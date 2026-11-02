@@ -45,3 +45,18 @@ Prüfen: `node qa/check-i18n-shell.mjs` (löst ca. 70 echte Fehler aus und prüf
 Reine Sätze und Beschriftungen ohne HTML aus js/main.js (locationModal, views.heute, EXTERNAL[].why) und
 js/content/curriculum.js (LOCATIONS label/short/desc). Zusammengesetzte Stellen als Muster mit benannten Platzhaltern:
 `Hallo {name}!` (ohne Namen: `Hallo!`), `{n} Abzeichen →`, `{done} von {all} geknackt`, `{n} % geschafft`, `Raum: {title}`.
+
+## level1.json (Lektionen, Übungen, Tipps, Prüfung)
+
+Gesammelt mit `node qa/extract-level1.mjs` (title/intro, concepts name/zweck/wirkung/regel, args[][1], fehler[],
+Übungen title/ziel/auftrag/scope/beleg/hinweis, knobel q/options t+why, nach, real-Texte, Rückmeldungen aus check(),
+uebungsTipps(), Prosa-Zeilen der Sandbox-Dateien, EXAM title/rules/topic/q/options).
+- Original bleibt alles, was check() vergleicht oder was man exakt eintippen soll (z. B. die drei Zeilen
+  „08:00 Alarm eingegangen …“, „Nicht löschen: Übergabe von der Frühschicht.“, „Failed password“, ERROR, debug=true,
+  das Präfix „ALT“), außerdem Config-/Log-/hosts-Zeilen.
+- Spickzettel-Tipps sind aus den übersetzten Lektionstiteln und Konzeptnamen zusammengesetzt; zusätzlich gibt es das Muster
+  `Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge: {begriffe}.`
+- Shell-Meldungen in Fragen („Keine Berechtigung“ …) stehen so, wie das übersetzte Terminal sie zeigt (shell.json).
+
+Prüfen: `node qa/check-i18n-level1.mjs` (Schlüssel, Befehle per codeify, alle 16 Sandbox-Übungen + 3 Praxisaufgaben der Prüfung
+mit übersetzten Dateien und Musterlösung lösbar).

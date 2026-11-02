@@ -28,8 +28,9 @@ for (const lang of ['en', 'uk']) {
     if (lang === 'uk' && /[a-zäöüß]{5,} [a-zäöüß]{5,} [a-zäöüß]{5,}/i.test(v.replace(/`[^`]*`|„[^“]*“|"[^"]*"/g, '')) && v !== k) console.log(`  · viel Latein im UK-Text: ${v.slice(0, 100)}`);
     if (!tippish(quelle.get(k) || '')) continue;
     for (const m of codeify(k).matchAll(/<code translate="no">(.*?)<\/code>/g)) {
-      const c = un(m[1]);
-      if (/<\S/.test(c) || /[A-ZÄÖÜ]{3,}/.test(c.replace(/KLY|ERROR|INFO|WARN|HEAD|TERM|KILL|HUP|README|DNS|HTTP|URL|PID|PPID|IP/g, ''))) continue;
+      const c = un(m[1]).replace(/[.,:;]$/, ''); // Satzzeichen am Ende gehört zum Satz
+      if (/<\S/.test(c) || /[A-ZÄÖÜ]{3,}/.test(c.replace(/KLY|ERROR|INFO|WARN|HEAD|TERM|KILL|HUP|README|DNS|HTTP|URL/g, ''))) continue;
+      if (/(^|-)[A-ZÄÖÜ][a-zäöüß]{2,}|^[A-ZÄÖÜ][a-zäöüß]+-/.test(c)) continue; // deutsche Wortteile wie „-Zeilen“, „Nicht-.txt“
       if (!v.includes(c)) err(`Befehl „${c}“ fehlt in: ${JSON.stringify(v).slice(0, 160)}`);
     }
   }
