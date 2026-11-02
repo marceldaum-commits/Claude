@@ -43,6 +43,18 @@ Gepflegt auf Branch `ccr-63912bdd-xpv8bk` (lesen: `git fetch origin ccr-63912bdd
 - Idee (offen): KI-Kapitel „KI in der IT-Sicherheit“ (z. B. KI-Antworten prüfen, Phishing erkennen) – Inhalte stimmen beide Sitzungen ab.
 - Beta-Tester: dieselben Einladungen/Tester-Liste. Marcel pflegt die Liste, beide Dienste nutzen eigene Codes.
 
+## Gegenseitiges Prüfen & Brainstorming
+
+- Nach jedem fertigen Stück schickt der Autor Branch + Commit + Prüfauftrag an die andere Sitzung.
+- Befunde sortiert nach: inhaltlich falsch / didaktisch unklar / Sicherheit & Datenschutz / Handy-Bedienung / Kleinkram.
+- Der Autor entscheidet und setzt um. Niemand ändert Dateien des anderen.
+- Ideen für die jeweils andere App sind ausdrücklich erwünscht (per Nachricht, hier unter „Ideen“ festgehalten).
+
+### Ideen
+
+- KI-App: Prompt-Werkstatt, Lügendetektor (Halluzinationen finden), Geheimnis-Wächter (was gehört nicht in einen Prompt), Rollen & Kontext, KI oder Mensch?, Story-Rahmen Praktikum, Tokens als Spielwährung.
+- Brücke „KI & Sicherheit“: Prompt-Injection verstehen und sich schützen (KI-App). Raum „Analyse mit KI-Hilfe“ mit fehlerhafter, vorgefertigter KI-Erklärung, die im Sandbox-Terminal nachgeprüft wird (Kali-App).
+
 ## Offene Punkte
 
 - [ ] Domain festlegen (Marcel)
