@@ -4,8 +4,8 @@
 
 export const LANGS = {
   de: { name: 'Deutsch', flag: '🇩🇪', note: '' },
-  en: { name: 'English', flag: '🇬🇧', note: 'Machine-translated (Google). Commands and terminals stay in the original – type them exactly as shown.' },
-  uk: { name: 'Українська', flag: '🇺🇦', note: 'Машинний переклад (Google). Команди й термінал залишаються в оригіналі – вводьте їх саме так, як показано.' },
+  en: { name: 'English', flag: '🇬🇧', note: 'Partly translated by hand, the rest by Google. Commands and the terminal stay in the original – type them exactly as shown.' },
+  uk: { name: 'Українська', flag: '🇺🇦', note: 'Частково перекладено вручну, решту – Google. Команди й термінал залишаються в оригіналі – вводь їх саме так, як показано.' },
 };
 const KEY = 'kly.lang';
 // Wenige feste Begriffe übersetzen wir selbst (zuverlässiger als die Maschine)
@@ -80,7 +80,7 @@ const STOP = new Set(('und oder zeigt gibt zählt ist sind scheitert liest mit f
   'hat haben einen eine ein einer reicht klappt funktioniert prüft vergleicht dreht entfernt zerlegt schneidet ändert startet ' +
   'verbindet läuft lassen lässt holt druckt ersetzt erzeugt liefert nimmt kommt bringt passt fehlt so wie wo was hier da noch schon ' +
   'immer jetzt mal bis vom zum zur beim nach vor über unter um bei ohne gegen durch alle alles jede jeder jedes ' +
-  'weiter dafür damit dazu davon darauf daran darin dort selbst zuerst danach gern einfach auch nochmal wieder sofort').split(' '));
+  'weiter dafür damit dazu davon darauf daran darin dort selbst zuerst danach gern einfach auch nochmal wieder sofort ab her hin los zurück').split(' '));
 const PATTERNS = [
   /KLY\{[^}\n]{0,40}\}/y, /KLY-(?:[0-9A-F]{6}|X{6})/y, /entsperren\s+\S+/y,
   /(?:~|\.{1,2})?\/[\w.\-*/~]*/y,                      // Pfade: /etc/passwd, ./-datei, ~/turm
@@ -105,8 +105,12 @@ function cmdSpan(s, i) {
   const sub = SUBCMD.has(w[0]);
   while (j < s.length && s[j] === ' ') {
     let k = j + 1, tok = '';
-    if (s[k] === "'" || s[k] === '"') { const q = s.indexOf(s[k], k + 1); if (q < 0) break; tok = s.slice(k, q + 1); }
-    else { const t = /[^\s]+/y; t.lastIndex = k; const r = t.exec(s); if (!r) break; tok = r[0]; }
+    if (s[k] === "'" || s[k] === '"') { const q = s.indexOf(s[k], k + 1); if (q < 0 || / [·–—] /.test(s.slice(k, q))) break; tok = s.slice(k, q + 1); }
+    else {
+      const t = /[^\s]+/y; t.lastIndex = k; const r = t.exec(s); if (!r) break; tok = r[0];
+      // -d' ' : offenes Anführungszeichen im Wort bis zum schließenden mitnehmen
+      for (const qc of tok.includes("'") ? ["'"] : ['"']) if ((tok.split(qc).length - 1) % 2 === 1) { const q = s.indexOf(qc, k + tok.length); if (q > 0 && !/ [·–—] |: /.test(s.slice(k, q))) { const t2 = /[^\s]*/y; t2.lastIndex = q + 1; tok = s.slice(k, q + 1) + t2.exec(s)[0]; } break; }
+    }
     let core = tok, trail = false;
     if (!/^['"]/.test(tok)) { const p = /[.,;:!?)“”]+$/.exec(tok); if (p && !/^\.+\/?$/.test(tok)) { core = tok.slice(0, p.index); trail = true; } }
     if (!core) break;
@@ -175,7 +179,7 @@ export function protectCodes() {
 // Datei i18n/<sprache>/<raumid>.json = { "<deutscher Originaltext>": "<Übersetzung>" } (Team „Sprache & Qualität“).
 // {code} steht für einen Code KLY{16 Zeichen}. Was nicht im Wörterbuch steht, bleibt original
 // (und wird dann wie bisher von Google übersetzt). Handübersetzte Stellen sind translate="no".
-export const HAND = { en: ['w1', 'w4'], uk: ['w1', 'w4'] };
+export const HAND = { en: ['w1', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'w9', 'p5', 'p6', 'p7', 'p8', 'p10'], uk: ['w1', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'w9', 'p5', 'p6', 'p7', 'p8', 'p10'] };
 const DICTS = {};
 const CODE_IN = /KLY\{[0-9a-f]{16}\}/g;
 

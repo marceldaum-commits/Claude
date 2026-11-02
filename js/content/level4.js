@@ -168,6 +168,14 @@ export const LEVEL4_ROOMS = [
     welcome: 'Kollektiv · Sandbox bereit. Start: cat LIESMICH.txt · help zeigt Befehle.',
     flags: Array.from({ length: STUFEN }, (_, n) => `l${n}`),
     setup, commands,
+    // Handübersetzung: ROT13-Text erst entschlüsseln, übersetzen, wieder verschieben; Logs/Tabellen bleiben original
+    translateFS(sh, T, translateTree) {
+      translateTree(sh.fs.get(K), T, (name, data) => {
+        if (name === 'abgefangen.txt') return rot13(T.t(rot13(data.trim()))) + '\n';
+        if (name.endsWith('.log') || name.endsWith('.csv')) return data;
+        return null;
+      });
+    },
     onSolve(sh, flag) { openStufe(sh, +flag.slice(1) + 1); },
     tasks: [
       { id: 's0', title: 'Stufe 0 – Drei Teile', body: 'Willkommen im Kollektiv. Erste Lektion: Variablen.', questions: [q(0, [
