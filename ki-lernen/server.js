@@ -5,6 +5,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import { Budget } from './budget.js';
 
@@ -34,7 +35,9 @@ const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
 const BASE_SYSTEM =
   'Du bist Teil der „KI-Werkstatt“, eines deutschsprachigen Lernprogramms, in dem Menschen spielerisch ' +
   'lernen, wie man mit KI-Assistenten umgeht. Antworte auf Deutsch, freundlich und knapp (höchstens etwa ' +
-  '150 Wörter), außer die Aufgabe verlangt ausdrücklich etwas anderes. Latency-sensitive; begin your visible answer immediately.';
+  '150 Wörter), außer die Aufgabe verlangt ausdrücklich etwas anderes. Unter den Lernenden können Kinder sein: ' +
+  'Bleib altersgerecht, frag nie nach Namen, Adressen, Schulen, Fotos oder anderen persönlichen Daten und rate davon ab, ' +
+  'solche Daten einzugeben. Beginne deine sichtbare Antwort sofort, ohne lange Vorrede.';
 
 // ---------- kleine Helfer ----------
 const MIME = {
@@ -74,13 +77,46 @@ async function readBody(req, limit = 64 * 1024) {
   }
 }
 
+// Echte Absender-IP: X-Forwarded-For nur glauben, wenn die Anfrage vom lokalen Plesk-nginx kommt.
+function clientIp(req) {
+  const peer = req.socket.remoteAddress || '';
+  const local = peer === '127.0.0.1' || peer === '::1' || peer === '::ffff:127.0.0.1';
+  const fwd = String(req.headers['x-forwarded-for'] || '').split(',').pop().trim();
+  return local && fwd ? fwd : peer;
+}
+
+// Codes zeitkonstant vergleichen (Hash auf feste Länge, dann timingSafeEqual).
+const digest = (s) => crypto.createHash('sha256').update(String(s)).digest();
+const CODE_DIGESTS = [...CODES.keys()].map((c) => [c, digest(c)]);
+function findCode(given) {
+  const d = digest(given);
+  let hit = null;
+  for (const [c, cd] of CODE_DIGESTS) if (crypto.timingSafeEqual(d, cd)) hit = c;
+  return hit;
+}
+
+// Fehlversuche pro IP: höchstens 10 in 15 Minuten, sonst Sperre (gegen Durchprobieren).
+const failures = new Map();
+const FAIL_WINDOW = 15 * 60_000;
+function blockedIp(ip) {
+  const list = (failures.get(ip) || []).filter((t) => Date.now() - t < FAIL_WINDOW);
+  failures.set(ip, list);
+  return list.length >= 10;
+}
+
 function auth(req) {
-  const code = String(req.headers['x-invite-code'] || '').trim();
-  if (!code || !CODES.has(code)) return null;
+  const ip = clientIp(req);
+  if (blockedIp(ip)) return { blocked: true };
+  const given = String(req.headers['x-invite-code'] || '').trim();
+  const code = given ? findCode(given) : null;
+  if (!code) {
+    if (given) failures.get(ip).push(Date.now());
+    return null;
+  }
   return { code, name: CODES.get(code) };
 }
 
-// Einfache Bremse: höchstens 12 KI-Anfragen pro Minute und Code.
+// Bremse: höchstens 12 KI-Anfragen pro Minute und Code.
 const recent = new Map();
 function rateLimited(code) {
   const now = Date.now();
@@ -89,6 +125,20 @@ function rateLimited(code) {
   list.push(now);
   recent.set(code, list);
   return false;
+}
+
+// Höchstens 3 gleichzeitige KI-Anfragen pro Code (das Würfel-Labor fragt dreimal parallel).
+// So kann niemand mit vielen parallelen Anfragen weit über das Budget schießen.
+const MAX_PARALLEL = 3;
+const running = new Map();
+function acquire(code) {
+  const n = running.get(code) || 0;
+  if (n >= MAX_PARALLEL) return false;
+  running.set(code, n + 1);
+  return true;
+}
+function release(code) {
+  running.set(code, Math.max(0, (running.get(code) || 1) - 1));
 }
 
 function cleanMessages(raw) {
@@ -107,7 +157,7 @@ function cleanMessages(raw) {
 function describeError(err) {
   if (err instanceof Anthropic.AuthenticationError) return 'Der API-Schlüssel auf dem Server ist ungültig.';
   if (err instanceof Anthropic.RateLimitError) return 'Die KI ist gerade überlastet. Bitte gleich nochmal versuchen.';
-  if (err instanceof Anthropic.BadRequestError) return 'Die Anfrage wurde abgelehnt: ' + err.message;
+  if (err instanceof Anthropic.BadRequestError) return 'Die KI konnte diese Anfrage nicht bearbeiten.';
   if (err instanceof Anthropic.APIError) return `KI-Fehler (${err.status ?? 'Netz'}).`;
   return err.message || 'Unbekannter Fehler';
 }
@@ -140,31 +190,55 @@ async function handleChat(req, res, user) {
 
   const stream = client.beta.messages.stream({
     model: MODEL,
-    max_tokens: 4000,
+    max_tokens: MAX_TOKENS,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
     output_config: { effort: 'low' },
     system,
     messages,
   });
-  req.on('close', () => stream.abort());
+  // Bisherigen Verbrauch mitschreiben, damit auch abgebrochene Antworten verbucht werden.
+  const seen = { input_tokens: 0, output_tokens: 0, chars: 0, model: MODEL };
+  let booked = false;
+  const book = (usage, model) => {
+    if (booked) return budget.left(user.code);
+    booked = true;
+    return budget.record(user.code, usage, model);
+  };
+  res.on('close', () => {
+    if (booked) return;
+    stream.abort();
+    // Ausgabe grob schätzen: sichtbare Zeichen / 3, mindestens das bisher Gemeldete.
+    book({ input_tokens: seen.input_tokens, output_tokens: Math.max(seen.output_tokens, Math.ceil(seen.chars / 3)) }, seen.model);
+  });
 
   try {
     for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+      if (event.type === 'message_start') {
+        seen.input_tokens = event.message.usage?.input_tokens || 0;
+        seen.model = event.message.model || MODEL;
+      } else if (event.type === 'message_delta') {
+        seen.output_tokens = event.usage?.output_tokens || seen.output_tokens;
+      } else if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+        seen.chars += event.delta.text.length;
         send('text', event.delta.text);
       }
     }
     const final = await stream.finalMessage();
-    const left = budget.record(user.code, final.usage, final.model);
+    const left = book(final.usage, final.model);
     const refusal = refusalText(final);
     if (refusal) send('text', '\n\n' + refusal);
-    send('done', { usage: final.usage, budgetLeft: left, stop: final.stop_reason });
+    if (final.stop_reason === 'max_tokens') send('text', ' …\n\n(Antwort gekürzt – frag nach, wenn du mehr willst.)');
+    send('done', { budgetLeft: left, stop: final.stop_reason });
   } catch (err) {
+    console.error('Chat-Fehler:', err.message);
     if (!res.writableEnded) send('error', describeError(err));
   }
   res.end();
 }
+
+// Antworten sollen kurz sein (~150 Wörter); das Denken des Modells zählt mit, darum etwas Luft.
+const MAX_TOKENS = 2000;
 
 // Prompt-Werkstatt: die KI bewertet einen Prompt nach festen Kriterien (strukturierte JSON-Antwort).
 const JUDGE_SCHEMA = {
@@ -191,7 +265,7 @@ async function handleJudge(req, res, user) {
 
   const msg = await client.beta.messages.create({
     model: MODEL,
-    max_tokens: 4000,
+    max_tokens: MAX_TOKENS,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
     output_config: { effort: 'low', format: { type: 'json_schema', schema: JUDGE_SCHEMA } },
@@ -246,20 +320,26 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { ok: true, ki: Boolean(client), model: MODEL });
       }
       const user = auth(req);
+      if (user?.blocked) return sendJson(res, 429, { error: 'Zu viele falsche Codes. Bitte in 15 Minuten nochmal.' });
       if (!user) return sendJson(res, 401, { error: 'Bitte einen gültigen Einladungscode eingeben.' });
       if (url.pathname === '/api/me') {
         return sendJson(res, 200, { name: user.name, budgetLeft: budget.left(user.code), budget: BUDGET_USD });
       }
       if (req.method !== 'POST') return sendJson(res, 405, { error: 'Nur POST.' });
       if (!client) return sendJson(res, 503, { error: 'Auf dem Server ist noch kein API-Schlüssel eingetragen.' });
+      if (rateLimited(user.code)) return sendJson(res, 429, { error: 'Langsam! Höchstens 12 Anfragen pro Minute.' });
       if (url.pathname === '/api/tokens') return await handleTokens(req, res);
+      const handler = { '/api/chat': handleChat, '/api/judge': handleJudge }[url.pathname];
+      if (!handler) return sendJson(res, 404, { error: 'Unbekannt.' });
       if (budget.left(user.code) <= 0) {
         return sendJson(res, 402, { error: 'Das KI-Budget für diesen Monat ist aufgebraucht.' });
       }
-      if (rateLimited(user.code)) return sendJson(res, 429, { error: 'Langsam! Höchstens 12 Anfragen pro Minute.' });
-      if (url.pathname === '/api/chat') return await handleChat(req, res, user);
-      if (url.pathname === '/api/judge') return await handleJudge(req, res, user);
-      return sendJson(res, 404, { error: 'Unbekannt.' });
+      if (!acquire(user.code)) return sendJson(res, 429, { error: 'Bitte warte, bis die laufenden Antworten fertig sind.' });
+      try {
+        return await handler(req, res, user);
+      } finally {
+        release(user.code);
+      }
     }
     return serveStatic(url.pathname, res);
   } catch (err) {

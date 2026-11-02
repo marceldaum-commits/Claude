@@ -138,6 +138,8 @@ function codeForm(render) {
   };
   return h('div', { class: 'card' },
     h('p', {}, '🔑 Für Missionen mit echter KI brauchst du einen Einladungscode.'),
+    h('p', { class: 'hint' }, '🔒 Was du in diesen Missionen schreibst, wird an die KI-Firma Anthropic geschickt. ' +
+      'Schreib darum nie deinen echten Namen, deine Adresse, deine Schule, Passwörter oder Fotos von dir oder anderen hinein.'),
     input,
     h('div', { class: 'row' }, h('button', { onclick: go }, 'Los geht’s')),
     msg);

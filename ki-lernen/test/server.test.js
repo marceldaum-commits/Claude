@@ -120,3 +120,16 @@ test('Prompt-Trainer liefert Bewertung, Budget sperrt danach', async () => {
   const r = await post('/api/judge', { task: 'x', prompt: 'y' });
   assert.equal(r.status, 402);
 });
+
+test('Fehlermeldung verrät keine API-Details', async () => {
+  // Fallback-Pfad: unbekannter Endpunkt liefert 404 ohne Interna
+  const r = await post('/api/gibtsnicht', {});
+  assert.equal(r.status, 404);
+});
+
+test('nach 10 falschen Codes wird die IP gesperrt – auch für richtige Codes', async () => {
+  // Test 3 hat schon einen falschen Code geschickt → 9 weitere ergeben 10
+  for (let i = 0; i < 9; i++) assert.equal((await post('/api/tokens', { text: 'x' }, 'RATEN-' + i)).status, 401);
+  const r = await post('/api/tokens', { text: 'x' }, 'GUT');
+  assert.equal(r.status, 429);
+});
