@@ -1,10 +1,13 @@
 :root {
   --bg: #f6f4ff; --card: #ffffff; --text: #1d1640; --muted: #5d5880; --line: #e2def5;
   --accent: #5b4bdb; --accent-2: #ffd166; --ok: #1f9d6b; --bad: #d64545; --chip: #ece9ff;
+  --on-accent: #ffffff; --on-ok: #ffffff;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #14112a; --card: #1f1b3d; --text: #f0eeff; --muted: #aaa4d4; --line: #332d5e;
-    --accent: #8f82ff; --accent-2: #ffd166; --ok: #4cd19a; --bad: #ff7a7a; --chip: #2b2652; }
+  /* Familien-Farben wie im Nachtfalter Hacklab; Violett ist der Akzent der KI-Werkstatt */
+  :root { --bg: #0b0b12; --card: #171724; --text: #e8e8f0; --muted: #a3a3b8; --line: #2a2a3d;
+    --accent: #a78bfa; --accent-2: #fbbf24; --ok: #a3e635; --bad: #f87171; --chip: #1e1e2e;
+    --on-accent: #0b0b12; --on-ok: #0b0b12; }
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text);
@@ -30,9 +33,9 @@ a.card:hover { transform: translateY(-2px); border-color: var(--accent); }
 .card p { margin: 0; color: var(--muted); font-size: 15px; }
 .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
 .tag { font-size: 12px; background: var(--chip); border-radius: 999px; padding: 2px 8px; color: var(--muted); }
-.tag.done { background: var(--ok); color: #fff; }
-button, .btn { font: inherit; border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer;
-  background: var(--accent); color: #fff; font-weight: 600; }
+.tag.done { background: var(--ok); color: var(--on-ok); }
+button, .btn { font: inherit; border: 0; border-radius: 12px; padding: 10px 16px; cursor: pointer;
+  background: var(--accent); color: var(--on-accent); font-weight: 600; }
 button.ghost { background: var(--chip); color: var(--text); }
 button:disabled { opacity: .5; cursor: not-allowed; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
@@ -55,7 +58,7 @@ textarea { min-height: 110px; resize: vertical; }
 .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
 .chat { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
 .msg { padding: 10px 12px; border-radius: 12px; max-width: 85%; white-space: pre-wrap; }
-.msg.user { align-self: flex-end; background: var(--accent); color: #fff; }
+.msg.user { align-self: flex-end; background: var(--accent); color: var(--on-accent); }
 .msg.assistant { align-self: flex-start; background: var(--chip); }
 .checks { list-style: none; padding: 0; margin: 8px 0; }
 .checks li::before { content: "✗ "; color: var(--bad); font-weight: 700; }
@@ -67,8 +70,9 @@ textarea { min-height: 110px; resize: vertical; }
 .back { display: inline-block; margin-bottom: 8px; text-decoration: none; }
 .right { display: flex; align-items: center; gap: 8px; min-width: 0; flex-shrink: 1; }
 select { font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; max-width: 100%; }
-select.lang { padding: 4px 6px; font-size: 14px; }
+select.lang { padding: 4px 8px; font-size: 14px; border-radius: 999px; background: transparent; }
 @media (max-width: 420px) { .top { padding: 10px 12px; gap: 8px; } .xp { font-size: 13px; } .bar { width: 90px; } }
 .toast { bottom: auto; top: 64px; }
-.brand b { font-weight: 800; }
+.brand b { font-weight: 800; color: var(--accent); }
+.brand img { width: 32px; height: 32px; }
 @media (max-width: 380px) { .brand { font-size: 15px; } .brand img { width: 24px; height: 24px; } }
