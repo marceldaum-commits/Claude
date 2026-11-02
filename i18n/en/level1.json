@@ -819,5 +819,15 @@
   "Prozesse (Praxis)": "Processes (practice)",
   "Praxis: Beende den Prozess „sleep 777“. Der Prozess „sleep 778“ muss weiterlaufen.": "Practice: End the process \"sleep 777\". The process \"sleep 778\" must keep running.",
   "Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge: {begriffe}.": "Check the cheat sheet \"{titel}\" – it lists the right tools: {begriffe}.",
-  "Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge.": "Check the cheat sheet \"{titel}\" – it lists the right tools."
+  "Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge.": "Check the cheat sheet \"{titel}\" – it lists the right tools.",
+  "Diese Übung erlaubt nur 127.0.0.1/localhost auf deinem eigenen Gerät. Nichts davon ausführen; falls schon geschehen: abbrechen (Strg+C) und den Vorfall im Bericht notieren.": "This exercise allows only 127.0.0.1/localhost on your own device. Do not run any of it; if it already happened: stop (Ctrl+C) and note the incident in your report.",
+  "Befehl eingetragen": "Command entered",
+  "Welchen Befehl hast du im echten Terminal genau eingegeben? Trage ihn ein.": "Which command exactly did you type in the real terminal? Enter it.",
+  "Ausgabe eingefügt": "Output pasted",
+  "Füge die tatsächliche Ausgabe deines Terminals ein – nicht abgetippt, nicht zusammengefasst.": "Paste the actual output of your terminal – not retyped, not summarized.",
+  "Die Eingabe sieht nach einem echten Schlüssel/Token aus. Entferne ihn sofort – Übungen brauchen niemals echte Zugangsdaten.": "The input looks like a real key/token. Remove it right away – exercises never need real credentials.",
+  "Passender Befehl verwendet": "Fitting command used",
+  "Passt dein Befehl zum Auftrag? Prüfe Befehlsname, Optionen und Ziel noch einmal gegen die Lektion.": "Does your command fit the task? Check the command name, options and target against the lesson once more.",
+  "Dein persönlicher Lab-Token ist in der Ausgabe": "Your personal lab token is in the output",
+  "Die Ausgabe enthält deinen Lab-Token nicht. Hast du das Setup-Skript aus DIESER App ausgeführt und arbeitest im richtigen Lab-Ordner?": "The output does not contain your lab token. Did you run the setup script from THIS app, and are you working in the right lab folder?"
 }

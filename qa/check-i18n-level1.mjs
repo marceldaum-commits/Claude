@@ -14,6 +14,8 @@ import { level1Strings } from './extract-level1.mjs';
 let fehler = 0;
 const err = (m) => { fehler++; console.log('  ✗ ' + m); };
 const quelle = level1Strings();
+// Standard-Rückmeldungen aus js/verify.js (resultsHTML schlägt sie im Level-1-Wörterbuch nach): wörtlich im Quelltext = gültig
+const VERIFY_SRC = readFileSync(new URL('../js/verify.js', import.meta.url), 'utf8');
 const TEMPLATES = new Set(['Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge: {begriffe}.', 'Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge.']);
 const un = (s) => s.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 const tippish = (w) => /\.(tipp|hinweis|check|real|knobel|auftrag)$/.test(w) || /^exam/.test(w);
@@ -22,7 +24,7 @@ for (const lang of ['en', 'uk']) {
   console.log(`\n== ${lang}: i18n/${lang}/level1.json`);
   const dict = JSON.parse(readFileSync(new URL(`../i18n/${lang}/level1.json`, import.meta.url), 'utf8'));
   for (const [k, v] of Object.entries(dict)) {
-    if (!quelle.has(k) && !TEMPLATES.has(k)) err(`Schlüssel nicht im Original: ${JSON.stringify(k).slice(0, 120)}`);
+    if (!quelle.has(k) && !TEMPLATES.has(k) && !VERIFY_SRC.includes(`'${k}'`)) err(`Schlüssel nicht im Original: ${JSON.stringify(k).slice(0, 120)}`);
     if (typeof v !== 'string' || !v.trim()) err(`leer: ${JSON.stringify(k).slice(0, 80)}`);
     if (lang === 'uk' && /[ыэъё]/i.test(v)) err(`russische Buchstaben: ${v.slice(0, 80)}`);
     if (lang === 'uk' && /[a-zäöüß]{5,} [a-zäöüß]{5,} [a-zäöüß]{5,}/i.test(v.replace(/`[^`]*`|„[^“]*“|"[^"]*"/g, '')) && v !== k) console.log(`  · viel Latein im UK-Text: ${v.slice(0, 100)}`);
