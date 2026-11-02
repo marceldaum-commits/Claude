@@ -13,7 +13,7 @@ Regeln für den Loader:
 - Nie übersetzt: Befehle, Optionen, Datei-/Ordnernamen, Pfade, Codes, Benutzernamen, Suchwörter
   (z. B. `Treffpunkt`, `GEHEIM` – in Texten steht dann eine Erklärung in Klammern).
 
-Prüfen: `node qa/check-i18n-w1.mjs` (Schlüssel gegen Original, geschützte Teile, Raum mit Muster-Loader komplett durchspielen).
+Prüfen: `node qa/check-i18n.mjs <raum>` (z. B. w1, w4): Schlüssel gegen Original, Befehle unverändert, Raum mit dem echten Loader (js/i18n.js) komplett durchspielen.
 
 ## shell.json (Terminal-Meldungen, gilt in allen Räumen)
 
@@ -30,3 +30,12 @@ entsperren-Befehlen (Nachtfalter, Kollektiv, Funkturm, Leitern).
   „Немає такого файла або каталогу“), damit man sie später im echten Kali wiedererkennt.
 
 Prüfen: `node qa/check-i18n-shell.mjs` (löst ca. 70 echte Fehler aus und prüft, dass jede deutsche Zeile übersetzt wird).
+
+## w4 Funkturm – Besonderheiten
+
+- Absichtlich NICHT übersetzt: `Code: {code}` (Etage 4: die Notiz muss genau 73 Bytes bleiben, `find -size 73c`),
+  `Signal stabil` (`grep -v`), `AKTIV`/`AUS` (Vergleich in der Schleife), `=== ANFANG/ENDE GEHEIM ===` (`grep GEHEIM`),
+  Protokoll-, Tabellen- und Zeichensalat-Zeilen, die Zeile `echo "Tor offen. …"` in tor.sh.
+- translateFS nötig für: `etage10/nachricht.b64` (zweimal Base64: zweimal entpacken, übersetzen, zweimal einpacken)
+  und `etage11/spiegel.txt` (erst umdrehen, dann ROT13 zurück, übersetzen, wieder ROT13 und umdrehen).
+  ROT13 verschiebt nur A–Z/a–z, kyrillischer Text bleibt dabei lesbar; der Code wird trotzdem korrekt verschoben.
