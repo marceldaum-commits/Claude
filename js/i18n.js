@@ -175,7 +175,7 @@ export function protectCodes() {
 // Datei i18n/<sprache>/<raumid>.json = { "<deutscher Originaltext>": "<Übersetzung>" } (Team „Sprache & Qualität“).
 // {code} steht für einen Code KLY{16 Zeichen}. Was nicht im Wörterbuch steht, bleibt original
 // (und wird dann wie bisher von Google übersetzt). Handübersetzte Stellen sind translate="no".
-export const HAND = { en: ['w1', 'w4'], uk: ['w1', 'w4'] };
+export const HAND = { en: ['w1', 'w4', 'w5'], uk: ['w1', 'w4', 'w5'] };
 const DICTS = {};
 const CODE_IN = /KLY\{[0-9a-f]{16}\}/g;
 

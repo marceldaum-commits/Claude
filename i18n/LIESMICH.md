@@ -64,3 +64,10 @@ mit übersetzten Dateien und Musterlösung lösbar).
 ui.json enthält außerdem die Bedienelemente der Raumseite und der Übungsseite (Tipp-Knopf, Punkte, Rückmeldungen,
 Feldnamen), weil Google dort falsch übersetzte („Tipp“ → „Чайові“ = Trinkgeld, „5 P.“ → „5 с.“, „Beleg“ → „Dokument“).
 Muster mit Platzhaltern wie `💡 Tipp {i}/{n} · danach noch {p} P.`, `noch {a} von {b} P.`, `Task {n}: {title}`, `Raum · {title}`.
+
+## w5 Stellwerk – Besonderheiten
+
+- NICHT übersetzt: `Code: {code}` und `ECHTER FAHRPLAN` (Posten 5: die Prüfsumme in pruefsumme.txt wird über den
+  Originalinhalt berechnet), pruefe.sh (`grep -v falsch`), funk.log (TEIL=/WERT=), Tabellen/Protokolle, stellwerk.bin.
+- translateFS nötig für `posten04/signal.hex`: Hex → Text, übersetzen, wieder Hex (Zeilen à 40 Zeichen).
+  Rohdaten (*.bin) und pruefe.sh am besten ganz überspringen.

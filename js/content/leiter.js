@@ -77,6 +77,14 @@ export function makeLadder(o) {
     flags: Array.from({ length: N }, (_, n) => `l${n}`),
     setup, commands,
     onSolve(sh, flag) { open(sh, +flag.slice(1) + 1); },
+    // Handübersetzung: Textdateien zeilenweise; Rohdaten (.bin) und Skripte (.sh) nie anfassen.
+    // Leiter-eigene Sonderfälle (verpackte Texte) über o.i18nSpecial(name, data, T).
+    translateFS(sh, T, translateTree) {
+      translateTree(sh.fs.get(base), T, (name, data) => {
+        if (name.endsWith('.bin') || name.endsWith('.sh')) return data;
+        return o.i18nSpecial ? o.i18nSpecial(name, data, T) ?? null : null;
+      });
+    },
     floors: o.floors, // für Tests (solve)
     dirOf,
     tasks: o.floors.map((fl, n) => ({

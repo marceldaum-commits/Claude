@@ -12,6 +12,12 @@ const binNoise = (R, n) => Array.from({ length: n }, () => String.fromCharCode(M
 // ============================================================================ w5 – Das Stellwerk (Linux, schwerer)
 const W5 = makeLadder({
   id: 'w5', title: 'Das Stellwerk', level: 'L4', dir: 'stellwerk', prefix: 'posten', seed: 5151, minutes: 120,
+  // Übersetzung: signal.hex erst zurückwandeln, übersetzen, wieder als Hex (40 Zeichen pro Zeile)
+  i18nSpecial(name, data, T) {
+    if (name !== 'signal.hex') return null;
+    const raw = data.replace(/\s+/g, ''); const bytes = new Uint8Array(raw.match(/../g).map(h => parseInt(h, 16)));
+    return hex(T.t(new TextDecoder().decode(bytes))).replace(/(.{40})/g, '$1\n') + '\n';
+  },
   tools: ['grep -ril', 'awk', 'sort -t -k', 'diff', 'xxd -r -p', 'sha256sum', 'strings', 'cut -c', 'Schleifen'],
   desc: 'Linux-Leiter, schwerer als der Funkturm: Im alten Stellwerk von Talheim stimmt nachts etwas mit den Weichen nicht. Zehn Posten bis zur Wahrheit.',
   ziel: 'Werkzeuge kombinieren: rekursiv suchen, filtern, vergleichen, Prüfsummen, Rohdaten lesen und eigene Schleifen.',

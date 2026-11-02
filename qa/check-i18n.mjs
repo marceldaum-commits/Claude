@@ -93,6 +93,15 @@ const ROOMDEF = {
       if (!run('cat ~/turm/dach/sender.txt').includes('Albers') && !run('cat ~/turm/dach/sender.txt').includes('Альберс')) err('Dach: Albers fehlt');
     },
   },
+  w5: {
+    base: HOME + '/stellwerk', ladder: 'posten',
+    decode(name, data) { if (name === 'signal.hex') return Buffer.from(data.replace(/\s+/g, ''), 'hex').toString('utf8'); if (name.endsWith('.bin')) return ''; return null; },
+    special(name, data, T) {
+      if (name === 'signal.hex') return Buffer.from(T.t(Buffer.from(data.replace(/\s+/g, ''), 'hex').toString('utf8')), 'utf8').toString('hex').replace(/(.{40})/g, '$1\n') + '\n';
+      if (name.endsWith('.bin') || name === 'pruefe.sh') return data; // Rohdaten und Skript nie anfassen
+      return null;
+    },
+  },
 };
 
 // ---------------------------------------------------------------- Originaltexte sammeln
@@ -161,7 +170,13 @@ for (const lang of ['en', 'uk']) {
     if (c !== F['l' + n]) return err(`Stufe/Etage ${n}: kein Code über „${cmd}“ → ${JSON.stringify(out.slice(0, 140))}`);
     if (!/🔓/.test(run('entsperren ' + c))) err(`${n}: entsperren klappt nicht`);
   };
-  def.solve(run, step);
+  if (def.ladder) r.floors.forEach((fl, n) => {
+    run(`cd ${def.base}/${def.ladder}${String(n).padStart(2, '0')}`);
+    const out = fl.solve(run); const c = (String(out).match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
+    if (c !== F['l' + n]) return err(`Stufe ${n}: Lösungsweg liefert keinen Code → ${JSON.stringify(String(out).slice(0, 140))}`);
+    if (!/🔓/.test(run('entsperren ' + c))) err(`${n}: entsperren klappt nicht`);
+  });
+  else def.solve(run, step);
   if (solved.length !== r.flags.length) err(`nur ${solved.length}/${r.flags.length} gelöst`);
   console.log(`  ${Object.keys(dict).length} Einträge, ${solved.length}/${r.flags.length} mit übersetzten Dateien gelöst.`);
 }
