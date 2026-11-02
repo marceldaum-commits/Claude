@@ -11,7 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
-import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree } from './i18n.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -1347,7 +1347,7 @@ function questionHTML(r, t, q) {
     input = `<div class="row" style="flex-wrap:nowrap"><input type="text" id="in-${id}" data-k="${key}" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${q.type === 'flag' ? 'KLY{…}' : 'Antwort'}" ${ok ? 'disabled value="✓ gelöst"' : ''}><button class="btn small primary" data-k="${key}" data-send ${ok ? 'disabled' : ''}>Senden</button></div>`;
   }
   return `<div class="q" id="q-${id}" style="margin:.7rem 0">
-    ${q.repeat ? `<span class="badge plain" title="Wiederholung">🔁 Wiederholung · ${esc(q.repeat)}</span>` : ''}
+    ${q.repeat ? `<span class="badge plain" title="Wiederholung">🔁 Wiederholung · ${makeT(handDict(r.id)).h(q.repeat, esc)}</span>` : ''}
     <div class="row between"><b class="small">${ok ? '✓ ' : ''}${makeT(handDict(r.id)).h(q.q)}</b><span class="small muted" data-pts="${key}">${pointsLabel(r, t, q)}</span></div>
     ${input}<div class="qfb small" data-fb="${key}"></div><div class="tips" data-tips="${key}">${tipsHTML(r, q, key)}</div></div>`;
 }
@@ -1510,7 +1510,7 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Start
-initLang(); protectCodes();
+initLang(); protectCodes(); loadShellT();
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
 onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
