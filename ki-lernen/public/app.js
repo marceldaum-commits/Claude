@@ -25,7 +25,7 @@ function h(tag, attrs = {}, ...kids) {
 }
 const app = document.getElementById('app');
 function show(...nodes) {
-  app.replaceChildren(...nodes);
+  app.replaceChildren(...nodes.filter((n) => n != null && n !== false));
   app.focus();
   window.scrollTo(0, 0);
 }
@@ -49,12 +49,14 @@ function renderHeader() {
   const bar = h('div', { class: 'bar' }, h('span'));
   bar.firstChild.style.width = pct + '%';
   const sel = h('select', { class: 'lang', 'aria-label': 'Sprache / Language / Мова' },
-    Object.entries(LANGS).map(([code, label]) => h('option', { value: code, selected: code === lang() }, label)));
+    Object.entries(LANGS).map(([code, label]) => h('option', { value: code, selected: code === lang(), title: label }, code.toUpperCase())));
   sel.addEventListener('change', async () => {
     state.lang = sel.value; save();
     await setLang(sel.value);
     renderHeader(); route();
   });
+  document.getElementById('brandname').textContent = t('KI-Werkstatt');
+  document.title = t('KI-Werkstatt');
   document.getElementById('xp').replaceChildren(
     h('div', {}, h('b', {}, t(name)), ` · ${state.xp} XP`), bar);
   document.getElementById('langbox').replaceChildren(sel);
@@ -66,7 +68,7 @@ function award(id, xp, label) {
   if (!state.done[id]) {
     state.done[id] = true;
     state.xp += xp;
-    toast(`+${xp} XP · ${label}`);
+    toast(xp ? `+${xp} XP · ${label}` : `✓ ${label}`);
   }
   save();
   renderHeader();
