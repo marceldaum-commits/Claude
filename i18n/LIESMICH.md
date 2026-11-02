@@ -71,3 +71,11 @@ Muster mit Platzhaltern wie `💡 Tipp {i}/{n} · danach noch {p} P.`, `noch {a}
   Originalinhalt berechnet), pruefe.sh (`grep -v falsch`), funk.log (TEIL=/WERT=), Tabellen/Protokolle, stellwerk.bin.
 - translateFS nötig für `posten04/signal.hex`: Hex → Text, übersetzen, wieder Hex (Zeilen à 40 Zeichen).
   Rohdaten (*.bin) und pruefe.sh am besten ganz überspringen.
+
+## w3 Kollektiv – Besonderheiten
+
+- NICHT übersetzt: protokoll.log (CODE/XX), einsaetze.csv, wachen/*.log (`grep -c ALARM`), Knoten- und Funkdateien.
+  Im Finale bleibt „Level 9“ stehen (Test prüft es).
+- translateFS nötig für `stufe2/abgefangen.txt`: ROT13 zurück, übersetzen, wieder ROT13 (kyrillischer Text bleibt dabei lesbar,
+  der Code wird korrekt verschoben). *.log und *.csv am besten überspringen.
+- entschluessler.sh: nur Kommentar und echo-Text übersetzt, die Logik bleibt.
