@@ -145,7 +145,7 @@ const F = {}; for (const f of r.flags) F[f] = await flagFor('KLY-QA-TEST', ROOM,
 
 function roomStrings() {
   const out = [r.title, r.difficulty, r.desc, r.ziel, r.scope, r.stop, r.cleanup, r.welcome, ...Object.values(r.nach || {})];
-  for (const task of r.tasks) { out.push(task.title, task.body); for (const q of task.questions) out.push(q.q, q.repeat, ...(q.hints || [])); }
+  for (const task of r.tasks) { out.push(task.title, task.body); for (const q of task.questions) out.push(q.q, q.repeat, ...(q.hints || []), ...(q.options || []).filter(o => typeof o === 'string')); }
   return out.filter(Boolean);
 }
 const hintSet = new Set(r.tasks.flatMap(t => t.questions.flatMap(q => q.hints || [])));
@@ -200,8 +200,10 @@ for (const lang of ['en', 'uk']) {
   const run = (c) => { const x = s.exec(c); return (x.out || '') + (x.err || ''); };
   const step = (n, cmd, given) => {
     const out = given ?? run(cmd); const c = (out.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
-    if (c !== F['l' + n]) return err(`Stufe/Etage ${n}: kein Code über „${cmd}“ → ${JSON.stringify(out.slice(0, 140))}`);
-    if (!/🔓/.test(run('entsperren ' + c))) err(`${n}: entsperren klappt nicht`);
+    const want = typeof n === 'string' ? F[n] : F['l' + n]; // Leitern: l0, l1 …; andere Räume: Flag-Namen
+    if (c !== want) return err(`Stufe/Flag ${n}: kein Code über „${cmd}“ → ${JSON.stringify(out.slice(0, 140))}`);
+    if (typeof n === 'string') solved.push(n);
+    if (typeof n !== 'string' && !/🔓/.test(run('entsperren ' + c))) err(`${n}: entsperren klappt nicht`);
   };
   if (def.ladder) r.floors.forEach((fl, n) => {
     run(`cd ${def.base}/${def.ladder}${String(n).padStart(2, '0')}`);
@@ -209,7 +211,7 @@ for (const lang of ['en', 'uk']) {
     if (c !== F['l' + n]) return err(`Stufe ${n}: Lösungsweg liefert keinen Code → ${JSON.stringify(String(out).slice(0, 140))}`);
     if (!/🔓/.test(run('entsperren ' + c))) err(`${n}: entsperren klappt nicht`);
   });
-  else def.solve(run, step);
+  else def.solve(run, step, { F, err });
   if (solved.length !== r.flags.length) err(`nur ${solved.length}/${r.flags.length} gelöst`);
   console.log(`  ${Object.keys(dict).length} Einträge, ${solved.length}/${r.flags.length} mit übersetzten Dateien gelöst.`);
 }

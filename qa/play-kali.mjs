@@ -70,13 +70,13 @@ for (const lang of ['de', 'en', 'uk']) for (const [vn, vp] of Object.entries(VIE
   await shot('funkturm');
 
   // 3b. Weitere Leitern: Start + erste Stufe (verpackte Dateien in w9)
-  const LANGTEST = { de: /\b(der|die|und|ist)\b/i, en: /\b(the|and|is|you)\b/i, uk: /[а-яіїєґ]{3}/i };
+  const LANGTEST = { de: /\b(der|die|das|und|ist|ich|bin|nicht)\b/i, en: /\b(the|and|is|you)\b/i, uk: /[а-яіїєґ]{3}/i };
   for (const [room, dir, cmds] of [
     ['w5', 'posten00', ['cat hinweis.txt', 'cat $(grep -ril "weiche 17" meldungen)']],
     ['w6', 'runde00', ['cat hinweis.txt']],
-    ['w7', 'phase00', ['cat hinweis.txt']],
+    ['w7', 'phase00', ['ls']], // Stufe 0 enthält nur Daten (bleiben original)
     ['w9', 'spur00', ["tr '_-' '/+' < botschaft.txt | base64 -d"]],
-    ['p5', 'pruefung00', ['cat hinweis.txt']],
+    ['p5', 'pruefung00', ['ls']], // dito
   ]) {
     await p.goto(URL_ + '/#/raum/' + room); await p.waitForSelector('.term-in input'); await p.waitForTimeout(500);
     const lm = await term(['cat LIESMICH.txt']);
@@ -84,7 +84,7 @@ for (const lang of ['de', 'en', 'uk']) for (const [vn, vp] of Object.entries(VIE
     const o2 = await term([`cd ${dir}`, ...cmds]);
     const tail = o2.split(cmds[0]).pop();
     if (room === 'w5' || room === 'w9') { if (!/KLY\{[0-9a-f]{16}\}/.test(tail)) note(`${lang}/${vn}: ${room} Stufe 0 ohne Code`); }
-    if (!LANGTEST[lang].test(tail)) note(`${lang}/${vn}: ${room} Stufe-0-Text nicht in ${lang}: ${tail.slice(0, 80)}`);
+    if (cmds[0] !== 'ls' && !LANGTEST[lang].test(tail)) note(`${lang}/${vn}: ${room} Stufe-0-Text nicht in ${lang}: ${tail.slice(0, 80)}`);
   }
   await shot('leitern');
 
