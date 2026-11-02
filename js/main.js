@@ -594,23 +594,23 @@ views.story = (id = 's1') => {
   const missing = lockedList(s);
   if (missing.length) {
     return {
-      html: `<h1>Story-Lab: ${L1h(s.title)}</h1>
-      <div class="card"><p>${L1h(s.teaser)}</p><p class="small muted">Rolle: ${L1h(s.role)} · Werkzeuge: <span translate="no">${s.tools.map(esc).join(', ')}</span></p></div>
-      <div class="card warn"><b>🔒 Noch gesperrt.</b> Die Mission verlangt diese Grundlagen – sonst wird sie zum Raten:
+      html: `<h1>${U('Story-Lab: {title}', { title: L1.t(s.title) })}</h1>
+      <div class="card"><p>${L1h(s.teaser)}</p><p class="small muted">${U('Rolle:')} ${L1h(s.role)} · ${U('Werkzeuge:')} <span translate="no">${s.tools.map(esc).join(', ')}</span></p></div>
+      <div class="card warn"><b>${U('🔒 Noch gesperrt.')}</b> ${U('Die Mission verlangt diese Grundlagen – sonst wird sie zum Raten:')}
       <ul class="list">${missing.map(m => exItem(m)).join('')}</ul></div>`,
     };
   }
   const ss = state.story[s.id] || (state.story[s.id] = { scene: 0, attempts: {}, hintUsed: {}, evidence: {}, answers: {}, report: {}, progress: {} });
   ss.progress = ss.progress || {};
   return {
-    html: `<div class="row between"><h1 style="margin:0">Story-Lab: ${L1h(s.title)}</h1>${ss.done ? '<span class="badge ok">abgeschlossen</span>' : ''}</div>
+    html: `<div class="row between"><h1 style="margin:0">${U('Story-Lab: {title}', { title: L1.t(s.title) })}</h1>${ss.done ? `<span class="badge ok">${U('abgeschlossen')}</span>` : ''}</div>
     <p class="small muted">${L1h(s.role)}</p>
     <div class="grid">
       <div class="card tight" id="scenecard"></div>
       <div id="tw"></div>
-      <div class="card tight"><b class="small">Fallverlauf</b><ul class="timeline" id="tl"></ul></div>
+      <div class="card tight"><b class="small">${U('Fallverlauf')}</b><ul class="timeline" id="tl"></ul></div>
     </div>
-    <p class="honest">Die Fallakte im Terminal ist SIMULIERT; Szenen mit „echt“ führst du in deiner eigenen Kali-VM/Termux aus und belegst sie hier.</p>`,
+    <p class="honest">${U('Die Fallakte im Terminal ist SIMULIERT; Szenen mit „echt“ führst du in deiner eigenen Kali-VM/Termux aus und belegst sie hier.')}</p>`,
     keepScroll: false,
     mount(root) {
       const sh = new Shell({ fs: baseFS() });
@@ -631,12 +631,12 @@ views.story = (id = 's1') => {
       };
       const showScene = (resume) => {
         const sc = scene();
-        term.printHTML(`<span class="good">━━ Szene ${ss.scene + 1}/${s.scenes.length}: ${esc(L1.t(sc.title))} ${sc.kind === 'real' ? '· ECHTER AUFTRAG' : sc.kind === 'sim' ? '· SIMULATION' : ''} ━━</span>`);
-        if (resume) say('sys', '(Fortsetzung – dein Fortschritt wurde gespeichert)');
+        term.printHTML(`<span class="good">${esc(Ut('━━ Szene {n}/{all}: {title} ━━', { n: ss.scene + 1, all: s.scenes.length, title: L1.t(sc.title) + (sc.kind === 'real' ? ' ' + Ut('· ECHTER AUFTRAG') : sc.kind === 'sim' ? ' ' + Ut('· SIMULATION') : '') }))}</span>`);
+        if (resume) say('sys', Ut('(Fortsetzung – dein Fortschritt wurde gespeichert)'));
         sc.chat.forEach(([w, t]) => say(L1.t(w), L1.t(t)));
-        term.printHTML(`<span class="warn">AUFTRAG: ${esc(L1.t(sc.auftrag))}</span>`);
+        term.printHTML(`<span class="warn">${esc(Ut('AUFTRAG: {text}', { text: L1.t(sc.auftrag) }))}</span>`);
         if (sc.options && (!needs(sc).ev || prog().ev) && (!needs(sc).rep || prog().rep)) printOptions(sc);
-        term.printHTML('<span class="sys">Befehle: auftrag · akte · beleg · antwort … · hinweis · scope · status · weiter · story-hilfe</span>');
+        term.printHTML(`<span class="sys">${esc(Ut('Befehle: auftrag · akte · beleg · antwort … · hinweis · scope · status · weiter · story-hilfe'))}</span>`);
       };
       const printOptions = (sc) => {
         term.printHTML(`<span class="story">${esc(L1.t(sc.optionsPrompt || sc.auftrag))}</span>`);
@@ -645,9 +645,9 @@ views.story = (id = 's1') => {
 
       const stepDone = (sc) => {
         if (complete(sc)) {
-          say('sys', '✓ Szene abgeschlossen.');
+          say('sys', Ut('✓ Szene abgeschlossen.'));
           say(L1.t('Mara (Schichtleitung)'), L1.t(sc.debrief).replace(/^(Mara|Мара): /, '').replace(/^["„«]|["“»]$/g, ''));
-          if (ss.scene < s.scenes.length - 1) term.printHTML('<span class="good">Weiter mit: weiter</span>');
+          if (ss.scene < s.scenes.length - 1) term.printHTML(`<span class="good">${esc(Ut('Weiter mit: weiter'))}</span>`);
           else {
             if (!ss.done) { ss.done = true; ss.doneAt = Date.now(); }
             term.printHTML(`<span class="good">★ Mission abgeschlossen · +${s.points} Punkte</span>`);
@@ -671,12 +671,12 @@ views.story = (id = 's1') => {
             ss.evidence[sc.id] = { command: res.command, output: res.output.slice(0, 4000), at: Date.now() };
             prog().ev = true; markActivity(state); save();
             term.slot.innerHTML = '';
-            term.printHTML(`<span class="good">✓ Beleg geprüft: ${esc(res.command)}</span>`);
+            term.printHTML(`<span class="good">${esc(Ut('✓ Beleg geprüft: {command}', { command: res.command }))}</span>`);
             if (sc.answer && !prog().ans) term.printHTML('<span class="story">Jetzt: antwort &lt;…&gt;</span>');
             stepDone(sc);
           } else {
             fail(sc);
-            term.printHTML(`<span class="err">✗ Beleg reicht noch nicht. ${res.scopeViolation ? 'SCOPE-VERLETZUNG – sofort stoppen.' : 'Siehe Rückfragen im Belegfeld.'}</span>`);
+            term.printHTML(`<span class="err">${esc(Ut('✗ Beleg reicht noch nicht.'))} ${esc(res.scopeViolation ? Ut('SCOPE-VERLETZUNG – sofort stoppen.') : Ut('Siehe Rückfragen im Belegfeld.'))}</span>`);
           }
         };
       };
@@ -701,24 +701,25 @@ views.story = (id = 's1') => {
           const grenzenOk = /(nicht|offen|unklar|nachbau|original|log|not|unknown|unclear|replica|open|не|невідом|неясн|відтвор|оригінал|лог)/i.test(v.grenzen);
           if (short.length || !grenzenOk) {
             fail(sc);
-            $('#rpfb', root).innerHTML = `<div class="feedback no">${short.length ? 'Zu knapp: ' + short.map(x => x[1]).join(', ') + '. Ein Kollege muss den Bericht ohne Rückfrage verstehen.' : ''} ${!grenzenOk ? 'Grenzen: Was weißt du ausdrücklich NICHT? Und worin unterscheidet sich dein Nachbau vom Original?' : ''}</div>`;
+            $('#rpfb', root).innerHTML = `<div class="feedback no">${short.length ? esc(Ut('Zu knapp: {fields}. Ein Kollege muss den Bericht ohne Rückfrage verstehen.', { fields: short.map(x => L1.t(x[1])).join(', ') })) : ''} ${!grenzenOk ? 'Grenzen: Was weißt du ausdrücklich NICHT? Und worin unterscheidet sich dein Nachbau vom Original?' : ''}</div>`;
             return;
           }
           prog().rep = true; save();
           term.slot.innerHTML = '';
-          term.printHTML('<span class="good">✓ Bericht abgegeben.</span>');
+          term.printHTML(`<span class="good">${esc(Ut('✓ Bericht abgegeben.'))}</span>`);
           stepDone(sc);
         };
       };
 
       const cmds = {
-        auftrag: () => { const sc = scene(); term.printHTML(`<span class="warn">AUFTRAG: ${esc(L1.t(sc.auftrag))}</span>`); return { out: '', code: 0 }; },
+        auftrag: () => { const sc = scene(); term.printHTML(`<span class="warn">${esc(Ut('AUFTRAG: {text}', { text: L1.t(sc.auftrag) }))}</span>`); return { out: '', code: 0 }; },
         scope: () => ({ out: 'SCOPE: ' + L1.t(scene().scope) + '\n', code: 0 }),
         akte: (a, { sh: x }) => x.exec('ls -l ~/fall-0417'),
         status: () => {
           const sc = scene(), n = needs(sc), p = prog();
-          const parts = [n.ev && `Beleg ${p.ev ? '✓' : 'offen'}`, n.ans && `Antwort ${p.ans ? '✓' : 'offen'}`, n.rep && `Bericht ${p.rep ? '✓' : 'offen'}`, n.opt && `Entscheidung ${p.opt ? '✓' : 'offen'}`].filter(Boolean);
-          return { out: `Szene ${ss.scene + 1}/${s.scenes.length} „${sc.title}“: ${parts.join(' · ')}${complete(sc) ? ' → weiter' : ''}\n`, code: 0 };
+          const st = (x) => ({ state: x ? '✓' : Ut('offen') });
+          const parts = [n.ev && Ut('Beleg {state}', st(p.ev)), n.ans && Ut('Antwort {state}', st(p.ans)), n.rep && Ut('Bericht {state}', st(p.rep)), n.opt && Ut('Entscheidung {state}', st(p.opt))].filter(Boolean);
+          return { out: `Szene ${ss.scene + 1}/${s.scenes.length} „${L1.t(sc.title)}“: ${parts.join(' · ')}${complete(sc) ? ' → weiter' : ''}\n`, code: 0 };
         },
         hinweis: () => {
           const sc = scene();
@@ -741,7 +742,7 @@ views.story = (id = 's1') => {
             ss.answers[sc.id] = ans;
             if (!r.ok) { fail(sc); return { out: '', err: L1.t(r.msg || 'Noch nicht.') + '\n', code: 1 }; }
             p.ans = true; save();
-            term.printHTML('<span class="good">✓ Antwort belegt.</span>');
+            term.printHTML(`<span class="good">${esc(Ut('✓ Antwort belegt.'))}</span>`);
             stepDone(sc);
             return { out: '', code: 0 };
           }
@@ -750,7 +751,7 @@ views.story = (id = 's1') => {
             if (!o) return { out: '', err: `Antworte mit ${shown(sc).map(x => x.key).join(' / ')}\n`, code: 1 };
             if (!o.ok) { fail(sc); return { out: '', err: L1.t(o.why || 'Nicht ganz.') + '\n', code: 1 }; }
             p.opt = true; ss.answers[sc.id + '-opt'] = ans; save();
-            term.printHTML('<span class="good">✓ Entscheidung begründet.</span>');
+            term.printHTML(`<span class="good">${esc(Ut('✓ Entscheidung begründet.'))}</span>`);
             stepDone(sc);
             return { out: '', code: 0 };
           }
@@ -773,12 +774,12 @@ views.story = (id = 's1') => {
         const p = ss.progress[sc.id] || {};
         const a = ss.attempts[sc.id] || 0;
         $('#scenecard', root).innerHTML = `
-          <div class="row between"><span>${sc.kind === 'real' ? '<span class="badge real">Echter Auftrag</span>' : sc.kind === 'sim' ? '<span class="badge sim">Simulation</span>' : sc.kind === 'report' ? '<span class="badge plain">Bericht</span>' : '<span class="badge plain">Entscheidung</span>'} <b>Szene ${ss.scene + 1}/${s.scenes.length}: ${L1h(sc.title)}</b></span><span class="small muted">Versuche: ${a}</span></div>
+          <div class="row between"><span>${sc.kind === 'real' ? `<span class="badge real">${U('Echter Auftrag')}</span>` : sc.kind === 'sim' ? `<span class="badge sim">${U('Simulation')}</span>` : sc.kind === 'report' ? `<span class="badge plain">${U('Bericht')}</span>` : '<span class="badge plain">Entscheidung</span>'} <b>Szene ${ss.scene + 1}/${s.scenes.length}: ${L1h(sc.title)}</b></span><span class="small muted">Versuche: ${a}</span></div>
           <div class="task-meta" style="margin-top:.6rem"><div><b>Lernziel</b>${L1h(sc.ziel)}</div><div><b>Auftrag</b>${L1h(sc.auftrag)}</div><div><b>Scope</b>${L1h(sc.scope)}</div></div>
           ${sc.kind === 'real' ? `<details ${p.ev ? '' : 'open'} style="margin-top:.6rem"><summary>Anleitung für dein echtes Terminal</summary>${vorausHTML(sc.real)}${scriptBlock('Setup (Lab-Nachbau):', sc.real.setup)}<p class="small muted">Lab-Token: <code>${esc(state.labToken)}</code> · ${L1h(sc.real.cleanup)}</p></details>
-          <div class="row" style="margin-top:.5rem"><button class="btn go small" id="evbtn" ${p.ev ? 'disabled' : ''}>${p.ev ? '✓ Beleg geprüft' : 'Beleg einfügen (= beleg)'}</button></div>` : ''}
-          ${sc.kind === 'report' ? `<div class="row" style="margin-top:.5rem"><button class="btn go small" id="rpbtn">${p.rep ? '✓ Bericht abgegeben – ansehen' : 'Bericht schreiben (= bericht)'}</button></div>` : ''}
-          ${complete(sc) && ss.scene < s.scenes.length - 1 ? '<div class="row" style="margin-top:.5rem"><button class="btn primary small" id="nxbtn">Nächste Szene (= weiter)</button></div>' : ''}`;
+          <div class="row" style="margin-top:.5rem"><button class="btn go small" id="evbtn" ${p.ev ? 'disabled' : ''}>${p.ev ? U('✓ Beleg geprüft') : U('Beleg einfügen (= beleg)')}</button></div>` : ''}
+          ${sc.kind === 'report' ? `<div class="row" style="margin-top:.5rem"><button class="btn go small" id="rpbtn">${p.rep ? U('✓ Bericht abgegeben – ansehen') : U('Bericht schreiben (= bericht)')}</button></div>` : ''}
+          ${complete(sc) && ss.scene < s.scenes.length - 1 ? `<div class="row" style="margin-top:.5rem"><button class="btn primary small" id="nxbtn">${U('Nächste Szene (= weiter)')}</button></div>` : ''}`;
         bindCopy($('#scenecard', root));
         const evb = $('#evbtn', root); if (evb) evb.onclick = () => { openEvidence(); term.el.scrollIntoView({ behavior: 'smooth', block: 'end' }); };
         const rpb = $('#rpbtn', root); if (rpb) rpb.onclick = () => { openReport(); term.el.scrollIntoView({ behavior: 'smooth', block: 'end' }); };

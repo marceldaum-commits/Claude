@@ -112,7 +112,7 @@
   "Weil kill manchmal Fehler ausgibt.": "Because kill sometimes prints errors.",
   "Mara: „Und wenn kill KEINEN Fehler ausgibt – ist der Prozess dann sicher weg?“": "Mara: \"And if kill prints NO error – is the process definitely gone then?\"",
   "Mara: „Warum bestehe ich auf dem Retest?“  antwort a | b | c": "Mara: \"Why do I insist on the retest?\"  antwort a | b | c",
-  "PID aus Szene 3 (prüfe sie neu mit ps!). chmod numerisch: 6-0-0.": "PID from scene 3 (check it again with ps!). chmod as a number: 6-0-0.",
+  "PID aus Szene 4 (prüfe sie neu mit ps!). chmod numerisch: 6-0-0.": "PID from scene 4 (check it again with ps!). chmod as a number: 6-0-0.",
   "Mara: „Dienst weg, Sicherung geschützt, beides belegt. Jetzt der Bericht.“": "Mara: \"Service gone, backup protected, both documented. Now the report.\"",
   "Bericht und Übergabe": "Report and handover",
   "Schreib den Bericht für die Übergabe. Kurz, belegbar, ehrlich. Was wissen wir, was nicht, was ist der nächste sichere Schritt?": "Write the report for the handover. Short, backed by evidence, honest. What do we know, what don’t we know, what’s the next safe step?",

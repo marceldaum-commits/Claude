@@ -112,7 +112,7 @@
   "Weil kill manchmal Fehler ausgibt.": "Бо kill іноді видає помилки.",
   "Mara: „Und wenn kill KEINEN Fehler ausgibt – ist der Prozess dann sicher weg?“": "Мара: «А якщо kill НЕ видає помилки – процес тоді точно зник?»",
   "Mara: „Warum bestehe ich auf dem Retest?“  antwort a | b | c": "Мара: «Чому я наполягаю на повторній перевірці?»  antwort a | b | c",
-  "PID aus Szene 3 (prüfe sie neu mit ps!). chmod numerisch: 6-0-0.": "PID зі сцени 3 (перевір його ще раз через ps!). chmod числом: 6-0-0.",
+  "PID aus Szene 4 (prüfe sie neu mit ps!). chmod numerisch: 6-0-0.": "PID зі сцени 4 (перевір його ще раз через ps!). chmod числом: 6-0-0.",
   "Mara: „Dienst weg, Sicherung geschützt, beides belegt. Jetzt der Bericht.“": "Мара: «Сервісу немає, резервна копія захищена, обидва пункти доведено. Тепер звіт.»",
   "Bericht und Übergabe": "Звіт і передача зміни",
   "Schreib den Bericht für die Übergabe. Kurz, belegbar, ehrlich. Was wissen wir, was nicht, was ist der nächste sichere Schritt?": "Напиши звіт для передачі зміни. Коротко, з доказами, чесно. Що ми знаємо, чого не знаємо, який наступний безпечний крок?",

@@ -819,5 +819,15 @@
   "Prozesse (Praxis)": "Процеси (практика)",
   "Praxis: Beende den Prozess „sleep 777“. Der Prozess „sleep 778“ muss weiterlaufen.": "Практика: Заверши процес «sleep 777». Процес «sleep 778» має працювати далі.",
   "Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge: {begriffe}.": "Зазирни в шпаргалку «{titel}» – там є потрібні інструменти: {begriffe}.",
-  "Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge.": "Зазирни в шпаргалку «{titel}» – там є потрібні інструменти."
+  "Schau im Spickzettel „{titel}“ nach – dort stehen die passenden Werkzeuge.": "Зазирни в шпаргалку «{titel}» – там є потрібні інструменти.",
+  "Diese Übung erlaubt nur 127.0.0.1/localhost auf deinem eigenen Gerät. Nichts davon ausführen; falls schon geschehen: abbrechen (Strg+C) und den Vorfall im Bericht notieren.": "Ця вправа дозволяє лише 127.0.0.1/localhost на твоєму власному пристрої. Нічого з цього не запускай; якщо вже запустилося – зупини (Ctrl+C) і зазнач інцидент у звіті.",
+  "Befehl eingetragen": "Команду вписано",
+  "Welchen Befehl hast du im echten Terminal genau eingegeben? Trage ihn ein.": "Яку саме команду ти ввів(-ела) у справжньому терміналі? Впиши її.",
+  "Ausgabe eingefügt": "Вивід вставлено",
+  "Füge die tatsächliche Ausgabe deines Terminals ein – nicht abgetippt, nicht zusammengefasst.": "Встав справжній вивід свого термінала – не передрукований і не скорочений.",
+  "Die Eingabe sieht nach einem echten Schlüssel/Token aus. Entferne ihn sofort – Übungen brauchen niemals echte Zugangsdaten.": "Введене схоже на справжній ключ/токен. Негайно прибери його – вправам ніколи не потрібні справжні облікові дані.",
+  "Passender Befehl verwendet": "Використано відповідну команду",
+  "Passt dein Befehl zum Auftrag? Prüfe Befehlsname, Optionen und Ziel noch einmal gegen die Lektion.": "Чи відповідає твоя команда завданню? Ще раз звір назву команди, опції та ціль з уроком.",
+  "Dein persönlicher Lab-Token ist in der Ausgabe": "Твій особистий лабораторний токен є у виводі",
+  "Die Ausgabe enthält deinen Lab-Token nicht. Hast du das Setup-Skript aus DIESER App ausgeführt und arbeitest im richtigen Lab-Ordner?": "Вивід не містить твого лабораторного токена. Ти запускав(-ла) скрипт підготовки з ЦЬОГО застосунку і працюєш у правильній лабораторній папці?"
 }
