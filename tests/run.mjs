@@ -13,6 +13,7 @@ import { STORY1 } from '../js/content/story1.js';
 import { LEVELS } from '../js/content/curriculum.js';
 import { ROOMS, BADGES } from '../js/content/rooms.js';
 import { EXTERN } from '../js/content/extern.js';
+import { makeT, translateTree, codeify } from '../js/i18n.js';
 import { flagFor } from '../js/flags.js';
 import { streak, markActivity } from '../js/state.js';
 import { spawn, execFileSync } from 'node:child_process';
@@ -356,12 +357,22 @@ await at('R0 Sandbox-Raum lösbar', async () => {
   ok(qs.t4q1.accept.some(re => re.test('~/raum0/archiv/2026/q2/tief/drin/zugang.key')));
 });
 
-await at('W1 Nachtfalter komplett lösbar (Sandbox)', async () => {
+for (const lang of ['de', 'en', 'uk']) await at(`W1 Nachtfalter komplett lösbar (Sandbox, ${lang})`, async () => {
   const r = ROOMS.find(x => x.id === 'w1'); const F = {};
   for (const f of r.flags) F[f] = await flagFor(TOKEN, 'w1', f);
   const solved = [];
   const s = new Shell({ fs: baseFS(), commands: r.commands({ F, solve: (f) => solved.push(f) }) });
   r.setup(s, F, new Set());
+  if (lang !== 'de') {
+    const dict = JSON.parse(readFileSync(join(ROOT, `i18n/${lang}/w1.json`), 'utf8'));
+    const T = makeT(dict); r.translateFS(s, T, translateTree);
+    ok(!s.exec('cat LIESMICH.txt').out.includes('im Zug gefunden'), 'Story übersetzt');
+    for (const tk of r.tasks) for (const q of tk.questions) for (const h of q.hints || []) {
+      const tr = T.t(h); ok(tr !== h, `Tipp übersetzt: ${h}`);
+      const un = (x) => x.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+      for (const m of codeify(h).matchAll(/<code translate="no">(.*?)<\/code>/g)) if ((/^(Lösung|grep|cat|find|chmod|base64|rev|sort)/.test(h) || /\s/.test(m[1])) && !/<|[A-ZÄÖÜ]{3,}/.test(un(m[1]).replace(/KLY|GEHEIM|LIESMICH/g, ""))) ok(tr.includes(un(m[1])), `Befehl „${un(m[1])}“ fehlt in: ${tr}`);
+    }
+  }
   const run = (c) => s.exec(c);
   const code = (txt) => (txt.match(/KLY\{[0-9a-f]{16}\}/) || [])[0];
   const step = (n, cmd) => { const c = code(run(cmd).out); eq(c, F['l' + n], `Stufe ${n} via ${cmd}`); ok(/Richtig|Letzte/.test(run('entsperren ' + c).out), `entsperren ${n}`); };

@@ -170,3 +170,53 @@ export function protectCodes() {
   new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) { if (n.nodeType === 1) protect(n); else if (n.nodeType === 3 && n.parentElement) protect(n.parentElement); } })
     .observe(document.body, { childList: true, subtree: true });
 }
+
+// ---- Handübersetzungen von Räumen ------------------------------------------------------------
+// Datei i18n/<sprache>/<raumid>.json = { "<deutscher Originaltext>": "<Übersetzung>" } (Team „Sprache & Qualität“).
+// {code} steht für einen Code KLY{16 Zeichen}. Was nicht im Wörterbuch steht, bleibt original
+// (und wird dann wie bisher von Google übersetzt). Handübersetzte Stellen sind translate="no".
+export const HAND = { en: ['w1'], uk: ['w1'] };
+const DICTS = {};
+const CODE_IN = /KLY\{[0-9a-f]{16}\}/g;
+
+export function hasHand(id) { return (HAND[currentLang()] || []).includes(id); }
+export function handDict(id) { return DICTS[id]; }
+export async function loadHand(id) {
+  const l = currentLang();
+  if (!hasHand(id)) return null;
+  if (DICTS[id] !== undefined) return DICTS[id];
+  try { const r = await fetch(`i18n/${l}/${id}.json`); DICTS[id] = r.ok ? await r.json() : null; } catch { DICTS[id] = null; }
+  return DICTS[id];
+}
+
+// Übersetzer-Funktionen aus einem Wörterbuch (auch für Tests nutzbar)
+export function makeT(dict) {
+  const d = dict || {};
+  const t = (s) => {
+    if (typeof s !== 'string' || !s) return s;
+    if (Object.hasOwn(d, s)) return d[s];
+    const codes = s.match(CODE_IN) || [];
+    if (codes.length) {
+      const k = s.replace(CODE_IN, '{code}');
+      if (Object.hasOwn(d, k)) { let i = 0; return d[k].replace(/\{code\}/g, () => codes[i++] ?? '{code}'); }
+    }
+    const chat = s.match(/^([A-ZÄÖÜ][a-zäöüß]+): (.+)$/); // Chat-Zeile „Name: Satz“
+    if (chat) { const r = t(chat[2]); if (r !== chat[2]) return chat[1] + ': ' + r; }
+    return s;
+  };
+  const lines = (text) => String(text).split('\n').map(t).join('\n');
+  // HTML: übersetzt → translate="no"; sonst Original (Google darf übersetzen)
+  const h = (s, fmt = codeify) => { const r = t(s); return r !== s ? `<span translate="no">${fmt(r)}</span>` : fmt(s); };
+  return { t, lines, h, active: !!dict };
+}
+
+// Alle Textdateien unter einem Ordner zeilenweise übersetzen (Standard für Räume ohne Sonderfälle)
+export function translateTree(node, T, special = () => null, path = '') {
+  for (const [name, kid] of Object.entries(node?.kids || {})) {
+    const p = path + '/' + name;
+    if (kid.kids) { translateTree(kid, T, special, p); continue; }
+    if (typeof kid.data !== 'string' || !kid.data) continue;
+    const s = special(name, kid.data, T, p);
+    kid.data = s ?? T.lines(kid.data);
+  }
+}
