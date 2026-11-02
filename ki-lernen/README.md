@@ -63,7 +63,7 @@ XP und Rang werden nur im Browser gespeichert.
        proxy_pass http://127.0.0.1:8100;
        proxy_http_version 1.1;
        proxy_set_header Host $host;
-       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-For $remote_addr;   # nicht $proxy_add_x_forwarded_for, sonst kann der Client eine IP vorschalten
        proxy_buffering off;          # Live-Text der KI nicht puffern
        proxy_read_timeout 120s;
    }
