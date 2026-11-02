@@ -248,3 +248,25 @@ export async function loadShellT() {
   const l = currentLang(); if (l === 'de') return;
   try { const r = await fetch(`i18n/${l}/shell.json`); if (r.ok) shellT = makeLineT(await r.json()); } catch { /* bleibt Deutsch */ }
 }
+
+// ---- Oberfläche (i18n/<sprache>/ui.json) -------------------------------------------------------
+// Feste Sätze von Startseite und Willkommen. {name}, {n} … = Platzhalter.
+let UI = null;
+export async function loadUI() {
+  const l = currentLang(); if (l === 'de') return;
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  try {
+    const r = await Promise.race([fetch(`i18n/${l}/ui.json`), wait(3000).then(() => null)]);
+    if (r && r.ok) UI = await r.json();
+  } catch { /* bleibt Deutsch, Google übersetzt */ }
+  await Promise.all((HAND[l] || []).map(loadHand)); // Raumtitel/-texte für die Karten
+}
+const fill = (s, v) => (v ? s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m)) : s);
+export const Ut = (s, v) => fill(UI && Object.hasOwn(UI, s) ? UI[s] : s, v);
+export const U = (s, v) => (UI && Object.hasOwn(UI, s) ? `<span translate="no">${escH(fill(UI[s], v))}</span>` : escH(fill(s, v)));
+// Raumtitel und Kurzbeschreibung aus der Handübersetzung (für Karten außerhalb des Raums)
+export const roomText = (r, field) => {
+  const T = makeT(DICTS[r.id]); const out = T.h(r[field], escH);
+  // Raumnamen sind Eigennamen: bei handübersetzten Räumen nie von Google übersetzen lassen
+  return field === 'title' && DICTS[r.id] && !out.startsWith('<span translate') ? `<span translate="no">${out}</span>` : out;
+};

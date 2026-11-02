@@ -11,7 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
-import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT } from './i18n.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, Ut, roomText } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -91,7 +91,7 @@ function levelProgress() {
 
 function nextStep() {
   // Erst hacken: offene Räume zuerst. Lektionen sind Nachschlagewerk, wenn du feststeckst.
-  for (const r of ROOMS) if (!roomDone(r.id) && !roomLock(r).length) return { kind: 'room', title: 'Raum: ' + r.title, href: `#/raum/${r.id}` };
+  for (const r of ROOMS) if (!roomDone(r.id) && !roomLock(r).length) return { kind: 'room', titleHTML: U('Raum: {title}', { title: r.title }), title: 'Raum: ' + r.title, href: `#/raum/${r.id}` };
   for (const l of LESSONS) {
     if (!lessonDone(l.id)) return { kind: 'lesson', id: l.id, title: l.title, href: `#/lektion/${l.id}` };
     for (const eid of l.exercises) {
@@ -120,7 +120,7 @@ function renderTop() {
   $('#top').innerHTML = `
     <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Kali <b>Level Up</b></span></a>
     <span class="spacer"></span>
-    <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + esc(loc.short) : '📍 Lernort?'}</button>
+    <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + U(loc.short) : '📍 Lernort?'}</button>
     <a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`;
   $('#locChip').onclick = () => locationModal(true);
 }
@@ -138,11 +138,11 @@ function locationModal(force = false) {
   if (!force && state.location && state.locationDay === today()) return;
   const m = document.createElement('div');
   m.className = 'modal';
-  m.innerHTML = `<div class="box" role="dialog" aria-label="Lernort wählen">
+  m.innerHTML = `<div class="box" role="dialog" aria-label="${Ut('Lernort wählen')}">
     ${state.location ? '' : langPickerHTML()}
-    ${state.location ? '<h2>Wo lernst du heute?</h2>' : '<h2>Willkommen! 👋</h2><p>Hier lernst du Linux und Hacking Schritt für Schritt – mit Rätseln, Geschichten und Tipps, wenn du festhängst.</p><p class="small"><b>Neu hier?</b> Nimm „Nur im Browser“ – du brauchst nichts zu installieren.</p><label class="small">Wie sollen wir dich nennen? (freiwillig)</label><input type="text" id="wname" maxlength="30" placeholder="Name oder Spitzname" style="margin-bottom:.6rem">'}
-    <p class="muted small">Anleitungen, Befehle und Grenzen werden an deinen Lernort angepasst. Du kannst ihn oben jederzeit ändern.</p>
-    ${Object.entries(LOCATIONS).map(([k, l]) => `<button class="loc-opt ${state.location === k ? 'on' : ''}" data-k="${k}"><span class="ic">${l.icon}</span><span><b>${esc(l.label)}</b><br><span class="small muted">${esc(l.desc)}</span></span></button>`).join('')}
+    ${state.location ? `<h2>${U('Wo lernst du heute?')}</h2>` : `<h2>${U('Willkommen! 👋')}</h2><p>${U('Hier lernst du Linux und Hacking Schritt für Schritt – mit Rätseln, Geschichten und Tipps, wenn du festhängst.')}</p><p class="small"><b>${U('Neu hier?')}</b> ${U('Nimm „Nur im Browser“ – du brauchst nichts zu installieren.')}</p><label class="small">${U('Wie sollen wir dich nennen? (freiwillig)')}</label><input type="text" id="wname" maxlength="30" placeholder="${esc(Ut('Name oder Spitzname'))}" style="margin-bottom:.6rem">`}
+    <p class="muted small">${U('Anleitungen, Befehle und Grenzen werden an deinen Lernort angepasst. Du kannst ihn oben jederzeit ändern.')}</p>
+    ${Object.entries(LOCATIONS).map(([k, l]) => `<button class="loc-opt ${state.location === k ? 'on' : ''}" data-k="${k}"><span class="ic">${l.icon}</span><span><b>${U(l.label)}</b><br><span class="small muted">${U(l.desc)}</span></span></button>`).join('')}
   </div>`;
   document.body.appendChild(m);
   bindLangPicker(m);
@@ -203,7 +203,7 @@ function continueRoom() {
 function miniRoom(r, phone = false) {
   const pct = roomPct(r.id);
   return `<li><a href="#/raum/${r.id}"><span class="state ${roomDone(r.id) ? 'done' : ''}">${roomDone(r.id) ? '✓' : pct ? pct + '%' : '▶'}</span>
-    <span class="grow"><span class="t">${esc(r.title)}</span><span class="s">${r.type === 'wargame' ? '🎮 Wargame' : 'Level ' + LEVELS.find(l => l.id === r.level).n + ' · ' + esc(LEVELS.find(l => l.id === r.level).title)}${phone && r.machine.kind === 'target' ? ' · mit Termux' : ''}</span></span></a></li>`;
+    <span class="grow"><span class="t">${roomText(r, 'title')}</span><span class="s">${r.type === 'wargame' ? '<span translate="no">🎮 Wargame</span>' : 'Level ' + LEVELS.find(l => l.id === r.level).n + ' · ' + esc(LEVELS.find(l => l.id === r.level).title)}${phone && r.machine.kind === 'target' ? ' · mit Termux' : ''}</span></span></a></li>`;
 }
 
 views.heute = () => {
@@ -220,39 +220,39 @@ views.heute = () => {
   return {
     html: `
     <section class="stack">
-      ${PREVIEW ? `<div class="card warn small"><b>Handy-Vorschau.</b> Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus.</div>` : ''}
+      ${PREVIEW ? `<div class="card warn small"><b>${U('Handy-Vorschau.')}</b> ${U('Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus.')}</div>` : ''}
       <div class="card violet">
-        <div class="row between"><span class="badge real">Ziel: eJPT</span><a class="small" href="#/profil" style="color:inherit">${earnedBadges().length} Abzeichen →</a></div>
-        <h1 style="margin:.5rem 0 .3rem">Hallo${state.profile.name ? ' ' + esc(state.profile.name) : ''}!</h1>
-        <div class="bar" aria-label="${done} von ${ROOMS.length} geknackt"><i style="width:${Math.round(done / ROOMS.length * 100)}%"></i></div>
-        <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>Tage in Folge</span></div></div>
+        <div class="row between"><span class="badge real">${U('Ziel: eJPT')}</span><a class="small" href="#/profil" style="color:inherit">${U('{n} Abzeichen →', { n: earnedBadges().length })}</a></div>
+        <h1 style="margin:.5rem 0 .3rem">${state.profile.name ? U('Hallo {name}!', { name: state.profile.name }) : U('Hallo!')}</h1>
+        <div class="bar" aria-label="${esc(Ut('{done} von {all} geknackt', { done, all: ROOMS.length }))}"><i style="width:${Math.round(done / ROOMS.length * 100)}%"></i></div>
+        <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>${U('Tage in Folge')}</span></div></div>
       </div>
 
       ${!cont && (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0] ? (() => { const f = (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0]; return `<a class="card lime" href="#/raum/${f.id}" style="display:block;text-decoration:none;color:inherit">
-        <span class="badge real">Los geht’s</span>
-        <h2 style="margin:.4rem 0 .2rem">${esc(f.title)}</h2>
-        <span class="small muted">${esc(f.desc)} →</span>
+        <span class="badge real">${U('Los geht’s')}</span>
+        <h2 style="margin:.4rem 0 .2rem">${roomText(f, 'title')}</h2>
+        <span class="small muted">${roomText(f, 'desc')} →</span>
       </a>`; })() : cont ? `<a class="card lime" href="#/raum/${cont.id}" style="display:block;text-decoration:none;color:inherit">
-        <span class="badge real">Weitermachen</span>
-        <h2 style="margin:.4rem 0 .2rem">${esc(cont.title)}</h2>
+        <span class="badge real">${U('Weitermachen')}</span>
+        <h2 style="margin:.4rem 0 .2rem">${roomText(cont, 'title')}</h2>
         <div class="bar"><i style="width:${roomPct(cont.id)}%"></i></div>
-        <span class="small muted">${roomPct(cont.id)} % geschafft · ${cont.machine.kind === 'sandbox' ? '📱 geht überall' : '🖥️ Kali-VM'} →</span>
+        <span class="small muted">${U('{n} % geschafft', { n: roomPct(cont.id) })} · ${cont.machine.kind === 'sandbox' ? U('📱 geht überall') : U('🖥️ Kali-VM')} →</span>
       </a>` : `<a class="card lime" href="${nx.href}" style="display:block;text-decoration:none;color:inherit">
-        <span class="badge real">Los geht’s</span>
-        <h2 style="margin:.4rem 0 .2rem">${esc(nx.title)}</h2>
-        <span class="small muted">Feststecken ist normal – jede Frage hat Tipps →</span>
+        <span class="badge real">${U('Los geht’s')}</span>
+        <h2 style="margin:.4rem 0 .2rem">${nx.titleHTML || esc(nx.title)}</h2>
+        <span class="small muted">${U('Feststecken ist normal – jede Frage hat Tipps →')}</span>
       </a>`}
 
-      ${loc === 'browser' ? section('🌐', 'Direkt hier im Browser', browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.</div>` : loc === 'pc' ? section('🖥️', 'Jetzt am PC', pcList) + section('📱', 'Für unterwegs', phoneList) : loc === 'phone' ? section('📱', 'Jetzt am Handy', phoneList) + section('🖥️', 'Wenn du am PC bist', pcList) : section('📱', 'Am Handy', phoneList) + section('🖥️', 'Am PC (Kali)', pcList)}
+      ${loc === 'browser' ? section('🌐', U('Direkt hier im Browser'), browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">${U('🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.')}</div>` : loc === 'pc' ? section('🖥️', U('Jetzt am PC'), pcList) + section('📱', U('Für unterwegs'), phoneList) : loc === 'phone' ? section('📱', U('Jetzt am Handy'), phoneList) + section('🖥️', U('Wenn du am PC bist'), pcList) : section('📱', U('Am Handy'), phoneList) + section('🖥️', U('Am PC (Kali)'), pcList)}
 
-      <a class="card" href="#/pfad" style="display:block;text-decoration:none;color:inherit"><b>Alles ansehen →</b><br><span class="small muted">Alle Wargames, Räume und Level bis zum eJPT</span></a>
+      <a class="card" href="#/pfad" style="display:block;text-decoration:none;color:inherit"><b>${U('Alles ansehen →')}</b><br><span class="small muted">${U('Alle Wargames, Räume und Level bis zum eJPT')}</span></a>
 
       <details class="card">
-        <summary><b>Außerhalb der App weitertrainieren</b></summary>
+        <summary><b>${U('Außerhalb der App weitertrainieren')}</b></summary>
         <ul class="list" style="margin-top:.4rem">
-          ${EXTERNAL.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener noreferrer"><span class="state">↗</span><span class="grow"><span class="t">${esc(x.name)}</span><span class="s">${esc(x.why)}</span></span><span class="badge ${x.free ? 'ok' : 'plain'}">${x.free ? 'gratis' : 'teils gratis'}</span></a></li>`).join('')}
+          ${EXTERNAL.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener noreferrer"><span class="state">↗</span><span class="grow"><span class="t" translate="no">${esc(x.name)}</span><span class="s">${U(x.why)}</span></span><span class="badge ${x.free ? 'ok' : 'plain'}">${x.free ? U('gratis') : U('teils gratis')}</span></a></li>`).join('')}
         </ul>
-        <p class="small muted">Alles legale Übungsumgebungen. Hacke nur Ziele, die dir gehören oder für die du ausdrücklich eine Erlaubnis hast.</p>
+        <p class="small muted">${U('Alles legale Übungsumgebungen. Hacke nur Ziele, die dir gehören oder für die du ausdrücklich eine Erlaubnis hast.')}</p>
       </details>
     </section>`,
   };
@@ -1499,7 +1499,7 @@ views.profil = () => {
   const days = [...Array(28)].map((_, i) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - 27 + i); return today(d); });
   return {
     html: `<a class="back" href="#/mehr">← Mehr</a><h1>${state.profile.name ? esc(state.profile.name) + 's Profil' : 'Dein Profil'}</h1>
-    <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>Punkte</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>geknackt</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>Tage in Folge</span></div></div>
+    <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>${U('Tage in Folge')}</span></div></div>
     <div class="card" style="margin-top:.8rem"><h3>Letzte 4 Wochen</h3>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
     <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${esc(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
@@ -1510,7 +1510,7 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Start
-initLang(); protectCodes(); loadShellT();
+initLang(); protectCodes(); loadShellT(); await loadUI();
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
 onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
