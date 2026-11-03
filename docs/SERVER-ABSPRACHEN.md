@@ -77,6 +77,7 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - **Cloudflare Access** schützt dann nur noch Vorschau/Admin; die öffentlichen Apps gehen ohne Access online.
 - **Bezahlen (später)**: zeitliche Pässe (z. B. 1 Monat / 3 Monate), Abwicklung über einen „Merchant of Record“ (z. B. Paddle oder Lemon Squeezy – übernimmt Umsatzsteuer/EU-Rechnungen), Webhook schreibt `entitlements`. Kein Abo-Zwang.
 - **Vorher rechtlich klären (Marcel)**: Impressum, Datenschutzerklärung, AGB/Widerruf für digitale Inhalte, ggf. Gewerbe/Kleinunternehmerregelung, Minderjährige (Einwilligung der Eltern, keine Käufe durch Kinder). Keine Rechtsberatung durch uns – im Zweifel Fachperson.
+- Schema-Wünsche der KI-Sitzung (eingeplant): `entitlements` nur serverseitig per service_role lesen (Dienste), RLS: Nutzer sehen nur eigene Zeilen; optionales Feld `ki_budget_usd` pro Entitlement (sonst Standard `BUDGET_USD_PER_CODE`). KI-Werkstatt hat dafür `ki-lernen/auth.js` mit `AUTH_MODE=codes|supabase` vorbereitet (0.4.0).
 - Zuständig: Kali-Sitzung (Konto, Datenbank, Sicherheit, Zahlungs-Webhook), KI-Sitzung (Anbindung KI-Werkstatt, Texte/Ablauf aus Nutzersicht), Sprache & Qualität (Übersetzung, Test).
 
 ## Offene Punkte
