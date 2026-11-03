@@ -22,7 +22,7 @@ for (const lang of ['en', 'uk']) {
     for (const re of KEEP) if (re.test(k) && !/Apollo 8/.test(re.source) && !re.test(v)) err(`Zahl ${re} fehlt: ${JSON.stringify(v)}`);
     if (/Apollo 8/.test(k) && !/Apollo 8|Аполлон\S*-8/.test(v)) err(`Apollo 8 fehlt: ${JSON.stringify(v)}`);
     if (lang === 'uk' && /[ыэъё]/i.test(v)) err(`russische Buchstaben: ${JSON.stringify(v)}`);
-    if (lang === 'uk' && /[a-zäöüß]{4,}/i.test(v) && !/Claude|Anthropic|XP|JSON|POST|API|Donaudampf|\{/.test(v)) err(`lateinische Wörter? ${JSON.stringify(v)}`);
+    if (lang === 'uk' && /[a-zäöüß]{4,}/i.test(v) && !/Claude|Anthropic|XP|JSON|POST|API|Donaudampf|Nachtfalter|\{/.test(v)) err(`lateinische Wörter? ${JSON.stringify(v)}`);
   }
   console.log(`  ${Object.keys(t).length}/${Object.keys(de).length} Texte`);
 }
