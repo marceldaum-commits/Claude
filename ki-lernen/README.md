@@ -61,9 +61,10 @@ Klartext, nur Hash-IDs bzw. `user:<uuid>`.
 - **Vor dem Einsatz mit Minderjährigen:** Die Nutzungsrichtlinien von Anthropic stellen zusätzliche Anforderungen an
   Angebote für Minderjährige. Bitte die aktuelle Fassung lesen (anthropic.com/legal/aup) und prüfen, ob eine Begleitung
   durch Erwachsene und ggf. Einwilligung der Eltern nötig ist.
-- Standardmodell `claude-opus-5-5` mit niedrigem Aufwand (`effort: low`). Für viele Tester ist `claude-haiku-5-5`
-  etwa 40-mal günstiger – einfach `KI_MODEL` in `.env` ändern.
-- Lehnt die KI eine Anfrage aus Sicherheitsgründen ab, springt automatisch ein Ersatzmodell ein (`fallbacks: "default"`).
+- Standardmodell `claude-haiku-5-5` (Marcels Entscheidung) mit niedrigem Aufwand (`effort: low`). Bei 2 $ Monatsbudget
+  reicht das für tausende Antworten. Wechsel auf `claude-opus-5-5` (etwa 40-mal teurer) über `KI_MODEL` in `.env`.
+- Lehnt die KI eine Anfrage aus Sicherheitsgründen ab, zeigt die App einen kindgerechten Hinweis. Bei Opus/Sonnet 5.5
+  springt zusätzlich automatisch ein Ersatzmodell ein (`fallbacks: "default"`); Haiku 5.5 hat das nicht.
 
 ## Einrichten auf dem Plesk-Server
 

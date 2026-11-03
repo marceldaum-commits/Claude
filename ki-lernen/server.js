@@ -13,7 +13,11 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(here, 'public');
 const PORT = Number(process.env.PORT || 8100);
 const HOST = process.env.HOST || '127.0.0.1';
-const MODEL = process.env.KI_MODEL || 'claude-opus-5-5';
+const MODEL = process.env.KI_MODEL || 'claude-haiku-5-5';
+// Ersatzmodell bei Sicherheits-Ablehnung gibt es serverseitig nur für Opus/Fable/Sonnet 5.5 – nicht für Haiku 5.5.
+const FALLBACK = /^claude-(opus-5|fable-5|sonnet-5-5|mythos-5)/.test(MODEL)
+  ? { betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' }
+  : {};
 const BUDGET_USD = Number(process.env.BUDGET_USD_PER_CODE || 2);
 
 const AUTH = createAuth(process.env, { budgetUsd: BUDGET_USD });
@@ -149,8 +153,7 @@ async function handleChat(req, res, user) {
   const stream = client.beta.messages.stream({
     model: MODEL,
     max_tokens: MAX_TOKENS,
-    betas: ['server-side-fallback-2026-07-01'],
-    fallbacks: 'default',
+    ...FALLBACK,
     output_config: { effort: 'low' },
     system,
     messages,
@@ -224,8 +227,7 @@ async function handleJudge(req, res, user) {
   const msg = await client.beta.messages.create({
     model: MODEL,
     max_tokens: MAX_TOKENS,
-    betas: ['server-side-fallback-2026-07-01'],
-    fallbacks: 'default',
+    ...FALLBACK,
     output_config: { effort: 'low', format: { type: 'json_schema', schema: JUDGE_SCHEMA } },
     system:
       BASE_SYSTEM +

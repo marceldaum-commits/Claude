@@ -11,7 +11,7 @@ const PRICES = {
 };
 
 export function costUsd(usage, model) {
-  const [pin, pout] = PRICES[model] || PRICES['claude-opus-5-5'];
+  const [pin, pout] = PRICES[model] || PRICES['claude-opus-5-5']; // Unbekanntes Modell: vorsichtig teuer rechnen
   const input =
     (usage?.input_tokens || 0) + (usage?.cache_creation_input_tokens || 0) * 1.25 + (usage?.cache_read_input_tokens || 0);
   return (input * pin + (usage?.output_tokens || 0) * pout) / 1e6;
