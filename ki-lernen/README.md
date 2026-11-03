@@ -1,6 +1,6 @@
 # Nachtfalter KI-Werkstatt
 
-Teil der Lernfamilie **Nachtfalter** (nachtfalter.dev): Startseite `nachtfalter.dev`, Hacking-App `app.`, Online-Labs `arena.`, diese Werkstatt unter **`ki.nachtfalter.dev`**.
+Teil der Lernfamilie **Nachtfalter** (nachtfalter.tech): Startseite `nachtfalter.tech`, Hacking-App `app.`, Online-Labs `arena.`, diese Werkstatt unter **`ki.nachtfalter.tech`**.
 
 Spielerisches Lernprogramm: Wie funktionieren KI-Assistenten, wie schreibe ich gute Prompts, wo liegt KI daneben?
 Läuft auf demselben Server wie die Kali-Arena, aber völlig getrennt (eigener Port, eigene Subdomain, eigener Ordner).
@@ -23,7 +23,7 @@ XP und Rang werden nur im Browser gespeichert.
 | | KI-Werkstatt | Nachtfalter Hacklab / Arena |
 |---|---|---|
 | Port (nur 127.0.0.1) | **8100** | 8090 |
-| Subdomain | `ki.nachtfalter.dev` | `arena.nachtfalter.dev` |
+| Subdomain | `ki.nachtfalter.tech` | `arena.nachtfalter.tech` |
 | Ordner | `~/ki-lernen` | `~/kly-labs` |
 | Docker | nicht nötig | Container mit Label `kly.arena` |
 | Last | nur API-Aufrufe, < 512 MB RAM | bis ~5 GB bei 20 Spielern |
@@ -75,7 +75,7 @@ Klartext, nur Hash-IDs bzw. `user:<uuid>`.
    (Schlüssel bei Anthropic/Supabase testen, kostenlos). Danach `npm start` → `curl http://127.0.0.1:8100/api/status`
    muss `"ki":true` zeigen.
 5. Dauerbetrieb: `ki-werkstatt.service` anpassen und als systemd-Dienst einrichten (Anleitung in der Datei).
-6. In Plesk die **Subdomain `ki.nachtfalter.dev`** anlegen (bzw. .de-Variante), **Let's Encrypt** einschalten.
+6. In Plesk die **Subdomain `ki.nachtfalter.tech`** anlegen, **Let's Encrypt** einschalten.
 7. Unter *Apache & nginx-Einstellungen* der Subdomain bei „Zusätzliche nginx-Anweisungen“ eintragen:
 
    ```nginx
