@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env server.js",
     "test": "node tools/i18n-keys.mjs --check && node --test test/*.test.js",
-    "i18n": "node tools/i18n-keys.mjs"
+    "i18n": "node tools/i18n-keys.mjs",
+    "check-env": "node tools/check-env.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0"

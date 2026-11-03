@@ -71,7 +71,9 @@ Klartext, nur Hash-IDs bzw. `user:<uuid>`.
 1. **Node.js 22 LTS** (mindestens 20.6 wegen `--env-file`) installieren (Plesk: Erweiterung „Node.js“ oder per Paketverwaltung).
 2. Code nach `~/ki-lernen` bringen (nur dieser Ordner aus dem Repo) und `npm ci --omit=dev` ausführen.
 3. `cp .env.example .env`, API-Schlüssel und Einladungscodes eintragen (Codes mit `openssl rand -hex 8` erzeugen), `chmod 600 .env`.
-4. Test: `npm start` → `curl http://127.0.0.1:8100/api/status` muss `"ki":true` zeigen.
+4. Prüfen ohne Werte anzuzeigen: `npm run check-env` (Format) und `npm run check-env -- --online`
+   (Schlüssel bei Anthropic/Supabase testen, kostenlos). Danach `npm start` → `curl http://127.0.0.1:8100/api/status`
+   muss `"ki":true` zeigen.
 5. Dauerbetrieb: `ki-werkstatt.service` anpassen und als systemd-Dienst einrichten (Anleitung in der Datei).
 6. In Plesk die **Subdomain `ki.nachtfalter.dev`** anlegen (bzw. .de-Variante), **Let's Encrypt** einschalten.
 7. Unter *Apache & nginx-Einstellungen* der Subdomain bei „Zusätzliche nginx-Anweisungen“ eintragen:
