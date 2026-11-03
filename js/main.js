@@ -1,4 +1,4 @@
-// Kali Level Up – App
+// Nachtfalter Hacklab (früher „Kali Level Up“) – App
 import { Shell, baseFS, HOME } from './shell.js';
 import { mountTerminal } from './terminal-ui.js';
 import { verifyEvidence, normAnswer } from './verify.js';
@@ -11,7 +11,7 @@ import { ROOMS, BADGES } from './content/rooms.js';
 import { PORTSWIGGER } from './content/web.js';
 import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
-import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, Ut, roomText, loadLevel1 } from './i18n.js';
+import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
@@ -120,8 +120,9 @@ function renderTop() {
   const loc = LOCATIONS[state.location];
   const st = syncStatus();
   $('#top').innerHTML = `
-    <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Kali <b>Level Up</b></span></a>
+    <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter <b>Hacklab</b></span></a>
     <span class="spacer"></span>
+    ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben">VORSCHAU ${esc(self.KLY_VERSION || '')}</span>` : ''}
     <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + U(loc.short) : '📍 Lernort?'}</button>
     <a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`;
   $('#locChip').onclick = () => locationModal(true);
@@ -198,7 +199,7 @@ function lastActivity(r) {
   return Math.max(rs.startedAt || 0, ...Object.values(rs.answers || {}).map(a => a.at || 0), ...Object.values(rs.answers || {}).map(a => (a.attempts ? 1 : 0)));
 }
 function continueRoom() {
-  const open = ROOMS.filter(r => !roomDone(r.id) && lastActivity(r) > 0);
+  const open = ROOMS.filter(r => !roomDone(r.id) && lastActivity(r) > 0 && visible(r)); // im Browser-Modus nur spielbare Räume
   open.sort((a, b) => lastActivity(b) - lastActivity(a));
   return open[0] || null;
 }
@@ -281,7 +282,7 @@ views.pfad = () => {
   const later = LEVELS.filter(l => !withRooms.includes(l));
   return {
     html: `<h1>Lernen</h1>
-    <p class="muted small">Vom Linux-Anfänger bis zum <b>eJPT</b>. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
+    <p class="muted small">Vom Linux-Anfänger bis zum eJPT. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
     <a class="card lime" href="#/extern" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <b>🌍 Externe Lernpfade</b> <span class="badge plain">${Object.keys(state.extern || {}).length} abgehakt</span><br>
       <span class="small muted">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF, Metasploitable – hier lernst du das Ausnutzen, legal. Mit Checklisten.</span>
@@ -1035,8 +1036,9 @@ views.mehr = () => {
     html: `<h1>Mehr</h1>
     <div class="stack">
       <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language · Мова</h3>${langPickerHTML()}
-        <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch werden automatisch von Google übersetzt (die Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
+        <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
       <div class="card"><ul class="list">
+        <li><a href="konto.html"><span class="state">👤</span><span class="grow"><span class="t">Nachtfalter-Konto</span><span class="s">Registrieren, anmelden, deine Zugänge (Beta)</span></span></a></li>
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
         <li><a href="#/extern"><span class="state">🌍</span><span class="grow"><span class="t">Externe Lernpfade</span><span class="s">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF – zum Abhaken</span></span></a></li>
@@ -1104,7 +1106,7 @@ views.mehr = () => {
         <label for="rst">Zum Bestätigen ZURÜCKSETZEN eintippen</label><input type="text" id="rst" autocapitalize="characters">
         <button class="btn danger" id="reset" style="margin-top:.5rem">Lokalen Lernstand zurücksetzen</button>
       </div>
-      <p class="small dim">Kali Level Up ${esc(self.KLY_VERSION || '')} · Geräte-ID ${esc(state.deviceId)} · Lab-Token ${esc(state.labToken)}</p>
+      <p class="small dim">Nachtfalter Hacklab ${esc(self.KLY_VERSION || '')} · Geräte-ID ${esc(state.deviceId)} · Lab-Token ${esc(state.labToken)}</p>
     </div>`,
     mount(root) {
       bindLangPicker(root);
@@ -1211,8 +1213,8 @@ function roomCard(r) {
   const lock = roomLock(r), pct = roomPct(r.id);
   return `<a class="card tight ${roomDone(r.id) ? 'lime' : ''}" href="#/raum/${r.id}" style="display:block;text-decoration:none;color:inherit;margin-bottom:.6rem">
     <div class="row between"><span>${typeBadge(r)} ${r.stufe ? `<span class="badge plain">${esc(r.stufe)}</span>` : ''} ${machineBadge(r)}</span><span class="small muted">~${r.minutes} min</span></div>
-    <b style="display:block;margin-top:.4rem">${lock.length ? '🔒 ' : ''}${esc(r.title)}</b>
-    <span class="small muted">${esc(r.desc)}</span>
+    <b style="display:block;margin-top:.4rem">${lock.length ? '🔒 ' : ''}${roomText(r, 'title')}</b>
+    <span class="small muted">${roomText(r, 'desc')}</span>
     <div class="bar" style="margin-top:.5rem"><i style="width:${pct}%"></i></div>
     <span class="small muted">${pct} % · ${roomPoints(r.id)} Punkte${lock.length ? ' · gesperrt: ' + esc(lock[0]) : ''}</span>
   </a>`;
@@ -1510,7 +1512,7 @@ views.profil = () => {
     <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>${U('Tage in Folge')}</span></div></div>
     <div class="card" style="margin-top:.8rem"><h3>Letzte 4 Wochen</h3>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
-    <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${esc(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
+    <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${UN(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
     <div class="card"><h3>Name</h3><div class="row" style="flex-wrap:nowrap"><input type="text" id="pname" maxlength="30" value="${esc(state.profile.name)}" placeholder="Name oder Spitzname"><button class="btn small primary" id="psave">Speichern</button></div></div>
     <p class="honest">Punkte, Abzeichen und Serien sind Motivation – sie schalten keine Prüfung und kein Level frei.</p>`,
     mount(root) { $('#psave', root).onclick = () => { state.profile.name = $('#pname', root).value.trim().slice(0, 30); save(); render(); toast('Gespeichert.'); }; },

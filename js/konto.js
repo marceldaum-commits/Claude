@@ -1,0 +1,202 @@
+// Nachtfalter-Konto: Registrieren, Anmelden, Passwort vergessen, Profil, Zugänge.
+// Eigenes Supabase-Projekt „nachtfalter-konto“ (getrennt vom Lernstand-Sync). Bewusst ohne Bibliothek:
+// nur die öffentlichen Auth- und REST-Endpunkte mit dem Publishable Key. Rechte regelt Row Level Security
+// (supabase/konto-schema.sql): Nutzer sehen nur ihr eigenes Profil und ihre eigenen Zugänge.
+// Später eigene Adresse: konto.nachtfalter.dev.
+import { initLang, protectCodes, loadUI, langNoteHTML, langPickerHTML, bindLangPicker, currentLang } from './i18n.js';
+
+const C = window.KLY_CONFIG || {};
+const URL_ = C.kontoUrl, KEY = C.kontoKey;
+const STORE = 'nf.konto';
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const here = () => location.origin + location.pathname; // Rücksprung nach E-Mail-Links
+const YEAR = new Date().getFullYear();
+const ADULT = 16; // DSGVO Art. 8 / Deutschland: unter 16 nur mit Einwilligung der Eltern
+
+// ---- Sitzung --------------------------------------------------------------------------------
+let ses = null;
+try { ses = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch { ses = null; }
+const saveSes = (s) => { ses = s; try { s ? localStorage.setItem(STORE, JSON.stringify(s)) : localStorage.removeItem(STORE); } catch { /* */ } };
+const fromToken = (t) => ({ access_token: t.access_token, refresh_token: t.refresh_token, expires_at: Math.floor(Date.now() / 1000) + Number(t.expires_in || 3600), user: t.user || null });
+
+async function api(path, { method = 'GET', body, auth = false, prefer } = {}) {
+  const headers = { apikey: KEY, 'Content-Type': 'application/json' };
+  if (auth) { await fresh(); if (!ses) throw new Error('Bitte erneut anmelden.'); headers.Authorization = `Bearer ${ses.access_token}`; }
+  if (prefer) headers.Prefer = prefer;
+  const r = await fetch(URL_ + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  const txt = await r.text(); let data = null; try { data = txt ? JSON.parse(txt) : null; } catch { data = txt; }
+  if (!r.ok) throw new Error(fehlertext(data, r.status));
+  return data;
+}
+function fehlertext(d, status) {
+  const m = String(d?.msg || d?.error_description || d?.message || d?.error || '');
+  if (/Invalid login credentials/i.test(m)) return 'E-Mail oder Passwort stimmt nicht.';
+  if (/Email not confirmed/i.test(m)) return 'Bitte bestätige zuerst deine E-Mail (Link im Postfach).';
+  if (/already registered|already exists/i.test(m)) return 'Für diese E-Mail gibt es schon ein Konto. Melde dich an oder nutze „Passwort vergessen“.';
+  if (/Password should be|weak/i.test(m)) return 'Das Passwort ist zu schwach. Nimm mindestens 10 Zeichen.';
+  if (/rate limit|too many/i.test(m) || status === 429) return 'Zu viele Versuche. Bitte warte ein paar Minuten.';
+  if (/Signups not allowed/i.test(m)) return 'Neue Konten sind gerade geschlossen (Beta).';
+  return m || `Fehler ${status}`;
+}
+async function fresh() {
+  if (!ses) return;
+  if (ses.expires_at - 60 > Date.now() / 1000) return;
+  try { saveSes(fromToken(await api('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: ses.refresh_token } }))); }
+  catch { saveSes(null); }
+}
+
+// ---- Rückkehr aus E-Mail-Links (#access_token=…&type=signup|recovery) -------------------------
+let modus = null, hinweis = '';
+(function rueckkehr() {
+  const h = new URLSearchParams(location.hash.replace(/^#/, ''));
+  if (h.get('error_description')) hinweis = h.get('error_description').replace(/\+/g, ' ');
+  if (h.get('access_token')) {
+    saveSes(fromToken({ access_token: h.get('access_token'), refresh_token: h.get('refresh_token'), expires_in: h.get('expires_in') }));
+    if (h.get('type') === 'recovery') modus = 'neues-passwort';
+    else if (h.get('type') === 'signup') hinweis = '✓ E-Mail bestätigt – du bist angemeldet.';
+  }
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+})();
+
+// ---- Ansichten ------------------------------------------------------------------------------
+const main = $('#main');
+const msg = (t, ok = false) => { const e = $('#msg'); if (e) e.innerHTML = t ? `<div class="feedback ${ok ? 'ok' : 'no'}">${esc(t)}</div>` : ''; };
+const busy = (form, on) => form.querySelectorAll('button, input, select').forEach(x => { x.disabled = on; });
+
+function rahmen(inner) {
+  main.innerHTML = `${langNoteHTML()}<section class="stack" style="max-width:520px;margin:0 auto">
+    <h1 style="margin-bottom:.2rem">Nachtfalter-Konto</h1>
+    <p class="small muted" style="margin-top:0">Ein Konto für alle Nachtfalter-Apps: Hacklab, Arena und KI-Werkstatt. <span class="badge plain">Beta</span></p>
+    ${hinweis ? `<div class="feedback ok">${esc(hinweis)}</div>` : ''}
+    ${inner}
+    <div id="msg"></div>
+    <details class="card tight small"><summary>🌍 Sprache · Language · Мова</summary><div style="margin-top:.5rem">${langPickerHTML()}</div></details>
+    <p class="small muted"><a href="./">← Zurück zum Hacklab</a></p>
+  </section>`;
+  bindLangPicker(main);
+  hinweis = '';
+}
+
+function abgemeldet(tab = 'login') {
+  const t = (id, label) => `<button class="btn small ${tab === id ? 'primary' : 'ghost'}" data-tab="${id}">${label}</button>`;
+  const formular = {
+    login: `<form id="f" class="stack">
+      <label>E-Mail<input type="email" name="email" autocomplete="email" required></label>
+      <label>Passwort<input type="password" name="pw" autocomplete="current-password" required></label>
+      <button class="btn go block">Anmelden</button></form>`,
+    neu: `<form id="f" class="stack">
+      <label>Wie sollen wir dich nennen?<input name="name" maxlength="30" placeholder="Name oder Spitzname" required></label>
+      <label>E-Mail<input type="email" name="email" autocomplete="email" required></label>
+      <label>Passwort (mindestens 10 Zeichen)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>
+      <label>Geburtsjahr<input type="number" name="jahr" inputmode="numeric" min="1900" max="${YEAR}" placeholder="z. B. 2012" required></label>
+      <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option><option value="uk">Українська</option></select></label>
+      <div id="eltern" class="card warn small" hidden>
+        <b>Unter ${ADULT} Jahren:</b> Ein Elternteil muss zustimmen und das Konto gemeinsam mit dir anlegen.
+        <label class="row" style="flex-wrap:nowrap;margin-top:.4rem"><input type="checkbox" name="eltern" style="width:auto"> Ich bin Elternteil bzw. erziehungsberechtigt und stimme zu, dass mein Kind dieses Konto nutzt.</label>
+      </div>
+      <p class="small muted">Gespeichert werden nur E-Mail, Name, Sprache und Geburtsjahr – für das Konto und deine Zugänge. Keine Werbung, keine Weitergabe.</p>
+      <button class="btn go block">Konto anlegen</button></form>`,
+    vergessen: `<form id="f" class="stack">
+      <label>E-Mail<input type="email" name="email" autocomplete="email" required></label>
+      <button class="btn go block">Link zum Zurücksetzen schicken</button></form>`,
+  }[tab];
+  rahmen(`<div class="row">${t('login', 'Anmelden')}${t('neu', 'Registrieren')}${t('vergessen', 'Passwort vergessen')}</div><div class="card">${formular}</div>`);
+  main.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => abgemeldet(b.dataset.tab));
+  const f = $('#f');
+  if (tab === 'neu') {
+    const pruefe = () => { const j = +f.jahr.value; $('#eltern').hidden = !(j && YEAR - j < ADULT); };
+    f.jahr.oninput = pruefe;
+    f.lang.value = currentLang();
+  }
+  f.onsubmit = async (e) => {
+    e.preventDefault(); msg(''); busy(f, true);
+    try {
+      if (tab === 'login') {
+        saveSes(fromToken(await api('/auth/v1/token?grant_type=password', { method: 'POST', body: { email: f.email.value.trim(), password: f.pw.value } })));
+        return angemeldet();
+      }
+      if (tab === 'neu') {
+        const jahr = +f.jahr.value, kind = YEAR - jahr < ADULT;
+        if (kind && !f.eltern.checked) throw new Error(`Unter ${ADULT} braucht es die Zustimmung eines Elternteils (Haken setzen).`);
+        await api(`/auth/v1/signup?redirect_to=${encodeURIComponent(here())}`, { method: 'POST', body: {
+          email: f.email.value.trim(), password: f.pw.value,
+          data: { display_name: f.name.value.trim().slice(0, 30), lang: f.lang.value, birth_year: String(jahr), parent_consent: kind ? 'true' : 'false' },
+        } });
+        f.reset(); return msg('Fast geschafft! Wir haben dir eine E-Mail geschickt. Klicke auf den Link darin, dann ist dein Konto aktiv.', true);
+      }
+      if (tab === 'vergessen') {
+        await api(`/auth/v1/recover?redirect_to=${encodeURIComponent(here())}`, { method: 'POST', body: { email: f.email.value.trim() } });
+        return msg('Wenn es ein Konto mit dieser E-Mail gibt, ist jetzt ein Link unterwegs. Schau auch im Spam-Ordner nach.', true);
+      }
+    } catch (err) { msg(err.message); } finally { busy(f, false); }
+  };
+}
+
+async function angemeldet() {
+  await fresh();
+  if (!ses) return abgemeldet();
+  rahmen('<div class="card"><p class="muted">Lade dein Konto …</p></div>');
+  try {
+    const [user, profile, zugaenge] = await Promise.all([
+      api('/auth/v1/user', { auth: true }),
+      api(`/rest/v1/profiles?select=display_name,lang,birth_year,parent_consent&id=eq.${ses.user?.id || ''}`, { auth: true }).catch(() => []),
+      api('/rest/v1/entitlements?select=produkt,gueltig_bis,quelle&order=gueltig_bis.desc', { auth: true }),
+    ]);
+    if (!ses.user) { saveSes({ ...ses, user }); }
+    const p = (profile[0]) || (await api(`/rest/v1/profiles?select=display_name,lang,birth_year,parent_consent&id=eq.${user.id}`, { auth: true }))[0] || {};
+    const NAMEN = { arena: '🖥️ Arena (Online-Labs)', ki: '🤖 KI-Werkstatt', alles: '⭐ Alles' };
+    const QUELLE = { beta: 'Beta-Zugang', kauf: 'gekauft', geschenk: 'geschenkt' };
+    const datum = (d) => new Date(d).toLocaleDateString(currentLang() === 'uk' ? 'uk-UA' : currentLang() === 'en' ? 'en-GB' : 'de-DE');
+    const liste = zugaenge.length ? `<ul class="list">${zugaenge.map(z => { const aktiv = new Date(z.gueltig_bis) > new Date(); return `<li><div class="row" style="flex-wrap:nowrap;padding:.45rem 0"><span class="state ${aktiv ? 'done' : ''}">${aktiv ? '✓' : '–'}</span><span class="grow" style="display:flex;flex-direction:column"><b>${esc(NAMEN[z.produkt] || z.produkt)}</b><span class="small muted">${aktiv ? 'gültig bis' : 'abgelaufen am'} ${esc(datum(z.gueltig_bis))} · ${esc(QUELLE[z.quelle] || z.quelle)}</span></span></div></li>`; }).join('')}</ul>`
+      : '<p class="small muted" style="margin:0">Noch keine Zugänge. Alles, was im Browser läuft, ist kostenlos. Arena und KI-Werkstatt kommen bald.</p>';
+    const kind = p.birth_year && YEAR - p.birth_year < ADULT;
+    rahmen(`
+      <div class="card"><h2 style="margin-bottom:.3rem">Hallo${p.display_name ? ' ' + esc(p.display_name) : ''}!</h2>
+        <p class="small muted" style="margin:0">${esc(user.email)}${p.birth_year ? ` · Jahrgang ${esc(p.birth_year)}` : ''}${kind ? ` · Elternzustimmung: ${p.parent_consent ? '✓' : 'fehlt'}` : ''}</p></div>
+      <div class="card"><h3>Meine Zugänge</h3>${liste}</div>
+      <div class="card"><h3>Profil</h3><form id="pf" class="stack">
+        <label>Name<input name="name" maxlength="30" value="${esc(p.display_name || '')}"></label>
+        <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option><option value="uk">Українська</option></select></label>
+        <button class="btn primary">Speichern</button></form></div>
+      <div class="card"><h3>Passwort ändern</h3><form id="pw" class="stack">
+        <label>Neues Passwort (mindestens 10 Zeichen)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>
+        <button class="btn">Passwort ändern</button></form></div>
+      <button class="btn ghost block" id="out">Abmelden</button>`);
+    const pf = $('#pf'); pf.lang.value = p.lang || 'de';
+    pf.onsubmit = async (e) => {
+      e.preventDefault(); busy(pf, true);
+      try { await api(`/rest/v1/profiles?id=eq.${user.id}`, { method: 'PATCH', auth: true, prefer: 'return=minimal', body: { display_name: pf.name.value.trim().slice(0, 30), lang: pf.lang.value } }); msg('✓ Profil gespeichert.', true); }
+      catch (err) { msg(err.message); } finally { busy(pf, false); }
+    };
+    const pw = $('#pw');
+    pw.onsubmit = async (e) => {
+      e.preventDefault(); busy(pw, true);
+      try { await api('/auth/v1/user', { method: 'PUT', auth: true, body: { password: pw.pw.value } }); pw.reset(); msg('✓ Passwort geändert.', true); }
+      catch (err) { msg(err.message); } finally { busy(pw, false); }
+    };
+    $('#out').onclick = async () => { try { await api('/auth/v1/logout', { method: 'POST', auth: true }); } catch { /* */ } saveSes(null); abgemeldet(); };
+  } catch (err) {
+    if (/anmelden|JWT|401/i.test(err.message)) { saveSes(null); return abgemeldet(); }
+    rahmen(`<div class="card danger">${esc(err.message)}</div><button class="btn" onclick="location.reload()">Neu laden</button>`);
+  }
+}
+
+function neuesPasswort() {
+  rahmen(`<div class="card"><h3>Neues Passwort festlegen</h3><form id="f" class="stack">
+    <label>Neues Passwort (mindestens 10 Zeichen)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>
+    <button class="btn go block">Speichern</button></form></div>`);
+  const f = $('#f');
+  f.onsubmit = async (e) => {
+    e.preventDefault(); busy(f, true);
+    try { await api('/auth/v1/user', { method: 'PUT', auth: true, body: { password: f.pw.value } }); hinweis = '✓ Neues Passwort gespeichert.'; angemeldet(); }
+    catch (err) { msg(err.message); busy(f, false); }
+  };
+}
+
+// ---- Start ----------------------------------------------------------------------------------
+initLang(); protectCodes(); await loadUI();
+if (!URL_ || !KEY) rahmen('<div class="card warn">Das Konto ist auf dieser Seite noch nicht eingerichtet.</div>');
+else if (modus === 'neues-passwort') neuesPasswort();
+else if (ses) angemeldet();
+else abgemeldet(new URLSearchParams(location.search).get('neu') ? 'neu' : 'login');

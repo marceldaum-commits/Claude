@@ -27,6 +27,8 @@ Gepflegt auf Branch `ccr-63912bdd-xpv8bk` (lesen: `git fetch origin ccr-63912bdd
 | KI (session_015vg1TkDYBs7kSfEMSPudbC) | Didaktik & Nutzererlebnis | KI-Werkstatt komplett, Verständlichkeits-Review beider Apps, gemeinsames Handy-Design, Inhalte Brücken-Raum |
 | Sprache & Qualität (session_015vg1TkXMWLfRNriT3axK7q, Branch `ccr-sprache-qualitaet`) | Übersetzung & Test | Handübersetzung UK/EN in `i18n/<sprache>/<raum>.json` (Kali) und `ki-lernen/i18n/` (KI), Testspieler auf Handy/PC |
 
+Weitere Mitarbeiter: Marcel hat erlaubt, bei Bedarf neue Sitzungen anzulegen. Vorher mit den anderen absprechen, Rolle und Grenzen (Ordner, Branch) festlegen und hier eintragen.
+
 Übersetzungsformat Kali-App: `i18n/<sprache>/<raumid>.json` = `{ "<exakter deutscher Text>": "<Übersetzung>" }`. Befehle, Dateinamen, Pfade und Codes werden nie übersetzt.
 
 ## Gemeinsame Regeln
@@ -64,6 +66,20 @@ Gepflegt auf Branch `ccr-63912bdd-xpv8bk` (lesen: `git fetch origin ccr-63912bdd
 
 - KI-App: Prompt-Werkstatt, Lügendetektor (Halluzinationen finden), Geheimnis-Wächter (was gehört nicht in einen Prompt), Rollen & Kontext, KI oder Mensch?, Story-Rahmen Praktikum, Tokens als Spielwährung.
 - Brücke „KI & Sicherheit“: Prompt-Injection verstehen und sich schützen (KI-App). Raum „Analyse mit KI-Hilfe“ mit fehlerhafter, vorgefertigter KI-Erklärung, die im Sandbox-Terminal nachgeprüft wird (Kali-App).
+
+## Plan: Nachtfalter-Konto (Registrierung, später bezahlter Zugang)
+
+Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtung.
+
+- **Ein Konto für alle Nachtfalter-Apps** (Hacklab, Arena, KI-Werkstatt): zentral über Supabase Auth (E-Mail + Passwort bzw. Magic Link), Login-Seite `konto.nachtfalter.dev`. Hacklab nutzt Supabase bereits für den Sync.
+- **Tabellen** (mit Row Level Security): `profiles` (Anzeigename, Sprache, Geburtsjahr/Elternfreigabe), `entitlements` (user, produkt `arena|ki|alles`, gueltig_bis, quelle `beta|kauf|geschenk`).
+- **Dienste prüfen den Zugang serverseitig**: Arena und KI-Werkstatt verlangen ein gültiges Supabase-Token + passendes Entitlement statt Einladungscode. Kostenlos bleibt alles, was im Browser läuft.
+- **Cloudflare Access** schützt dann nur noch Vorschau/Admin; die öffentlichen Apps gehen ohne Access online.
+- **Bezahlen (später)**: zeitliche Pässe (z. B. 1 Monat / 3 Monate), Abwicklung über einen „Merchant of Record“ (z. B. Paddle oder Lemon Squeezy – übernimmt Umsatzsteuer/EU-Rechnungen), Webhook schreibt `entitlements`. Kein Abo-Zwang.
+- **Vorher rechtlich klären (Marcel)**: Impressum, Datenschutzerklärung, AGB/Widerruf für digitale Inhalte, ggf. Gewerbe/Kleinunternehmerregelung, Minderjährige (Einwilligung der Eltern, keine Käufe durch Kinder). Keine Rechtsberatung durch uns – im Zweifel Fachperson.
+- Schema-Wünsche der KI-Sitzung (eingeplant): `entitlements` nur serverseitig per service_role lesen (Dienste), RLS: Nutzer sehen nur eigene Zeilen; optionales Feld `ki_budget_usd` pro Entitlement (sonst Standard `BUDGET_USD_PER_CODE`). KI-Werkstatt hat dafür `ki-lernen/auth.js` mit `AUTH_MODE=codes|supabase` vorbereitet (0.4.0).
+- **Stand 03.11.2026:** Supabase-Projekt „nachtfalter-konto“ angelegt (Ref `sxapebxzxmathkvtuuvn`, Frankfurt), Schema `supabase/konto-schema.sql` angewendet, Sicherheits-Prüfung ohne Befund. Schlüssel (service_role) holt Marcel im Supabase-Dashboard und trägt ihn nur in die `.env` auf dem Server ein – nie in Chat oder Repo.
+- Zuständig: Kali-Sitzung (Konto, Datenbank, Sicherheit, Zahlungs-Webhook), KI-Sitzung (Anbindung KI-Werkstatt, Texte/Ablauf aus Nutzersicht), Sprache & Qualität (Übersetzung, Test).
 
 ## Offene Punkte
 

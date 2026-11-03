@@ -65,7 +65,7 @@ export async function exportApp({ includeState, state }) {
     root.file('lernstand-snapshot.json', JSON.stringify(snapshotForExport(state), null, 2));
   }
   root.file('WEITERGABE.txt',
-    `Kali Level Up ${self.KLY_VERSION || ''} – exportiert am ${new Date().toLocaleString('de-DE')}\n\n` +
+    `Nachtfalter Hacklab ${self.KLY_VERSION || ''} – exportiert am ${new Date().toLocaleString('de-DE')}\n\n` +
     (includeState
       ? 'ACHTUNG: Dieses Paket enthält einen PERSÖNLICHEN Lernstand (lernstand-snapshot.json) als Momentaufnahme.\nNicht öffentlich weitergeben. Import in der App: Mehr → Daten → Lernstand importieren.\n'
       : 'Neutrale Version: kein Lernstand, keine Zugangsdaten. Sync-Konfiguration ist leer.\n') +
