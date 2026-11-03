@@ -86,8 +86,8 @@ export function createCodeAuth(codes) {
 
 const b64url = (s) => Buffer.from(s, 'base64url');
 const ALGS = {
-  ES256: { hash: 'sha256', dsaEncoding: 'ieee-p1363' },
-  RS256: { hash: 'sha256' },
+  ES256: { hash: 'sha256', dsaEncoding: 'ieee-p1363', kty: 'EC', crv: 'P-256' },
+  RS256: { hash: 'sha256', kty: 'RSA' },
 };
 
 export function verifyJwt(token, keys, { issuer, audience, now = Date.now() / 1000 } = {}) {
@@ -103,6 +103,7 @@ export function verifyJwt(token, keys, { issuer, audience, now = Date.now() / 10
   const alg = ALGS[header.alg];
   const key = keys.get(header.kid);
   if (!alg || !key || (key.alg && key.alg !== header.alg)) return null;
+  if (key.kty !== alg.kty || (alg.crv && key.crv !== alg.crv)) return null;
   const ok = crypto.verify(alg.hash, Buffer.from(`${parts[0]}.${parts[1]}`),
     { key: key.pub, dsaEncoding: alg.dsaEncoding }, b64url(parts[2]));
   if (!ok) return null;
@@ -113,6 +114,7 @@ export function verifyJwt(token, keys, { issuer, audience, now = Date.now() / 10
   const aud = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
   if (audience && !aud.includes(audience)) return null;
   if (payload.role !== 'authenticated' || !/^[0-9a-f-]{36}$/i.test(payload.sub || '')) return null;
+  if (payload.is_anonymous === true) return null; // anonyme Supabase-Nutzer haben auch role=authenticated
   return payload;
 }
 
@@ -131,13 +133,20 @@ export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl =
       if (Date.now() - lastForced < 30_000) return; // unbekannte kid: höchstens alle 30 s nachladen
       lastForced = Date.now();
     }
-    const res = await fetchImpl(`${issuer}/.well-known/jwks.json`);
-    if (!res.ok) throw new Error(`JWKS nicht ladbar (${res.status})`);
-    const { keys: list = [] } = await res.json();
+    let list;
+    try {
+      const res = await fetchImpl(`${issuer}/.well-known/jwks.json`);
+      if (!res.ok) throw new Error(`JWKS ${res.status}`);
+      ({ keys: list = [] } = await res.json());
+    } catch (err) {
+      console.error('Anmeldeschlüssel nicht ladbar:', err.message);
+      if (keys.size) { keysAt = Date.now() - 9 * 60_000; return; } // mit alten Schlüsseln weiter, in 1 Min erneut versuchen
+      throw unavailable();
+    }
     const next = new Map();
     for (const jwk of list) {
       try {
-        next.set(jwk.kid, { alg: jwk.alg, pub: crypto.createPublicKey({ key: jwk, format: 'jwk' }) });
+        next.set(jwk.kid, { alg: jwk.alg, kty: jwk.kty, crv: jwk.crv, pub: crypto.createPublicKey({ key: jwk, format: 'jwk' }) });
       } catch { /* unbekannter Schlüsseltyp */ }
     }
     keys = next;
@@ -148,7 +157,18 @@ export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl =
   const headers = { apikey: serviceKey, Accept: 'application/json' };
   if (serviceKey.startsWith('eyJ')) headers.Authorization = `Bearer ${serviceKey}`;
 
+  const unavailable = () => Object.assign(new Error('Die Anmeldung ist gerade nicht erreichbar. Bitte gleich nochmal versuchen.'), { status: 503 });
+  // 4) Zugangs-Cache mit Obergrenze: abgelaufene Einträge zuerst, sonst die ältesten entfernen
   const cache = new Map(); // user_id → { until, value }
+  const MAX_CACHE = 5000;
+  function remember(userId, value) {
+    if (cache.size >= MAX_CACHE) {
+      const t = Date.now();
+      for (const [k, v] of cache) if (v.until <= t) cache.delete(k);
+      while (cache.size >= MAX_CACHE) cache.delete(cache.keys().next().value);
+    }
+    cache.set(userId, { until: Date.now() + 60_000, value });
+  }
   async function lookup(userId) {
     const hit = cache.get(userId);
     if (hit && hit.until > Date.now()) return hit.value;
@@ -156,6 +176,9 @@ export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl =
     const q = (path) => fetchImpl(`${base}/rest/v1/${path}`, { headers }).then((r) => {
       if (!r.ok) throw new Error(`Supabase ${r.status}`);
       return r.json();
+    }).catch((err) => {
+      console.error('Zugangsabfrage fehlgeschlagen:', err.message);
+      throw unavailable();
     });
     const [ents, profs] = await Promise.all([
       q(`entitlements?select=produkt,gueltig_bis,ki_budget_usd&user_id=eq.${userId}&produkt=in.(ki,alles)&gueltig_bis=gt.${encodeURIComponent(now)}`),
@@ -170,7 +193,7 @@ export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl =
         name: profs[0]?.display_name || '',
       };
     }
-    cache.set(userId, { until: Date.now() + 60_000, value });
+    remember(userId, value);
     return value;
   }
 

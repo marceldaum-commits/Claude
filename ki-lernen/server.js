@@ -115,6 +115,7 @@ function describeError(err) {
   if (err instanceof Anthropic.RateLimitError) return msg('Die KI ist gerade überlastet. Bitte gleich nochmal versuchen.');
   if (err instanceof Anthropic.BadRequestError) return msg('Die KI konnte diese Anfrage nicht bearbeiten.');
   if (err instanceof Anthropic.APIError) return msg('Die KI ist gerade nicht erreichbar. Bitte später nochmal.');
+  if (err.status === 503) return msg('Die Anmeldung ist gerade nicht erreichbar. Bitte gleich nochmal versuchen.');
   return err.status ? err.message : msg('Unbekannter Fehler');
 }
 

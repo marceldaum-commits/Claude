@@ -109,3 +109,29 @@ test('Einladungscodes: Hash-ID statt Klartext, Sperre nach 10 Fehlversuchen', ()
   for (let i = 0; i < 10; i++) assert.equal(r('X' + i), null);
   assert.deepEqual(r('ABC'), { blocked: true });
 });
+
+test('Härtung: anonyme Nutzer und falscher Schlüsseltyp werden abgelehnt', async () => {
+  const k = keypair('k1');
+  const noAlg = { ...k.jwk }; delete noAlg.alg; // JWK ohne alg-Angabe
+  const { fetchImpl } = setup({ jwks: () => [noAlg], ents: { [UID]: [{ produkt: 'ki', gueltig_bis: future, ki_budget_usd: null }] } });
+  const auth = createSupabaseAuth({ url: URL_, serviceKey: 'sb_secret_test', defaultBudget: 2, fetchImpl });
+  assert.ok((await auth.authenticate(req(sign(k, good())))).id);
+  assert.equal(await auth.authenticate(req(sign(k, good(UID, { is_anonymous: true })))), null);
+  // RS256 im Kopf, aber EC-Schlüssel: muss scheitern, auch ohne alg in der JWK
+  assert.equal(await auth.authenticate(req(sign(k, good(), { alg: 'RS256' }))), null);
+});
+
+test('Härtung: JWKS-Ausfall → 503 ohne Schlüssel, mit alten Schlüsseln weiter', async () => {
+  const k = keypair('k1');
+  let down = true;
+  const { fetchImpl: inner } = setup({ jwks: () => [k.jwk], ents: { [UID]: [{ produkt: 'ki', gueltig_bis: future, ki_budget_usd: null }] } });
+  const fetchImpl = async (url, o) => (down && url.endsWith('jwks.json') ? { ok: false, status: 500, json: async () => ({}) } : inner(url, o));
+  const auth = createSupabaseAuth({ url: URL_, serviceKey: 'sb_secret_test', defaultBudget: 2, fetchImpl });
+  await assert.rejects(auth.authenticate(req(sign(k, good()))), (e) => e.status === 503);
+  down = false;
+  assert.ok((await auth.authenticate(req(sign(k, good())))).id);
+  down = true; // Schlüssel sind geladen: Ausfall stört nicht
+  const k2 = keypair('k2'); // unbekannte kid erzwingt Nachladen, das scheitert → alte Schlüssel bleiben
+  assert.equal(await auth.authenticate(req(sign(k2, good()))), null);
+  assert.ok((await auth.authenticate(req(sign(k, good())))).id);
+});
