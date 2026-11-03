@@ -81,7 +81,7 @@ test('ohne Code keine KI', async () => {
 });
 
 test('Status und Profil', async () => {
-  assert.deepEqual(await (await fetch(base + '/api/status')).json(), { ok: true, ki: true, model: 'claude-opus-5-5' });
+  assert.deepEqual(await (await fetch(base + '/api/status')).json(), { ok: true, ki: true, model: 'claude-opus-5-5', auth: 'codes' });
   const me = await (await fetch(base + '/api/me', { headers: { 'x-invite-code': 'GUT' } })).json();
   assert.equal(me.name, 'Tina');
 });

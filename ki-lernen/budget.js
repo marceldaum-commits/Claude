@@ -36,11 +36,11 @@ export class Budget {
     return e && e.month === month() ? e.usd : 0;
   }
 
-  left(code) {
-    return Math.max(0, Math.round((this.limit - this.spent(code)) * 10000) / 10000);
+  left(code, limit = this.limit) {
+    return Math.max(0, Math.round((limit - this.spent(code)) * 10000) / 10000);
   }
 
-  record(code, usage, model) {
+  record(code, usage, model, limit = this.limit) {
     const usd = costUsd(usage, model || this.model);
     this.data[code] = { month: month(), usd: this.spent(code) + usd };
     try {
@@ -49,6 +49,6 @@ export class Budget {
     } catch (err) {
       console.error('Budget konnte nicht gespeichert werden:', err.message);
     }
-    return this.left(code);
+    return this.left(code, limit);
   }
 }

@@ -16,7 +16,8 @@ const HOST = process.env.HOST || '127.0.0.1';
 const MODEL = process.env.KI_MODEL || 'claude-opus-5-5';
 const BUDGET_USD = Number(process.env.BUDGET_USD_PER_CODE || 2);
 
-const AUTH = createAuth();
+const AUTH = createAuth(process.env, { budgetUsd: BUDGET_USD });
+const SUPABASE_URL = AUTH.kind === 'supabase' ? process.env.SUPABASE_URL.replace(/\/+$/, '') : '';
 
 const budget = new Budget(path.join(here, 'data', 'usage.json'), MODEL, BUDGET_USD);
 const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
@@ -48,7 +49,7 @@ const SECURITY_HEADERS = {
   'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'no-referrer',
   'Content-Security-Policy':
-    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'${SUPABASE_URL ? ' ' + SUPABASE_URL : ''}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`,
 };
 
 function sendJson(res, status, obj) {
@@ -157,9 +158,9 @@ async function handleChat(req, res, user) {
   const seen = { input_tokens: 0, output_tokens: 0, chars: 0, model: MODEL };
   let booked = false;
   const book = (usage, model) => {
-    if (booked) return budget.left(user.id);
+    if (booked) return budget.left(user.id, user.budgetUsd);
     booked = true;
-    return budget.record(user.id, usage, model);
+    return budget.record(user.id, usage, model, user.budgetUsd);
   };
   res.on('close', () => {
     if (booked) return;
@@ -237,7 +238,7 @@ async function handleJudge(req, res, user) {
       },
     ],
   });
-  const left = budget.record(user.id, msg.usage, msg.model);
+  const left = budget.record(user.id, msg.usage, msg.model, user.budgetUsd);
   const refusal = refusalText(msg);
   if (refusal) return sendJson(res, 200, { error: refusal, budgetLeft: left });
   const text = msg.content.find((b) => b.type === 'text')?.text || '{}';
@@ -274,13 +275,20 @@ const server = http.createServer(async (req, res) => {
   try {
     if (url.pathname.startsWith('/api/')) {
       if (url.pathname === '/api/status') {
-        return sendJson(res, 200, { ok: true, ki: Boolean(client), model: MODEL });
+        return sendJson(res, 200, {
+          ok: true, ki: Boolean(client), model: MODEL, auth: AUTH.kind,
+          // öffentliche Werte für die Anmeldung im Browser (kein Geheimnis)
+          ...(AUTH.kind === 'supabase' ? { supabaseUrl: SUPABASE_URL, supabaseKey: process.env.SUPABASE_PUBLISHABLE_KEY || '', accountUrl: process.env.ACCOUNT_URL || '' } : {}),
+        });
       }
-      const user = AUTH.authenticate(req);
+      const user = await AUTH.authenticate(req);
       if (user?.blocked) return sendJson(res, 429, { error: msg('Zu viele falsche Codes. Bitte in 15 Minuten nochmal.') });
-      if (!user) return sendJson(res, 401, { error: msg('Bitte einen gültigen Einladungscode eingeben.') });
+      if (user?.noAccess) return sendJson(res, 403, { error: msg('Dein Konto hat noch keinen Zugang zur KI-Werkstatt.') });
+      if (!user) {
+        return sendJson(res, 401, { error: AUTH.kind === 'supabase' ? msg('Bitte melde dich mit deinem Nachtfalter-Konto an.') : msg('Bitte einen gültigen Einladungscode eingeben.') });
+      }
       if (url.pathname === '/api/me') {
-        return sendJson(res, 200, { name: user.name, budgetLeft: budget.left(user.id), budget: BUDGET_USD });
+        return sendJson(res, 200, { name: user.name, budgetLeft: budget.left(user.id, user.budgetUsd), budget: user.budgetUsd ?? BUDGET_USD, until: user.until || null });
       }
       if (req.method !== 'POST') return sendJson(res, 405, { error: msg('Nur POST.') });
       if (!client) return sendJson(res, 503, { error: msg('Auf dem Server ist noch kein API-Schlüssel eingetragen.') });
@@ -288,7 +296,7 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === '/api/tokens') return await handleTokens(req, res);
       const handler = { '/api/chat': handleChat, '/api/judge': handleJudge }[url.pathname];
       if (!handler) return sendJson(res, 404, { error: msg('Unbekannt.') });
-      if (budget.left(user.id) <= 0) {
+      if (budget.left(user.id, user.budgetUsd) <= 0) {
         return sendJson(res, 402, { error: msg('Das KI-Budget für diesen Monat ist aufgebraucht.') });
       }
       if (!acquire(user.id)) return sendJson(res, 429, { error: msg('Bitte warte, bis die laufenden Antworten fertig sind.') });

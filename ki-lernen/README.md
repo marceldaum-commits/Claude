@@ -41,10 +41,17 @@ XP und Rang werden nur im Browser gespeichert.
 ## Anmeldung (austauschbar)
 
 Die Anmeldung steckt komplett in `auth.js` (`createAuth()` → `authenticate(req)` liefert `{ id, name }`, `{ blocked }` oder `null`).
-Heute: Einladungscodes (`AUTH_MODE=codes`, Standard). Geplant mit dem gemeinsamen **Nachtfalter-Konto**:
-`AUTH_MODE=supabase` – Supabase-JWT aus `Authorization: Bearer …` prüfen und Entitlement `ki` oder `alles`
-mit `gueltig_bis` in der Zukunft verlangen. Budget, Rate-Limit und Parallel-Bremse hängen nur an `id`
-und funktionieren dann unverändert. In `data/usage.json` stehen keine Codes im Klartext, nur Hash-IDs.
+- `AUTH_MODE=codes` (Standard): Einladungscodes, IP-Sperre nach 10 Fehlversuchen.
+- `AUTH_MODE=supabase`: gemeinsames **Nachtfalter-Konto**. Der Browser meldet sich mit E-Mail + Passwort direkt
+  bei Supabase an (öffentlicher Schlüssel) und schickt das Zugriffstoken mit; abgelaufene Tokens werden
+  automatisch erneuert. Der Server prüft das Token selbst (ES256/RS256 über die JWKS des Projekts, Aussteller,
+  `aud=authenticated`, Ablauf) und liest mit dem geheimen Dienst-Schlüssel `entitlements`:
+  Zugang nur bei `produkt in (ki, alles)` und `gueltig_bis` in der Zukunft (Ergebnis 60 s zwischengespeichert).
+  Monatsbudget = größtes `ki_budget_usd` der gültigen Zugänge, sonst `BUDGET_USD_PER_CODE`.
+  Ohne Zugang meldet die App „Dein Konto hat noch keinen Zugang“ (403).
+
+Budget, Rate-Limit und Parallel-Bremse hängen nur an der `id`. In `data/usage.json` stehen keine Codes im
+Klartext, nur Hash-IDs bzw. `user:<uuid>`.
 
 ## Kinder und Datenschutz
 

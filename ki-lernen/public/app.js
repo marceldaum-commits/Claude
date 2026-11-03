@@ -6,7 +6,7 @@ const KEY = 'kiw-state-v1';
 function load() {
   try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; }
 }
-const state = Object.assign({ xp: 0, done: {}, best: {}, code: '', lang: '' }, load());
+const state = Object.assign({ xp: 0, done: {}, best: {}, code: '', session: null, lang: '' }, load());
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* privates Fenster */ }
 }
@@ -79,23 +79,51 @@ function award(id, xp, label) {
 
 // ---------- Server-Verbindung ----------
 let serverInfo = { ki: false };
-const headers = () => ({ 'Content-Type': 'application/json', 'X-Invite-Code': state.code });
-async function api(path, body) {
-  const res = await fetch(path, { method: 'POST', headers: headers(), body: JSON.stringify({ ...body, lang: lang() }) });
+const kontoModus = () => serverInfo.auth === 'supabase';
+const loggedIn = () => (kontoModus() ? Boolean(state.session) : Boolean(state.code));
+
+// ----- Nachtfalter-Konto (Supabase Auth, ohne Bibliothek) -----
+async function supabaseToken(grant, body) {
+  const res = await fetch(`${serverInfo.supabaseUrl}/auth/v1/token?grant_type=${grant}`, {
+    method: 'POST',
+    headers: { apikey: serverInfo.supabaseKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(t(data.error || 'Fehler {n}', { n: res.status }));
-  return data;
+  if (!res.ok || !data.access_token) throw new Error(t('Anmeldung fehlgeschlagen. Stimmen E-Mail und Passwort?'));
+  state.session = { access: data.access_token, refresh: data.refresh_token, exp: Date.now() / 1000 + (data.expires_in || 3600) };
+  save();
+}
+function logout() {
+  state.code = '';
+  state.session = null;
+  save();
+}
+async function authHeaders() {
+  const hd = { 'Content-Type': 'application/json' };
+  if (!kontoModus()) return { ...hd, 'X-Invite-Code': state.code };
+  if (state.session && state.session.exp - 60 < Date.now() / 1000) {
+    try { await supabaseToken('refresh_token', { refresh_token: state.session.refresh }); } catch { logout(); }
+  }
+  return state.session ? { ...hd, Authorization: `Bearer ${state.session.access}` } : hd;
+}
+async function failed(res) {
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { logout(); renderHeader(); }
+  return new Error(t(data.error || 'Fehler {n}', { n: res.status }));
+}
+async function api(path, body) {
+  const res = await fetch(path, { method: 'POST', headers: await authHeaders(), body: JSON.stringify({ ...body, lang: lang() }) });
+  if (!res.ok) throw await failed(res);
+  return res.json();
 }
 
 // Chat mit Live-Text (Server-Sent Events über fetch)
 async function streamChat({ messages, system }, onText) {
   const res = await fetch('/api/chat', {
-    method: 'POST', headers: headers(), body: JSON.stringify({ messages, system, lang: lang() }),
+    method: 'POST', headers: await authHeaders(), body: JSON.stringify({ messages, system, lang: lang() }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(t(data.error || 'Fehler {n}', { n: res.status }));
-  }
+  if (!res.ok) throw await failed(res);
   const reader = res.body.getReader();
   const dec = new TextDecoder();
   let buf = '';
@@ -127,8 +155,34 @@ function needsKi(render) {
       h('p', {}, t('🔌 Die KI ist auf dem Server noch nicht eingeschaltet. Diese Mission braucht eine Verbindung zur KI.')),
       h('p', { class: 'hint' }, t('Probier so lange „Wahr oder Mythos?“ oder den „Halluzinations-Detektiv“ – die laufen ohne KI.')));
   }
-  if (!state.code) return codeForm(render);
+  if (!loggedIn()) return kontoModus() ? loginForm(render) : codeForm(render);
   return null;
+}
+const privacyNote = () => h('p', { class: 'hint' }, t('🔒 Was du in diesen Missionen schreibst, wird an die KI-Firma Anthropic geschickt. Schreib darum nie deinen echten Namen, deine Adresse, deine Schule, Passwörter oder Fotos von dir oder anderen hinein.'));
+function loginForm(render) {
+  const mail = h('input', { type: 'email', placeholder: t('E-Mail'), autocomplete: 'username', 'aria-label': t('E-Mail') });
+  const pass = h('input', { type: 'password', placeholder: t('Passwort'), autocomplete: 'current-password', 'aria-label': t('Passwort') });
+  const msg = h('p', { class: 'hint' });
+  const btn = h('button', {}, t('Anmelden'));
+  const go = async () => {
+    btn.disabled = true; msg.textContent = '';
+    try {
+      await supabaseToken('password', { email: mail.value.trim(), password: pass.value });
+      const res = await fetch('/api/me', { headers: await authHeaders() });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { msg.textContent = t(data.error || 'Fehler {n}', { n: res.status }); if (res.status !== 403) logout(); return; }
+      toast(t('Hallo {name}!', { name: data.name }));
+      render();
+    } catch (e) { msg.textContent = e.message; } finally { btn.disabled = false; }
+  };
+  btn.addEventListener('click', go);
+  pass.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+  return h('div', { class: 'card' },
+    h('p', {}, t('🔑 Für Missionen mit echter KI meldest du dich mit deinem Nachtfalter-Konto an.')),
+    privacyNote(), mail, h('p', {}), pass,
+    h('div', { class: 'row' }, btn,
+      serverInfo.accountUrl ? h('a', { href: serverInfo.accountUrl, rel: 'noopener' }, t('Noch kein Konto? Hier registrieren')) : null),
+    msg);
 }
 function codeForm(render) {
   const input = h('input', { type: 'password', placeholder: t('Einladungscode'), autocomplete: 'off', 'aria-label': t('Einladungscode') });
@@ -144,7 +198,7 @@ function codeForm(render) {
   };
   return h('div', { class: 'card' },
     h('p', {}, t('🔑 Für Missionen mit echter KI brauchst du einen Einladungscode.')),
-    h('p', { class: 'hint' }, t('🔒 Was du in diesen Missionen schreibst, wird an die KI-Firma Anthropic geschickt. Schreib darum nie deinen echten Namen, deine Adresse, deine Schule, Passwörter oder Fotos von dir oder anderen hinein.')),
+    privacyNote(),
     input,
     h('div', { class: 'row' }, h('button', { onclick: go }, t('Los geht’s'))),
     msg);
@@ -170,7 +224,7 @@ function home() {
       h('li', {}, h('b', {}, t('Klar fragen:')), ' ', t('Ziel, Zielgruppe, Länge und Form nennen.')),
       h('li', {}, h('b', {}, t('Prüfen:')), ' ', t('KI kann sich irren und klingt dabei sicher.')),
       h('li', {}, h('b', {}, t('Schützen:')), ' ', t('Keine Passwörter oder privaten Daten eingeben.'))),
-    state.code ? h('p', { class: 'hint' }, h('a', { href: '#/', onclick: () => { state.code = ''; save(); home(); } }, t('Einladungscode abmelden'))) : null,
+    loggedIn() ? h('p', { class: 'hint' }, h('a', { href: '#/', onclick: () => { logout(); home(); } }, kontoModus() ? t('Abmelden') : t('Einladungscode abmelden'))) : null,
   );
 }
 
