@@ -91,7 +91,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 1rem 0; }
 
 /* ---------- Formulare ---------- */
 label { display: block; font-weight: 600; font-size: .9rem; margin: .6rem 0 .25rem; }
-input[type=text], input[type=email], input[type=password], textarea, select { width: 100%; background: var(--term); border: 1px solid var(--line); border-radius: 10px; padding: .6rem .7rem; color: var(--text); }
+input[type=text], input:not([type]), input[type=number], input[type=email], input[type=password], textarea, select { width: 100%; background: var(--term); border: 1px solid var(--line); border-radius: 10px; padding: .6rem .7rem; color: var(--text); }
 textarea { min-height: 120px; font-family: var(--mono); font-size: .86rem; resize: vertical; }
 input:focus, textarea:focus, select:focus { outline: 2px solid var(--violet); outline-offset: 1px; }
 .check { display: flex; gap: .5rem; align-items: flex-start; font-weight: 400; }
@@ -227,3 +227,5 @@ details > summary { cursor: pointer; font-weight: 600; padding: .3rem 0; }
 .goog-te-banner-frame, iframe.skiptranslate, #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
 body { top: 0 !important; }
 .goog-text-highlight { background: none !important; box-shadow: none !important; }
+.konto label { display: block; font-size: .9rem; color: var(--muted); }
+.konto label > input, .konto label > select { margin-top: .3rem; color: var(--text); }

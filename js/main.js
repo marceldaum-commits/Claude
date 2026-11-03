@@ -1038,6 +1038,7 @@ views.mehr = () => {
       <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language · Мова</h3>${langPickerHTML()}
         <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
       <div class="card"><ul class="list">
+        <li><a href="konto.html"><span class="state">👤</span><span class="grow"><span class="t">Nachtfalter-Konto</span><span class="s">Registrieren, anmelden, deine Zugänge (Beta)</span></span></a></li>
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
         <li><a href="#/extern"><span class="state">🌍</span><span class="grow"><span class="t">Externe Lernpfade</span><span class="s">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF – zum Abhaken</span></span></a></li>

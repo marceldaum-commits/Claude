@@ -51,3 +51,21 @@ begin
 end $$;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();
+
+-- Migration „konto_registrierung_alter“ (03.11.2026): Geburtsjahr und Eltern-Erklärung aus der Registrierung
+-- (raw_user_meta_data) übernehmen. Danach nicht mehr durch den Nutzer änderbar (nur display_name/lang).
+create or replace function public.handle_new_user() returns trigger
+language plpgsql security definer set search_path = '' as $$
+declare
+  jahr int := case when (new.raw_user_meta_data->>'birth_year') ~ '^\d{4}$' then (new.raw_user_meta_data->>'birth_year')::int end;
+begin
+  if jahr is not null and (jahr < 1900 or jahr > extract(year from now())::int) then jahr := null; end if;
+  insert into public.profiles (id, display_name, lang, birth_year, parent_consent)
+  values (new.id,
+          left(coalesce(new.raw_user_meta_data->>'display_name', ''), 30),
+          case when new.raw_user_meta_data->>'lang' in ('de','en','uk') then new.raw_user_meta_data->>'lang' else 'de' end,
+          jahr,
+          coalesce(new.raw_user_meta_data->>'parent_consent', '') = 'true');
+  return new;
+end $$;
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
