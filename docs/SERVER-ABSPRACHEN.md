@@ -67,6 +67,18 @@ Weitere Mitarbeiter: Marcel hat erlaubt, bei Bedarf neue Sitzungen anzulegen. Vo
 - KI-App: Prompt-Werkstatt, Lügendetektor (Halluzinationen finden), Geheimnis-Wächter (was gehört nicht in einen Prompt), Rollen & Kontext, KI oder Mensch?, Story-Rahmen Praktikum, Tokens als Spielwährung.
 - Brücke „KI & Sicherheit“: Prompt-Injection verstehen und sich schützen (KI-App). Raum „Analyse mit KI-Hilfe“ mit fehlerhafter, vorgefertigter KI-Erklärung, die im Sandbox-Terminal nachgeprüft wird (Kali-App).
 
+## Plan: Nachtfalter-Konto (Registrierung, später bezahlter Zugang)
+
+Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtung.
+
+- **Ein Konto für alle Nachtfalter-Apps** (Hacklab, Arena, KI-Werkstatt): zentral über Supabase Auth (E-Mail + Passwort bzw. Magic Link), Login-Seite `konto.nachtfalter.dev`. Hacklab nutzt Supabase bereits für den Sync.
+- **Tabellen** (mit Row Level Security): `profiles` (Anzeigename, Sprache, Geburtsjahr/Elternfreigabe), `entitlements` (user, produkt `arena|ki|alles`, gueltig_bis, quelle `beta|kauf|geschenk`).
+- **Dienste prüfen den Zugang serverseitig**: Arena und KI-Werkstatt verlangen ein gültiges Supabase-Token + passendes Entitlement statt Einladungscode. Kostenlos bleibt alles, was im Browser läuft.
+- **Cloudflare Access** schützt dann nur noch Vorschau/Admin; die öffentlichen Apps gehen ohne Access online.
+- **Bezahlen (später)**: zeitliche Pässe (z. B. 1 Monat / 3 Monate), Abwicklung über einen „Merchant of Record“ (z. B. Paddle oder Lemon Squeezy – übernimmt Umsatzsteuer/EU-Rechnungen), Webhook schreibt `entitlements`. Kein Abo-Zwang.
+- **Vorher rechtlich klären (Marcel)**: Impressum, Datenschutzerklärung, AGB/Widerruf für digitale Inhalte, ggf. Gewerbe/Kleinunternehmerregelung, Minderjährige (Einwilligung der Eltern, keine Käufe durch Kinder). Keine Rechtsberatung durch uns – im Zweifel Fachperson.
+- Zuständig: Kali-Sitzung (Konto, Datenbank, Sicherheit, Zahlungs-Webhook), KI-Sitzung (Anbindung KI-Werkstatt, Texte/Ablauf aus Nutzersicht), Sprache & Qualität (Übersetzung, Test).
+
 ## Offene Punkte
 
 - [ ] Domain festlegen (Marcel)
