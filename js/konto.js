@@ -3,7 +3,7 @@
 // nur die öffentlichen Auth- und REST-Endpunkte mit dem Publishable Key. Rechte regelt Row Level Security
 // (supabase/konto-schema.sql): Nutzer sehen nur ihr eigenes Profil und ihre eigenen Zugänge.
 // Später eigene Adresse: konto.nachtfalter.dev.
-import { initLang, protectCodes, loadUI, langNoteHTML, langPickerHTML, bindLangPicker, currentLang } from './i18n.js';
+import { initLang, protectCodes, loadUI, langNoteHTML, langPickerHTML, bindLangPicker, currentLang, setLang } from './i18n.js';
 
 const C = window.KLY_CONFIG || {};
 const URL_ = C.kontoUrl, KEY = C.kontoKey;
@@ -13,6 +13,8 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<'
 const here = () => location.origin + location.pathname; // Rücksprung nach E-Mail-Links
 const YEAR = new Date().getFullYear();
 const ADULT = 16; // DSGVO Art. 8 / Deutschland: unter 16 nur mit Einwilligung der Eltern
+// Nur der Jahrgang ist bekannt: vorsichtig rechnen – wer dieses Jahr 16 wird, kann noch 15 sein.
+const evtlKind = (jahr) => !!jahr && YEAR - jahr <= ADULT;
 
 // ---- Sitzung --------------------------------------------------------------------------------
 let ses = null;
@@ -37,7 +39,12 @@ function fehlertext(d, status) {
   if (/Password should be|weak/i.test(m)) return 'Das Passwort ist zu schwach. Nimm mindestens 10 Zeichen.';
   if (/rate limit|too many/i.test(m) || status === 429) return 'Zu viele Versuche. Bitte warte ein paar Minuten.';
   if (/Signups not allowed/i.test(m)) return 'Neue Konten sind gerade geschlossen (Beta).';
-  return m || `Fehler ${status}`;
+  if (/invalid format|Unable to validate email/i.test(m)) return 'Diese E-Mail-Adresse sieht nicht richtig aus.';
+  if (/should be different/i.test(m)) return 'Das neue Passwort muss anders sein als das alte.';
+  if (/expired|invalid.*(token|link)|otp/i.test(m)) return 'Der Link ist abgelaufen. Fordere einfach einen neuen an.';
+  if (/Bitte erneut anmelden/.test(m)) return m;
+  console.warn('Konto:', status, m);
+  return `Das hat nicht geklappt (Fehler ${status}). Bitte versuch es nochmal.`;
 }
 async function fresh() {
   if (!ses) return;
@@ -47,10 +54,10 @@ async function fresh() {
 }
 
 // ---- Rückkehr aus E-Mail-Links (#access_token=…&type=signup|recovery) -------------------------
-let modus = null, hinweis = '';
+let modus = null, hinweis = '', fehlerHinweis = '';
 (function rueckkehr() {
   const h = new URLSearchParams(location.hash.replace(/^#/, ''));
-  if (h.get('error_description')) hinweis = h.get('error_description').replace(/\+/g, ' ');
+  if (h.get('error_description') || h.get('error')) { console.warn('Konto-Link:', h.get('error_description')); fehlerHinweis = 'Der Link ist abgelaufen oder wurde schon benutzt. Fordere unten einfach einen neuen an.'; }
   if (h.get('access_token')) {
     saveSes(fromToken({ access_token: h.get('access_token'), refresh_token: h.get('refresh_token'), expires_in: h.get('expires_in') }));
     if (h.get('type') === 'recovery') modus = 'neues-passwort';
@@ -69,13 +76,14 @@ function rahmen(inner) {
     <h1 style="margin-bottom:.2rem">Nachtfalter-Konto</h1>
     <p class="small muted" style="margin-top:0">Ein Konto für alle Nachtfalter-Apps: Hacklab, Arena und KI-Werkstatt. <span class="badge plain">Beta</span></p>
     ${hinweis ? `<div class="feedback ok">${esc(hinweis)}</div>` : ''}
+    ${fehlerHinweis ? `<div class="feedback no">${esc(fehlerHinweis)}</div>` : ''}
     ${inner}
     <div id="msg"></div>
     <details class="card tight small"><summary>🌍 Sprache · Language · Мова</summary><div style="margin-top:.5rem">${langPickerHTML()}</div></details>
     <p class="small muted"><a href="./">← Zurück zum Hacklab</a></p>
   </section>`;
   bindLangPicker(main);
-  hinweis = '';
+  hinweis = ''; fehlerHinweis = '';
 }
 
 function abgemeldet(tab = 'login') {
@@ -86,16 +94,16 @@ function abgemeldet(tab = 'login') {
       <label>Passwort<input type="password" name="pw" autocomplete="current-password" required></label>
       <button class="btn go block">Anmelden</button></form>`,
     neu: `<form id="f" class="stack">
-      <label>Wie sollen wir dich nennen?<input name="name" maxlength="30" placeholder="Name oder Spitzname" required></label>
+      <label>Wie sollen wir dich nennen?<input name="name" maxlength="30" placeholder="Spitzname – nicht dein echter Name" required></label>
       <label>E-Mail<input type="email" name="email" autocomplete="email" required></label>
-      <label>Passwort (mindestens 10 Zeichen)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>
+      <label>Passwort (mindestens 10 Zeichen – Tipp: drei Wörter mit Bindestrich, z. B. Mond-Kakao-Fahrrad)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>
       <label>Geburtsjahr<input type="number" name="jahr" inputmode="numeric" min="1900" max="${YEAR}" placeholder="z. B. 2012" required></label>
       <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option><option value="uk">Українська</option></select></label>
       <div id="eltern" class="card warn small" hidden>
-        <b>Unter ${ADULT} Jahren:</b> Ein Elternteil muss zustimmen und das Konto gemeinsam mit dir anlegen.
+        <b>Unter ${ADULT} Jahren:</b> Hol jetzt bitte deine Mama, deinen Papa oder wer sonst für dich sorgt – ihr legt das Konto zusammen an.
         <label class="row" style="flex-wrap:nowrap;margin-top:.4rem"><input type="checkbox" name="eltern" style="width:auto"> Ich bin Elternteil bzw. erziehungsberechtigt und stimme zu, dass mein Kind dieses Konto nutzt.</label>
       </div>
-      <p class="small muted">Gespeichert werden nur E-Mail, Name, Sprache und Geburtsjahr – für das Konto und deine Zugänge. Keine Werbung, keine Weitergabe.</p>
+      <p class="small muted">Gespeichert werden E-Mail, Spitzname, Sprache, Geburtsjahr und ob ein Elternteil zugestimmt hat – nur für dein Konto und deine Zugänge. Keine Werbung, keine Weitergabe.</p>
       <button class="btn go block">Konto anlegen</button></form>`,
     vergessen: `<form id="f" class="stack">
       <label>E-Mail<input type="email" name="email" autocomplete="email" required></label>
@@ -105,7 +113,7 @@ function abgemeldet(tab = 'login') {
   main.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => abgemeldet(b.dataset.tab));
   const f = $('#f');
   if (tab === 'neu') {
-    const pruefe = () => { const j = +f.jahr.value; $('#eltern').hidden = !(j && YEAR - j < ADULT); };
+    const pruefe = () => { const j = +f.jahr.value; $('#eltern').hidden = !evtlKind(j); };
     f.jahr.oninput = pruefe;
     f.lang.value = currentLang();
   }
@@ -117,13 +125,13 @@ function abgemeldet(tab = 'login') {
         return angemeldet();
       }
       if (tab === 'neu') {
-        const jahr = +f.jahr.value, kind = YEAR - jahr < ADULT;
+        const jahr = +f.jahr.value, kind = evtlKind(jahr);
         if (kind && !f.eltern.checked) throw new Error(`Unter ${ADULT} braucht es die Zustimmung eines Elternteils (Haken setzen).`);
         await api(`/auth/v1/signup?redirect_to=${encodeURIComponent(here())}`, { method: 'POST', body: {
           email: f.email.value.trim(), password: f.pw.value,
           data: { display_name: f.name.value.trim().slice(0, 30), lang: f.lang.value, birth_year: String(jahr), parent_consent: kind ? 'true' : 'false' },
         } });
-        f.reset(); return msg('Fast geschafft! Wir haben dir eine E-Mail geschickt. Klicke auf den Link darin, dann ist dein Konto aktiv.', true);
+        f.reset(); return msg('Fast geschafft! Wir haben dir eine E-Mail geschickt. Klicke auf den Link darin, dann ist dein Konto aktiv. Keine E-Mail da? Schau im Spam-Ordner nach. Hattest du schon ein Konto, nutze „Passwort vergessen“.', true);
       }
       if (tab === 'vergessen') {
         await api(`/auth/v1/recover?redirect_to=${encodeURIComponent(here())}`, { method: 'POST', body: { email: f.email.value.trim() } });
@@ -150,7 +158,7 @@ async function angemeldet() {
     const datum = (d) => new Date(d).toLocaleDateString(currentLang() === 'uk' ? 'uk-UA' : currentLang() === 'en' ? 'en-GB' : 'de-DE');
     const liste = zugaenge.length ? `<ul class="list">${zugaenge.map(z => { const aktiv = new Date(z.gueltig_bis) > new Date(); return `<li><div class="row" style="flex-wrap:nowrap;padding:.45rem 0"><span class="state ${aktiv ? 'done' : ''}">${aktiv ? '✓' : '–'}</span><span class="grow" style="display:flex;flex-direction:column"><b>${esc(NAMEN[z.produkt] || z.produkt)}</b><span class="small muted">${aktiv ? 'gültig bis' : 'abgelaufen am'} ${esc(datum(z.gueltig_bis))} · ${esc(QUELLE[z.quelle] || z.quelle)}</span></span></div></li>`; }).join('')}</ul>`
       : '<p class="small muted" style="margin:0">Noch keine Zugänge. Alles, was im Browser läuft, ist kostenlos. Arena und KI-Werkstatt kommen bald.</p>';
-    const kind = p.birth_year && YEAR - p.birth_year < ADULT;
+    const kind = evtlKind(p.birth_year);
     rahmen(`
       <div class="card"><h2 style="margin-bottom:.3rem">Hallo${p.display_name ? ' ' + esc(p.display_name) : ''}!</h2>
         <p class="small muted" style="margin:0">${esc(user.email)}${p.birth_year ? ` · Jahrgang ${esc(p.birth_year)}` : ''}${kind ? ` · Elternzustimmung: ${p.parent_consent ? '✓' : 'fehlt'}` : ''}</p></div>
@@ -166,7 +174,7 @@ async function angemeldet() {
     const pf = $('#pf'); pf.lang.value = p.lang || 'de';
     pf.onsubmit = async (e) => {
       e.preventDefault(); busy(pf, true);
-      try { await api(`/rest/v1/profiles?id=eq.${user.id}`, { method: 'PATCH', auth: true, prefer: 'return=minimal', body: { display_name: pf.name.value.trim().slice(0, 30), lang: pf.lang.value } }); msg('✓ Profil gespeichert.', true); }
+      try { await api(`/rest/v1/profiles?id=eq.${user.id}`, { method: 'PATCH', auth: true, prefer: 'return=minimal', body: { display_name: pf.name.value.trim().slice(0, 30), lang: pf.lang.value } }); msg('✓ Profil gespeichert.', true); if (pf.lang.value !== currentLang()) setLang(pf.lang.value); }
       catch (err) { msg(err.message); } finally { busy(pf, false); }
     };
     const pw = $('#pw');
@@ -178,7 +186,8 @@ async function angemeldet() {
     $('#out').onclick = async () => { try { await api('/auth/v1/logout', { method: 'POST', auth: true }); } catch { /* */ } saveSes(null); abgemeldet(); };
   } catch (err) {
     if (/anmelden|JWT|401/i.test(err.message)) { saveSes(null); return abgemeldet(); }
-    rahmen(`<div class="card danger">${esc(err.message)}</div><button class="btn" onclick="location.reload()">Neu laden</button>`);
+    rahmen(`<div class="card danger">${esc(err.message)}</div><button class="btn" id="reload">Neu laden</button>`);
+    $('#reload').onclick = () => location.reload();
   }
 }
 
