@@ -71,7 +71,7 @@ Weitere Mitarbeiter: Marcel hat erlaubt, bei Bedarf neue Sitzungen anzulegen. Vo
 
 Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtung.
 
-- **Ein Konto für alle Nachtfalter-Apps** (Hacklab, Arena, KI-Werkstatt): zentral über Supabase Auth (E-Mail + Passwort bzw. Magic Link), Login-Seite `konto.nachtfalter.dev`. Hacklab nutzt Supabase bereits für den Sync.
+- **Ein Konto für alle Nachtfalter-Apps** (Hacklab, Arena, KI-Werkstatt): zentral über Supabase Auth (E-Mail + Passwort bzw. Magic Link), Login-Seite `konto.nachtfalter.tech`. Hacklab nutzt Supabase bereits für den Sync.
 - **Tabellen** (mit Row Level Security): `profiles` (Anzeigename, Sprache, Geburtsjahr/Elternfreigabe), `entitlements` (user, produkt `arena|ki|alles`, gueltig_bis, quelle `beta|kauf|geschenk`).
 - **Dienste prüfen den Zugang serverseitig**: Arena und KI-Werkstatt verlangen ein gültiges Supabase-Token + passendes Entitlement statt Einladungscode. Kostenlos bleibt alles, was im Browser läuft.
 - **Cloudflare Access** schützt dann nur noch Vorschau/Admin; die öffentlichen Apps gehen ohne Access online.

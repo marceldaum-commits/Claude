@@ -2,7 +2,7 @@
 // Eigenes Supabase-Projekt „nachtfalter-konto“ (getrennt vom Lernstand-Sync). Bewusst ohne Bibliothek:
 // nur die öffentlichen Auth- und REST-Endpunkte mit dem Publishable Key. Rechte regelt Row Level Security
 // (supabase/konto-schema.sql): Nutzer sehen nur ihr eigenes Profil und ihre eigenen Zugänge.
-// Später eigene Adresse: konto.nachtfalter.dev.
+// Später eigene Adresse: konto.nachtfalter.tech.
 import { initLang, protectCodes, loadUI, langNoteHTML, langPickerHTML, bindLangPicker, currentLang, setLang } from './i18n.js';
 
 const C = window.KLY_CONFIG || {};
