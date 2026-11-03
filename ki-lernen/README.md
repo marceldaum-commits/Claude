@@ -38,6 +38,14 @@ XP und Rang werden nur im Browser gespeichert.
 - Nach 10 falschen Codes sperrt die App die IP für 15 Minuten (echte IP über `X-Forwarded-For`, nur vom lokalen Proxy).
 - Prompts werden nicht gespeichert oder geloggt; Fehlermeldungen an den Browser sind allgemein gehalten.
 
+## Anmeldung (austauschbar)
+
+Die Anmeldung steckt komplett in `auth.js` (`createAuth()` → `authenticate(req)` liefert `{ id, name }`, `{ blocked }` oder `null`).
+Heute: Einladungscodes (`AUTH_MODE=codes`, Standard). Geplant mit dem gemeinsamen **Nachtfalter-Konto**:
+`AUTH_MODE=supabase` – Supabase-JWT aus `Authorization: Bearer …` prüfen und Entitlement `ki` oder `alles`
+mit `gueltig_bis` in der Zukunft verlangen. Budget, Rate-Limit und Parallel-Bremse hängen nur an `id`
+und funktionieren dann unverändert. In `data/usage.json` stehen keine Codes im Klartext, nur Hash-IDs.
+
 ## Kinder und Datenschutz
 
 - Die App zeigt vor der ersten KI-Mission einen Hinweis: Eingaben gehen an Anthropic (Claude-API), keine echten Namen,

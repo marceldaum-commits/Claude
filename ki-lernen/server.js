@@ -5,9 +5,9 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import crypto from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import { Budget } from './budget.js';
+import { createAuth } from './auth.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(here, 'public');
@@ -16,17 +16,7 @@ const HOST = process.env.HOST || '127.0.0.1';
 const MODEL = process.env.KI_MODEL || 'claude-opus-5-5';
 const BUDGET_USD = Number(process.env.BUDGET_USD_PER_CODE || 2);
 
-// Einladungscodes "CODE:Name,CODE2:Name2"
-const CODES = new Map(
-  (process.env.INVITE_CODES || '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((s) => {
-      const [code, ...name] = s.split(':');
-      return [code.trim(), name.join(':').trim() || code.trim()];
-    }),
-);
+const AUTH = createAuth();
 
 const budget = new Budget(path.join(here, 'data', 'usage.json'), MODEL, BUDGET_USD);
 const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
@@ -79,45 +69,6 @@ async function readBody(req, limit = 64 * 1024) {
   } catch {
     throw Object.assign(new Error(msg('Ungültiges JSON')), { status: 400 });
   }
-}
-
-// Echte Absender-IP: X-Forwarded-For nur glauben, wenn die Anfrage vom lokalen Plesk-nginx kommt.
-function clientIp(req) {
-  const peer = req.socket.remoteAddress || '';
-  const local = peer === '127.0.0.1' || peer === '::1' || peer === '::ffff:127.0.0.1';
-  const fwd = String(req.headers['x-forwarded-for'] || '').split(',').pop().trim();
-  return local && fwd ? fwd : peer;
-}
-
-// Codes zeitkonstant vergleichen (Hash auf feste Länge, dann timingSafeEqual).
-const digest = (s) => crypto.createHash('sha256').update(String(s)).digest();
-const CODE_DIGESTS = [...CODES.keys()].map((c) => [c, digest(c)]);
-function findCode(given) {
-  const d = digest(given);
-  let hit = null;
-  for (const [c, cd] of CODE_DIGESTS) if (crypto.timingSafeEqual(d, cd)) hit = c;
-  return hit;
-}
-
-// Fehlversuche pro IP: höchstens 10 in 15 Minuten, sonst Sperre (gegen Durchprobieren).
-const failures = new Map();
-const FAIL_WINDOW = 15 * 60_000;
-function blockedIp(ip) {
-  const list = (failures.get(ip) || []).filter((t) => Date.now() - t < FAIL_WINDOW);
-  failures.set(ip, list);
-  return list.length >= 10;
-}
-
-function auth(req) {
-  const ip = clientIp(req);
-  if (blockedIp(ip)) return { blocked: true };
-  const given = String(req.headers['x-invite-code'] || '').trim();
-  const code = given ? findCode(given) : null;
-  if (!code) {
-    if (given) failures.get(ip).push(Date.now());
-    return null;
-  }
-  return { code, name: CODES.get(code) };
 }
 
 // Bremse: höchstens 12 KI-Anfragen pro Minute und Code.
@@ -206,9 +157,9 @@ async function handleChat(req, res, user) {
   const seen = { input_tokens: 0, output_tokens: 0, chars: 0, model: MODEL };
   let booked = false;
   const book = (usage, model) => {
-    if (booked) return budget.left(user.code);
+    if (booked) return budget.left(user.id);
     booked = true;
-    return budget.record(user.code, usage, model);
+    return budget.record(user.id, usage, model);
   };
   res.on('close', () => {
     if (booked) return;
@@ -286,7 +237,7 @@ async function handleJudge(req, res, user) {
       },
     ],
   });
-  const left = budget.record(user.code, msg.usage, msg.model);
+  const left = budget.record(user.id, msg.usage, msg.model);
   const refusal = refusalText(msg);
   if (refusal) return sendJson(res, 200, { error: refusal, budgetLeft: left });
   const text = msg.content.find((b) => b.type === 'text')?.text || '{}';
@@ -325,26 +276,26 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === '/api/status') {
         return sendJson(res, 200, { ok: true, ki: Boolean(client), model: MODEL });
       }
-      const user = auth(req);
+      const user = AUTH.authenticate(req);
       if (user?.blocked) return sendJson(res, 429, { error: msg('Zu viele falsche Codes. Bitte in 15 Minuten nochmal.') });
       if (!user) return sendJson(res, 401, { error: msg('Bitte einen gültigen Einladungscode eingeben.') });
       if (url.pathname === '/api/me') {
-        return sendJson(res, 200, { name: user.name, budgetLeft: budget.left(user.code), budget: BUDGET_USD });
+        return sendJson(res, 200, { name: user.name, budgetLeft: budget.left(user.id), budget: BUDGET_USD });
       }
       if (req.method !== 'POST') return sendJson(res, 405, { error: msg('Nur POST.') });
       if (!client) return sendJson(res, 503, { error: msg('Auf dem Server ist noch kein API-Schlüssel eingetragen.') });
-      if (rateLimited(user.code)) return sendJson(res, 429, { error: msg('Langsam! Höchstens 12 Anfragen pro Minute.') });
+      if (rateLimited(user.id)) return sendJson(res, 429, { error: msg('Langsam! Höchstens 12 Anfragen pro Minute.') });
       if (url.pathname === '/api/tokens') return await handleTokens(req, res);
       const handler = { '/api/chat': handleChat, '/api/judge': handleJudge }[url.pathname];
       if (!handler) return sendJson(res, 404, { error: msg('Unbekannt.') });
-      if (budget.left(user.code) <= 0) {
+      if (budget.left(user.id) <= 0) {
         return sendJson(res, 402, { error: msg('Das KI-Budget für diesen Monat ist aufgebraucht.') });
       }
-      if (!acquire(user.code)) return sendJson(res, 429, { error: msg('Bitte warte, bis die laufenden Antworten fertig sind.') });
+      if (!acquire(user.id)) return sendJson(res, 429, { error: msg('Bitte warte, bis die laufenden Antworten fertig sind.') });
       try {
         return await handler(req, res, user);
       } finally {
-        release(user.code);
+        release(user.id);
       }
     }
     return serveStatic(url.pathname, res);
@@ -384,7 +335,7 @@ function serveStatic(pathname, res) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   server.listen(PORT, HOST, () => {
-    console.log(`Nachtfalter KI-Werkstatt läuft auf http://${HOST}:${PORT} (Modell ${MODEL}, ${CODES.size} Codes)`);
+    console.log(`Nachtfalter KI-Werkstatt läuft auf http://${HOST}:${PORT} (Modell ${MODEL}, ${AUTH.count} Codes)`);
     if (!client) console.log('Hinweis: ANTHROPIC_API_KEY fehlt – nur die Offline-Missionen funktionieren.');
   });
 }

@@ -51,6 +51,7 @@ before(async () => {
   fs.cpSync(path.resolve('server.js'), path.join(tmp, 'server.js'));
   fs.cpSync(path.resolve('package.json'), path.join(tmp, 'package.json'));
   fs.cpSync(path.resolve('budget.js'), path.join(tmp, 'budget.js'));
+  fs.cpSync(path.resolve('auth.js'), path.join(tmp, 'auth.js'));
   fs.cpSync(path.resolve('public'), path.join(tmp, 'public'), { recursive: true });
   fs.symlinkSync(path.resolve('node_modules'), path.join(tmp, 'node_modules'));
   ({ server } = await import(path.join(tmp, 'server.js')));
@@ -143,4 +144,10 @@ test('nach 10 falschen Codes wird die IP gesperrt – auch für richtige Codes',
 
 test('kaputtes %-Encoding ergibt 400 statt 500', async () => {
   assert.equal((await fetch(base + '/%E0%A4%A')).status, 400);
+});
+
+test('Budget-Datei enthält keine Einladungscodes im Klartext', () => {
+  const raw = fs.readFileSync(path.join(tmp, 'data', 'usage.json'), 'utf8');
+  assert.ok(!raw.includes('GUT') && !raw.includes('ZWEI'));
+  assert.match(raw, /"code:[0-9a-f]{16}"/);
 });
