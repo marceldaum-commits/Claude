@@ -141,7 +141,8 @@ arena() {
     docker rm -f nf-arena >/dev/null 2>&1 || true
     docker run -d --name nf-arena --restart unless-stopped --env-file "$ETC/arena.env" \
       -e HOST=0.0.0.0 -e PORT=8090 -e TRUST_PROXY=1 -p 127.0.0.1:8090:8090 \
-      -v /var/run/docker.sock:/var/run/docker.sock --memory 512m "nachtfalter-arena:$1" >/dev/null
+      -v /var/run/docker.sock:/var/run/docker.sock --memory 512m \
+      --log-opt max-size=10m --log-opt max-file=3 "nachtfalter-arena:$1" >/dev/null
   }
   starten live
   if warten http://127.0.0.1:8090/api/status; then
