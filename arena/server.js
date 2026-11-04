@@ -118,6 +118,10 @@ const LABS = {
     produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 5, praefix: 'chiffren',
     kurz: 'Kryptoanalyse: klassische Chiffren brechen – Caesar, XOR mit Byte und Schlüsselwort, Kodierungs-Ketten und Vigenère. Jede Nachricht enthält ihren Code.',
     hello: hallo('Der Chiffrensaal', 'krypto', 'Auftrag: cat ~/auftrag.txt   ·   Rätsel: ~/raetsel/   ·   begriff verschluesselung') },
+  versteck: { image: env('VERSTECK_IMAGE', 'nf-versteck'), user: 'sucher', ready: 'Versteck bereit', title: 'Das Versteck', host: 'versteck',
+    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 5, praefix: 'versteck',
+    kurz: 'Steganografie: versteckte Daten finden – hinter Bildern, in Archiven, in Leerzeichen und im niederwertigsten Bit von Pixeln.',
+    hello: hallo('Das Versteck', 'sucher', 'Auftrag: cat ~/auftrag.txt   ·   Dateien: ~/fundstuecke/   ·   begriff steganografie') },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -133,6 +137,7 @@ const EINORDNUNG = {
   mitschnitt: ['Ermitteln', ['Netzwerk', 'Forensik', 'Logs']],
   werkstatt: ['Hacken', ['Reverse', 'Binär']],
   chiffren: ['Hacken', ['Krypto']],
+  versteck: ['Ermitteln', ['Steganografie', 'Forensik']],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};

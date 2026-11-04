@@ -152,3 +152,6 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - 2.38.0: „Der Chiffrensaal“ (Reihe Hacken, Fortgeschritten) – NEUE Methode Kryptoanalyse: Caesar, XOR (Byte/Wort),
   Kodierungs-Kette (base64/base32/hex), Vigenère; jede Nachricht enthält ihren Code. Aus dem Salz erzeugt, 5 Codes,
   durchgespielt. Lernpfad-Stufe s15. Jetzt 18 Arenen.
+- 2.39.0: „Das Versteck“ (Reihe Ermitteln, Fortgeschritten) – NEUE Methode Steganografie: Daten hinter einer PNG,
+  ZIP-Polyglot, Whitespace-Stego, LSB in einem PPM-Bild, base64+umgedreht. Aus dem Salz erzeugt, 5 Codes,
+  durchgespielt. Lernpfad-Stufe s16. Jetzt 19 Arenen, 17 Lernpfad-Stufen.

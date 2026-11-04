@@ -241,4 +241,18 @@ export const LERNPFAD = [
     selbst: ['Spiele „Der Chiffrensaal“ und brich alle fünf Nachrichten.'],
     uebung: { label: 'Arena: Der Chiffrensaal', href: 'arena:chiffren', erfordert: { arena: 'chiffren', level: 4 }, hinweis: 'Entschlüssle mindestens 4 der 5 Nachrichten.' },
   },
+  {
+    id: 's16', icon: '🫥', titel: 'Steganografie: das Versteckte sehen',
+    einleitung: 'Eine letzte neue Methode für den Moment: Daten, die in harmlosen Dateien versteckt sind. Hinter Bildern, in Archiven, in Leerzeichen oder einzelnen Bits – man muss nur wissen, wo man hinschaut.',
+    konzepte: [
+      ['Steganografie', 'Daten so verstecken, dass niemand ahnt, dass dort etwas ist.'],
+      ['Base64', 'Oft die äußerste Schicht einer versteckten Nachricht.'],
+    ],
+    beispiel: {
+      text: 'Zuerst immer: was ist die Datei wirklich, und hängt etwas dahinter?',
+      befehle: ['file datei', 'strings datei', 'tail -c 80 datei', 'unzip datei'],
+    },
+    selbst: ['Spiele „Das Versteck“ und hol alle fünf versteckten Codes heraus.'],
+    uebung: { label: 'Arena: Das Versteck', href: 'arena:versteck', erfordert: { arena: 'versteck', level: 4 }, hinweis: 'Finde mindestens 4 der 5 versteckten Codes.' },
+  },
 ];
