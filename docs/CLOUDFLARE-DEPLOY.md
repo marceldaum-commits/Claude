@@ -1,3 +1,7 @@
+> **Hinweis (historisch):** Nachtfalter läuft seit 11/2026 auf dem eigenen Strato/Plesk-Server
+> (siehe `SERVER-EINRICHTUNG.md` und `SERVER-ABSPRACHEN.md`). Diese Cloudflare-Anleitung ist VERALTET
+> und bleibt nur als Verlauf erhalten.
+
 # Private Veröffentlichung mit Cloudflare Pages + Cloudflare Access
 
 Ziel: Die App läuft unter einer festen **https-Adresse** (z. B. `https://kali-level-up.pages.dev`),
