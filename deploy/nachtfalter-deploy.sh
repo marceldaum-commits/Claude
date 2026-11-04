@@ -37,7 +37,7 @@ status() {
   echo "== Nachtfalter-Dienste =="
   for c in arena ki; do printf '%-6s Stand: %s\n' "$c" "$(cat "$STATE/$c.commit" 2>/dev/null | cut -c1-7 || echo -)"; done
   printf 'KI-Werkstatt: %s\n' "$(systemctl is-active nachtfalter-ki 2>/dev/null || true)"
-  printf 'Arena:        %s\n' "$(docker inspect -f '{{.State.Status}}' nf-arena 2>/dev/null || echo 'nicht vorhanden')"
+  printf 'Arena:        %s\n' "$(docker inspect -f '{{.State.Status}}' nf-arena 2>/dev/null | head -1 | grep . || echo 'nicht vorhanden')"
   printf 'Prüfung 8100: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8100/api/status >/dev/null 2>&1 && echo ok || echo -)"
   printf 'Prüfung 8090: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8090/api/status >/dev/null 2>&1 && echo ok || echo -)"
   echo "== Letzte Meldungen =="; tail -n 8 "$LOG" 2>/dev/null || true
@@ -71,7 +71,8 @@ warten() { for _ in $(seq 1 30); do curl -fsS -m 3 "$1" >/dev/null 2>&1 && retur
 ki() {
   local dir rev
   dir=$(holen ki-live) || { log "ki: Branch ki-live nicht abrufbar – übersprungen"; return 0; }
-  rev=$(git -C "$dir" rev-parse HEAD); neu ki "$rev" || return 0
+  rev=$(git -C "$dir" rev-parse HEAD:ki-lernen 2>/dev/null) || { log "ki: ki-lernen fehlt im Branch ki-live"; return 1; }
+  neu ki "$rev" || return 0
   [ -f "$dir/ki-lernen/server.js" ] || { log "ki: ki-lernen/server.js fehlt in ${rev:0:7}"; return 1; }
   [ -s "$ETC/ki.env" ] || { log "ki: $ETC/ki.env fehlt – nicht gestartet"; return 1; }
   log "ki: baue ${rev:0:7}"
@@ -119,11 +120,13 @@ EOF
 arena() {
   local dir rev
   dir=$(holen live) || { log "arena: Branch live nicht abrufbar – übersprungen"; return 0; }
-  rev=$(git -C "$dir" rev-parse HEAD); neu arena "$rev" || return 0
+  # Nur neu bauen, wenn sich Arena oder Lab geändert haben (sonst brächen laufende Labs ab)
+  rev="$(git -C "$dir" rev-parse HEAD:arena 2>/dev/null)-$(git -C "$dir" rev-parse HEAD:labs/kly-keller 2>/dev/null)"
+  neu arena "$rev" || return 0
   [ -f "$dir/arena/server.js" ] || { log "arena: arena/server.js fehlt in ${rev:0:7}"; return 1; }
   [ -s "$ETC/arena.env" ] || { log "arena: $ETC/arena.env fehlt – nicht gestartet"; return 1; }
   log "arena: baue ${rev:0:7}"
-  if ! docker build -q -t kly-keller "$dir/labs/kly-keller" >>"$LOG" 2>&1 || ! docker build -q -t nachtfalter-arena:neu "$dir/arena" >>"$LOG" 2>&1; then
+  if ! docker build -q -t kly-keller "$dir/labs/kly-keller" >/dev/null 2>>"$LOG" || ! docker build -q -t nachtfalter-arena:neu "$dir/arena" >/dev/null 2>>"$LOG"; then
     log "arena: Bau fehlgeschlagen – alter Stand bleibt"; return 1
   fi
   docker image inspect nachtfalter-arena:live >/dev/null 2>&1 && docker tag nachtfalter-arena:live nachtfalter-arena:alt
