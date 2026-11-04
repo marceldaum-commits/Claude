@@ -7,12 +7,12 @@ const URL_ = Deno.env.get('SUPABASE_URL')!;
 const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ORIGINS = new Set([
   'https://kali-level-up.pages.dev', 'https://vorschau.kali-level-up.pages.dev',
-  'https://konto.nachtfalter.tech', 'https://app.nachtfalter.tech',
+  'https://konto.nachtfalter.tech', 'https://app.nachtfalter.tech', 'https://vorschau.nachtfalter.tech',
 ]);
 const db = createClient(URL_, SERVICE, { auth: { persistSession: false, autoRefreshToken: false } });
 
 const cors = (origin: string | null) => ({
-  'Access-Control-Allow-Origin': origin && ORIGINS.has(origin) ? origin : 'https://kali-level-up.pages.dev',
+  'Access-Control-Allow-Origin': origin && ORIGINS.has(origin) ? origin : 'https://app.nachtfalter.tech',
   'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Vary': 'Origin',

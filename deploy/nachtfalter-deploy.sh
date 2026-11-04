@@ -10,6 +10,8 @@
 # Quellen (Repository marceldaum-commits/claude):
 #   Branch „live“     → Arena (arena/, labs/kly-keller/)        → Container nf-arena, 127.0.0.1:8090
 #   Branch „ki-live“  → KI-Werkstatt (ki-lernen/)               → systemd nachtfalter-ki, 127.0.0.1:8100
+#   Branch „live“     → Web-App (Hacklab, Konto, Verwaltung)    → /opt/nachtfalter/web/live     → app.nachtfalter.tech
+#   Arbeits-Branch    → Web-App Vorschau                         → /opt/nachtfalter/web/vorschau → vorschau.nachtfalter.tech
 # Branches werden nur nach Marcels „ok“ aktualisiert. Fehlt ein Branch, wird der Teil übersprungen.
 #
 # Geheimnisse (nur root lesbar, nie im Repository):
@@ -26,6 +28,8 @@ STATE=/var/lib/nachtfalter
 BASE=/opt/nachtfalter
 LOG=/var/log/nachtfalter-deploy.log
 DIENST=nfdienst
+WEBCONF=/etc/nachtfalter-web     # nginx-Bausteine + Vorschau-Passwort (für nginx lesbar, keine Geheimnisse außer dem Passwort-Hash)
+VORSCHAU=ccr-63912bdd-xpv8bk     # Arbeits-Branch → vorschau.nachtfalter.tech
 MODE=${1:-}
 
 [ "$(id -u)" = 0 ] || { echo "Bitte mit sudo starten: sudo $0 $MODE"; exit 1; }
@@ -35,7 +39,7 @@ log() { echo "$(date '+%F %T') $*" | tee -a "$LOG"; }
 
 status() {
   echo "== Nachtfalter-Dienste =="
-  for c in arena ki; do printf '%-6s Stand: %s\n' "$c" "$(cat "$STATE/$c.commit" 2>/dev/null | cut -c1-7 || echo -)"; done
+  for c in web-live web-vorschau arena ki; do printf '%-12s Stand: %s\n' "$c" "$(cat "$STATE/$c.commit" 2>/dev/null | cut -c1-7 || echo -)"; done
   printf 'KI-Werkstatt: %s\n' "$(systemctl is-active nachtfalter-ki 2>/dev/null || true)"
   printf 'Arena:        %s\n' "$(docker inspect -f '{{.State.Status}}' nf-arena 2>/dev/null | head -1 | grep . || echo 'nicht vorhanden')"
   printf 'Prüfung 8100: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8100/api/status >/dev/null 2>&1 && echo ok || echo -)"
@@ -148,7 +152,87 @@ arena() {
   fi
 }
 
+# ---------------------------------------------------------------- Web-App (Hacklab, Konto, Verwaltung)
+# Statische Dateien nach $BASE/web/<seite>; nginx (Plesk) bindet $WEBCONF/<seite>.conf ein.
+# Die Sicherheits-Header kommen aus _headers im Repository (streng geprüft, sonst kein Wechsel).
+nginx_conf() { # $1 = _headers-Datei, $2 = Web-Ordner, $3 = vorschau|live → schreibt Konfiguration auf stdout
+  local datei=$1 root=$2 seite=$3 pfad="" zeile name wert
+  declare -A H=(); local -a P=()
+  while IFS= read -r zeile || [ -n "$zeile" ]; do
+    zeile=${zeile%$'\r'}
+    case "$zeile" in ''|'#'*) continue;; esac
+    if [[ "$zeile" =~ ^/[A-Za-z0-9._/*-]*$ ]]; then pfad=$zeile; [ "$pfad" = '/*' ] || P+=("$pfad"); continue; fi
+    [[ "$zeile" =~ ^[[:space:]]+([A-Za-z-]+):[[:space:]]*(.+)$ ]] || { echo "unlesbare Zeile: $zeile" >&2; return 1; }
+    name=${BASH_REMATCH[1]} wert=${BASH_REMATCH[2]}
+    [[ "$wert" =~ [\"\\\$\{\}] ]] && { echo "unerlaubtes Zeichen in $name" >&2; return 1; }
+    [ -n "$pfad" ] || { echo "Header ohne Pfad" >&2; return 1; }
+    H["$pfad"]+="add_header $name \"$wert\" always;"$'\n'
+  done < "$datei"
+  echo "# Automatisch erzeugt von nachtfalter-deploy ($seite) – nicht von Hand ändern."
+  echo "root $root;"
+  echo "index index.html;"
+  if [ "$seite" = vorschau ] && [ -s "$WEBCONF/vorschau.htpasswd" ]; then
+    echo 'auth_basic "Nachtfalter Vorschau";'
+    echo "auth_basic_user_file $WEBCONF/vorschau.htpasswd;"
+  fi
+  printf '%s' "${H['/*']:-}"
+  local p re
+  for p in "${P[@]}"; do
+    [[ "$p" == *'*'* ]] && continue
+    re=${p//./\\.}
+    echo "location ~ ^${re}\$ {"; printf '%s' "${H['/*']:-}${H[$p]:-}"; echo "}"
+  done
+  # HTML immer frisch prüfen lassen (Cloudflare tat das von selbst)
+  echo 'location ~ \.html$ {'; printf '%s' "${H['/*']:-}"; echo 'add_header Cache-Control "no-cache" always;'; echo "}"
+  echo 'location ~ (/\.(?!well-known/)|/_headers$) { return 404; }'
+}
+
+web() { # $1 = live|vorschau, $2 = Branch
+  local seite=$1 br=$2 dir rev ziel neu
+  dir=$(holen "$br") || { log "web-$seite: Branch $br nicht abrufbar – übersprungen"; return 0; }
+  rev=$(git -C "$dir" rev-parse 'HEAD^{tree}')
+  ziel="$BASE/web/$seite"; neu="$ziel.neu"
+  if neu "web-$seite" "$rev" || [ ! -d "$ziel" ]; then
+    [ -f "$dir/tools/build-deploy.sh" ] && [ -f "$dir/app-files.js" ] && [ -f "$dir/_headers" ] \
+      || { log "web-$seite: Bau-Dateien fehlen in ${rev:0:7}"; return 1; }
+    log "web-$seite: baue ${rev:0:7}"
+    install -d -m 755 "$BASE/web"; install -d -o "$DIENST" -g "$DIENST" -m 755 "$BASE/web/bau"
+    rm -rf "$BASE/web/bau/$seite"
+    if ! runuser -u "$DIENST" -- env HOME="$BASE" bash "$dir/tools/build-deploy.sh" "$BASE/web/bau/$seite" >>"$LOG" 2>&1 \
+       || [ ! -f "$BASE/web/bau/$seite/index.html" ]; then
+      log "web-$seite: Bau fehlgeschlagen – alter Stand bleibt"; return 1
+    fi
+    rm -rf "$neu"; cp -r "$BASE/web/bau/$seite" "$neu"; rm -f "$neu/_headers"
+    chown -R root:root "$neu"; chmod -R u=rwX,go=rX "$neu"
+    rm -rf "$ziel.alt"; [ -d "$ziel" ] && mv "$ziel" "$ziel.alt"; mv "$neu" "$ziel"
+    cp "$dir/_headers" "$STATE/web-$seite.headers"
+    echo "$rev" > "$STATE/web-$seite.commit"; log "web-$seite: Dateien aktuell (${rev:0:7})"
+  fi
+  # nginx-Baustein (bei jedem Lauf prüfen, z. B. wenn das Vorschau-Passwort neu angelegt wurde)
+  install -d -m 755 "$WEBCONF"
+  local conf="$WEBCONF/$seite.conf" tmp; tmp=$(mktemp)
+  if ! nginx_conf "$STATE/web-$seite.headers" "$ziel" "$seite" > "$tmp" 2>>"$LOG"; then
+    rm -f "$tmp"; log "web-$seite: _headers nicht übernehmbar – nginx-Baustein bleibt"; return 1
+  fi
+  if [ -f "$WEBCONF/vorschau.htpasswd" ]; then # nginx-Arbeitsprozesse müssen die Datei lesen können
+    local wu; wu=$(ps -o user= -C nginx 2>/dev/null | grep -vx root | sort -u | head -1)
+    if [ -n "$wu" ]; then chown "root:$(id -gn "$wu")" "$WEBCONF/vorschau.htpasswd"; chmod 640 "$WEBCONF/vorschau.htpasswd"; fi
+  fi
+  if cmp -s "$tmp" "$conf"; then rm -f "$tmp"; return 0; fi
+  [ -f "$conf" ] && cp "$conf" "$conf.alt"
+  install -m 644 "$tmp" "$conf"; rm -f "$tmp"
+  if nginx -t >/dev/null 2>>"$LOG"; then
+    systemctl reload nginx && log "web-$seite: nginx neu geladen"
+  else
+    log "web-$seite: nginx-Prüfung fehlgeschlagen – vorheriger Baustein zurück"
+    if [ -f "$conf.alt" ]; then mv "$conf.alt" "$conf"; else rm -f "$conf"; fi
+    return 1
+  fi
+}
+
 fehler=0
+web live live || fehler=1
+web vorschau "$VORSCHAU" || fehler=1
 ki || fehler=1
 arena || fehler=1
 docker image prune -f >/dev/null 2>&1 || true

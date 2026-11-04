@@ -53,3 +53,15 @@ ersten Server am 03.11. eingerichtet hat. Hier angepasst an Nachtfalter (Arena, 
 - Dokumentstamm nicht raten: `/var/www/vhosts/system/<domain>/conf/httpd.conf` (DocumentRoot) prüfen.
 - Dateien mit Geheimnissen nach dem Anlegen auf 600 setzen (Plesk legt oft 644 an).
 - Nach jedem Push Remote prüfen (`git ls-remote`).
+
+## Web-App auf dem eigenen Server (ab 04.11.2026)
+
+- `nachtfalter-deploy` baut die statische App (Hacklab, Konto, Verwaltung) mit `tools/build-deploy.sh`:
+  Branch `live` → `/opt/nachtfalter/web/live` (**app.nachtfalter.tech**), Arbeits-Branch → `/opt/nachtfalter/web/vorschau`
+  (**vorschau.nachtfalter.tech**). DNS: Platzhalter `*.nachtfalter.tech` zeigt schon auf den Server.
+- Sicherheits-Header kommen aus `_headers` und werden als nginx-Baustein `/etc/nachtfalter-web/<seite>.conf` erzeugt
+  (streng geprüft, `nginx -t`, bei Fehler alter Baustein zurück). Plesk → Subdomain → Apache & nginx:
+  Proxy-Modus aus, zusätzliche nginx-Anweisung: `location ~ ^/ { include /etc/nachtfalter-web/live.conf; }`
+  (bzw. `vorschau.conf`).
+- Vorschau-Passwort: `htpasswd -c /etc/nachtfalter-web/vorschau.htpasswd marcel` (als root; Passwort nur dort tippen,
+  in Bitwarden ablegen). Das Skript setzt die Rechte so, dass nginx die Datei lesen kann.
