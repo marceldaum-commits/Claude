@@ -228,7 +228,7 @@ views.heute = () => {
     <section class="stack">
       ${PREVIEW ? `<div class="card warn small"><b>${U('Handy-Vorschau.')}</b> ${U('Lernstand bleibt in diesem Browser, Sync und Downloads sind hier aus.')}</div>` : ''}
       <div class="card violet">
-        <div class="row between"><span class="badge real">${U('Ziel: eJPT')}</span><a class="small" href="#/profil" style="color:inherit">${U('{n} Abzeichen →', { n: earnedBadges().length })}</a></div>
+        <div class="row between"><span class="badge real">${U('Ziel: eJPT')}</span><a class="btn small ghost" href="#/profil" style="min-height:36px">${U('{n} Abzeichen →', { n: earnedBadges().length })}</a></div>
         <h1 style="margin:.5rem 0 .3rem">${state.profile.name ? U('Hallo {name}!', { name: state.profile.name }) : U('Hallo!')}</h1>
         <div class="bar" aria-label="${esc(Ut('{done} von {all} geknackt', { done, all: ROOMS.length }))}"><i style="width:${Math.round(done / ROOMS.length * 100)}%"></i></div>
         <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>${U('Tage in Folge')}</span></div></div>
@@ -298,7 +298,7 @@ views.pfad = () => {
     ${withRooms.map(l => `<h2 style="margin-top:1.2rem">Level ${l.n} · ${esc(l.title)}</h2>
       <p class="small muted" style="margin-top:-.2rem">${esc(l.goal)}</p>
       ${ROOMS.filter(r => inLevel(r, l) && visible(r)).map(roomCard).join('')}
-      ${ROOMS.filter(r => r.level === l.id && r.type === 'wargame' && l.id !== 'L1').map(r => `<a class="small" href="#/raum/${r.id}" style="display:block;margin:.2rem 0 .6rem">🎮 Passende Leiter: <b>${esc(r.title)}</b> →</a>`).join('')}
+      ${ROOMS.filter(r => r.level === l.id && r.type === 'wargame' && l.id !== 'L1').map(r => `<a class="btn small navbtn" href="#/raum/${r.id}">🎮 <span>Passende Leiter: <b>${esc(r.title)}</b></span><span class="pfeil">→</span></a>`).join('')}
       ${l.id === 'L1' ? `<div class="grid two">
         <a class="card tight" href="#/level/L1" style="display:block;text-decoration:none;color:inherit"><b>📖 Linux-Spickzettel</b><br><span class="small muted">${LESSONS.length} Kapitel zum Nachschlagen + Übungen</span></a>
         <a class="card tight ${state.story.s1?.done ? 'lime' : ''}" href="#/story/s1" style="display:block;text-decoration:none;color:inherit"><b>🎬 ${esc(STORY.s1.title)}</b><br><span class="small muted">Story-Mission${storyLocked(STORY.s1).length ? ' · braucht ein paar Übungen' : ''}</span></a>
@@ -937,7 +937,7 @@ views.extern = () => {
         <div class="bar" style="margin:.5rem 0"><i style="width:${Math.round(n / st.length * 100)}%"></i></div>
         <p class="small">${esc(pf.was)}</p>
         <p class="small muted">💶 ${esc(pf.kosten)}</p>
-        <p class="small"><a href="${pf.url}" target="_blank" rel="noopener noreferrer">↗ Zur Plattform</a></p>
+        <p><a class="btn small" href="${pf.url}" target="_blank" rel="noopener noreferrer">↗ Zur Plattform</a></p>
         <details class="small"><summary>So startest du</summary><ol style="padding-left:1.2rem;margin:.4rem 0">${pf.start.map(x => `<li>${codeify(x)}</li>`).join('')}</ol></details>
         ${pf.gruppen.map(g => `<h4 style="margin:.8rem 0 .3rem">${esc(g.name)}</h4>
           <ul class="list">${g.schritte.map(x => {
@@ -945,7 +945,7 @@ views.extern = () => {
             return `<li><a href="#" data-ext="${key}" role="checkbox" aria-checked="${ok}">
               <span class="state ${ok ? 'done' : ''}">${ok ? '✓' : ''}</span>
               <span class="grow"><span class="t">${esc(x.t)}</span><span class="s">${esc(x.thema)}${prep ? ` · Vorbereitung: ${esc(prep.title)}${roomDone(prep.id) ? ' ✓' : ''}` : ''}</span></span>
-            </a>${prep && !roomDone(prep.id) ? `<a class="small" href="#/raum/${prep.id}" style="display:block;margin:-.3rem 0 .5rem 2.6rem">→ erst ${esc(prep.title)} üben</a>` : ''}</li>`;
+            </a>${prep && !roomDone(prep.id) ? `<a class="btn small ghost navbtn" href="#/raum/${prep.id}" style="margin:-.2rem 0 .5rem 2.6rem;width:auto">→ erst ${esc(prep.title)} üben</a>` : ''}</li>`;
           }).join('')}</ul>`).join('')}
       </details>`;
     }).join('')}</div>

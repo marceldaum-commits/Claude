@@ -13,7 +13,21 @@ export const NAV = { de: ['Start', 'Lernen', 'Terminal', 'Mehr'], en: ['Home', '
 const FAIL = { en: 'Translation service not reachable right now – showing the German original.', uk: 'Сервіс перекладу зараз недоступний – показано німецький оригінал.' };
 
 export function currentLang() {
-  try { const l = localStorage.getItem(KEY); return LANGS[l] ? l : 'de'; } catch { return 'de'; }
+  try { const l = localStorage.getItem(KEY); if (LANGS[l]) return l; } catch { /* */ }
+  return geraeteSprache();
+}
+
+// Hat die Person selbst eine Sprache gewählt? Nur dann laden wir Google Übersetzer (Einwilligung, siehe Datenschutz).
+export function selbstGewaehlt() {
+  try { return !!LANGS[localStorage.getItem(KEY)]; } catch { return false; }
+}
+
+// Ohne eigene Wahl: Handy-Sprache nehmen (Deutsch, Ukrainisch, Englisch), sonst Englisch
+export function geraeteSprache() {
+  const liste = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])
+    .map(x => String(x).toLowerCase().slice(0, 2));
+  const erste = liste[0];
+  return LANGS[erste] ? erste : 'en';
 }
 
 function setCookie(v) {
@@ -36,6 +50,7 @@ export function initLang() {
   const l = currentLang();
   document.documentElement.lang = l === 'de' ? 'de' : l;
   if (l === 'de') { setCookie(''); return; }
+  if (!selbstGewaehlt()) { setCookie(''); return; } // nur eigene Übersetzungen, kein Google ohne aktive Wahl
   setCookie(`/de/${l}`);
   const holder = document.createElement('div'); holder.id = 'gt-el'; holder.hidden = true; document.body.appendChild(holder);
   window.klyGtInit = () => {
@@ -54,7 +69,9 @@ export function initLang() {
 // Hinweiszeile bei maschineller Übersetzung (wird selbst nicht übersetzt)
 export function langNoteHTML() {
   const l = currentLang();
-  return l === 'de' ? '' : `<div class="card tight small" id="lang-note" translate="no">${LANGS[l].flag} ${LANGS[l].note}</div>`;
+  if (l === 'de') return '';
+  const auto = { en: 'Language set from your phone. Some texts are still German – tap your language again in “More” to translate the rest automatically (Google).', uk: 'Мову взято з налаштувань телефона. Деякі тексти ще німецькою – натисни свою мову ще раз у «Ще», щоб автоматично перекласти решту (Google).' };
+  return `<div class="card tight small" id="lang-note" translate="no">${LANGS[l].flag} ${selbstGewaehlt() ? LANGS[l].note : auto[l]}</div>`;
 }
 
 // Auswahlknöpfe (nicht übersetzt, damit jede Sprache ihren eigenen Namen zeigt)
@@ -63,7 +80,7 @@ export function langPickerHTML() {
   return `<div class="row" translate="no" style="gap:.4rem;flex-wrap:wrap">${Object.entries(LANGS).map(([k, v]) => `<button class="btn small ${k === l ? 'primary' : 'ghost'}" data-lang="${k}">${v.flag} ${v.name}</button>`).join('')}</div>`;
 }
 export function bindLangPicker(root) {
-  root.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { if (b.dataset.lang !== currentLang()) setLang(b.dataset.lang); });
+  root.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { if (b.dataset.lang !== currentLang() || !selbstGewaehlt()) setLang(b.dataset.lang); });
 }
 
 // ---- Codes & Befehle vor der Übersetzung schützen -------------------------------------------

@@ -96,7 +96,7 @@ zeilen.append((3, 17, 43, 'debug auth wache pass_hex=' + pw.encode().hex()))
 zeilen.sort()
 for h, m, s, t in zeilen: print(f'2026-11-03 {h:02d}:{m:02d}:{s:02d} {t}')
 PY
-chmod 644 /var/log/leitstelle/zugriffe.log
+chown root:archiv /var/log/leitstelle/zugriffe.log; chmod 640 /var/log/leitstelle/zugriffe.log   # nur das Archiv darf das Protokoll lesen
 cat > $H/auftrag.txt <<'T'
 AUFTRAG Archiv
 
@@ -186,6 +186,19 @@ class Portal(http.server.BaseHTTPRequestHandler):
         return self.senden(404, 'Nicht gefunden.\n')
 threading.Thread(target=http.server.ThreadingHTTPServer(('127.0.0.1', 8080), Portal).serve_forever, daemon=True).start()
 
+import pwd as _pwd
+def wer(sock):
+    """Welcher Linux-Benutzer hat diese localhost-Verbindung geöffnet? (über /proc/net/tcp)"""
+    try:
+        port = sock.getpeername()[1]; mein = sock.getsockname()[1]
+        for fn in ('/proc/net/tcp', '/proc/net/tcp6'):
+            for z in open(fn).readlines()[1:]:
+                p = z.split()
+                if int(p[1].rsplit(':', 1)[1], 16) == port and int(p[2].rsplit(':', 1)[1], 16) == mein:
+                    return _pwd.getpwuid(int(p[7])).pw_name
+    except Exception: pass
+    return None
+
 def gateway():
     s = socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); s.bind(('127.0.0.1', 4444)); s.listen(8)
     paket = base64.b64encode(gzip.compress(f'Zugang Konto archiv: {GATEWAY}\n'.encode(), mtime=0)).decode()
@@ -196,7 +209,10 @@ def gateway():
             t = zeile.strip().split()
             if not t: continue
             b = t[0].upper()
-            if b == 'HALLO' and len(t) > 1: hallo = True; f.write(f'OK hallo {t[1][:20]}\n')
+            if b == 'HALLO' and len(t) > 1:
+                echt = wer(c)
+                if echt != 'netz': f.write(f'FEHLER Zugang nur für das Konto netz (du bist {echt or "unbekannt"})\n'); f.flush(); break
+                hallo = True; f.write(f'OK hallo {t[1][:20]}\n')
             elif b == 'TSCHUESS': f.write('OK tschüss\n'); f.flush(); break
             elif not hallo: f.write('FEHLER erst HALLO <name>\n')
             elif b == 'LISTE': f.write('OK wetter.txt dienstplan.txt zugang-archiv\n')

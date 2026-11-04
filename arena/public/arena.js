@@ -79,6 +79,9 @@
 
   function anfrageStatus(produkt) { return anfragen.find(x => x.produkt === produkt) || null; }
 
+  // Empfohlene Reihenfolge: Keller → Leitstelle → Tresor
+  const VORHER = { leitstelle: 'keller', tresor: 'leitstelle' };
+
   function zeichne() {
     $('#labs').innerHTML = LABS.map((L) => {
       const darf = !!zugang.labs[L.id];
@@ -93,9 +96,18 @@
         <details><summary class="small">Zugang anfragen</summary>
           <form data-anfrage="${esc(L.produkt)}"><label>Kurz zu dir (freiwillig)<textarea name="n" maxlength="500" placeholder="z. B. Ich habe den Kellerserver geschafft und will mehr."></textarea></label>
           <button class="btn sek">Zugang anfragen</button></form></details>`;
+      const vorId = VORHER[L.id], vor = vorId && LABS.find(x => x.id === vorId);
+      let empf = '';
+      if (vor) {
+        const vf = geloest.filter(x => x.lab === vor.id).length;
+        empf = vf >= vor.levels
+          ? `<p class="hinweis gruen small">✓ Voraussetzung geschafft: „${esc(vor.titel)}“ komplett gelöst.</p>`
+          : `<p class="hinweis small">💡 Empfohlen: Schaff vorher „${esc(vor.titel)}“ (${vf} von ${vor.levels} Codes) – hier baut alles darauf auf.</p>`;
+      }
       return `<section class="card lab ${markiert === L.id ? 'markiert' : ''}" id="lab-${esc(L.id)}">
         <div class="kopf"><h2 style="margin:0">${esc(L.titel)}</h2><span class="stufe ${esc(L.stufe)}">${esc(L.stufe)}</span></div>
         <p class="small">${esc(L.kurz)}</p>
+        ${empf}
         <div class="balken"><i style="width:${Math.round(100 * fertig / L.levels)}%"></i></div>
         <p class="small muted" style="margin:0 0 .6rem">${fertig} von ${L.levels} Codes gefunden</p>
         ${status}

@@ -242,7 +242,17 @@ http.server.HTTPServer(('127.0.0.1', 7070), H).serve_forever()
 P
 chmod 644 /opt/keller/dienst.py
 runuser -u dienst -- env -i PATH=/usr/bin:/bin python3 /opt/keller/dienst.py >/dev/null 2>&1 &
-runuser -u admin -- env -i PATH=/usr/bin:/bin python3 /opt/nachtjob/sync.py --benutzer admin --passwort "$L6" >/dev/null 2>&1 &
+# Der Nachtjob startet erst, wenn sich „nacht“ anmeldet – sonst stünde das Admin-Passwort schon für azubi in der Prozessliste.
+install -m 700 /dev/null /opt/keller/nachtjob-start
+cat > /opt/keller/nachtjob-start <<N
+#!/bin/bash
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+[ "\${PAM_USER:-}" = nacht ] && [ "\${PAM_TYPE:-}" = open_session ] || exit 0
+pgrep -u admin -f /opt/nachtjob/sync.py >/dev/null && exit 0
+setsid runuser -u admin -- env -i PATH=/usr/bin:/bin python3 /opt/nachtjob/sync.py --benutzer admin --passwort "$L6" </dev/null >/dev/null 2>&1 &
+exit 0
+N
+echo 'session optional pam_exec.so quiet /opt/keller/nachtjob-start' >> /etc/pam.d/sshd
 
 # SSH absichern: nur Passwort/Schlüssel-Login, keine Weiterleitungen, kein root
 cat > /etc/ssh/sshd_config.d/keller.conf <<C

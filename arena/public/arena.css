@@ -37,3 +37,4 @@ details.klein summary { cursor: pointer; color: var(--muted); font-size: .9rem; 
 .hinweis { font-size: .88rem; margin: .5rem 0 0; }
 .ok { color: var(--lime); } .warn { color: #fbbf24; } .rot { color: #f87171; }
 .btn.sek { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.hinweis.gruen { color: var(--lime); }

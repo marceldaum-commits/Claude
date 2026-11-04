@@ -80,7 +80,7 @@ for d in range(1, 29):
 print(f'2026-10-29 02:00 sicherung start ziel=https://betrieb:{sys.argv[2]}@archiv2.falkenstein.intern/upload')
 print('2026-10-29 02:00 sicherung FEHLER verbindung abgelehnt (debug: volle URL protokolliert)')
 PY
-chmod 644 /var/log/tresor/sicherung.log
+chown root:entwickler /var/log/tresor/sicherung.log; chmod 640 /var/log/tresor/sicherung.log   # nur für die Entwicklung lesbar
 printf 'Prüfauftrag 3: Seit einem Fehler Ende Oktober läuft die Nacht-Sicherung (/var/log/tresor/) wieder.\nIst dabei etwas mitgeschrieben worden, das niemand sehen sollte?\n' > $H/hinweis.txt
 as entwickler $H
 
@@ -118,6 +118,18 @@ as tresormeister $H
 cat > /opt/tresor/api.py <<'PY'
 import http.server, urllib.parse, os
 BASIS = '/home/tresormeister/api-dokumente/'
+import pwd as _pwd
+def wer(sock):
+    """Welcher Linux-Benutzer hat diese localhost-Verbindung geöffnet? (über /proc/net/tcp)"""
+    try:
+        port = sock.getpeername()[1]; mein = sock.getsockname()[1]
+        for fn in ('/proc/net/tcp', '/proc/net/tcp6'):
+            for z in open(fn).readlines()[1:]:
+                p = z.split()
+                if int(p[1].rsplit(':', 1)[1], 16) == port and int(p[2].rsplit(':', 1)[1], 16) == mein:
+                    return _pwd.getpwuid(int(p[7])).pw_name
+    except Exception: pass
+    return None
 class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a): pass
     def senden(self, c, t):
@@ -125,6 +137,7 @@ class H(http.server.BaseHTTPRequestHandler):
         self.send_header('Content-Length', str(len(b))); self.end_headers(); self.wfile.write(b)
     def do_GET(self):
         u = urllib.parse.urlparse(self.path)
+        if wer(self.connection) != 'tresorwart': return self.senden(403, 'Tresor-API: nur für den Tresorwart.\n')
         if u.path != '/dokument': return self.senden(404, 'Tresor-API: /dokument?name=…\n')
         name = urllib.parse.parse_qs(u.query).get('name', [''])[0]
         try:   # ABSICHTLICHE SCHWACHSTELLE: Pfad wird nicht geprüft (Übung „Path Traversal“)

@@ -47,8 +47,7 @@ Kellerserver-Raum den Knopf **„Online spielen“** (und er erscheint auch im M
 ```bash
 npm install
 docker build -t kly-keller ../labs/kly-keller
-ARENA_CODE=test node server.js        # http://127.0.0.1:8090/?lab=keller&token=KLY-ABC123
-ARENA=http://127.0.0.1:8090 CODE=test node test/smoke.mjs
+node server.js        # http://127.0.0.1:8090/ – Anmeldung mit Nachtfalter-Konto
 ```
 Der Rauchtest prüft: falscher Code/Token abgewiesen, Lab startet, Terminal als azubi, Codes passen zum Token,
 `ssh` zwischen Konten, nur localhost-Netz, kein Internet, Token in der Umgebung von PID 1 nicht lesbar.
@@ -61,4 +60,17 @@ werden kann). Der Server prüft das Token beim Supabase-Auth-Server und liest Zu
 (RLS) – er braucht dafür **kein Geheimnis**, nur die öffentliche Adresse und den öffentlichen Schlüssel.
 
 Umgebungsvariablen: `KONTO=1` (Standard), `KONTO_URL`, `KONTO_KEY`, `MAX_PER_USER` (Standard 2).
-Der alte Einladungscode `ARENA_CODE` funktioniert übergangsweise weiter, solange er gesetzt ist.
+Der alte Einladungscode `ARENA_CODE` ist abgeschaltet (er umging die Zugangsprüfung). `ARENA_ORIGIN` (Standard
+`https://arena.nachtfalter.tech`) ist die eigene Adresse für die WebSocket-Herkunftsprüfung.
+
+## Schutz (Stand 2.26.0, nach Sicherheitsprüfung)
+- Alles, wo Spieler schreiben dürfen (`/home`, `/tmp`, `/var/tmp`, `/run/lock`, lab-eigene Arbeitsordner), liegt als
+  tmpfs im Arbeitsspeicher und zählt zur Speichergrenze – die Server-Festplatte kann nicht volllaufen.
+  Container-Logs max. 1 MB, einzelne Dateien max. 64 MB.
+- Echte Client-IP aus `X-Real-IP` bzw. dem letzten `X-Forwarded-For`-Eintrag (der erste ist fälschbar).
+- WebSocket nur von der eigenen Seite (Origin), Leerlauf zählt nur Eingaben des Spielers.
+- xterm vom CDN mit SRI-Prüfsummen, CSP nur für `cdn.jsdelivr.net/npm/@xterm/`.
+- Labs: Dienste prüfen über `/proc/net/tcp`, welcher Benutzer anfragt (Gateway nur für `netz`, Tresor-API nur für
+  `tresorwart`); Protokolle nur für das zuständige Konto lesbar; der Keller-Nachtjob startet erst bei Anmeldung von `nacht`.
+- Offen (Empfehlung): Die Arena hat Zugriff auf den Docker-Socket (= root auf dem Host). Am sichersten auf einem
+  eigenen kleinen Server statt neben Plesk, oder mit gVisor/Socket-Proxy.

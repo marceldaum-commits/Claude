@@ -12,7 +12,7 @@
 
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { randomBytes, timingSafeEqual, createHash } from 'node:crypto';
+import { randomBytes, createHash } from 'node:crypto';
 import { extname, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Docker from 'dockerode';
@@ -23,7 +23,6 @@ const env = (k, d) => process.env[k] ?? d;
 const CFG = {
   port: +env('PORT', 8090),
   host: env('HOST', '127.0.0.1'),            // hinter Caddy: nur lokal lauschen
-  code: env('ARENA_CODE', ''),               // Einladungscode (leer = Arena gesperrt)
   maxTotal: +env('MAX_SESSIONS', 20),
   maxPerIp: +env('MAX_PER_IP', 2),
   ttlMin: +env('SESSION_MINUTES', 120),
@@ -38,6 +37,7 @@ const CFG = {
   kontoUrl: env('KONTO_URL', 'https://sxapebxzxmathkvtuuvn.supabase.co'),
   kontoKey: env('KONTO_KEY', 'sb_publishable_04l6lOd2uIPsErdWDOMvew_U6vsFGbn'),
   maxPerUser: +env('MAX_PER_USER', 2),
+  origin: env('ARENA_ORIGIN', 'https://arena.nachtfalter.tech'), // eigene Adresse (für die WebSocket-Prüfung)
 };
 
 // Verfügbare Labs. user = als wer das Terminal startet; ready = Logzeile, wenn der Container bereit ist.
@@ -49,11 +49,11 @@ const LABS = {
     kurz: 'Ein alter Firmenserver: Arbeite dich Konto für Konto bis zum Chef durch – versteckte Dateien, Verläufe, Rechte, Schlüssel.',
     hello: hallo('Kellerserver', 'azubi') },
   leitstelle: { image: env('LEITSTELLE_IMAGE', 'nf-leitstelle'), user: 'funker', ready: 'Leitstelle bereit', title: 'Die Leitstelle', host: 'leitstelle',
-    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 6, praefix: 'leitstelle',
+    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 6, praefix: 'leitstelle', tmpfs: { '/opt/schichtwechsel': 'rw,exec,nosuid,size=4m' },
     kurz: 'Netzwerk & Dienste: offene Ports finden, mit Diensten sprechen, versteckte Web-Bereiche, eigenes Protokoll, Protokolle auswerten, unsichere Automatik.',
     hello: hallo('Leitstelle Nordhafen', 'funker') },
   tresor: { image: env('TRESOR_IMAGE', 'nf-tresor'), user: 'gast', ready: 'Tresor bereit', title: 'Der Tresor', host: 'tresor',
-    produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'tresor',
+    produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'tresor', tmpfs: { '/opt/tresor/werkzeuge': 'rw,exec,nosuid,size=4m', '/opt/tresor/pruefung': 'rw,exec,nosuid,size=1m' },
     kurz: 'Für Experten: Passwort-Hash knacken, Geheimnisse in Git und Logs, PATH-Falle, Pfad-Ausbruch in einer API, verschlüsselter Tresor.',
     hello: hallo('Bankhaus Falkenstein', 'gast') },
 };
@@ -61,8 +61,10 @@ const LABS = {
 const vorhanden = {};
 async function imagesPruefen() { for (const [id, L] of Object.entries(LABS)) vorhanden[id] = await docker.getImage(L.image).inspect().then(() => true, () => false); }
 const labOeffentlich = () => Object.entries(LABS).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, kurz: L.kurz, produkt: L.produkt, levels: L.levels, praefix: L.praefix, codesInApp: !!L.codesInApp, bereit: vorhanden[id] !== false }));
+const istLab = (lab) => Object.hasOwn(LABS, lab);
 function darf(k, lab) {
-  const L = LABS[lab]; if (!L || !k?.ok) return false;
+  if (!istLab(lab)) return false;
+  const L = LABS[lab]; if (!k?.ok) return false;
   if (k.admin || k.produkte.includes('alles') || k.produkte.includes(L.produkt)) return true;
   return L.produkt === 'arena' && k.produkte.includes('arena-profi');
 }
@@ -72,13 +74,10 @@ const sessions = new Map(); // id -> { id, lab, containerId, ip, created, lastSe
 const log = (...a) => console.log(new Date().toISOString(), ...a);
 
 function clientIp(req) {
-  if (CFG.trustProxy && req.headers['x-forwarded-for']) return String(req.headers['x-forwarded-for']).split(',')[0].trim();
+  // Hinter nginx: X-Real-IP bzw. der LETZTE Eintrag von X-Forwarded-For stammt von nginx selbst (der erste kann gefälscht sein)
+  if (CFG.trustProxy && req.headers['x-real-ip']) return String(req.headers['x-real-ip']).trim();
+  if (CFG.trustProxy && req.headers['x-forwarded-for']) return String(req.headers['x-forwarded-for']).split(',').pop().trim();
   return req.socket.remoteAddress || '?';
-}
-function codeOk(given) {
-  if (!CFG.code) return false;
-  const a = Buffer.from(String(given || '')), b = Buffer.from(CFG.code);
-  return a.length === b.length && timingSafeEqual(a, b);
 }
 // Nachtfalter-Konto prüfen: Token beim Auth-Server verifizieren, dann (mit dem Token des Spielers, RLS)
 // eigene Zugänge und Sperre lesen. Ergebnis 60 s zwischenspeichern, damit nicht jeder Klick nachfragt.
@@ -87,7 +86,8 @@ async function kontoPruefen(token, frisch = false) {
   if (!CFG.konto) return { status: 403, fehler: 'Anmeldung mit dem Nachtfalter-Konto ist hier abgeschaltet.' };
   if (!/^[A-Za-z0-9._-]{20,4096}$/.test(token)) return { status: 401, fehler: 'Bitte neu anmelden.' };
   const key = createHash('sha256').update(token).digest('hex');
-  const c = kontoCache.get(key); if (!frisch && c && c.t > Date.now() - 30000) return c.r;
+  const c = kontoCache.get(key);
+  if (c && c.t > Date.now() - (frisch ? 10000 : 30000)) return c.r; // auch „frisch“ höchstens alle 10 s
   const h = { apikey: CFG.kontoKey, Authorization: `Bearer ${token}` };
   const holen = (pfad) => fetch(CFG.kontoUrl + pfad, { headers: h, signal: AbortSignal.timeout(6000) });
   let r;
@@ -133,8 +133,8 @@ async function waitReady(container, marker, ms = 20000) {
 }
 
 async function createSession(lab, token, ip, userId = null) {
+  if (!istLab(lab)) throw Object.assign(new Error('Unbekanntes Lab'), { status: 400 });
   const L = LABS[lab];
-  if (!L) throw Object.assign(new Error('Unbekanntes Lab'), { status: 400 });
   if (vorhanden[lab] === false) throw Object.assign(new Error('Diese Arena wird gerade noch aufgebaut – bitte später noch einmal.'), { status: 503 });
   if (!/^KLY-[0-9A-F]{6}$/.test(token)) throw Object.assign(new Error('Ungültiger Lab-Token'), { status: 400 });
   if (sessions.size >= CFG.maxTotal) throw Object.assign(new Error('Die Arena ist gerade voll – bitte später noch einmal versuchen.'), { status: 503 });
@@ -160,7 +160,11 @@ async function createSession(lab, token, ip, userId = null) {
       CapAdd: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'AUDIT_WRITE', 'SYS_CHROOT', 'NET_BIND_SERVICE'],
       SecurityOpt: ['no-new-privileges'],
       AutoRemove: true,
-      Tmpfs: { '/tmp': 'rw,noexec,nosuid,size=16m' },
+      // Alles, wo Spieler schreiben dürfen, liegt im Arbeitsspeicher (zählt zur Speichergrenze) – so kann
+      // niemand die Festplatte des Servers volllaufen lassen.
+      Tmpfs: { '/tmp': 'rw,noexec,nosuid,size=16m', '/var/tmp': 'rw,nosuid,size=16m', '/run/lock': 'rw,noexec,nosuid,size=1m', '/home': 'rw,exec,nosuid,size=48m,mode=755', ...(L.tmpfs || {}) },
+      LogConfig: { Type: 'json-file', Config: { 'max-size': '1m', 'max-file': '1' } },
+      Ulimits: [{ Name: 'fsize', Soft: 64 * 1024 * 1024, Hard: 64 * 1024 * 1024 }],
     },
   });
   sessions.get(id).containerId = container.id;
@@ -196,13 +200,13 @@ setInterval(() => reap().catch(e => log('reap', e.message)), 60000).unref();
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.css': 'text/css' };
 const SEC_HEADERS = {
   'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY', 'Strict-Transport-Security': 'max-age=31536000',
-  'Content-Security-Policy': `default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' ${CFG.kontoUrl}; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'`,
+  'Content-Security-Policy': `default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@xterm/; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@xterm/; connect-src 'self' ${CFG.kontoUrl}; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'`,
 };
 
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://x');
-    if (req.method === 'GET' && url.pathname === '/api/status') return json(res, 200, { ok: true, labs: Object.keys(LABS), frei: CFG.maxTotal - sessions.size, offen: !!CFG.code || CFG.konto, konto: CFG.konto ? { url: CFG.kontoUrl, key: CFG.kontoKey, app: CFG.appOrigin } : null });
+    if (req.method === 'GET' && url.pathname === '/api/status') return json(res, 200, { ok: true, labs: Object.keys(LABS), frei: CFG.maxTotal - sessions.size, offen: CFG.konto, konto: CFG.konto ? { url: CFG.kontoUrl, key: CFG.kontoKey, app: CFG.appOrigin } : null });
     if (req.method === 'GET' && url.pathname === '/api/labs') return json(res, 200, { labs: labOeffentlich() });
     if (req.method === 'GET' && url.pathname === '/api/zugang') {
       const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
@@ -220,13 +224,13 @@ const server = http.createServer(async (req, res) => {
         let k; try { k = await kontoPruefen(bearer); } catch (e) { log('konto', e.message); return json(res, 502, { fehler: 'Konto gerade nicht erreichbar – bitte gleich noch einmal versuchen.' }); }
         if (!k.ok) return json(res, k.status, { fehler: k.fehler, code: k.code });
         const lab = String(body.lab || '');
-        if (!LABS[lab]) return json(res, 400, { fehler: 'Unbekanntes Lab' });
+        if (!istLab(lab)) return json(res, 400, { fehler: 'Unbekanntes Lab' });
         if (!darf(k, lab)) { // vielleicht gerade erst freigeschaltet → einmal frisch nachfragen
           let k2; try { k2 = await kontoPruefen(bearer, true); } catch { k2 = k; }
           if (!darf(k2, lab)) return json(res, 403, { code: 'kein_zugang', produkt: LABS[lab].produkt, fehler: `Für „${LABS[lab].title}“ brauchst du einen Zugang. Du kannst ihn anfragen oder einen Einladungscode einlösen.` });
         }
         userId = k.userId;
-      } else if (!codeOk(body.code)) return json(res, 401, { fehler: 'Bitte mit deinem Nachtfalter-Konto anmelden.' });
+      } else return json(res, 401, { fehler: 'Bitte mit deinem Nachtfalter-Konto anmelden.' }); // alter Einladungscode abgeschaltet (umging die Zugangsprüfung)
       try { const s = await createSession(String(body.lab || ''), String(body.token || ''), ip, userId); return json(res, 200, { id: s.id, ablauf: s.created + CFG.ttlMin * 60000 }); }
       catch (e) { log('fehler', e.message); return json(res, e.status || 500, { fehler: e.status ? e.message : 'Lab konnte nicht gestartet werden.' }); }
     }
@@ -249,6 +253,9 @@ server.on('upgrade', (req, socket, head) => {
   const m = req.url.match(/^\/api\/term\/([0-9a-f]{32})$/);
   const s = m && sessions.get(m[1]);
   if (!s || s.startet) { socket.destroy(); return; }
+  const origin = String(req.headers.origin || '');
+  const erlaubt = [CFG.origin, `https://${req.headers.host}`, `http://${req.headers.host}`];
+  if (origin && !erlaubt.includes(origin)) { log('ws', 'fremde Herkunft', origin); socket.destroy(); return; }
   wss.handleUpgrade(req, socket, head, (ws) => attach(ws, s));
 });
 
@@ -259,7 +266,7 @@ async function attach(ws, s) {
     const exec = await c.exec({ Cmd: ['runuser', '-l', L.user], AttachStdin: true, AttachStdout: true, AttachStderr: true, Tty: true, Env: ['TERM=xterm-256color', 'LANG=C.UTF-8'] });
     const stream = await exec.start({ hijack: true, stdin: true, Tty: true });
     ws.send(L.hello);
-    stream.on('data', (d) => { s.lastSeen = Date.now(); if (ws.readyState === 1) ws.send(d.toString('utf8')); });
+    stream.on('data', (d) => { if (ws.readyState === 1) ws.send(d.toString('utf8')); });
     stream.on('end', () => { if (ws.readyState === 1) ws.close(1000, 'Sitzung beendet'); });
     ws.on('message', async (raw) => {
       s.lastSeen = Date.now();
@@ -274,4 +281,4 @@ async function attach(ws, s) {
 process.on('SIGTERM', async () => { for (const id of [...sessions.keys()]) await endSession(id, 'Dienst stoppt'); process.exit(0); });
 reap().catch(() => {});
 imagesPruefen().catch(() => {}); setInterval(() => imagesPruefen().catch(() => {}), 300000).unref();
-server.listen(CFG.port, CFG.host, () => log(`Arena lauscht auf ${CFG.host}:${CFG.port} · Labs: ${Object.keys(LABS).join(', ')} · Konto ${CFG.konto ? 'an' : 'aus'} · alter Code ${CFG.code ? 'gesetzt' : 'aus'}`));
+server.listen(CFG.port, CFG.host, () => log(`Arena lauscht auf ${CFG.host}:${CFG.port} · Labs: ${Object.keys(LABS).join(', ')} · Konto ${CFG.konto ? 'an' : 'aus'}`));
