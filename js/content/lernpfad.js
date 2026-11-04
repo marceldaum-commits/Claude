@@ -8,7 +8,8 @@
 
 export const LERNPFAD = [
   {
-    id: 's0', icon: '🚀', titel: 'Willkommen – was ist „Hacken“ wirklich?',
+    id: 's0',
+    schutz: 'Teste nur im erlaubten Rahmen (Scope) – nie fremde Systeme ohne schriftliche Erlaubnis.', icon: '🚀', titel: 'Willkommen – was ist „Hacken“ wirklich?',
     einleitung: 'Hacken heißt nicht „Knöpfe drücken wie im Film“, sondern: ein System genau verstehen und Fehler finden, bevor es die Bösen tun. Du lernst hier Angriff UND Verteidigung – immer nur im erlaubten Rahmen (deinem eigenen Übungssystem).',
     konzepte: [
       ['Scope', 'Der erlaubte Bereich. Alles, was du hier machst, läuft in abgeschotteten Übungs-Servern, die nur dir gehören. Nie fremde Systeme ohne schriftliche Erlaubnis.'],
@@ -22,7 +23,8 @@ export const LERNPFAD = [
     uebung: { label: 'Übungs-Terminal öffnen', href: '#/terminal', erfordert: { lektion: 'l1-01' }, hinweis: 'Lies die erste Lektion im Spickzettel, dann ist diese Stufe geschafft.' },
   },
   {
-    id: 's1', icon: '🐧', titel: 'Linux-Grundlagen: Dateien und Ordner',
+    id: 's1',
+    schutz: 'Dateirechte so eng wie möglich; keine Geheimnisse in Dateien, die andere lesen können.', icon: '🐧', titel: 'Linux-Grundlagen: Dateien und Ordner',
     einleitung: 'Fast alle Server laufen mit Linux. Dateien lesen, Ordner wechseln, versteckte Dinge finden – das ist das Handwerk, auf dem alles aufbaut.',
     konzepte: [
       ['Rechte (rwx)', 'Jede Datei sagt: Wer darf lesen (r), schreiben (w), ausführen (x)? Das zu lesen ist die halbe Miete.'],
@@ -36,7 +38,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Der Kellerserver', href: 'arena:keller', erfordert: { arena: 'keller', level: 3 }, hinweis: 'Schaffe die ersten 3 Codes im Kellerserver (oder spiele den Raum im Hacklab).', auchRaum: 'w2' },
   },
   {
-    id: 's2', icon: '🔑', titel: 'Rechte und Benutzer: der Weg nach oben',
+    id: 's2',
+    schutz: 'Least Privilege; keine Passwörter in Prozessen oder Verläufen; lange, einmalige Passwörter.', icon: '🔑', titel: 'Rechte und Benutzer: der Weg nach oben',
     einleitung: 'Als schwacher Benutzer gestartet – wie kommt man zu mehr Rechten? Durch Fehler in Rechten, vergessene Passwörter, Prozesse und Gruppen. Das nennt man Rechteausweitung (Eskalation).',
     konzepte: [
       ['Eskalation', 'Von einem kleinen Konto zu einem mächtigeren kommen, über Fehlkonfigurationen.'],
@@ -51,7 +54,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Kellerserver (weiter)', href: 'arena:keller', erfordert: { arena: 'keller', level: 6 }, hinweis: 'Schaffe mindestens 6 Codes im Kellerserver.' },
   },
   {
-    id: 's3', icon: '🛰️', titel: 'Netzwerk und Dienste',
+    id: 's3',
+    schutz: 'Nur wirklich nötige Dienste anbieten; keine Geheimnisse in Protokolle oder Antworten schreiben.', icon: '🛰️', titel: 'Netzwerk und Dienste',
     einleitung: 'Server bieten Dienste an „Türen“ (Ports) an. Finden, ansprechen, verstehen – und aus den Antworten den nächsten Schritt ableiten.',
     konzepte: [
       ['Port', 'Eine Tür an einem Rechner, hinter der ein Dienst lauscht. ss -tln zeigt die offenen.'],
@@ -66,7 +70,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Die Leitstelle', href: 'arena:leitstelle', erfordert: { arena: 'leitstelle', level: 3 }, hinweis: 'Schaffe mindestens 3 Codes in der Leitstelle.' },
   },
   {
-    id: 's4', icon: '🌐', titel: 'Web-Grundlagen',
+    id: 's4',
+    schutz: 'Alte/Test-Bereiche vor dem Livegang entfernen; Methoden und Dateipfade serverseitig begrenzen; Header nie als Ausweis vertrauen.', icon: '🌐', titel: 'Web-Grundlagen',
     einleitung: 'Die meisten Angriffe heute laufen über das Web. Hier lernst du, wie Browser und Server reden – und wo die typischen Schwachstellen sitzen.',
     konzepte: [
       ['HTTP-Methoden', 'GET holt, POST schickt. Manche Bereiche antworten nur auf eine bestimmte Methode.'],
@@ -81,7 +86,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Web 1', href: 'arena:web1', erfordert: { arena: 'web1', level: 4 }, hinweis: 'Schaffe mindestens 4 der 6 Codes in Web 1.' },
   },
   {
-    id: 's5', icon: '💉', titel: 'Web-Angriffe: Injection & Umwege',
+    id: 's5',
+    schutz: 'SQL nur mit Platzhaltern; SSRF-Ziele auf eine Positivliste; nur erwartete Felder übernehmen.', icon: '💉', titel: 'Web-Angriffe: Injection & Umwege',
     einleitung: 'Jetzt wird es scharf: Eingaben, die als Befehl missbraucht werden (Injection), fremde Daten über Nummern (IDOR), und den Server dazu bringen, selbst Adressen abzurufen (SSRF).',
     konzepte: [
       ['SQL-Injection', 'Eingaben verändern die Datenbank-Abfrage. Klassiker beim Login: admin\'--'],
@@ -96,7 +102,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Web 2', href: 'arena:web2', erfordert: { arena: 'web2', level: 4 }, hinweis: 'Schaffe mindestens 4 Codes in Web 2.', auchArena: { arena: 'webshop', level: 4 } },
   },
   {
-    id: 's6', icon: '🔐', titel: 'Verschlüsselung, Hashes und Passwörter',
+    id: 's6',
+    schutz: 'Lange zufällige Passwörter; verratene Geheimnisse aus der Git-Historie entfernen UND austauschen; geprüfte Verschlüsselung nutzen.', icon: '🔐', titel: 'Verschlüsselung, Hashes und Passwörter',
     einleitung: 'Warum sind schwache Passwörter gefährlich? Wie werden sie gespeichert? Und wie öffnet man ein verschlüsseltes Archiv, wenn man den Schlüssel kennt?',
     konzepte: [
       ['Hash', 'Ein Fingerabdruck von Daten. Nicht umkehrbar – aber man kann Kandidaten vergleichen (Wortliste).'],
@@ -110,7 +117,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Der Tresor', href: 'arena:tresor', erfordert: { arena: 'tresor', level: 3 }, hinweis: 'Schaffe mindestens 3 Codes im Tresor.' },
   },
   {
-    id: 's7', icon: '🧬', titel: 'Web-Profi: Ketten und moderne Lücken',
+    id: 's7',
+    schutz: 'Niemals Eingaben als Vorlage oder Code auswerten; sichere Deserialisierung; kritische Schritte mit Sperren gegen Race Conditions.', icon: '🧬', titel: 'Web-Profi: Ketten und moderne Lücken',
     einleitung: 'Die Königsklasse: Lücken verketten. Vorlagen-Injection (SSTI), unsichere Deserialisierung, Race Conditions und blinde SQL-Injection – da, wo man nichts sieht.',
     konzepte: [
       ['SSTI', 'Deine Eingabe wird als Vorlage ausgewertet. Test: {{ 7*7 }} ergibt 49.'],
@@ -125,7 +133,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Web 3', href: 'arena:web3', erfordert: { arena: 'web3', level: 3 }, hinweis: 'Schaffe mindestens 3 Codes in Web 3.' },
   },
   {
-    id: 's8', icon: '🔍', titel: 'Forensik: Spuren lesen',
+    id: 's8',
+    schutz: 'Anmeldungen und Änderungen überwachen; neue Konten nur mit Freigabe anlegen.', icon: '🔍', titel: 'Forensik: Spuren lesen',
     einleitung: 'Jetzt die andere Seite: Ein System wurde angegriffen – finde heraus, was passiert ist. Protokolle, Verläufe und Zeiten erzählen die Geschichte.',
     konzepte: [
       ['Log / Protokoll', 'Mitschrift, was passiert ist. Erste Anlaufstelle: /var/log/auth.log.'],
@@ -140,7 +149,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Die Spurensuche', href: 'arena:spuren', erfordert: { arena: 'spuren', level: 4 }, hinweis: 'Beantworte mindestens 4 Fragen in der Spurensuche.' },
   },
   {
-    id: 's9', icon: '🕵️', titel: 'Forensik-Profi: den Maulwurf überführen',
+    id: 's9',
+    schutz: 'Alle Protokolle in UTC führen; DNS auf Auffälligkeiten überwachen; Prüfsummen wichtiger Dateien kontrollieren.', icon: '🕵️', titel: 'Forensik-Profi: den Maulwurf überführen',
     einleitung: 'Schwere Fälle: Zeitzonen, wiederverwendete IP-Adressen, heimlich hinausgeschmuggelte Daten. Hier zählt genaues Lesen und Kombinieren.',
     konzepte: [
       ['UTC / Zeitzone', 'Protokolle mischen Zeitzonen. 23:58 MEZ = 22:58 UTC – das entscheidet, wer es war.'],
@@ -154,7 +164,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Der Einbruch', href: 'arena:einbruch', erfordert: { arena: 'einbruch', level: 4 }, hinweis: 'Beantworte mindestens 4 Fragen im Einbruch.' },
   },
   {
-    id: 's10', icon: '🛡️', titel: 'Verteidigung: gegen einen Angreifer bestehen',
+    id: 's10',
+    schutz: 'Standard-Passwörter sofort ändern; Rechte eng halten; Autostarts regelmäßig prüfen; fremde SSH-Schlüssel entfernen.', icon: '🛡️', titel: 'Verteidigung: gegen einen Angreifer bestehen',
     einleitung: 'Zum Abschluss die Verteidiger-Seite: Ein Angreifer greift live an, du musst die Lücken dichtmachen, bevor er Schaden anrichtet. Alles, was du gelernt hast, hilft dir jetzt beim Erkennen.',
     konzepte: [
       ['Least Privilege', 'Jeder bekommt nur die Rechte, die er wirklich braucht.'],
@@ -169,7 +180,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Angriff! Stufe 1', href: 'arena:abwehr1', erfordert: { arena: 'abwehr1', level: 5 }, hinweis: 'Wehre alle 5 Wellen in Angriff! Stufe 1 ab.' },
   },
   {
-    id: 's11', icon: '🏆', titel: 'Meister: das ganze Rechenzentrum',
+    id: 's11',
+    schutz: 'Netze segmentieren; starke Passwörter; C sicher programmieren (Puffergrenzen, Stack-Schutz, PIE/ASLR); von root ausgeführte Skripte nie für andere beschreibbar.', icon: '🏆', titel: 'Meister: das ganze Rechenzentrum',
     einleitung: 'Die Abschlussprüfung. Jetzt kommt alles zusammen: Du verschaffst dir Zugang, pivotierst durch ein simuliertes internes Netz von Maschine zu Maschine, knackst einen Passwort-Hash, überlistest einen Dienst mit einem echten Buffer Overflow und arbeitest dich bis root durch.',
     konzepte: [
       ['Pivoting', 'Von einem übernommenen Rechner aus die nächsten im inneren Netz angreifen.'],
@@ -184,7 +196,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Der Meister', href: 'arena:meister', erfordert: { arena: 'meister', level: 4 }, hinweis: 'Schaffe mindestens 4 der 6 Codes im Rechenzentrum.' },
   },
   {
-    id: 's12', icon: '⚔️', titel: 'Das Duell: gegen einen lebendigen Gegner',
+    id: 's12',
+    schutz: 'Lücken schnell schließen; Persistenz immer komplett entfernen (laufender Prozess UND Autostart).', icon: '⚔️', titel: 'Das Duell: gegen einen lebendigen Gegner',
     einleitung: 'Zum Abschluss: kein Drehbuch mehr. Ein Gegner schaut live, welche Lücken bei dir offen sind, nimmt sich eine zufällige davon vor und wird immer schneller. Alles, was du gelernt hast, zählt jetzt unter Zeitdruck.',
     konzepte: [
       ['Threat Hunting', 'Aktiv und schnell Schwachstellen bei dir selbst finden und schließen.'],
@@ -199,7 +212,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Das Duell', href: 'arena:duell', erfordert: { arena: 'duell', level: 6 }, hinweis: 'Mach im Duell alle 6 Lücken dicht.' },
   },
   {
-    id: 's13', icon: '🧵', titel: 'Netzwerk-Forensik: den Mitschnitt lesen',
+    id: 's13',
+    schutz: 'Immer TLS/HTTPS statt Klartext; DNS und ausgehende Verbindungen überwachen.', icon: '🧵', titel: 'Netzwerk-Forensik: den Mitschnitt lesen',
     einleitung: 'Eine neue Methode: Statt Dateien auf einem Rechner liest du jetzt den Netzwerkverkehr selbst – einen Mitschnitt (pcap). So sieht man Logins, Downloads und heimliche Verbindungen „auf der Leitung“.',
     konzepte: [
       ['Exfiltration', 'Heimliches Hinausschaffen von Daten – im Verkehr oft gut sichtbar.'],
@@ -214,7 +228,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Der Mitschnitt', href: 'arena:mitschnitt', erfordert: { arena: 'mitschnitt', level: 4 }, hinweis: 'Beantworte mindestens 4 der 5 Fragen zum Mitschnitt.' },
   },
   {
-    id: 's14', icon: '🔧', titel: 'Reverse Engineering: Programme ohne Quelltext',
+    id: 's14',
+    schutz: 'Keine Geheimnisse ins Programm einbauen (auch nicht XOR-verschleiert); Passwort-/Lizenzprüfung gehört auf den Server.', icon: '🔧', titel: 'Reverse Engineering: Programme ohne Quelltext',
     einleitung: 'Eine neue Methode: Du bekommst nur ein fertiges Programm – keinen Quelltext – und findest heraus, was es tut. So knackt man „Crackmes“ und versteht fremde Software.',
     konzepte: [
       ['Reverse Engineering', 'Ein Programm untersuchen, ohne den Quelltext zu haben.'],
@@ -228,7 +243,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Die Werkstatt', href: 'arena:werkstatt', erfordert: { arena: 'werkstatt', level: 4 }, hinweis: 'Knacke mindestens 4 der 5 Crackmes.' },
   },
   {
-    id: 's15', icon: '🔡', titel: 'Kryptoanalyse: Chiffren brechen',
+    id: 's15',
+    schutz: 'Klassische Chiffren nie für echte Geheimnisse; moderne, geprüfte Verfahren (z. B. AES) und Schlüssel sicher verwahren.', icon: '🔡', titel: 'Kryptoanalyse: Chiffren brechen',
     einleitung: 'Noch eine neue Methode: verschlüsselte Nachrichten knacken, ohne den Schlüssel zu kennen. Von der uralten Caesar-Chiffre bis zu XOR und Vigenère – mit System und ein paar Zeilen Python.',
     konzepte: [
       ['Verschlüsselung', 'Daten unlesbar machen. Klassische Verfahren sind mit etwas Mühe zu brechen.'],
@@ -242,7 +258,8 @@ export const LERNPFAD = [
     uebung: { label: 'Arena: Der Chiffrensaal', href: 'arena:chiffren', erfordert: { arena: 'chiffren', level: 4 }, hinweis: 'Entschlüssle mindestens 4 der 5 Nachrichten.' },
   },
   {
-    id: 's16', icon: '🫥', titel: 'Steganografie: das Versteckte sehen',
+    id: 's16',
+    schutz: 'Dateien aus unbekannter Quelle prüfen (file, Größe, Anhänge hinter dem Ende); ausgehende Dateien auf versteckte Inhalte kontrollieren.', icon: '🫥', titel: 'Steganografie: das Versteckte sehen',
     einleitung: 'Eine letzte neue Methode für den Moment: Daten, die in harmlosen Dateien versteckt sind. Hinter Bildern, in Archiven, in Leerzeichen oder einzelnen Bits – man muss nur wissen, wo man hinschaut.',
     konzepte: [
       ['Steganografie', 'Daten so verstecken, dass niemand ahnt, dass dort etwas ist.'],

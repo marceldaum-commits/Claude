@@ -363,7 +363,8 @@ views.lernstufe = (id) => {
   if (!stufeOffen(i)) return { title: st.titel, html: `<a class="back" href="#/lernpfad">← Lernpfad</a><div class="card warn"><b>🔒 Noch gesperrt.</b> Schließe erst die Übung der vorigen Stufe ab.</div>` };
   if (!arenaProgGeladen) ladeArenaProg().then(render);
   const u = st.uebung || {}; const done = stufeGeschafft(st);
-  const code = (c) => `<code translate="no">${esc(c)}</code>`;
+  const lp = (state.lernpfad = state.lernpfad || {}); const ref = (lp[id] = lp[id] || {});
+  const offenbar = !!ref.offen; // Profi-Zusammenfassung schon aufgedeckt?
   return {
     title: st.titel,
     html: `<a class="back" href="#/lernpfad">← Lernpfad</a>
@@ -377,7 +378,21 @@ views.lernstufe = (id) => {
       <p class="small">${esc(u.hinweis || '')}</p>
       ${u.href ? `<a class="btn primary" href="${esc(pfadUebungLink(u.href))}" ${u.href.startsWith('arena:') ? 'target="_blank" rel="noopener"' : ''}>${esc(u.label || 'Zur Übung')} →</a>` : ''}
       ${!done ? '<p class="small muted" style="margin:.5rem 0 0">Sobald du das geschafft hast, öffnet sich die nächste Stufe. (Arena-Fortschritt zählt, wenn du angemeldet bist.)</p>' : (LERNPFAD[i + 1] ? `<p style="margin:.5rem 0 0"><a class="btn" href="#/lernstufe/${LERNPFAD[i + 1].id}">Nächste Stufe →</a></p>` : '<p class="small">🏆 Das war die letzte Stufe – stark!</p>')}
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">✍️ Verstanden-Check</h3>
+      <p class="small muted">Das Wichtigste bleibt hängen, wenn du es selbst in Worte fasst – wie in einem kleinen Pentest-Bericht. (Freiwillig, schaltet nichts frei.)</p>
+      <label class="small">Welche Technik/Lücke steckt hinter dieser Stufe?<textarea id="ref-was" rows="2" placeholder="In eigenen Worten …">${esc(ref.was || '')}</textarea></label>
+      <label class="small">Wie würde man sich davor schützen?<textarea id="ref-schutz" rows="2" placeholder="Deine Gegenmaßnahme …">${esc(ref.schutz || '')}</textarea></label>
+      <div class="row" style="margin-top:.4rem"><button class="btn small primary" id="ref-save">Speichern</button><button class="btn small ghost" id="ref-zeig">${offenbar ? 'Profi-Zusammenfassung' : 'Erst selbst versuchen, dann Profi-Lösung zeigen'}</button></div>
+      <div id="ref-loesung" ${offenbar ? '' : 'hidden'}>${st.schutz ? `<div class="card lime tight" style="margin-top:.6rem"><b>So fasst es ein Profi zusammen:</b><br>${esc(st.schutz)}</div>` : ''}</div>
+      <p id="ref-msg" class="small muted" style="margin:.3rem 0 0"></p>
     </div>`,
+    mount(root) {
+      const g = (x) => root.querySelector(x);
+      g('#ref-save').onclick = () => { ref.was = g('#ref-was').value.trim().slice(0, 500); ref.schutz = g('#ref-schutz').value.trim().slice(0, 500); ref.at = Date.now(); save(); g('#ref-msg').textContent = '✓ Gespeichert.'; };
+      g('#ref-zeig').onclick = () => { ref.offen = true; save(); g('#ref-loesung').hidden = false; g('#ref-zeig').textContent = 'Profi-Zusammenfassung'; };
+    },
   };
 };
 

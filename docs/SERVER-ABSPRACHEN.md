@@ -155,3 +155,6 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - 2.39.0: „Das Versteck“ (Reihe Ermitteln, Fortgeschritten) – NEUE Methode Steganografie: Daten hinter einer PNG,
   ZIP-Polyglot, Whitespace-Stego, LSB in einem PPM-Bild, base64+umgedreht. Aus dem Salz erzeugt, 5 Codes,
   durchgespielt. Lernpfad-Stufe s16. Jetzt 19 Arenen, 17 Lernpfad-Stufen.
+- 2.40.0: Didaktik-Verbesserung aus Wettbewerbs-Kritik (TryHackMe/HTB): „Verstanden-Check“ pro Lernpfad-Stufe –
+  eigener Mini-Bericht (Lücke + Schutz), dann Profi-Zusammenfassung; Notizen werden gespeichert/synchronisiert.
+  Begründung in docs/DIDAKTIK.md.
