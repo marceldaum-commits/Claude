@@ -143,3 +143,6 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - 2.35.0: „Der Mitschnitt“ (Reihe Ermitteln, Experte) – NEUE Methode Netzwerk-Forensik: einen pcap mit tshark auswerten
   (Klartext-Login, Datei-Diebstahl, DNS-Ausleitung, verstecktes base64-Kommando). pcap wird aus dem Salz mit scapy
   erzeugt. 5 Codes, durchgespielt. Lernpfad-Stufe s13. Jetzt 16 Arenen.
+- 2.36.0: Isolation nachgewiesen und als Dauerprüfung verankert: alle Labs laufen mit NetworkMode none (nur lo,
+  kein Internet/DNS), doppelt erzwungen (Server + Wächter). tools/isolation-check.mjs prüft das in npm run check;
+  docs/ISOLATION.md dokumentiert die Garantien. Zur Laufzeit an nf-meister/nf-duell/nf-mitschnitt verifiziert.
