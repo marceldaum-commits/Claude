@@ -30,6 +30,60 @@ async function token(path, body) {
   if (!r.ok) throw new Error(j.error_description || j.msg || 'Anmeldung fehlgeschlagen');
   return { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Math.floor(Date.now() / 1000) + Number(j.expires_in || 3600), user: j.user };
 }
+async function auth(path, { method = 'GET', body } = {}) {
+  const r = await fetch(`${URL_}/auth/v1/${path}`, { method, headers: { apikey: KEY, Authorization: `Bearer ${ses.access_token}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.msg || j.error_description || j.message || `Fehler ${r.status}`);
+  return j;
+}
+const stufe = () => { try { return JSON.parse(atob(ses.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).aal || ''; } catch { return ''; } };
+
+// Zwei-Faktor-Anmeldung (TOTP, z. B. Google/Microsoft Authenticator, Bitwarden Authenticator)
+async function zweiterFaktor() {
+  kopf(false);
+  main.innerHTML = '<section class="stack" style="max-width:440px;margin:2rem auto"><p class="muted">Prüfe Zwei-Faktor-Anmeldung …</p></section>';
+  let user;
+  try { user = await auth('user'); } catch (e) { speichern(null); return anmelden(e.message); }
+  const totp = (user.factors || []).filter(f => f.factor_type === 'totp');
+  const fertig = totp.find(f => f.status === 'verified');
+  if (fertig) return codeAbfrage(fertig.id, false);
+  for (const f of totp) { try { await auth(`factors/${f.id}`, { method: 'DELETE' }); } catch { /* */ } } // halbfertige Versuche aufräumen
+  let neu;
+  try { neu = await auth('factors', { method: 'POST', body: { factor_type: 'totp', friendly_name: `Zentrale ${new Date().toISOString().slice(0, 16)}`, issuer: 'Nachtfalter Zentrale' } }); }
+  catch (e) { return anmelden(`Zwei-Faktor-Einrichtung nicht möglich: ${e.message}`); }
+  codeAbfrage(neu.id, true, neu.totp);
+}
+function codeAbfrage(faktor, einrichten, totp = {}) {
+  main.innerHTML = `<section class="stack" style="max-width:440px;margin:1.5rem auto">
+    <div style="text-align:center"><div style="font-size:2.4rem">🔐</div><h1 style="margin:.2rem 0 0">${einrichten ? 'Zwei-Faktor einrichten' : 'Code aus der App'}</h1></div>
+    ${einrichten ? `<div class="card stack">
+      <p style="margin:0">Die Zentrale ist zusätzlich mit einem <b>Code aus einer Authenticator-App</b> geschützt (z. B. Google Authenticator, Microsoft Authenticator oder Bitwarden Authenticator).</p>
+      <ol class="small" style="margin:0;padding-left:1.2rem"><li>App öffnen → „Konto hinzufügen“ → <b>QR-Code scannen</b>.</li><li>Den <b>6-stelligen Code</b> aus der App unten eintragen.</li></ol>
+      <div style="background:#fff;border-radius:12px;padding:10px;width:max-content;margin:0 auto"><img src="${esc(totp.qr_code || '')}" alt="QR-Code für die Authenticator-App" width="200" height="200"></div>
+      <details class="small"><summary>QR-Code geht nicht? Schlüssel von Hand eingeben</summary><code translate="no" style="display:block;margin-top:.4rem;word-break:break-all">${esc(totp.secret || '')}</code></details>
+      <p class="small muted" style="margin:0">Am Handy, auf dem du die Zentrale gerade öffnest: Schlüssel kopieren und in der App „Schlüssel eingeben“ wählen.</p>
+    </div>` : '<p class="muted" style="text-align:center;margin:0">Öffne deine Authenticator-App und gib den aktuellen 6-stelligen Code für „Nachtfalter Zentrale“ ein.</p>'}
+    <form id="mf" class="card stack konto"><label>6-stelliger Code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required autofocus></label>
+      <button class="btn go block">${einrichten ? 'Einrichten und anmelden' : 'Bestätigen'}</button></form>
+    <div id="mmsg"></div>
+    <p class="small muted" style="text-align:center"><button class="linkbtn" id="mab">Abbrechen und abmelden</button></p>
+  </section>`;
+  $('#mab').onclick = () => { speichern(null); anmelden(); };
+  const f = $('#mf');
+  f.onsubmit = async (e) => {
+    e.preventDefault(); f.querySelector('button').disabled = true;
+    try {
+      const ch = await auth(`factors/${faktor}/challenge`, { method: 'POST', body: {} });
+      const t = await auth(`factors/${faktor}/verify`, { method: 'POST', body: { challenge_id: ch.id, code: f.code.value.trim() } });
+      speichern({ access_token: t.access_token, refresh_token: t.refresh_token, expires_at: Math.floor(Date.now() / 1000) + Number(t.expires_in || 3600), user: t.user || ses.user });
+      D = null; location.hash = '#/'; route();
+    } catch (err) {
+      $('#mmsg').innerHTML = `<div class="feedback no">${esc(/invalid|expired/i.test(err.message) ? 'Der Code stimmt nicht oder ist abgelaufen. Nimm den aktuellen Code aus der App.' : err.message)}</div>`;
+      f.querySelector('button').disabled = false; f.code.value = ''; f.code.focus();
+    }
+  };
+}
+
 async function frisch() {
   if (!ses) return null;
   if (ses.expires_at - 60 > Date.now() / 1000) return ses;
@@ -41,6 +95,7 @@ async function api(aktion, daten = {}) {
   const r = await fetch(`${URL_}/functions/v1/admin`, { method: 'POST', headers: { apikey: KEY, Authorization: `Bearer ${s.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ aktion, ...daten }) });
   const j = await r.json().catch(() => ({}));
   if (r.status === 401) { speichern(null); anmelden('Deine Anmeldung ist abgelaufen. Bitte neu anmelden.'); throw new Error('abgemeldet'); }
+  if (r.status === 403 && j.code === 'mfa') { zweiterFaktor(); throw new Error('abgemeldet'); }
   if (r.status === 403) { keinZugriff(); throw new Error('kein Zugriff'); }
   if (!r.ok) throw new Error(j.fehler || `Fehler ${r.status}`);
   return j;
@@ -66,7 +121,7 @@ function anmelden(hinweis = '') {
   const f = $('#lf');
   f.onsubmit = async (e) => {
     e.preventDefault(); f.querySelector('button').disabled = true;
-    try { speichern(await token('password', { email: f.email.value.trim(), password: f.pw.value })); location.hash = '#/'; route(); }
+    try { speichern(await token('password', { email: f.email.value.trim(), password: f.pw.value })); zweiterFaktor(); }
     catch (err) { $('#lmsg').innerHTML = `<div class="feedback no">${esc(err.message === 'Invalid login credentials' ? 'E-Mail oder Passwort stimmt nicht.' : err.message)}</div>`; f.querySelector('button').disabled = false; }
   };
 }
@@ -324,6 +379,7 @@ async function system() {
 // ---------------------------------------------------------------- Router
 async function route() {
   if (!await frisch()) return anmelden();
+  if (stufe() !== 'aal2') return zweiterFaktor();
   kopf(true);
   const [, teil = '', arg] = (location.hash || '#/').split('/');
   document.querySelectorAll('#tabs a').forEach(a => a.classList.toggle('an', a.dataset.r === (teil === 'kunde' ? 'kunden' : teil)));

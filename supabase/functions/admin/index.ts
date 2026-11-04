@@ -41,6 +41,10 @@ Deno.serve(async (req) => {
   // 2) Admin-Rolle prüfen
   const { data: adm } = await db.from('admins').select('user_id').eq('user_id', u.user.id).maybeSingle();
   if (!adm) return antwort(origin, 403, { fehler: 'Kein Zugriff.' });
+  // 3) Zwei-Faktor-Pflicht: Die Zentrale braucht eine Anmeldung mit App-Code (Supabase AAL2)
+  let aal = '';
+  try { aal = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).aal || ''; } catch { /* */ }
+  if (aal !== 'aal2') return antwort(origin, 403, { fehler: 'Bitte mit Zwei-Faktor-Code anmelden.', code: 'mfa' });
 
   // Jede ändernde Aktion wird protokolliert (Tabelle admin_log, nur für den Dienst lesbar)
   const protokoll = (aktion: string, ziel: string | null, details: Record<string, unknown> = {}) =>
