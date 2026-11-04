@@ -272,3 +272,6 @@ a.karte:hover { border-color: var(--violet); }
   .held-punkte { display: block; font-size: 1rem; }
   .held-bild { border-radius: 22px; }
 }
+
+.seite.text { overflow-wrap: anywhere; }
+.datenschutz h2 { margin-top: 1.6rem; }
