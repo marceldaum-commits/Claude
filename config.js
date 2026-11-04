@@ -9,5 +9,5 @@ window.KLY_CONFIG = {
   kontoUrl: 'https://sxapebxzxmathkvtuuvn.supabase.co',
   kontoKey: 'sb_publishable_04l6lOd2uIPsErdWDOMvew_U6vsFGbn',
   // Online-Labs (Arena, siehe arena/README.md). Leer = Knopf „Online spielen“ ausgeblendet.
-  arenaUrl: '',
+  arenaUrl: 'https://arena.nachtfalter.tech',
 };
