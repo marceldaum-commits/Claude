@@ -2,7 +2,7 @@
 
 > Automatisch erzeugt aus `arena/server.js` mit `node tools/arena-uebersicht.mjs`. Nicht von Hand ändern.
 
-Insgesamt **17 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
+Insgesamt **18 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
 
 ## 🗝️ Hacken
 
@@ -13,6 +13,7 @@ Insgesamt **17 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 | **Die Leitstelle** | Fortgeschritten | 6 | Profi | #Netzwerk #Dienste #Linux |
 | **Der Webshop** | Fortgeschritten | 6 | Profi | #Web #Injection |
 | **Web 1: Das Kleingedruckte** | Fortgeschritten | 6 | Arena | #Web |
+| **Der Chiffrensaal** | Fortgeschritten | 5 | Profi | #Krypto |
 | **Der Tresor** | Experte | 6 | Profi | #Krypto #Web #Linux |
 | **Web 2: Umwege** | Experte | 6 | Profi | #Web #Injection #Netzwerk |
 | **Die Werkstatt** | Experte | 5 | Profi | #Reverse #Binär |
@@ -23,6 +24,7 @@ Insgesamt **17 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 - **Die Leitstelle** (Fortgeschritten): Netzwerk & Dienste: offene Ports finden, mit Diensten sprechen, versteckte Web-Bereiche, eigenes Protokoll, Protokolle auswerten, unsichere Automatik.
 - **Der Webshop** (Fortgeschritten): Web-Hacking mit curl: vergessener Testzugang, fremde Bestellungen, Rollen-Cookie fälschen, SQL-Injection, Befehle einschleusen, Signatur selbst bauen.
 - **Web 1: Das Kleingedruckte** (Fortgeschritten): Web-Grundlagen mit curl: versteckte Pfade (robots.txt), HTTP-Methoden, versteckte Parameter, Pfad-Ausbruch, vergessene Backup-Datei, gefälschte Header.
+- **Der Chiffrensaal** (Fortgeschritten): Kryptoanalyse: klassische Chiffren brechen – Caesar, XOR mit Byte und Schlüsselwort, Kodierungs-Ketten und Vigenère. Jede Nachricht enthält ihren Code.
 - **Der Tresor** (Experte): Für Experten: Passwort-Hash knacken, Geheimnisse in Git und Logs, PATH-Falle, Pfad-Ausbruch in einer API, verschlüsselter Tresor.
 - **Web 2: Umwege** (Experte): Web mittel: SQL-Login umgehen, mit UNION fremde Tabellen lesen, SSRF auf interne Dienste, unsicheres Zusatzfeld, Token fälschen (JWT alg=none), file://.
 - **Die Werkstatt** (Experte): Reverse Engineering: fünf kleine Programme (Crackmes) ohne Quelltext knacken – mit strings, ltrace, objdump, gdb und einer selbst gebauten Keygen.

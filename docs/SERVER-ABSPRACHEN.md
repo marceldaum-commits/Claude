@@ -149,3 +149,6 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - 2.37.0: „Die Werkstatt“ (Reihe Hacken, Experte) – NEUE Methode Reverse Engineering: 5 Crackmes ohne Quelltext
   (strings, ltrace, objdump/gdb, Keygen, XOR-Dekodierung). Binaries werden zur Laufzeit aus dem Salz gebaut, Codes
   liegen XOR-verschlüsselt drin (kein strings-Shortcut). Durchgespielt. Lernpfad-Stufe s14. Jetzt 17 Arenen.
+- 2.38.0: „Der Chiffrensaal“ (Reihe Hacken, Fortgeschritten) – NEUE Methode Kryptoanalyse: Caesar, XOR (Byte/Wort),
+  Kodierungs-Kette (base64/base32/hex), Vigenère; jede Nachricht enthält ihren Code. Aus dem Salz erzeugt, 5 Codes,
+  durchgespielt. Lernpfad-Stufe s15. Jetzt 18 Arenen.

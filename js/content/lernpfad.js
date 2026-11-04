@@ -227,4 +227,18 @@ export const LERNPFAD = [
     selbst: ['Spiele „Die Werkstatt“ und knacke die fünf Crackmes von leicht (strings) bis zur eigenen Keygen.'],
     uebung: { label: 'Arena: Die Werkstatt', href: 'arena:werkstatt', erfordert: { arena: 'werkstatt', level: 4 }, hinweis: 'Knacke mindestens 4 der 5 Crackmes.' },
   },
+  {
+    id: 's15', icon: '🔡', titel: 'Kryptoanalyse: Chiffren brechen',
+    einleitung: 'Noch eine neue Methode: verschlüsselte Nachrichten knacken, ohne den Schlüssel zu kennen. Von der uralten Caesar-Chiffre bis zu XOR und Vigenère – mit System und ein paar Zeilen Python.',
+    konzepte: [
+      ['Verschlüsselung', 'Daten unlesbar machen. Klassische Verfahren sind mit etwas Mühe zu brechen.'],
+      ['Base64', 'Kodierung, keine Verschlüsselung – immer umkehrbar.'],
+    ],
+    beispiel: {
+      text: 'Caesar per Schleife durchprobieren und XOR mit einem Byte testen:',
+      befehle: ['python3 -c "c=\'...\'; [print(s, \'\'.join(chr((ord(x)-97-s)%26+97) if x.isalpha() else x for x in c)) for s in range(26)]"', 'xxd / base64 -d / base32 -d'],
+    },
+    selbst: ['Spiele „Der Chiffrensaal“ und brich alle fünf Nachrichten.'],
+    uebung: { label: 'Arena: Der Chiffrensaal', href: 'arena:chiffren', erfordert: { arena: 'chiffren', level: 4 }, hinweis: 'Entschlüssle mindestens 4 der 5 Nachrichten.' },
+  },
 ];

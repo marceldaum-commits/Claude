@@ -8,7 +8,7 @@ const URL_ = Deno.env.get('SUPABASE_URL')!;
 const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ARENA = Deno.env.get('ARENA_URL') || 'https://arena.nachtfalter.tech';
 const ORIGINS = new Set(['https://arena.nachtfalter.tech', 'https://app.nachtfalter.tech']);
-const LABS = new Set(['keller', 'leitstelle', 'tresor', 'webshop', 'einbruch', 'spuren', 'maulwurf', 'abwehr1', 'abwehr2', 'abwehr3', 'web1', 'web2', 'web3', 'meister', 'duell', 'mitschnitt', 'werkstatt']);
+const LABS = new Set(['keller', 'leitstelle', 'tresor', 'webshop', 'einbruch', 'spuren', 'maulwurf', 'abwehr1', 'abwehr2', 'abwehr3', 'web1', 'web2', 'web3', 'meister', 'duell', 'mitschnitt', 'werkstatt', 'chiffren']);
 const db = createClient(URL_, SERVICE, { auth: { persistSession: false, autoRefreshToken: false } });
 
 const cors = (o: string | null) => ({

@@ -114,6 +114,10 @@ const LABS = {
     produkt: 'arena-profi', stufe: 'Experte', levels: 5, praefix: 'werkstatt', tmpfs: { '/opt/werkstatt': 'rw,exec,nosuid,size=8m' },
     kurz: 'Reverse Engineering: fünf kleine Programme (Crackmes) ohne Quelltext knacken – mit strings, ltrace, objdump, gdb und einer selbst gebauten Keygen.',
     hello: hallo('Die Werkstatt', 'knacker', 'Auftrag: cat ~/auftrag.txt   ·   Programme: /opt/werkstatt/cm1 … cm5   ·   begriff reverse') },
+  chiffren: { image: env('CHIFFREN_IMAGE', 'nf-chiffren'), user: 'krypto', ready: 'Chiffrensaal bereit', title: 'Der Chiffrensaal', host: 'chiffrensaal',
+    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 5, praefix: 'chiffren',
+    kurz: 'Kryptoanalyse: klassische Chiffren brechen – Caesar, XOR mit Byte und Schlüsselwort, Kodierungs-Ketten und Vigenère. Jede Nachricht enthält ihren Code.',
+    hello: hallo('Der Chiffrensaal', 'krypto', 'Auftrag: cat ~/auftrag.txt   ·   Rätsel: ~/raetsel/   ·   begriff verschluesselung') },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -128,6 +132,7 @@ const EINORDNUNG = {
   duell: ['Abwehren', ['Threat Hunting', 'Rechte', 'Persistenz']],
   mitschnitt: ['Ermitteln', ['Netzwerk', 'Forensik', 'Logs']],
   werkstatt: ['Hacken', ['Reverse', 'Binär']],
+  chiffren: ['Hacken', ['Krypto']],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};
