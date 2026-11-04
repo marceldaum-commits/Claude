@@ -88,10 +88,18 @@ const LABS = {
     hello: hallo('Angriff! Stufe 3', 'verteidiger', 'Lagebild: lage   ·   live: tail -f /var/log/angriff.log   ·   cat ~/LIESMICH.txt') },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem'];
+// Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
+const EINORDNUNG = {
+  keller: ['Hacken', ['Linux', 'Rechte', 'Passwörter']], leitstelle: ['Hacken', ['Netzwerk', 'Dienste', 'Linux']],
+  webshop: ['Hacken', ['Web', 'Injection']], tresor: ['Hacken', ['Krypto', 'Web', 'Linux']],
+  spuren: ['Ermitteln', ['Forensik', 'Logs']], einbruch: ['Ermitteln', ['Forensik', 'Logs', 'Schadsoftware']],
+  maulwurf: ['Ermitteln', ['Forensik', 'Netzwerk', 'Krypto']],
+  abwehr1: ['Abwehren', ['Rechte', 'Passwörter']], abwehr2: ['Abwehren', ['Web', 'Injection', 'Linux']], abwehr3: ['Abwehren', ['Threat Hunting', 'Linux']],
+};
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};
 async function imagesPruefen() { for (const [id, L] of Object.entries(LABS)) vorhanden[id] = await docker.getImage(L.image).inspect().then(() => true, () => false); }
-const labOeffentlich = () => Object.entries(LABS).sort((a, b) => STUFEN.indexOf(a[1].stufe) - STUFEN.indexOf(b[1].stufe)).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, kurz: L.kurz, produkt: L.produkt, levels: L.levels, bereit: vorhanden[id] !== false }));
+const labOeffentlich = () => Object.entries(LABS).sort((a, b) => STUFEN.indexOf(a[1].stufe) - STUFEN.indexOf(b[1].stufe)).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, reihe: EINORDNUNG[id]?.[0] || 'Hacken', themen: EINORDNUNG[id]?.[1] || [], kurz: L.kurz, produkt: L.produkt, levels: L.levels, bereit: vorhanden[id] !== false }));
 const istLab = (lab) => Object.hasOwn(LABS, lab);
 function darf(k, lab) {
   if (!istLab(lab)) return false;

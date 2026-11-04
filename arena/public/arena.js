@@ -82,8 +82,26 @@
   // Empfohlene Reihenfolge je Reihe: Hacken (Keller → …), Ermitteln (Spurensuche → Einbruch → Maulwurf), Abwehren (Angriff! 1 → 2 → 3)
   const VORHER = { leitstelle: 'keller', webshop: 'keller', tresor: 'leitstelle', einbruch: 'spuren', maulwurf: 'einbruch', abwehr2: 'abwehr1', abwehr3: 'abwehr2' };
 
+  // ---------------------------------------------------------------- Register (Filter nach Reihe, Stufe, Thema)
+  const REIHEN = { Hacken: '🗝️ Hacken', Ermitteln: '🔍 Ermitteln', Abwehren: '🛡️ Abwehren' };
+  const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem'];
+  let F = { reihe: '', stufe: '', thema: '' };
+  try { F = { ...F, ...JSON.parse(store.get('arena.filter') || '{}') }; } catch { /* */ }
+  function filterZeichnen() {
+    const knopf = (art, wert, text) => `<button data-f="${art}" data-w="${esc(wert)}" class="${F[art] === wert ? 'an' : ''}">${esc(text)}</button>`;
+    const themen = [...new Set(LABS.flatMap(l => l.themen || []))].sort();
+    $('#fReihe').innerHTML = knopf('reihe', '', 'Alle') + Object.entries(REIHEN).map(([k, t]) => knopf('reihe', k, t)).join('');
+    $('#fStufe').innerHTML = knopf('stufe', '', 'Jede Stufe') + STUFEN.filter(x => LABS.some(l => l.stufe === x)).map(x => knopf('stufe', x, x)).join('');
+    $('#fThema').innerHTML = knopf('thema', '', 'Alle Themen') + themen.map(x => knopf('thema', x, '#' + x)).join('');
+    document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { F[b.dataset.f] = F[b.dataset.f] === b.dataset.w ? '' : b.dataset.w; store.set('arena.filter', JSON.stringify(F)); zeichne(); });
+  }
+  const passt = (L) => (!F.reihe || L.reihe === F.reihe) && (!F.stufe || L.stufe === F.stufe) && (!F.thema || (L.themen || []).includes(F.thema));
+
   function zeichne() {
-    $('#labs').innerHTML = LABS.map((L) => {
+    filterZeichnen();
+    const sichtbar = LABS.filter(passt);
+    $('#fInfo').textContent = `${sichtbar.length} von ${LABS.length} Arenen`;
+    $('#labs').innerHTML = (sichtbar.length ? '' : '<section class="card"><p class="muted">Keine Arena passt zu diesem Filter.</p></section>') + sichtbar.map((L) => {
       const darf = !!zugang.labs[L.id];
       const fertig = geloest.filter(x => x.lab === L.id).length;
       const af = anfrageStatus(L.produkt);
@@ -106,7 +124,9 @@
       }
       return `<section class="card lab ${markiert === L.id ? 'markiert' : ''}" id="lab-${esc(L.id)}">
         <div class="kopf"><h2 style="margin:0">${esc(L.titel)}</h2><span class="stufe ${esc(L.stufe)}">${esc(L.stufe)}</span></div>
+        <div class="themen"><span>${esc(REIHEN[L.reihe] || L.reihe)}</span>${(L.themen || []).map(t => `<span>#${esc(t)}</span>`).join('')}</div>
         <p class="small">${esc(L.kurz)}</p>
+        <p class="small" style="margin:.2rem 0 .5rem"><a href="handbuch.html#handout-${esc(L.id)}">📄 Handout: Begriffe, Werkzeuge, Vorgehen</a></p>
         ${empf}
         <div class="balken"><i style="width:${Math.round(100 * fertig / L.levels)}%"></i></div>
         <p class="small muted" style="margin:0 0 .6rem">${fertig} von ${L.levels} Codes gefunden</p>

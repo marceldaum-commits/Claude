@@ -1,0 +1,65 @@
+HILFE · Der Tresor
+
+Worum geht es? In einer Bank vom Gast bis zum Tresor vordringen – mit Hashes, Git-Spuren, Protokollen, PATH und Verschlüsselung.
+
+Werkzeuge:
+  sha256sum
+  git log -p
+  grep
+  echo $PATH
+  curl
+  openssl enc -d
+
+So gehst du vor:
+  • Hashes vergleicht man, statt sie „zurückzurechnen“.
+  • Gelöscht heißt in Git nicht weg.
+  • Lies Skripte, die andere Konten ausführen, genau – wo suchen sie ihre Programme?
+  • Teste, ob ein Dienst wirklich nur seinen Ordner ausliefert.
+
+Begriffe dazu (begriff WORT):
+  Hash · Wortliste · PATH · Path Traversal · Verschlüsselung · Log / Protokoll
+
+Wichtige Befehle:
+  ls -la                             Inhalt eines Ordners mit Rechten und versteckten Dateien
+  cd ORDNER                          Ordner wechseln (cd ~ = nach Hause)
+  cat DATEI                          Datei anzeigen
+  less DATEI                         Datei seitenweise lesen (q = beenden, /wort = suchen)
+  grep WORT DATEI                    Zeilen mit WORT finden (-i ohne Groß/Klein, -r in Ordnern, -v alles außer)
+  find / -name "*.txt" 2>/dev/null   Dateien suchen (Fehler ausblenden)
+  find / -group NAME 2>/dev/null     Dateien einer Gruppe finden
+  sort | uniq -c | sort -rn          Zählen, wie oft etwas vorkommt – häufigstes oben
+  awk '{print $1}'                   Bestimmte Spalte ausgeben
+  cut -d";" -f2                      Spalte 2 bei Trennzeichen ;
+  head / tail -n 20                  Anfang / Ende einer Datei
+  tail -f DATEI                      Datei live mitlesen (Strg+C beendet)
+  diff A B                           Unterschiede zweier Dateien
+  file DATEI                         Was steckt wirklich in der Datei?
+  strings DATEI                      Lesbare Texte aus einer Datei ziehen
+  base64 -d                          Base64 zurückwandeln
+  xxd -r -p                          Hex-Text zurück in Daten
+  gunzip / zcat                      gzip entpacken / anzeigen
+  sha256sum -c LISTE                 Dateien gegen eine Prüfsummenliste prüfen
+  date -u -d @ZAHL                   Unix-Zeitstempel in UTC-Uhrzeit
+  id / whoami                        Wer bin ich, in welchen Gruppen?
+  ssh NAME@localhost                 Als anderes Konto anmelden
+  chmod 600 DATEI / chmod 700 ORDNER Rechte setzen: nur ich
+  chmod o-w ORDNER                   Schreibrecht für „alle anderen“ entfernen
+  ps aux / command ps aux            Laufende Prozesse (command = echtes ps, keine Funktion)
+  kill PID                           Prozess beenden
+  ss -tlnp                           Offene Ports und welches Programm lauscht
+  nc localhost PORT                  Mit einem Dienst „sprechen“
+  curl -i URL                        Web-Anfrage mit Antwort-Kopf
+  curl -d "a=1&b=2" URL              POST-Anfrage (Formular)
+  curl -b DATEI / -c DATEI           Cookies mitschicken / speichern
+  curl -H "Name: Wert" URL           Eigenen Header mitschicken
+  curl -G --data-urlencode "q=…" URL Sonderzeichen sicher in die Adresse packen
+  type BEFEHL                        Programm, Alias oder Funktion?
+  echo $PATH                         Wo sucht die Shell nach Programmen?
+  crontab -l / cat ~/.bashrc         Zeitpläne / Startdatei ansehen
+  git log -p                         Git-Historie mit allen Änderungen
+  git config --global --list         Globale Git-Einstellungen
+  openssl enc -d -aes-256-cbc -pbkdf2 -in DATEI -pass pass:PW Datei entschlüsseln
+  python3 -c "…"                     Kurzes Python-Programm direkt ausführen
+  nano DATEI                         Datei bearbeiten (Strg+O speichern, Strg+X beenden)
+
+Handbuch mit allem: https://arena.nachtfalter.tech/handbuch.html

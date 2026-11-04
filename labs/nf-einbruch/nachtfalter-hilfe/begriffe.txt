@@ -1,0 +1,215 @@
+== Account / Konto
+Ein Benutzer auf einem Rechner. Jedes Konto hat eigene Dateien und Rechte.
+Beispiel: whoami zeigt, als wer du gerade arbeitest.
+
+== Authentifizierung
+Nachweis, wer man ist – z. B. mit Passwort, Schlüssel oder Code.
+Beispiel: Beim SSH-Login prüft der Server Passwort oder Schlüssel.
+
+== Autorisierung
+Was jemand nach der Anmeldung tun DARF. Fehlt diese Prüfung, sieht man fremde Daten.
+Beispiel: Bestellung 1042 ist deine – darfst du auch 1001 sehen?
+
+== Base64
+Eine Umwandlung von Daten in lesbare Zeichen. Keine Verschlüsselung – jeder kann sie rückgängig machen.
+Beispiel: echo SGFsbG8= | base64 -d  →  Hallo
+
+== Brute Force
+Ausprobieren sehr vieler Passwörter oder PINs, bis eines passt. Schutz: lange Passwörter, Sperre nach Fehlversuchen.
+Beispiel: Viele „Failed password“ von derselben IP im auth.log.
+
+== C2 / Command & Control
+Der Rechner, bei dem sich Schadsoftware meldet und Befehle abholt.
+Beispiel: Ein Programm ruft alle 5 Minuten eine fremde Adresse auf.
+
+== Cookie
+Kleine Information, die eine Webseite im Browser speichert und bei jeder Anfrage mitschickt. Was der Nutzer ändern kann, darf der Server nicht blind glauben.
+Beispiel: curl -b "name=wert" schickt ein Cookie mit.
+
+== Cronjob
+Eine Aufgabe, die automatisch nach Zeitplan läuft. Beliebt für Wartung – und bei Angreifern zum Wiederkommen.
+Beispiel: */5 * * * * = alle 5 Minuten.
+
+== CVE
+Eine öffentlich bekannte, nummerierte Sicherheitslücke in einer Software.
+Beispiel: CVE-2021-44228 war „Log4Shell“.
+
+== Debug-Modus
+Ein Entwickler-Modus mit vielen Details. Im Betrieb gefährlich, weil er oft Geheimnisse anzeigt.
+Beispiel: Eine /debug-Seite zeigt alle Einstellungen.
+
+== DNS
+Das „Telefonbuch“ des Internets: übersetzt Namen in IP-Adressen. Kann auch missbraucht werden, um Daten in Anfragen zu verstecken.
+Beispiel: getent hosts localhost
+
+== Eskalation (Rechteausweitung)
+Von einem schwachen Konto zu einem mächtigeren kommen – über Fehlkonfigurationen oder Lücken.
+Beispiel: Ein Skript, das ein anderes Konto ausführt, ist für dich beschreibbar.
+
+== Exfiltration
+Das heimliche Hinausschaffen von Daten.
+Beispiel: Stückweise in DNS-Anfragen versteckt.
+
+== Fail2Ban
+Ein Werkzeug, das IP-Adressen nach zu vielen Fehlversuchen automatisch sperrt.
+Beispiel: Schützt SSH vor Brute Force.
+
+== Firewall
+Regeln, welche Verbindungen erlaubt sind und welche nicht.
+Beispiel: Nur Port 22, 80 und 443 offen lassen.
+
+== Flag / Code
+Ein Beweis, dass du eine Aufgabe gelöst hast. In der Arena: KLY{…}
+Beispiel: KLY{0123456789abcdef}
+
+== Forensik
+Spurensuche nach einem Vorfall: Was ist passiert, wann, durch wen?
+Beispiel: Protokolle, Verläufe und Dateien auswerten.
+
+== Gruppe
+Mehrere Konten mit gemeinsamen Rechten auf Dateien.
+Beispiel: id zeigt deine Gruppen.
+
+== Hash
+Ein „Fingerabdruck“ von Daten. Aus dem Hash kommt man nicht zurück – man kann aber Kandidaten ausprobieren und vergleichen.
+Beispiel: echo -n hallo | sha256sum
+
+== Header (HTTP)
+Zusatzangaben bei Web-Anfragen und -Antworten, z. B. Cookies oder Ausweise.
+Beispiel: curl -H "X-Name: Wert" …
+
+== HMAC / Signatur
+Ein Prüfwert, der nur mit einem geheimen Schlüssel berechnet werden kann. Wer den Schlüssel hat, kann gültige Signaturen bauen.
+Beispiel: HMAC-SHA256(Schlüssel, Nachricht)
+
+== Hintertür (Backdoor)
+Ein versteckter Zugang, den ein Angreifer hinterlässt, um wiederzukommen.
+Beispiel: Ein unbekanntes Programm lauscht auf Port 4444.
+
+== HTTP
+Die Sprache, in der Browser und Webserver reden. GET holt, POST schickt Daten.
+Beispiel: curl -i http://localhost:8000/
+
+== IDOR
+Insecure Direct Object Reference: Man ändert eine Nummer in der Adresse und sieht fremde Daten, weil der Server nicht prüft, wem sie gehören.
+Beispiel: /bestellung?id=1042 → id=1001
+
+== Injection (Einschleusung)
+Eingaben werden als Befehl oder Programmcode ausgeführt statt als reine Daten. Oberbegriff für SQL-, Befehls- und andere Einschleusungen.
+Beispiel: Ein Dateiname wird mit eval verarbeitet.
+
+== IP-Adresse
+Die „Hausnummer“ eines Rechners im Netz. Kann im Lauf des Tages an verschiedene Geräte vergeben werden.
+Beispiel: 10.20.5.17
+
+== Kernel-Thread
+Interne Aufgabe des Betriebssystems, z. B. [kworker/0:1]. Gehört immer root – nie einem normalen Konto.
+Beispiel: ps -eo user,args
+
+== Least Privilege
+Jeder bekommt nur die Rechte, die er wirklich braucht.
+Beispiel: Ein Webdienst läuft nicht als root.
+
+== Log / Protokoll
+Mitschrift, was auf einem System passiert. Erste Anlaufstelle bei Vorfällen.
+Beispiel: /var/log/auth.log
+
+== Path Traversal
+Mit ../ aus einem erlaubten Ordner ausbrechen und fremde Dateien lesen.
+Beispiel: ?name=../../etc/passwd
+
+== PATH
+Liste der Ordner, in denen die Shell nach Programmen sucht – von links nach rechts. Ein fremder Ordner vorne kann echte Befehle „überdecken“.
+Beispiel: echo $PATH ; type ls
+
+== Persistenz
+Wie sich ein Angreifer festsetzt, damit er nach Neustart oder Abmelden wieder da ist.
+Beispiel: Eine Zeile in ~/.bashrc oder ein Cronjob.
+
+== Pivoting
+Von einem übernommenen Rechner aus weitere Rechner im inneren Netz angreifen.
+Beispiel: Rechner A sieht B, du siehst nur A.
+
+== Port
+Eine „Tür“ an einem Rechner, hinter der ein Dienst lauscht.
+Beispiel: ss -tln zeigt offene Ports.
+
+== Prozess
+Ein laufendes Programm. Hat eine Nummer (PID) und gehört einem Konto.
+Beispiel: ps aux ; kill PID
+
+== Rate Limit
+Begrenzung, wie oft man etwas in kurzer Zeit versuchen darf.
+Beispiel: Nach 5 falschen PINs 2 Minuten Sperre.
+
+== Rechte (rwx)
+Wer darf lesen (r), schreiben (w), ausführen (x)? Je für Besitzer, Gruppe, alle anderen.
+Beispiel: chmod 600 datei = nur ich lesen/schreiben
+
+== Reverse Engineering
+Ein Programm untersuchen, ohne den Quelltext zu haben, um zu verstehen, was es tut.
+Beispiel: strings programm
+
+== robots.txt
+Datei, die Suchmaschinen sagt, was sie NICHT ansehen sollen – und Neugierigen damit, wo es spannend wird.
+Beispiel: curl http://localhost/robots.txt
+
+== Scope
+Der schriftlich erlaubte Bereich eines Tests. Alles außerhalb ist tabu – auch wenn es technisch ginge.
+Beispiel: Nur localhost, nur dieses Lab.
+
+== Session
+Eine Anmeldung, die über mehrere Anfragen erhalten bleibt – meist über ein Cookie.
+Beispiel: Cookie „sitzung=…“
+
+== setuid
+Programm läuft mit den Rechten seines Besitzers statt des Aufrufers. Mächtig und gefährlich.
+Beispiel: ls -l zeigt ein „s“ statt „x“.
+
+== Shell
+Die Kommandozeile, in die du Befehle tippst (hier: bash).
+Beispiel: echo $SHELL
+
+== SQL
+Sprache für Datenbanken: Daten abfragen, ändern, verknüpfen.
+Beispiel: SELECT name FROM produkte
+
+== SQL-Injection
+Eingaben werden direkt in eine SQL-Abfrage geklebt und verändern sie. Schutz: vorbereitete Abfragen mit Platzhaltern.
+Beispiel: Eine Suche liefert plötzlich Daten aus einer anderen Tabelle.
+
+== SSH
+Sichere Fernanmeldung an einem Rechner – mit Passwort oder Schlüssel.
+Beispiel: ssh name@localhost
+
+== SSH-Schlüssel
+Schlüsselpaar: privat (geheim, bei dir) und öffentlich (auf dem Server in authorized_keys). Wer den privaten hat, kommt rein.
+Beispiel: ~/.ssh/authorized_keys
+
+== Steganografie
+Daten so verstecken, dass niemand ahnt, dass dort etwas ist.
+Beispiel: Eine Nachricht in einem Bild.
+
+== Threat Hunting
+Aktive Suche nach Angreifern, die schon im System sind.
+Beispiel: Ungewöhnliche Prozesse, Autostarts, Verbindungen prüfen.
+
+== Timeline
+Zeitliche Abfolge aller Ereignisse eines Vorfalls – aus mehreren Protokollen zusammengesetzt.
+Beispiel: Erst Brute Force, dann Login, dann Download.
+
+== Unix-Zeitstempel
+Sekunden seit 1.1.1970 (UTC). Umrechnen: date -u -d @SEKUNDEN
+Beispiel: date -u -d @1700000000
+
+== UTC / Zeitzone
+UTC ist die Weltzeit. Deutschland ist im Winter UTC+1 (MEZ). Protokolle mischen das gern.
+Beispiel: 23:58 MEZ = 22:58 UTC
+
+== Verschlüsselung
+Daten unlesbar machen – nur mit dem richtigen Schlüssel wieder lesbar.
+Beispiel: openssl enc -d -aes-256-cbc -pbkdf2 …
+
+== Wortliste
+Liste wahrscheinlicher Passwörter zum Ausprobieren gegen Hashes oder Logins.
+Beispiel: Häufigste Passwörter, Namen, Jahreszahlen.

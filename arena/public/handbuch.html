@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Handbuch · Arena · Nachtfalter</title>
+<link rel="stylesheet" href="arena.css">
+</head>
+<body class="handbuch">
+  <header>
+    <b>Nachtfalter <span class="lime">Hacklab</span> · Handbuch</b>
+    <span class="noprint"><a class="btn ghost" href="./">← Arena</a> <button class="btn ghost" id="drucken">🖨️ Drucken / PDF</button></span>
+  </header>
+  <main>
+    <nav class="tabs noprint" id="tabs">
+      <button data-tab="begriffe">📖 Begriffe</button><button data-tab="befehle">⌨️ Befehle</button><button data-tab="handouts">📄 Handouts</button>
+    </nav>
+    <section id="begriffe" class="card" hidden>
+      <h1>Begriffe</h1>
+      <input id="suche" class="noprint" type="search" placeholder="Suchen … z. B. Injection, Hash, PATH" autocomplete="off">
+      <dl id="liste"></dl>
+    </section>
+    <section id="befehle" class="card" hidden>
+      <h1>Befehle</h1>
+      <p class="small muted">In jedem Lab gibt es außerdem <code>hilfe</code> (Befehle für dieses Lab) und <code>begriff WORT</code> (Begriff erklären).</p>
+      <table id="cmds"></table>
+    </section>
+    <section id="handouts" hidden>
+      <div class="card noprint"><h1>Handouts</h1><p class="small muted">Ein Blatt pro Arena: Ziel, Begriffe, Werkzeuge, Vorgehen und Schutz im echten Leben. Ohne Lösungen.</p>
+        <label>Arena<select id="wahl"><option value="">Alle Arenen</option></select></label></div>
+      <div id="blaetter"></div>
+    </section>
+  </main>
+  <script src="handbuch-daten.js"></script>
+  <script src="handbuch.js"></script>
+</body>
+</html>

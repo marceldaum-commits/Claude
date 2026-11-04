@@ -7,6 +7,9 @@ RUN apt-get update \
       curl xxd gzip less nano file ca-certificates \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /run/sshd
+COPY nachtfalter-hilfe /usr/local/share/nachtfalter
+RUN install -m 755 /usr/local/share/nachtfalter/begriff /usr/local/share/nachtfalter/hilfe /usr/local/bin/ \
+ && chmod 644 /usr/local/share/nachtfalter/*.txt
 COPY setup.sh /opt/lab/setup.sh
 RUN chmod 700 /opt/lab/setup.sh
 ENTRYPOINT ["/opt/lab/setup.sh"]
