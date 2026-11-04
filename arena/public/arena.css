@@ -61,3 +61,4 @@ details.klein summary { cursor: pointer; color: var(--muted); font-size: .9rem; 
   .handbuch dl dt, .lime { color: #000 !important; }
   code { color: #000 !important; background: #eee !important; }
 }
+.stufe.Meister { color: #fbbf24; border-color: rgba(251,191,36,.7); background: rgba(251,191,36,.08); }

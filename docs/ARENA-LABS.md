@@ -2,12 +2,13 @@
 
 > Automatisch erzeugt aus `arena/server.js` mit `node tools/arena-uebersicht.mjs`. Nicht von Hand ändern.
 
-Insgesamt **13 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
+Insgesamt **14 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
 
 ## 🗝️ Hacken
 
 | Arena | Stufe | Codes | Zugang | Themen |
 |---|---|---|---|---|
+| **Der Meister: Das Rechenzentrum** | Meister | 6 | Profi | #Pivoting #Exploitation #Netzwerk #Linux |
 | **Der Kellerserver** | Einsteiger | 10 | Arena | #Linux #Rechte #Passwörter |
 | **Die Leitstelle** | Fortgeschritten | 6 | Profi | #Netzwerk #Dienste #Linux |
 | **Der Webshop** | Fortgeschritten | 6 | Profi | #Web #Injection |
@@ -16,6 +17,7 @@ Insgesamt **13 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 | **Web 2: Umwege** | Experte | 6 | Profi | #Web #Injection #Netzwerk |
 | **Web 3: Die Kette** | Extrem | 6 | Profi | #Web #Injection |
 
+- **Der Meister: Das Rechenzentrum** (Meister): Die Königsklasse: durch ein simuliertes internes Netz (mehrere Konten = Maschinen) bis zum Kern pivotieren – Hash knacken, echter Buffer Overflow (ret2win), Rechteausweitung bis root.
 - **Der Kellerserver** (Einsteiger): Ein alter Firmenserver: Arbeite dich Konto für Konto bis zum Chef durch – versteckte Dateien, Verläufe, Rechte, Schlüssel.
 - **Die Leitstelle** (Fortgeschritten): Netzwerk & Dienste: offene Ports finden, mit Diensten sprechen, versteckte Web-Bereiche, eigenes Protokoll, Protokolle auswerten, unsichere Automatik.
 - **Der Webshop** (Fortgeschritten): Web-Hacking mit curl: vergessener Testzugang, fremde Bestellungen, Rollen-Cookie fälschen, SQL-Injection, Befehle einschleusen, Signatur selbst bauen.

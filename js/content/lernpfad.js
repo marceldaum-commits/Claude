@@ -168,4 +168,19 @@ export const LERNPFAD = [
     selbst: ['Spiele die Reihe „Angriff!“ – Stufe 1, dann 2, dann 3 (Extrem).'],
     uebung: { label: 'Arena: Angriff! Stufe 1', href: 'arena:abwehr1', erfordert: { arena: 'abwehr1', level: 5 }, hinweis: 'Wehre alle 5 Wellen in Angriff! Stufe 1 ab.' },
   },
+  {
+    id: 's11', icon: '🏆', titel: 'Meister: das ganze Rechenzentrum',
+    einleitung: 'Die Abschlussprüfung. Jetzt kommt alles zusammen: Du verschaffst dir Zugang, pivotierst durch ein simuliertes internes Netz von Maschine zu Maschine, knackst einen Passwort-Hash, überlistest einen Dienst mit einem echten Buffer Overflow und arbeitest dich bis root durch.',
+    konzepte: [
+      ['Pivoting', 'Von einem übernommenen Rechner aus die nächsten im inneren Netz angreifen.'],
+      ['Buffer Overflow', 'Zu viele Daten in einen zu kleinen Puffer – man überschreibt die Rücksprungadresse und lenkt das Programm um (ret2win).'],
+      ['Eskalation', 'Über Fehlkonfigurationen vom kleinen Konto bis zu root.'],
+    ],
+    beispiel: {
+      text: 'Die Gewinn-Funktion und ein ret-Gadget finden, dann die Rücksprungadresse überschreiben:',
+      befehle: ['objdump -d pruefdienst | grep -A2 gewinn', 'python3 -c "import struct; print((b\'A\'*72+struct.pack(\'<Q\',WIN)).hex())"'],
+    },
+    selbst: ['Spiele „Der Meister: Das Rechenzentrum“. Nimm dir Zeit – das ist die härteste Arena.', 'Nutze das Handout und begriff pivoting / begriff buffer.'],
+    uebung: { label: 'Arena: Der Meister', href: 'arena:meister', erfordert: { arena: 'meister', level: 4 }, hinweis: 'Schaffe mindestens 4 der 6 Codes im Rechenzentrum.' },
+  },
 ];

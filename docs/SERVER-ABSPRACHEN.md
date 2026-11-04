@@ -131,3 +131,8 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
   versteckte Parameter, LFI, Backup, Header-Spoofing), Web 2 Umwege (Experte: SQLi-Login/UNION, SSRF, Mass Assignment,
   JWT alg=none, file://), Web 3 Die Kette (Extrem: SSTI, Deserialisierung, Race Condition, Blind-SQLi, SSRF-Bypass, XXE).
   Alle sechs Stufen je Lab durchgespielt. Jetzt 13 Arenen.
+- 2.33.0: Meister-Stufe „Der Meister: Das Rechenzentrum“ (neue Stufe „Meister“, Reihe Hacken): Pivoting durch ein
+  simuliertes internes Netz (ein abgeschotteter Container, Konten = Maschinen, KEIN Wächter-Eingriff), Hash knacken,
+  echter Buffer Overflow (ret2win über 127.0.0.1:9099, Dienst läuft als eigener Benutzer pruef – kein Abkürzen),
+  Rechteausweitung bis root über einen beschreibbaren Root-Skriptordner. 6 Codes, komplett durchgespielt.
+  Lernpfad-Abschlussstufe s11 ergänzt. Jetzt 14 Arenen.

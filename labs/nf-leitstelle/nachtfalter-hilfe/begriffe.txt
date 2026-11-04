@@ -14,6 +14,10 @@ Beispiel: Bestellung 1042 ist deine – darfst du auch 1001 sehen?
 Eine Umwandlung von Daten in lesbare Zeichen. Keine Verschlüsselung – jeder kann sie rückgängig machen.
 Beispiel: echo SGFsbG8= | base64 -d  →  Hallo
 
+== Buffer Overflow
+Zu viele Daten in einen zu kleinen Puffer schreiben. Man überschreibt die Rücksprungadresse und lenkt das Programm um – z. B. auf eine versteckte Funktion (ret2win).
+Beispiel: puffer[64], aber read(…, 256) – 72 Bytes bis zur Rücksprungadresse.
+
 == Brute Force
 Ausprobieren sehr vieler Passwörter oder PINs, bis eines passt. Schutz: lange Passwörter, Sperre nach Fehlversuchen.
 Beispiel: Viele „Failed password“ von derselben IP im auth.log.
