@@ -65,3 +65,12 @@ ersten Server am 03.11. eingerichtet hat. Hier angepasst an Nachtfalter (Arena, 
   (bzw. `vorschau.conf`).
 - Vorschau-Passwort: `htpasswd -c /etc/nachtfalter-web/vorschau.htpasswd marcel` (als root; Passwort nur dort tippen,
   in Bitwarden ablegen). Das Skript setzt die Rechte so, dass nginx die Datei lesen kann.
+
+## Zentrale (ab 04.11.2026)
+
+- **zentrale.nachtfalter.tech**: Kundenverwaltung (`zentrale/`, gebaut mit `tools/build-zentrale.sh`, eigene strenge Header in
+  `zentrale/_headers`). Plesk-Anweisung: `location ~ ^/ { include /etc/nachtfalter-web/zentrale.con[f]; }`
+  (`[f]` = Muster, damit Plesk nicht meckert, solange die Datei noch fehlt).
+- Vorschau der Zentrale: `vorschau.nachtfalter.tech/zentrale/` (aus dem Arbeits-Branch, im Vorschau-Baustein eingebunden).
+- Rechte: Edge Function `admin` prüft Anmeldung + Tabelle `admins` („Verwaltung“); jede Änderung landet in `admin_log`,
+  Notizen in `kunden_notizen` (beide ohne Policies, nur für den Dienst).
