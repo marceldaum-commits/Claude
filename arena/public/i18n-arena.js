@@ -21,13 +21,31 @@
     const l = aktuell();
     const box = document.getElementById('sprache'); if (!box) return;
     box.setAttribute('translate', 'no');
-    box.innerHTML = Object.entries(LANGS).map(([k, v]) => `<button class="${k === l ? 'an' : ''}" data-l="${k}">${v.flag} ${v.name}</button>`).join('');
+    box.innerHTML = `<span class="sprachlabel">🌐 Sprache / Language:</span>` +
+      Object.entries(LANGS).map(([k, v]) => `<button class="${k === l ? 'an' : ''}" data-l="${k}">${v.flag} ${v.name}</button>`).join('');
     box.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { if (b.dataset.l !== l || !gewaehlt()) setze(b.dataset.l); });
     if (!gewaehlt() && l !== 'de') {
       const n = document.createElement('p'); n.className = 'small muted'; n.id = 'sprachhinweis';
       n.textContent = { en: 'Language from your phone. Tap your language again to translate the rest automatically (Google).', uk: 'Мову взято з телефона. Натисни мову ще раз для авто-перекладу решти (Google).' }[l];
       box.after(n);
     }
+  }
+  // Auffälliger Hinweis ganz oben – nur wenn das Handy nicht auf Deutsch steht und noch nichts gewählt wurde.
+  function banner() {
+    if (gewaehlt()) return;
+    const l = geraeteSprache(); if (l === 'de') return;
+    const host = document.querySelector('header'); if (!host || document.getElementById('sprachbanner')) return;
+    const txt = { en: 'This page is in German.', uk: 'Ця сторінка німецькою.' }[l];
+    const btn = { en: `Switch to English`, uk: `Перейти українською` }[l];
+    const zu = { en: 'Keep German', uk: 'Залишити німецькою' }[l];
+    const bar = document.createElement('div');
+    bar.id = 'sprachbanner'; bar.className = 'sprachbanner'; bar.setAttribute('translate', 'no');
+    bar.innerHTML = `<span>🌐 ${txt}</span>
+      <button class="go" data-l="${l}">${LANGS[l].flag} ${btn} →</button>
+      <button class="zu" data-l="de">${zu}</button>`;
+    host.after(bar);
+    bar.querySelector('.go').onclick = () => setze(l);
+    bar.querySelector('.zu').onclick = () => setze('de');
   }
   function initGoogle() {
     const l = aktuell();
@@ -39,6 +57,6 @@
     const s = document.createElement('script'); s.src = 'https://translate.google.com/translate_a/element.js?cb=arenaGtInit'; document.head.appendChild(s);
   }
   window.ArenaI18n = { picker, aktuell };
-  if (document.readyState !== 'loading') { picker(); initGoogle(); }
-  else document.addEventListener('DOMContentLoaded', () => { picker(); initGoogle(); });
+  if (document.readyState !== 'loading') { banner(); picker(); initGoogle(); }
+  else document.addEventListener('DOMContentLoaded', () => { banner(); picker(); initGoogle(); });
 })();

@@ -68,3 +68,9 @@ details.klein summary { cursor: pointer; color: var(--muted); font-size: .9rem; 
 .kizeile.user { color: var(--text); }
 .kizeile.assistant { color: var(--lime); }
 #kiprem select { min-height: 40px; }
+/* Sprach-Banner oben + Umschalter-Label */
+.sprachbanner { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .6rem 1rem; background: linear-gradient(90deg, rgba(139,92,246,.18), rgba(182,242,60,.12)); border-bottom: 1px solid var(--line); }
+.sprachbanner span { font-weight: 600; margin-right: .2rem; }
+.sprachbanner .go { background: var(--lime); color: #111; border: 0; border-radius: 999px; padding: .45rem .9rem; font-weight: 700; font-size: .9rem; cursor: pointer; min-height: 38px; }
+.sprachbanner .zu { background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .45rem .8rem; font-size: .85rem; cursor: pointer; min-height: 38px; }
+.sprachlabel { display: inline-flex; align-items: center; font-size: .82rem; color: var(--muted); margin-right: .2rem; }
