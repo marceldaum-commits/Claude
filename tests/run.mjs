@@ -576,7 +576,8 @@ t('Externe Lernpfade: vollständig, Vorbereitungen existieren, Sync behält Hake
 t('W2 Kellerserver: Codes und Scope', () => {
   const sh = readFileSync(join(ROOT, 'labs/kly-keller/setup.sh'), 'utf8');
   const df = readFileSync(join(ROOT, 'labs/kly-keller/Dockerfile'), 'utf8');
-  ok(/sha256sum \| cut -c1-16/.test(sh) && sh.includes('$TOKEN:w2:$1'), 'Code-Formel wie flags.js');
+  // Ohne Arena-Salz (eigenes Kali) wird der Token benutzt → gleiche Codes wie in der App (flags.js)
+  ok(/sha256sum \| cut -c1-16/.test(sh) && sh.includes('$SALZ:w2:$1') && sh.includes('|| SALZ="$TOKEN"'), 'Code-Formel wie flags.js');
   ok(sh.includes('PermitRootLogin no') && sh.includes('AllowTcpForwarding no'), 'SSH gehärtet');
   ok(df.includes('-p 127.0.0.1:2220:22'), 'Startbefehl nur Loopback');
   const w2 = ROOMS.find(x => x.id === 'w2'); eq(w2.tasks.length, 10);
