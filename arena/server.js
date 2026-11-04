@@ -122,6 +122,10 @@ const LABS = {
     produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 5, praefix: 'versteck',
     kurz: 'Steganografie: versteckte Daten finden – hinter Bildern, in Archiven, in Leerzeichen und im niederwertigsten Bit von Pixeln.',
     hello: hallo('Das Versteck', 'sucher', 'Auftrag: cat ~/auftrag.txt   ·   Dateien: ~/fundstuecke/   ·   begriff steganografie') },
+  ki: { image: env('KI_IMAGE', 'nf-ki'), user: 'hacker', ready: 'Flüsterer bereit', title: 'Der Flüsterer', host: 'ki-assistent',
+    produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'ki',
+    kurz: 'KI-Sicherheit: einen lokalen KI-Assistenten per Prompt Injection austricksen, damit er sein geheimes Codewort verrät – durch sechs immer strengere Schutzregeln.',
+    hello: hallo('Der Flüsterer', 'hacker', 'Auftrag: cat ~/auftrag.txt   ·   Reden: ki 1 "Hallo"   ·   begriff prompt injection') },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -138,6 +142,7 @@ const EINORDNUNG = {
   werkstatt: ['Hacken', ['Reverse', 'Binär']],
   chiffren: ['Hacken', ['Krypto']],
   versteck: ['Ermitteln', ['Steganografie', 'Forensik']],
+  ki: ['Hacken', ['KI-Sicherheit', 'Prompt Injection']],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};

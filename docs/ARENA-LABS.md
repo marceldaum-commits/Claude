@@ -2,7 +2,7 @@
 
 > Automatisch erzeugt aus `arena/server.js` mit `node tools/arena-uebersicht.mjs`. Nicht von Hand ändern.
 
-Insgesamt **19 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
+Insgesamt **20 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
 
 ## 🗝️ Hacken
 
@@ -17,6 +17,7 @@ Insgesamt **19 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 | **Der Tresor** | Experte | 6 | Profi | #Krypto #Web #Linux |
 | **Web 2: Umwege** | Experte | 6 | Profi | #Web #Injection #Netzwerk |
 | **Die Werkstatt** | Experte | 5 | Profi | #Reverse #Binär |
+| **Der Flüsterer** | Experte | 6 | Profi | #KI-Sicherheit #Prompt Injection |
 | **Web 3: Die Kette** | Extrem | 6 | Profi | #Web #Injection |
 
 - **Der Meister: Das Rechenzentrum** (Meister): Die Königsklasse: durch ein simuliertes internes Netz (mehrere Konten = Maschinen) bis zum Kern pivotieren – Hash knacken, echter Buffer Overflow (ret2win), Rechteausweitung bis root.
@@ -28,6 +29,7 @@ Insgesamt **19 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 - **Der Tresor** (Experte): Für Experten: Passwort-Hash knacken, Geheimnisse in Git und Logs, PATH-Falle, Pfad-Ausbruch in einer API, verschlüsselter Tresor.
 - **Web 2: Umwege** (Experte): Web mittel: SQL-Login umgehen, mit UNION fremde Tabellen lesen, SSRF auf interne Dienste, unsicheres Zusatzfeld, Token fälschen (JWT alg=none), file://.
 - **Die Werkstatt** (Experte): Reverse Engineering: fünf kleine Programme (Crackmes) ohne Quelltext knacken – mit strings, ltrace, objdump, gdb und einer selbst gebauten Keygen.
+- **Der Flüsterer** (Experte): KI-Sicherheit: einen lokalen KI-Assistenten per Prompt Injection austricksen, damit er sein geheimes Codewort verrät – durch sechs immer strengere Schutzregeln.
 - **Web 3: Die Kette** (Extrem): Web extrem: Template-Injection, unsichere Deserialisierung, Race Condition, Blind-SQL-Injection, SSRF mit umgangener Sperre, XXE.
 
 ## 🔍 Ermitteln

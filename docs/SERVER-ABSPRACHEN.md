@@ -158,3 +158,7 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - 2.40.0: Didaktik-Verbesserung aus Wettbewerbs-Kritik (TryHackMe/HTB): „Verstanden-Check“ pro Lernpfad-Stufe –
   eigener Mini-Bericht (Lücke + Schutz), dann Profi-Zusammenfassung; Notizen werden gespeichert/synchronisiert.
   Begründung in docs/DIDAKTIK.md.
+- 2.43.0: „Der Flüsterer“ (Reihe Hacken, Experte) – NEUE Methode KI-Sicherheit / Prompt Injection: lokaler,
+  regelbasierter KI-Assistent (kein Internet), 6 Stufen mit immer strengeren Schutzregeln (Stichwort-Sperre,
+  Umschreiben, Ausgabefilter, System-Prompt-Leak, Kombi). Secrets nur für den Bot-Benutzer lesbar. Durchgespielt.
+  Lernpfad-Stufe s17. Jetzt 20 Arenen, 18 Lernpfad-Stufen.
