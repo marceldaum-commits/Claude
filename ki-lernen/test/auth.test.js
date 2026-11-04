@@ -135,3 +135,31 @@ test('Härtung: JWKS-Ausfall → 503 ohne Schlüssel, mit alten Schlüsseln weit
   assert.equal(await auth.authenticate(req(sign(k2, good()))), null);
   assert.ok((await auth.authenticate(req(sign(k, good())))).id);
 });
+
+test('ohne Dienst-Schlüssel: Abfrage mit öffentlichem Schlüssel + Token des Nutzers (RLS), gesperrte Konten abgewiesen', async () => {
+  const k = keypair('k1');
+  const calls = [];
+  const fetchImpl = async (url, opts = {}) => {
+    calls.push({ url, headers: opts.headers || {} });
+    const json = (b) => ({ ok: true, status: 200, json: async () => b });
+    if (url.endsWith('jwks.json')) return json({ keys: [k.jwk] });
+    const uid = /(?:user_id|id)=eq\.([0-9a-f-]+)/.exec(url)[1];
+    if (url.includes('/entitlements')) return json([{ produkt: 'ki', gueltig_bis: future, ki_budget_usd: null }]);
+    if (url.includes('/profiles')) return json([{ display_name: 'Tom', gesperrt: uid === UID2 }]);
+    return json({});
+  };
+  const auth = createSupabaseAuth({ url: URL_, publishableKey: 'sb_publishable_x', serviceKey: '', defaultBudget: 2, fetchImpl });
+  const token = sign(k, good());
+  const u = await auth.authenticate(req(token));
+  assert.equal(u.name, 'Tom');
+  const rest = calls.find((c) => c.url.includes('/rest/v1/entitlements'));
+  assert.equal(rest.headers.apikey, 'sb_publishable_x');
+  assert.equal(rest.headers.Authorization, `Bearer ${token}`);
+  assert.match(calls.find((c) => c.url.includes('/profiles')).url, /select=display_name,gesperrt/);
+  assert.deepEqual(await auth.authenticate(req(sign(k, good(UID2)))), { noAccess: true, gesperrt: true });
+});
+
+test('Konfiguration: Supabase-Modus braucht URL und mindestens einen Schlüssel', () => {
+  assert.throws(() => createSupabaseAuth({ url: URL_, defaultBudget: 2 }), /SUPABASE_PUBLISHABLE_KEY/);
+  assert.throws(() => createSupabaseAuth({ publishableKey: 'x', defaultBudget: 2 }), /SUPABASE_URL/);
+});

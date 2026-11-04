@@ -45,7 +45,9 @@ Die Anmeldung steckt komplett in `auth.js` (`createAuth()` → `authenticate(req
 - `AUTH_MODE=supabase`: gemeinsames **Nachtfalter-Konto**. Der Browser meldet sich mit E-Mail + Passwort direkt
   bei Supabase an (öffentlicher Schlüssel) und schickt das Zugriffstoken mit; abgelaufene Tokens werden
   automatisch erneuert. Der Server prüft das Token selbst (ES256/RS256 über die JWKS des Projekts, Aussteller,
-  `aud=authenticated`, Ablauf) und liest mit dem geheimen Dienst-Schlüssel `entitlements`:
+  `aud=authenticated`, Ablauf) und liest dann `entitlements` und `profiles` **mit dem Token des Nutzers** und dem
+  öffentlichen Schlüssel (RLS: nur eigene Zeilen, wie die Arena) – ein geheimer Supabase-Schlüssel ist nicht nötig.
+  Gesperrte Konten (`profiles.gesperrt`) werden abgewiesen.
   Zugang nur bei `produkt in (ki, alles)` und `gueltig_bis` in der Zukunft (Ergebnis 60 s zwischengespeichert).
   Monatsbudget = größtes `ki_budget_usd` der gültigen Zugänge, sonst `BUDGET_USD_PER_CODE`.
   Ohne Zugang meldet die App „Dein Konto hat noch keinen Zugang“ (403).
@@ -67,6 +69,11 @@ Klartext, nur Hash-IDs bzw. `user:<uuid>`.
   springt zusätzlich automatisch ein Ersatzmodell ein (`fallbacks: "default"`); Haiku 5.5 hat das nicht.
 
 ## Einrichten auf dem Plesk-Server
+
+> Stand der Server-Einrichtung (Kali-Sitzung, siehe `docs/SERVER-ABSPRACHEN.md`): Code aus Branch `ki-live` nach
+> `/opt/nachtfalter/ki`, systemd-Dienst `nachtfalter-ki`, `127.0.0.1:8100`, Einstellungen in `/etc/nachtfalter/ki.env`
+> (prüfen mit `node tools/check-env.mjs /etc/nachtfalter/ki.env --online`). **Veröffentlichung erst nach Marcels Freigabe.**
+> Die Schritte unten beschreiben die Einrichtung allgemein.
 
 1. **Node.js 22 LTS** (mindestens 20.6 wegen `--env-file`) installieren (Plesk: Erweiterung „Node.js“ oder per Paketverwaltung).
 2. Code nach `~/ki-lernen` bringen (nur dieser Ordner aus dem Repo) und `npm ci --omit=dev` ausführen.

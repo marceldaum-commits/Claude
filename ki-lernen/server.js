@@ -23,7 +23,8 @@ const BUDGET_USD = Number(process.env.BUDGET_USD_PER_CODE || 2);
 const AUTH = createAuth(process.env, { budgetUsd: BUDGET_USD });
 const SUPABASE_URL = AUTH.kind === 'supabase' ? process.env.SUPABASE_URL.replace(/\/+$/, '') : '';
 
-const budget = new Budget(path.join(here, 'data', 'usage.json'), MODEL, BUDGET_USD);
+// DATA_DIR: beschreibbarer Ordner für den Verbrauch (auf dem Server z. B. /var/lib/nachtfalter-ki)
+const budget = new Budget(path.join(process.env.DATA_DIR || path.join(here, 'data'), 'usage.json'), MODEL, BUDGET_USD);
 const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
 
 // Grundregel für jede KI-Antwort: Sie läuft in einem Lernprogramm.
@@ -286,6 +287,7 @@ const server = http.createServer(async (req, res) => {
       }
       const user = await AUTH.authenticate(req);
       if (user?.blocked) return sendJson(res, 429, { error: msg('Zu viele falsche Codes. Bitte in 15 Minuten nochmal.') });
+      if (user?.gesperrt) return sendJson(res, 403, { error: msg('Dein Konto ist gesperrt.') });
       if (user?.noAccess) return sendJson(res, 403, { error: msg('Dein Konto hat noch keinen Zugang zur KI-Werkstatt.') });
       if (!user) {
         return sendJson(res, 401, { error: AUTH.kind === 'supabase' ? msg('Bitte melde dich mit deinem Nachtfalter-Konto an.') : msg('Bitte einen gültigen Einladungscode eingeben.') });

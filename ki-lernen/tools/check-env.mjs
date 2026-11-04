@@ -52,10 +52,16 @@ if (auth === 'codes') {
 } else {
   fmt('SUPABASE_URL', /^https:\/\/[a-z0-9]{20}\.supabase\.co\/?$/, 'https://<ref>.supabase.co');
   fmt('SUPABASE_PUBLISHABLE_KEY', /^(sb_publishable_[A-Za-z0-9_-]{10,}|eyJ[\w-]+\.[\w-]+\.[\w-]+)$/, 'sb_publishable_…');
-  fmt('SUPABASE_SERVICE_KEY', /^(sb_secret_[A-Za-z0-9_-]{10,}|eyJ[\w-]+\.[\w-]+\.[\w-]+)$/, 'sb_secret_…');
+  if (has('SUPABASE_SERVICE_KEY')) fmt('SUPABASE_SERVICE_KEY', /^(sb_secret_[A-Za-z0-9_-]{10,}|eyJ[\w-]+\.[\w-]+\.[\w-]+)$/, 'sb_secret_…');
+  else line('✓', 'SUPABASE_SERVICE_KEY', 'leer – Zugänge werden mit dem Token des Nutzers gelesen (empfohlen)');
   if (env.SUPABASE_SERVICE_KEY && env.SUPABASE_SERVICE_KEY === env.SUPABASE_PUBLISHABLE_KEY) line('✗', 'SUPABASE_SERVICE_KEY', 'ist derselbe wie der öffentliche Schlüssel');
   if (/^sb_publishable_/.test(env.SUPABASE_SERVICE_KEY || '')) line('✗', 'SUPABASE_SERVICE_KEY', 'ist ein öffentlicher Schlüssel – hier gehört sb_secret_… hin');
   line(has('ACCOUNT_URL') ? '✓' : '⚠', 'ACCOUNT_URL', has('ACCOUNT_URL') ? env.ACCOUNT_URL : 'leer – kein Registrier-Link');
+}
+if (has('DATA_DIR')) {
+  let w = false;
+  try { fs.accessSync(env.DATA_DIR, fs.constants.W_OK); w = true; } catch { /* */ }
+  line(w ? '✓' : '✗', 'DATA_DIR', `${env.DATA_DIR}${w ? '' : ' – nicht beschreibbar'}`);
 }
 
 if (online) {
@@ -70,6 +76,10 @@ if (online) {
     const base = env.SUPABASE_URL.replace(/\/+$/, '');
     const j = await fetch(`${base}/auth/v1/.well-known/jwks.json`).catch((e) => ({ ok: false, status: e.message }));
     line(j.ok ? '✓' : '✗', 'Supabase JWKS', j.ok ? 'erreichbar' : `nicht erreichbar (${j.status})`);
+    if (has('SUPABASE_PUBLISHABLE_KEY')) {
+      const e = await fetch(`${base}/rest/v1/entitlements?select=id&limit=1`, { headers: { apikey: env.SUPABASE_PUBLISHABLE_KEY } }).catch((x) => ({ ok: false, status: x.message }));
+      line(e.ok ? '✓' : '✗', 'Öffentlicher Schlüssel', e.ok ? 'gültig (ohne Anmeldung keine Zeilen sichtbar)' : `abgelehnt (${e.status})`);
+    }
     if (has('SUPABASE_SERVICE_KEY')) {
       const h = { apikey: env.SUPABASE_SERVICE_KEY };
       if (env.SUPABASE_SERVICE_KEY.startsWith('eyJ')) h.Authorization = `Bearer ${env.SUPABASE_SERVICE_KEY}`;

@@ -4,7 +4,7 @@
 //   authenticate(req) → { id, name, budgetUsd? }  angemeldet und berechtigt (budgetUsd: eigenes Monatsbudget) (id ist stabil und enthält kein Geheimnis;
 //                                        Budget, Rate-Limit und Parallel-Bremse hängen an id)
 //                     → { blocked: true } zu viele Fehlversuche von dieser IP
-//                     → { noAccess: true }  angemeldet, aber ohne gültigen Zugang (Konto-Modus)
+//                     → { noAccess: true[, gesperrt: true] }  angemeldet, aber ohne gültigen Zugang bzw. gesperrt
 //                     → null              nicht angemeldet
 // authenticate darf ein Promise liefern.
 //
@@ -118,8 +118,12 @@ export function verifyJwt(token, keys, { issuer, audience, now = Date.now() / 10
   return payload;
 }
 
-export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl = fetch }) {
-  if (!url || !serviceKey) throw new Error('AUTH_MODE=supabase braucht SUPABASE_URL und SUPABASE_SERVICE_KEY in .env');
+// Zugänge lesen: bevorzugt OHNE Geheimschlüssel – mit dem Token des Nutzers und dem öffentlichen Schlüssel;
+// RLS lässt jeden nur seine eigenen Zeilen sehen (wie die Arena). Optional mit Dienst-Schlüssel (serviceKey).
+export function createSupabaseAuth({ url, publishableKey, serviceKey, defaultBudget, fetchImpl = fetch }) {
+  if (!url || !(publishableKey || serviceKey)) {
+    throw new Error('AUTH_MODE=supabase braucht SUPABASE_URL und SUPABASE_PUBLISHABLE_KEY (oder SUPABASE_SERVICE_KEY)');
+  }
   const base = url.replace(/\/+$/, '');
   const issuer = `${base}/auth/v1`;
   let keys = new Map();
@@ -153,9 +157,16 @@ export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl =
     keysAt = Date.now();
   }
 
-  // Neue Supabase-Schlüssel (sb_secret_…) nur als apikey; alte service_role-JWTs zusätzlich als Bearer.
-  const headers = { apikey: serviceKey, Accept: 'application/json' };
-  if (serviceKey.startsWith('eyJ')) headers.Authorization = `Bearer ${serviceKey}`;
+  // Mit Dienst-Schlüssel: sb_secret_… nur als apikey, alter service_role-JWT zusätzlich als Bearer.
+  // Ohne: öffentlicher Schlüssel als apikey + Token des Nutzers als Bearer (RLS: nur eigene Zeilen).
+  const headersFor = (token) => {
+    if (serviceKey) {
+      const h = { apikey: serviceKey, Accept: 'application/json' };
+      if (serviceKey.startsWith('eyJ')) h.Authorization = `Bearer ${serviceKey}`;
+      return h;
+    }
+    return { apikey: publishableKey, Authorization: `Bearer ${token}`, Accept: 'application/json' };
+  };
 
   const unavailable = () => Object.assign(new Error('Die Anmeldung ist gerade nicht erreichbar. Bitte gleich nochmal versuchen.'), { status: 503 });
   // 4) Zugangs-Cache mit Obergrenze: abgelaufene Einträge zuerst, sonst die ältesten entfernen
@@ -169,11 +180,12 @@ export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl =
     }
     cache.set(userId, { until: Date.now() + 60_000, value });
   }
-  async function lookup(userId) {
+  async function lookup(userId, token) {
     const hit = cache.get(userId);
     if (hit && hit.until > Date.now()) return hit.value;
     const now = new Date().toISOString();
-    const q = (path) => fetchImpl(`${base}/rest/v1/${path}`, { headers }).then((r) => {
+    const headers = headersFor(token);
+    const q = (path) => fetchImpl(`${base}/rest/v1/${path}`, { headers, signal: AbortSignal.timeout(6000) }).then((r) => {
       if (!r.ok) throw new Error(`Supabase ${r.status}`);
       return r.json();
     }).catch((err) => {
@@ -182,10 +194,11 @@ export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl =
     });
     const [ents, profs] = await Promise.all([
       q(`entitlements?select=produkt,gueltig_bis,ki_budget_usd&user_id=eq.${userId}&produkt=in.(ki,alles)&gueltig_bis=gt.${encodeURIComponent(now)}`),
-      q(`profiles?select=display_name&id=eq.${userId}`),
+      q(`profiles?select=display_name,gesperrt&id=eq.${userId}`),
     ]);
     let value = null;
-    if (ents.length) {
+    if (profs[0]?.gesperrt) value = { gesperrt: true };
+    else if (ents.length) {
       const budgets = ents.map((e) => e.ki_budget_usd).filter((b) => b !== null && b !== undefined).map(Number);
       value = {
         budgetUsd: budgets.length ? Math.max(...budgets) : defaultBudget,
@@ -216,7 +229,8 @@ export function createSupabaseAuth({ url, serviceKey, defaultBudget, fetchImpl =
         }
       }
       if (!claims) return null;
-      const ent = await lookup(claims.sub);
+      const ent = await lookup(claims.sub, m[1]);
+      if (ent?.gesperrt) return { noAccess: true, gesperrt: true };
       if (!ent) return { noAccess: true };
       return { id: `user:${claims.sub}`, name: ent.name || 'Nachtfalter', budgetUsd: ent.budgetUsd, until: ent.until };
     },
@@ -228,7 +242,12 @@ export function createAuth(env = process.env, defaults = {}) {
   const mode = env.AUTH_MODE || 'codes';
   if (mode === 'codes') return createCodeAuth(parseCodes(env.INVITE_CODES));
   if (mode === 'supabase') {
-    return createSupabaseAuth({ url: env.SUPABASE_URL, serviceKey: env.SUPABASE_SERVICE_KEY, defaultBudget: defaults.budgetUsd });
+    return createSupabaseAuth({
+      url: env.SUPABASE_URL,
+      publishableKey: env.SUPABASE_PUBLISHABLE_KEY,
+      serviceKey: env.SUPABASE_SERVICE_KEY || '',
+      defaultBudget: defaults.budgetUsd,
+    });
   }
   throw new Error(`Unbekannter AUTH_MODE=${mode} (erlaubt: codes, supabase)`);
 }
