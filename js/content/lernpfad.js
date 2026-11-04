@@ -198,4 +198,19 @@ export const LERNPFAD = [
     selbst: ['Spiele „Das Duell: Mann gegen Maschine“. Je schneller du schließt, desto weniger Treffer landet der Gegner.'],
     uebung: { label: 'Arena: Das Duell', href: 'arena:duell', erfordert: { arena: 'duell', level: 6 }, hinweis: 'Mach im Duell alle 6 Lücken dicht.' },
   },
+  {
+    id: 's13', icon: '🧵', titel: 'Netzwerk-Forensik: den Mitschnitt lesen',
+    einleitung: 'Eine neue Methode: Statt Dateien auf einem Rechner liest du jetzt den Netzwerkverkehr selbst – einen Mitschnitt (pcap). So sieht man Logins, Downloads und heimliche Verbindungen „auf der Leitung“.',
+    konzepte: [
+      ['Exfiltration', 'Heimliches Hinausschaffen von Daten – im Verkehr oft gut sichtbar.'],
+      ['DNS', 'Auffällig viele oder seltsame DNS-Namen verraten eine Ausleitung.'],
+      ['Base64', 'Versteckte Kommandos sind oft base64-kodiert.'],
+    ],
+    beispiel: {
+      text: 'Mit tshark (Wireshark für die Kommandozeile) HTTP-POSTs und DNS ansehen:',
+      befehle: ['tshark -r mitschnitt.pcap -Y http.request', 'tshark -r mitschnitt.pcap -Y dns -T fields -e dns.qry.name | sort | uniq -c'],
+    },
+    selbst: ['Spiele „Der Mitschnitt“. Das Handout zeigt die passenden tshark-Filter.'],
+    uebung: { label: 'Arena: Der Mitschnitt', href: 'arena:mitschnitt', erfordert: { arena: 'mitschnitt', level: 4 }, hinweis: 'Beantworte mindestens 4 der 5 Fragen zum Mitschnitt.' },
+  },
 ];

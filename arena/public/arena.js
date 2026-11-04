@@ -80,7 +80,7 @@
   function anfrageStatus(produkt) { return anfragen.find(x => x.produkt === produkt) || null; }
 
   // Empfohlene Reihenfolge je Reihe: Hacken (Keller → …), Ermitteln (Spurensuche → Einbruch → Maulwurf), Abwehren (Angriff! 1 → 2 → 3)
-  const VORHER = { leitstelle: 'keller', webshop: 'keller', tresor: 'leitstelle', einbruch: 'spuren', maulwurf: 'einbruch', abwehr2: 'abwehr1', abwehr3: 'abwehr2', web2: 'web1', web3: 'web2', meister: 'web3', duell: 'abwehr3' };
+  const VORHER = { leitstelle: 'keller', webshop: 'keller', tresor: 'leitstelle', einbruch: 'spuren', maulwurf: 'einbruch', abwehr2: 'abwehr1', abwehr3: 'abwehr2', web2: 'web1', web3: 'web2', meister: 'web3', duell: 'abwehr3', mitschnitt: 'spuren' };
 
   // ---------------------------------------------------------------- Register (Filter nach Reihe, Stufe, Thema)
   const REIHEN = { Hacken: '🗝️ Hacken', Ermitteln: '🔍 Ermitteln', Abwehren: '🛡️ Abwehren' };

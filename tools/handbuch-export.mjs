@@ -6,8 +6,8 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 require('../arena/public/handbuch-daten.js');
 const { BEGRIFFE, BEFEHLE, HANDOUTS } = globalThis.NF_HANDBUCH;
-const ORDNER = { keller: 'kly-keller', leitstelle: 'nf-leitstelle', webshop: 'nf-webshop', tresor: 'nf-tresor', spuren: 'nf-spuren', einbruch: 'nf-einbruch', maulwurf: 'nf-maulwurf', meister: 'nf-meister', duell: 'nf-duell', web1: 'nf-web1', web2: 'nf-web2', web3: 'nf-web3', abwehr1: 'nf-abwehr1', abwehr2: 'nf-abwehr2', abwehr3: 'nf-abwehr3' };
-const TITEL = { keller: 'Der Kellerserver', leitstelle: 'Die Leitstelle', webshop: 'Der Webshop', tresor: 'Der Tresor', spuren: 'Die Spurensuche', einbruch: 'Der Einbruch', maulwurf: 'Der Maulwurf', meister: 'Der Meister: Das Rechenzentrum', duell: 'Das Duell: Mann gegen Maschine', web1: 'Web 1: Das Kleingedruckte', web2: 'Web 2: Umwege', web3: 'Web 3: Die Kette', abwehr1: 'Angriff! Offene Türen', abwehr2: 'Angriff! Die Hintertür', abwehr3: 'Angriff! Der Profi' };
+const ORDNER = { keller: 'kly-keller', leitstelle: 'nf-leitstelle', webshop: 'nf-webshop', tresor: 'nf-tresor', spuren: 'nf-spuren', einbruch: 'nf-einbruch', maulwurf: 'nf-maulwurf', meister: 'nf-meister', duell: 'nf-duell', mitschnitt: 'nf-mitschnitt', web1: 'nf-web1', web2: 'nf-web2', web3: 'nf-web3', abwehr1: 'nf-abwehr1', abwehr2: 'nf-abwehr2', abwehr3: 'nf-abwehr3' };
+const TITEL = { keller: 'Der Kellerserver', leitstelle: 'Die Leitstelle', webshop: 'Der Webshop', tresor: 'Der Tresor', spuren: 'Die Spurensuche', einbruch: 'Der Einbruch', maulwurf: 'Der Maulwurf', meister: 'Der Meister: Das Rechenzentrum', duell: 'Das Duell: Mann gegen Maschine', mitschnitt: 'Der Mitschnitt', web1: 'Web 1: Das Kleingedruckte', web2: 'Web 2: Umwege', web3: 'Web 3: Die Kette', abwehr1: 'Angriff! Offene Türen', abwehr2: 'Angriff! Die Hintertür', abwehr3: 'Angriff! Der Profi' };
 const begriffe = BEGRIFFE.map(([t, e, b]) => `== ${t}\n${e}\n${b ? `Beispiel: ${b}\n` : ''}`).join('\n');
 const BEGRIFF_SH = `#!/bin/bash
 # begriff WORT – erklärt einen Begriff aus dem Nachtfalter-Handbuch (ohne WORT: alle Begriffe auflisten)

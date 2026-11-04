@@ -106,6 +106,10 @@ const LABS = {
     produkt: 'arena-profi', stufe: 'Extrem', levels: 6, praefix: 'duell', tmpfs: { '/srv/app': 'rw,exec,nosuid,size=16m' },
     kurz: 'Ein lebendiger Gegner: Der Hacker-Bot prüft live, welche Lücken offen sind, greift eine zufällige davon an und wird immer schneller. Mach alles dicht – jede geschlossene Lücke gibt einen Code.',
     hello: hallo('Das Duell', 'verteidiger', 'Lagebild: lage   ·   live: tail -f /var/log/duell.log   ·   cat ~/LIESMICH.txt') },
+  mitschnitt: { image: env('MITSCHNITT_IMAGE', 'nf-mitschnitt'), user: 'analyst', ready: 'Mitschnitt bereit', title: 'Der Mitschnitt', host: 'soc',
+    produkt: 'arena-profi', stufe: 'Experte', levels: 5, praefix: 'mitschnitt',
+    kurz: 'Netzwerk-Forensik: einen aufgezeichneten Datenverkehr (pcap) mit tshark auswerten – Klartext-Login, Datei-Diebstahl, DNS-Ausleitung und ein verstecktes Kommando.',
+    hello: hallo('SOC Nordstadt', 'analyst', 'Fall: cat ~/fall.txt   ·   Beweis: /beweise/mitschnitt.pcap   ·   begriff exfiltration') },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -118,6 +122,7 @@ const EINORDNUNG = {
   web1: ['Hacken', ['Web']], web2: ['Hacken', ['Web', 'Injection', 'Netzwerk']], web3: ['Hacken', ['Web', 'Injection']],
   meister: ['Hacken', ['Pivoting', 'Exploitation', 'Netzwerk', 'Linux']],
   duell: ['Abwehren', ['Threat Hunting', 'Rechte', 'Persistenz']],
+  mitschnitt: ['Ermitteln', ['Netzwerk', 'Forensik', 'Logs']],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};

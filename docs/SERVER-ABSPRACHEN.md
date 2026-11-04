@@ -140,3 +140,6 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
   welche Lücken offen sind, greift eine zufällige an, wird schneller; jede geschlossene Lücke gibt sofort einen Code.
   Claude-Anbindung vorbereitet (BRAIN=ki + Not-Aus auf Drehbuch), siehe docs/ARENA-GEGNER.md – echter Claude-Gegner
   braucht noch Marcels Anthropic-Schlüssel + sicheren Steuerkanal. Lernpfad-Stufe s12. Jetzt 15 Arenen.
+- 2.35.0: „Der Mitschnitt“ (Reihe Ermitteln, Experte) – NEUE Methode Netzwerk-Forensik: einen pcap mit tshark auswerten
+  (Klartext-Login, Datei-Diebstahl, DNS-Ausleitung, verstecktes base64-Kommando). pcap wird aus dem Salz mit scapy
+  erzeugt. 5 Codes, durchgespielt. Lernpfad-Stufe s13. Jetzt 16 Arenen.

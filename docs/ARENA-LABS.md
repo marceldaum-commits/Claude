@@ -2,7 +2,7 @@
 
 > Automatisch erzeugt aus `arena/server.js` mit `node tools/arena-uebersicht.mjs`. Nicht von Hand ändern.
 
-Insgesamt **15 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
+Insgesamt **16 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
 
 ## 🗝️ Hacken
 
@@ -32,10 +32,12 @@ Insgesamt **15 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 |---|---|---|---|---|
 | **Die Spurensuche** | Einsteiger | 5 | Arena | #Forensik #Logs |
 | **Der Einbruch** | Experte | 6 | Profi | #Forensik #Logs #Schadsoftware |
+| **Der Mitschnitt** | Experte | 5 | Profi | #Netzwerk #Forensik #Logs |
 | **Der Maulwurf** | Extrem | 6 | Profi | #Forensik #Netzwerk #Krypto |
 
 - **Die Spurensuche** (Einsteiger): Deine erste Ermittlung: Wer hat nachts die Firmen-Webseite verändert? Mit ls, grep, diff und base64 den Spuren folgen.
 - **Der Einbruch** (Experte): Blue Team: Ein Server wurde gehackt. Finde in Protokollen, Verlauf, Cronjobs und verschleierter Schadsoftware heraus, wer, wie und was gestohlen hat.
+- **Der Mitschnitt** (Experte): Netzwerk-Forensik: einen aufgezeichneten Datenverkehr (pcap) mit tshark auswerten – Klartext-Login, Datei-Diebstahl, DNS-Ausleitung und ein verstecktes Kommando.
 - **Der Maulwurf** (Extrem): Werksspionage von innen: Zeitzonen, wiederverwendete IP-Adressen, DNS-Ausleitung zusammensetzen, Prüfsummen, Zeitstempel, verschlüsseltes Archiv.
 
 ## 🛡️ Abwehren
