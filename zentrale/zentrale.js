@@ -53,13 +53,18 @@ async function zweiterFaktor() {
   catch (e) { return anmelden(`Zwei-Faktor-Einrichtung nicht möglich: ${e.message}`); }
   codeAbfrage(neu.id, true, neu.totp);
 }
+// Supabase liefert das SVG roh („data:image/svg+xml;utf-8,<svg …>“) – für <img> sauber kodieren
+function qrDaten(q = '') {
+  const i = q.indexOf('<svg');
+  return i >= 0 ? 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(q.slice(i)) : q;
+}
 function codeAbfrage(faktor, einrichten, totp = {}) {
   main.innerHTML = `<section class="stack" style="max-width:440px;margin:1.5rem auto">
     <div style="text-align:center"><div style="font-size:2.4rem">🔐</div><h1 style="margin:.2rem 0 0">${einrichten ? 'Zwei-Faktor einrichten' : 'Code aus der App'}</h1></div>
     ${einrichten ? `<div class="card stack">
       <p style="margin:0">Die Zentrale ist zusätzlich mit einem <b>Code aus einer Authenticator-App</b> geschützt (z. B. Google Authenticator, Microsoft Authenticator oder Bitwarden Authenticator).</p>
       <ol class="small" style="margin:0;padding-left:1.2rem"><li>App öffnen → „Konto hinzufügen“ → <b>QR-Code scannen</b>.</li><li>Den <b>6-stelligen Code</b> aus der App unten eintragen.</li></ol>
-      <div style="background:#fff;border-radius:12px;padding:10px;width:max-content;margin:0 auto"><img src="${esc(totp.qr_code || '')}" alt="QR-Code für die Authenticator-App" width="200" height="200"></div>
+      <div style="background:#fff;border-radius:12px;padding:10px;width:max-content;margin:0 auto"><img src="${esc(qrDaten(totp.qr_code))}" alt="QR-Code für die Authenticator-App" width="200" height="200"></div>
       <details class="small"><summary>QR-Code geht nicht? Schlüssel von Hand eingeben</summary><code translate="no" style="display:block;margin-top:.4rem;word-break:break-all">${esc(totp.secret || '')}</code></details>
       <p class="small muted" style="margin:0">Am Handy, auf dem du die Zentrale gerade öffnest: Schlüssel kopieren und in der App „Schlüssel eingeben“ wählen.</p>
     </div>` : '<p class="muted" style="text-align:center;margin:0">Öffne deine Authenticator-App und gib den aktuellen 6-stelligen Code für „Nachtfalter Zentrale“ ein.</p>'}
