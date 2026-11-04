@@ -22,6 +22,15 @@ const antwort = (origin: string | null, status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors(origin), 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
 const UUID = /^[0-9a-f-]{36}$/i;
+// Fortschritt kommt aus Kundendaten (frei beschreibbar) → immer defensiv lesen
+const obj = (v: unknown): Record<string, any> => (v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, any> : {});
+const arr = (v: unknown): any[] => (Array.isArray(v) ? v : []);
+const zeit = (v: unknown) => {
+  const t = typeof v === 'number' ? v : typeof v === 'string' ? Date.parse(v) : NaN;
+  return Number.isFinite(t) && t > 0 && t < 4102444800000 ? new Date(t).toISOString() : null; // bis 2100
+};
+const anzahlFertig = (m: unknown) => Object.values(obj(m)).filter((x: any) => x && typeof x === 'object' && x.doneAt).length;
+const bestanden = (m: unknown) => Object.values(obj(m)).filter((e: any) => arr(e?.attempts).some((a: any) => a?.passed === true)).length;
 const zufallsCode = () => {
   const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // ohne 0/O/1/I
   const b = crypto.getRandomValues(new Uint8Array(12));
@@ -37,6 +46,7 @@ Deno.serve(async (req) => {
   // 1) Anmeldung prüfen (Token beim Auth-Server verifizieren)
   const token = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
   const { data: u, error: ue } = await db.auth.getUser(token);
+  if (ue && !(Number(ue.status) >= 400 && Number(ue.status) < 500)) return antwort(origin, 503, { fehler: 'Anmeldedienst gerade nicht erreichbar – bitte gleich noch einmal versuchen.' });
   if (ue || !u?.user) return antwort(origin, 401, { fehler: 'Bitte anmelden.' });
   // 2) Admin-Rolle prüfen
   const { data: adm } = await db.from('admins').select('user_id').eq('user_id', u.user.id).maybeSingle();
@@ -61,8 +71,13 @@ Deno.serve(async (req) => {
   try {
     switch (aktion) {
       case 'uebersicht': {
-        const { data: lu, error } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-        if (error) throw error;
+        const alle: any[] = [];
+        for (let seite = 1; seite <= 50; seite++) {
+          const { data: lu, error } = await db.auth.admin.listUsers({ page: seite, perPage: 1000 });
+          if (error) throw error;
+          alle.push(...lu.users);
+          if (lu.users.length < 1000) break;
+        }
         const [{ data: profs }, { data: ents }, { data: prog }, { data: admins }, { data: notizen }] = await Promise.all([
           db.from('profiles').select('id, display_name, lang, birth_year, parent_consent, freigeschaltet, gesperrt, last_seen'),
           db.from('entitlements').select('id, user_id, produkt, gueltig_bis, quelle, notiz').order('gueltig_bis', { ascending: false }),
@@ -74,14 +89,12 @@ Deno.serve(async (req) => {
         const P = new Map((profs || []).map((p) => [p.id, p]));
         const G = new Map((prog || []).map((p) => [p.user_id, p]));
         const A = new Set((admins || []).map((a) => a.user_id));
-        const nutzer = lu.users.map((x) => {
+        const nutzer = alle.map((x) => {
           const p = P.get(x.id) || {};
           const g = G.get(x.id);
-          const st = g?.state || {};
-          const rooms = st.rooms || {};
-          const geloest = Object.values(rooms).filter((r: any) => r && r.doneAt).length;
-          const lektionen = Object.values(st.lessons || {}).filter((l: any) => l && l.doneAt).length;
-          const pruefungen = Object.values(st.exams || {}).filter((e: any) => (e?.attempts || []).some((a: any) => a?.passed)).length;
+          const st = obj(g?.state);
+          let geloest = 0, lektionen = 0, pruefungen = 0;
+          try { geloest = anzahlFertig(st.rooms); lektionen = anzahlFertig(st.lessons); pruefungen = bestanden(st.exams); } catch { /* fehlerhafte Daten eines Kunden */ }
           return {
             id: x.id, email: x.email, bestaetigt: !!x.email_confirmed_at, erstellt: x.created_at, zuletzt: x.last_sign_in_at,
             name: p.display_name || '', lang: p.lang, jahrgang: p.birth_year, eltern: p.parent_consent,
@@ -165,21 +178,19 @@ Deno.serve(async (req) => {
       case 'nutzer_detail': {
         if (!UUID.test(id)) return antwort(origin, 400, { fehler: 'Unbekannter Nutzer' });
         const { data: g } = await db.from('progress').select('updated_at, state').eq('user_id', id).maybeSingle();
-        const st: any = g?.state || {};
-        const ms = (v: unknown) => (typeof v === 'number' ? new Date(v).toISOString() : v || null);
-        const raeume = Object.entries(st.rooms || {}).map(([rid, r]: [string, any]) => ({
-          id: rid, begonnen: ms(r?.startedAt), geloest: ms(r?.doneAt),
-          antworten: Object.values(r?.answers || {}).filter((a: any) => a?.ok).length,
-          tipps: Object.values(r?.hints || {}).reduce((n: number, h: any) => n + (typeof h === 'number' ? h : Array.isArray(h) ? h.length : h ? 1 : 0), 0),
-        }));
-        const pruefungen = Object.entries(st.exams || {}).map(([lv, e]: [string, any]) => {
-          const at = e?.attempts || [];
-          return { level: lv, versuche: at.length, bestanden: at.some((a: any) => a?.passed), beste: at.reduce((m: number, a: any) => Math.max(m, Number(a?.score) || 0), 0) };
+        const st = obj(g?.state);
+        const raeume = Object.entries(obj(st.rooms)).slice(0, 500).map(([rid, r0]) => { const r = obj(r0); return {
+          id: String(rid).slice(0, 40), begonnen: zeit(r.startedAt), geloest: zeit(r.doneAt),
+          antworten: Object.values(obj(r.answers)).filter((a: any) => a?.ok === true).length,
+          tipps: Object.values(obj(r.hints)).reduce((n: number, h: any) => n + (typeof h === 'number' && Number.isFinite(h) ? Math.min(Math.max(h, 0), 99) : Array.isArray(h) ? h.length : h ? 1 : 0), 0),
+        }; });
+        const pruefungen = Object.entries(obj(st.exams)).slice(0, 50).map(([lv, e]) => {
+          const at = arr(obj(e).attempts);
+          return { level: String(lv).slice(0, 20), versuche: at.length, bestanden: at.some((a: any) => a?.passed === true), beste: at.reduce((m: number, a: any) => { const v = Number(a?.score); return Number.isFinite(v) ? Math.max(m, v) : m; }, 0) };
         });
-        const geschichten = Object.entries(st.story || {}).map(([sid, x]: [string, any]) => ({ id: sid, fertig: ms(x?.doneAt) }));
+        const geschichten = Object.entries(obj(st.story)).slice(0, 50).map(([sid, x]) => ({ id: String(sid).slice(0, 40), fertig: zeit(obj(x).doneAt) }));
         return antwort(origin, 200, { aktualisiert: g?.updated_at || null, raeume, pruefungen, geschichten,
-          lektionen: Object.values(st.lessons || {}).filter((l: any) => l && l.doneAt).length,
-          uebungen: Object.keys(st.exercises || {}).length });
+          lektionen: anzahlFertig(st.lessons), uebungen: Object.keys(obj(st.exercises)).length });
       }
       case 'passwort_mail': {
         if (!UUID.test(id)) return antwort(origin, 400, { fehler: 'Unbekannter Nutzer' });

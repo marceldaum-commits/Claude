@@ -13,7 +13,6 @@
 #   Branch „live“     → Web-App (Hacklab, Konto, Verwaltung)    → /opt/nachtfalter/web/live     → app.nachtfalter.tech
 #   Arbeits-Branch    → Web-App Vorschau                         → /opt/nachtfalter/web/vorschau → vorschau.nachtfalter.tech
 #   Branch „live“     → Zentrale (Kundenverwaltung)              → /opt/nachtfalter/web/zentrale → zentrale.nachtfalter.tech
-#   Arbeits-Branch    → Zentrale-Vorschau                         → vorschau.nachtfalter.tech/zentrale/
 # Branches werden nur nach Marcels „ok“ aktualisiert. Fehlt ein Branch, wird der Teil übersprungen.
 #
 # Geheimnisse (nur root lesbar, nie im Repository):
@@ -42,7 +41,7 @@ log() { echo "$(date '+%F %T') $*" | tee -a "$LOG"; }
 
 status() {
   echo "== Nachtfalter-Dienste =="
-  for c in web-live web-vorschau web-zentrale web-zentrale-vorschau arena ki; do printf '%-12s Stand: %s\n' "$c" "$(cat "$STATE/$c.commit" 2>/dev/null | cut -c1-7 || echo -)"; done
+  for c in web-live web-vorschau web-zentrale arena ki; do printf '%-12s Stand: %s\n' "$c" "$(cat "$STATE/$c.commit" 2>/dev/null | cut -c1-7 || echo -)"; done
   printf 'KI-Werkstatt: %s\n' "$(systemctl is-active nachtfalter-ki 2>/dev/null || true)"
   printf 'Arena:        %s\n' "$(docker inspect -f '{{.State.Status}}' nf-arena 2>/dev/null | head -1 | grep . || echo 'nicht vorhanden')"
   printf 'Prüfung 8100: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8100/api/status >/dev/null 2>&1 && echo ok || echo -)"
@@ -180,11 +179,8 @@ header_lesen() { # $1 = _headers-Datei → füllt HDR[pfad] und HPFADE
 }
 nginx_conf() { # $1 = _headers-Datei, $2 = Web-Ordner, $3 = Seite → Konfiguration auf stdout
   local root=$2 seite=$3 p re zblock=""
-  # Zentrale-Vorschau als Unterordner der Vorschau (eigene, strengere Header)
-  if [ "$seite" = vorschau ] && [ -d "$BASE/web/zentrale-vorschau" ] && [ -s "$STATE/web-zentrale-vorschau.headers" ]; then
-    header_lesen "$STATE/web-zentrale-vorschau.headers" || return 1
-    zblock="location ~ ^/zentrale/(.*)\$ {"$'\n'"alias $BASE/web/zentrale-vorschau/\$1;"$'\n'"${HDR['/*']:-}}"$'\n'
-  fi
+  # (Die Zentrale-Vorschau lief früher unter vorschau.nachtfalter.tech/zentrale/ – abgeschaltet, weil sie sich dort
+  #  den Browser-Speicher mit der Vorschau-App teilte. Eine eigene Vorschau-Adresse kann später folgen.)
   header_lesen "$1" || return 1
   echo "# Automatisch erzeugt von nachtfalter-deploy ($seite) – nicht von Hand ändern."
   echo "root $root;"
@@ -219,11 +215,21 @@ web() { # $1 = Seite, $2 = Branch, $3 = app|zentrale
     log "web-$seite: baue ${rev:0:7}"
     install -d -m 755 "$BASE/web"; install -d -o "$DIENST" -g "$DIENST" -m 755 "$BASE/web/bau"
     rm -rf "$BASE/web/bau/$seite"
-    if ! runuser -u "$DIENST" -- env HOME="$BASE" bash "$dir/$bau" "$BASE/web/bau/$seite" >>"$LOG" 2>&1 \
-       || [ ! -f "$BASE/web/bau/$seite/index.html" ]; then
+    # Bau als Dienstbenutzer in einer eigenen systemd-Einheit: Nach dem Ende werden auch alle
+    # zurückgelassenen Prozesse beendet (kein nachträgliches Austauschen von Dateien).
+    if ! systemd-run --quiet --wait --pipe --collect --uid="$DIENST" --gid="$DIENST" \
+         -p RuntimeMaxSec=600 -p KillMode=control-group -E HOME="$BASE" \
+         bash "$dir/$bau" "$BASE/web/bau/$seite" >>"$LOG" 2>&1 \
+       || [ -L "$BASE/web/bau/$seite" ] || [ ! -f "$BASE/web/bau/$seite/index.html" ]; then
       log "web-$seite: Bau fehlgeschlagen – alter Stand bleibt"; return 1
     fi
-    rm -rf "$neu"; cp -r "$BASE/web/bau/$seite" "$neu"; rm -f "$neu/_headers"
+    rm -rf "$neu"; cp -r "$BASE/web/bau/$seite" "$neu"
+    # Die Kopie gehört root und liegt in einem nur für root beschreibbaren Ordner – erst DORT prüfen:
+    # keine Verknüpfungen (Symlinks), sonst würde nginx womöglich fremde Dateien ausliefern.
+    if [ -L "$neu" ] || [ ! -d "$neu" ] || [ -n "$(find "$neu" -type l -print -quit)" ]; then
+      log "web-$seite: Bau enthält Verknüpfungen – abgelehnt, alter Stand bleibt"; rm -rf "$neu"; return 1
+    fi
+    rm -f "$neu/_headers"
     chown -R root:root "$neu"; chmod -R u=rwX,go=rX "$neu"
     rm -rf "$ziel.alt"; [ -d "$ziel" ] && mv "$ziel" "$ziel.alt"; mv "$neu" "$ziel"
     cp "$dir/$hdr" "$STATE/web-$seite.headers"
@@ -272,22 +278,30 @@ konto() {
   [ "$(cat "$STATE/konto-sicherung" 2>/dev/null)" != "$heute" ] || return 0
   command -v pg_dump >/dev/null || { log "konto: pg_dump fehlt (apt install postgresql-client)"; echo "$heute" > "$STATE/konto-sicherung"; return 1; }
   local url; url=$(sed -n 's/^KONTO_DB_URL=//p' "$ETC/konto-db.env" | head -1)
-  [ -n "$url" ] || { log "konto: KONTO_DB_URL fehlt in $ETC/konto-db.env"; return 1; }
-  install -d -m 700 "$SICHERUNG"
-  local ziel="$SICHERUNG/konto-$heute.dump"
-  if PGCONNECT_TIMEOUT=20 pg_dump --dbname="$url" --format=custom --no-owner --no-privileges \
-       --schema=public --schema=auth --file="$ziel.tmp" 2>>"$LOG"; then
-    mv "$ziel.tmp" "$ziel"; chmod 600 "$ziel"; echo "$heute" > "$STATE/konto-sicherung"
-    find "$SICHERUNG" -name 'konto-*.dump' -mtime +14 -delete
-    log "konto: Sicherung $(du -h "$ziel" | cut -f1) gespeichert"
-  else
-    rm -f "$ziel.tmp"; log "konto: Sicherung fehlgeschlagen"; echo "$heute" > "$STATE/konto-sicherung"; return 1
-  fi
+  # postgresql://benutzer:passwort@host:port/datenbank → Umgebungsvariablen (nicht in der Prozessliste sichtbar)
+  [[ "$url" =~ ^postgres(ql)?://([^:/@]+):([^@]+)@([^:/]+):([0-9]+)/([^?]+)$ ]] \
+    || { log "konto: KONTO_DB_URL in $ETC/konto-db.env hat nicht das erwartete Format"; return 1; }
+  local -x PGUSER=${BASH_REMATCH[2]} PGPASSWORD=${BASH_REMATCH[3]} PGHOST=${BASH_REMATCH[4]} PGPORT=${BASH_REMATCH[5]} \
+           PGDATABASE=${BASH_REMATCH[6]} PGSSLMODE=require PGCONNECT_TIMEOUT=20
+  ( umask 077
+    # Zielordner: muss root gehören und darf keine Verknüpfung sein
+    [ -L "$SICHERUNG" ] && { log "konto: $SICHERUNG ist eine Verknüpfung – abgebrochen"; exit 1; }
+    install -d -o root -g root -m 700 "$SICHERUNG"
+    [ "$(stat -c %u "$SICHERUNG")" = 0 ] || { log "konto: $SICHERUNG gehört nicht root – abgebrochen"; exit 1; }
+    local tmp="$STATE/konto-sicherung.tmp"
+    if pg_dump --format=custom --no-owner --no-privileges --schema=public --schema=auth --file="$tmp" 2>>"$LOG"; then
+      install -o root -g root -m 600 "$tmp" "$SICHERUNG/konto-$heute.dump"; rm -f "$tmp"
+      find "$SICHERUNG" -maxdepth 1 -type f -name 'konto-*.dump' -mtime +14 -delete
+      log "konto: Sicherung $(du -h "$SICHERUNG/konto-$heute.dump" | cut -f1) gespeichert"
+    else
+      rm -f "$tmp"; log "konto: Sicherung fehlgeschlagen"; exit 1
+    fi )
+  local rc=$?; echo "$heute" > "$STATE/konto-sicherung"; return $rc
 }
 
 fehler=0
 web live live || fehler=1
-web zentrale-vorschau "$VORSCHAU" zentrale || fehler=1
+rm -rf "$BASE/web/zentrale-vorschau" "$STATE/web-zentrale-vorschau.headers" "$STATE/web-zentrale-vorschau.commit"
 web vorschau "$VORSCHAU" || fehler=1
 web zentrale live zentrale || fehler=1
 ki || fehler=1

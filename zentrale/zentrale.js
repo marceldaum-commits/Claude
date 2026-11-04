@@ -27,7 +27,7 @@ const speichern = (s) => { ses = s; try { s ? localStorage.setItem(STORE, JSON.s
 async function token(path, body) {
   const r = await fetch(`${URL_}/auth/v1/token?grant_type=${path}`, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.error_description || j.msg || 'Anmeldung fehlgeschlagen');
+  if (!r.ok) throw Object.assign(new Error(j.error_description || j.msg || 'Anmeldung fehlgeschlagen'), { status: r.status });
   return { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Math.floor(Date.now() / 1000) + Number(j.expires_in || 3600), user: j.user };
 }
 async function auth(path, { method = 'GET', body } = {}) {
@@ -44,6 +44,14 @@ async function zweiterFaktor() {
   main.innerHTML = '<section class="stack" style="max-width:440px;margin:2rem auto"><p class="muted">Prüfe Zwei-Faktor-Anmeldung …</p></section>';
   let user;
   try { user = await auth('user'); } catch (e) { speichern(null); return anmelden(e.message); }
+  // Nur Verwaltungs-Konten bekommen überhaupt eine Zwei-Faktor-Einrichtung (Kunden-Konten bleiben unberührt)
+  let rolle = null;
+  try {
+    const r = await fetch(`${URL_}/rest/v1/rpc/mein_status`, { method: 'POST', headers: { apikey: KEY, Authorization: `Bearer ${ses.access_token}`, 'Content-Type': 'application/json' }, body: '{}' });
+    rolle = r.ok ? await r.json() : null;
+  } catch { /* */ }
+  if (!rolle) return anmelden('Die Rolle konnte gerade nicht geprüft werden – bitte gleich noch einmal versuchen.');
+  if (!rolle.admin) return keinZugriff();
   const totp = (user.factors || []).filter(f => f.factor_type === 'totp');
   const fertig = totp.find(f => f.status === 'verified');
   if (fertig) return codeAbfrage(fertig.id, false);
@@ -92,7 +100,8 @@ function codeAbfrage(faktor, einrichten, totp = {}) {
 async function frisch() {
   if (!ses) return null;
   if (ses.expires_at - 60 > Date.now() / 1000) return ses;
-  try { speichern(await token('refresh_token', { refresh_token: ses.refresh_token })); } catch { speichern(null); }
+  try { speichern(await token('refresh_token', { refresh_token: ses.refresh_token })); }
+  catch (e) { if (e.status >= 400 && e.status < 500) speichern(null); else throw new Error('Anmeldedienst gerade nicht erreichbar – bitte gleich noch einmal versuchen.'); }
   return ses;
 }
 async function api(aktion, daten = {}) {
@@ -222,7 +231,7 @@ async function kunden() {
 function csv(nutzer) {
   const zeilen = [['E-Mail', 'Name', 'Rolle', 'Status', 'Registriert', 'Zuletzt angemeldet', 'Jahrgang', 'Eltern-Zustimmung', 'Räume gelöst', 'Lektionen', 'Prüfungen bestanden', 'Notiz']];
   for (const n of nutzer) zeilen.push([n.email, n.name, n.admin ? 'Verwaltung' : 'Kunde', status(n)[0], datum(n.erstellt), datum(n.zuletzt), n.jahrgang || '', kind(n) ? (n.eltern ? 'ja' : 'nein') : '', n.fortschritt?.geloest ?? 0, n.fortschritt?.lektionen ?? 0, n.fortschritt?.pruefungen ?? 0, n.notiz || '']);
-  const text = '﻿' + zeilen.map(z => z.map(v => `"${String(v ?? '').replace(/"/g, '""').replace(/^([=+\-@])/, "'$1")}"`).join(';')).join('\r\n');
+  const text = '﻿' + zeilen.map(z => z.map(v => `"${String(v ?? '').replace(/"/g, '""').replace(/^([=+\-@\t\r])/, "'$1")}"`).join(';')).join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
   a.download = `nachtfalter-kunden-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
@@ -387,7 +396,10 @@ async function system() {
 
 // ---------------------------------------------------------------- Router
 async function route() {
-  if (!await frisch()) return anmelden();
+  let s;
+  try { s = await frisch(); }
+  catch (e) { main.innerHTML = `<section class="stack" style="max-width:480px;margin:2rem auto"><div class="card warn">${esc(e.message)}</div><button class="btn" id="nochmal">Nochmal versuchen</button></section>`; $('#nochmal').onclick = route; return; }
+  if (!s) return anmelden();
   if (stufe() !== 'aal2') return zweiterFaktor();
   kopf(true);
   const [, teil = '', arg] = (location.hash || '#/').split('/');

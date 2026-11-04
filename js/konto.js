@@ -28,7 +28,7 @@ async function api(path, { method = 'GET', body, auth = false, prefer } = {}) {
   if (prefer) headers.Prefer = prefer;
   const r = await fetch(URL_ + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
   const txt = await r.text(); let data = null; try { data = txt ? JSON.parse(txt) : null; } catch { data = txt; }
-  if (!r.ok) throw new Error(fehlertext(data, r.status));
+  if (!r.ok) throw Object.assign(new Error(fehlertext(data, r.status)), { status: r.status });
   return data;
 }
 function fehlertext(d, status) {
@@ -50,7 +50,7 @@ async function fresh() {
   if (!ses) return;
   if (ses.expires_at - 60 > Date.now() / 1000) return;
   try { saveSes(fromToken(await api('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: ses.refresh_token } }))); }
-  catch { saveSes(null); }
+  catch (e) { if (e.status >= 400 && e.status < 500) saveSes(null); } // bei Netz-/Serverstörung angemeldet bleiben
 }
 
 // ---- Rückkehr aus E-Mail-Links (#access_token=…&type=signup|recovery) -------------------------

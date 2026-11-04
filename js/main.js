@@ -1536,7 +1536,7 @@ if (syncConfigured() && !hatSitzung()) { zurAnmeldung(); await new Promise(() =>
 initLang(); protectCodes(); loadShellT(); await loadUI(); L1 = makeT(await loadLevel1());
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
-onSyncStatus((st) => { if (syncConfigured() && !st.user && st.state === 'warn' && navigator.onLine) return zurAnmeldung(); renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
+onSyncStatus((st) => { if (syncConfigured() && !st.user && st.state === 'warn' && navigator.onLine && !hatSitzung()) return zurAnmeldung(); renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
 render();
 locationModal(false);
 initSync(getState, applyState);

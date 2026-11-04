@@ -71,7 +71,8 @@ async function kontoPruefen(token) {
   const holen = (pfad) => fetch(CFG.kontoUrl + pfad, { headers: h, signal: AbortSignal.timeout(6000) });
   let r;
   const u = await holen('/auth/v1/user');
-  if (!u.ok) r = { status: 401, fehler: 'Deine Anmeldung ist abgelaufen – bitte neu anmelden.' };
+  if (u.status === 401 || u.status === 403) return { status: 401, fehler: 'Deine Anmeldung ist abgelaufen – bitte neu anmelden.' };
+  if (!u.ok) throw new Error(`Auth-Dienst antwortet mit ${u.status}`);
   else {
     const user = await u.json();
     const jetzt = new Date().toISOString();
@@ -85,7 +86,7 @@ async function kontoPruefen(token) {
     else if (!zug.length) r = { status: 403, code: 'kein_zugang', fehler: 'Für die Arena brauchst du einen Arena-Zugang. Hast du einen Einladungscode? Dann löse ihn unten ein.' };
     else r = { ok: true, userId: user.id, bis: zug.map(x => x.gueltig_bis).sort().pop() };
   }
-  kontoCache.set(key, { t: Date.now(), r });
+  if (r.ok) kontoCache.set(key, { t: Date.now(), r }); // nur Erfolge merken – nach Code-Einlösung sofort neu prüfen
   if (kontoCache.size > 2000) kontoCache.clear();
   return r;
 }
@@ -119,6 +120,9 @@ async function createSession(lab, token, ip, userId = null) {
   if (userId && [...sessions.values()].filter(s => s.userId === userId).length >= CFG.maxPerUser) throw Object.assign(new Error('Du hast schon zu viele Labs offen. Schließe erst eins.'), { status: 429 });
 
   const id = randomBytes(16).toString('hex');
+  // Platz sofort (vor dem ersten await) reservieren, damit parallele Anfragen die Grenzen nicht umgehen
+  sessions.set(id, { id, lab, containerId: null, ip, userId, created: Date.now(), lastSeen: Date.now(), token, startet: true });
+  try {
   const container = await docker.createContainer({
     Image: L.image,
     name: `kly-arena-${lab}-${id.slice(0, 10)}`,
@@ -137,6 +141,7 @@ async function createSession(lab, token, ip, userId = null) {
       Tmpfs: { '/tmp': 'rw,noexec,nosuid,size=16m' },
     },
   });
+  sessions.get(id).containerId = container.id;
   await container.start();
   try { await waitReady(container, L.ready); }
   catch (e) { await container.remove({ force: true }).catch(() => {}); throw e; }
@@ -144,6 +149,7 @@ async function createSession(lab, token, ip, userId = null) {
   sessions.set(id, s);
   log('start', lab, id.slice(0, 8), ip);
   return s;
+  } catch (e) { sessions.delete(id); throw e; }
 }
 
 async function endSession(id, why) {
@@ -206,7 +212,7 @@ const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
 server.on('upgrade', (req, socket, head) => {
   const m = req.url.match(/^\/api\/term\/([0-9a-f]{32})$/);
   const s = m && sessions.get(m[1]);
-  if (!s) { socket.destroy(); return; }
+  if (!s || s.startet) { socket.destroy(); return; }
   wss.handleUpgrade(req, socket, head, (ws) => attach(ws, s));
 });
 
