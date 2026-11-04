@@ -20,7 +20,7 @@ const PRODUKT_OPT = `<option value="arena">🖥️ Arena (Einsteiger)</option><o
 const DAUER_OPT = `<option value="7">7 Tage</option><option value="30" selected>30 Tage</option><option value="90">90 Tage</option><option value="180">6 Monate</option><option value="365">1 Jahr</option><option value="unbefristet">unbefristet</option>`;
 const unbefristet = (d) => d && new Date(d).getFullYear() >= 9999;
 const bis = (d) => unbefristet(d) ? 'unbefristet' : `bis ${datum(d, false)}`;
-const LABNAME = { keller: 'Kellerserver', leitstelle: 'Leitstelle', tresor: 'Tresor', webshop: 'Webshop', einbruch: 'Einbruch', spuren: 'Spurensuche', maulwurf: 'Maulwurf', abwehr1: 'Angriff! 1', abwehr2: 'Angriff! 2', abwehr3: 'Angriff! 3', web1: 'Web 1', web2: 'Web 2', web3: 'Web 3', meister: 'Meister' };
+const LABNAME = { keller: 'Kellerserver', leitstelle: 'Leitstelle', tresor: 'Tresor', webshop: 'Webshop', einbruch: 'Einbruch', spuren: 'Spurensuche', maulwurf: 'Maulwurf', abwehr1: 'Angriff! 1', abwehr2: 'Angriff! 2', abwehr3: 'Angriff! 3', web1: 'Web 1', web2: 'Web 2', web3: 'Web 3', meister: 'Meister', duell: 'Duell' };
 const main = $('#main');
 let NAMEN = { raeume: {}, reihenfolge: [], geschichten: {} };
 fetch('raeume.json').then(r => r.ok ? r.json() : null).then(j => { if (j) NAMEN = { geschichten: {}, ...j }; }).catch(() => {});

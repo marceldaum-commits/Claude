@@ -136,3 +136,7 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
   echter Buffer Overflow (ret2win über 127.0.0.1:9099, Dienst läuft als eigener Benutzer pruef – kein Abkürzen),
   Rechteausweitung bis root über einen beschreibbaren Root-Skriptordner. 6 Codes, komplett durchgespielt.
   Lernpfad-Abschlussstufe s11 ergänzt. Jetzt 14 Arenen.
+- 2.34.0: „Das Duell: Mann gegen Maschine“ (Reihe Abwehren, Extrem) – lebendiger, reagierender Gegner: prüft live,
+  welche Lücken offen sind, greift eine zufällige an, wird schneller; jede geschlossene Lücke gibt sofort einen Code.
+  Claude-Anbindung vorbereitet (BRAIN=ki + Not-Aus auf Drehbuch), siehe docs/ARENA-GEGNER.md – echter Claude-Gegner
+  braucht noch Marcels Anthropic-Schlüssel + sicheren Steuerkanal. Lernpfad-Stufe s12. Jetzt 15 Arenen.

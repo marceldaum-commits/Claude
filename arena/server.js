@@ -102,6 +102,10 @@ const LABS = {
     produkt: 'arena-profi', stufe: 'Meister', levels: 6, praefix: 'meister', tmpfs: { '/opt/meister/aufgaben': 'rw,exec,nosuid,size=4m' },
     kurz: 'Die Königsklasse: durch ein simuliertes internes Netz (mehrere Konten = Maschinen) bis zum Kern pivotieren – Hash knacken, echter Buffer Overflow (ret2win), Rechteausweitung bis root.',
     hello: hallo('Rechenzentrum Nordstadt', 'extern', 'Auftrag: cat ~/auftrag.txt   ·   Hilfe: hilfe   ·   begriff pivoting') },
+  duell: { image: env('DUELL_IMAGE', 'nf-duell'), user: 'verteidiger', ready: 'Duell bereit', title: 'Das Duell: Mann gegen Maschine', host: 'mein-pc',
+    produkt: 'arena-profi', stufe: 'Extrem', levels: 6, praefix: 'duell', tmpfs: { '/srv/app': 'rw,exec,nosuid,size=16m' },
+    kurz: 'Ein lebendiger Gegner: Der Hacker-Bot prüft live, welche Lücken offen sind, greift eine zufällige davon an und wird immer schneller. Mach alles dicht – jede geschlossene Lücke gibt einen Code.',
+    hello: hallo('Das Duell', 'verteidiger', 'Lagebild: lage   ·   live: tail -f /var/log/duell.log   ·   cat ~/LIESMICH.txt') },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -113,6 +117,7 @@ const EINORDNUNG = {
   abwehr1: ['Abwehren', ['Rechte', 'Passwörter']], abwehr2: ['Abwehren', ['Web', 'Injection', 'Linux']], abwehr3: ['Abwehren', ['Threat Hunting', 'Linux']],
   web1: ['Hacken', ['Web']], web2: ['Hacken', ['Web', 'Injection', 'Netzwerk']], web3: ['Hacken', ['Web', 'Injection']],
   meister: ['Hacken', ['Pivoting', 'Exploitation', 'Netzwerk', 'Linux']],
+  duell: ['Abwehren', ['Threat Hunting', 'Rechte', 'Persistenz']],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};

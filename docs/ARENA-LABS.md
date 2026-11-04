@@ -2,7 +2,7 @@
 
 > Automatisch erzeugt aus `arena/server.js` mit `node tools/arena-uebersicht.mjs`. Nicht von Hand ändern.
 
-Insgesamt **14 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
+Insgesamt **15 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
 
 ## 🗝️ Hacken
 
@@ -45,10 +45,12 @@ Insgesamt **14 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 | **Angriff! Offene Türen** | Einsteiger | 5 | Arena | #Rechte #Passwörter |
 | **Angriff! Die Hintertür** | Fortgeschritten | 6 | Profi | #Web #Injection #Linux |
 | **Angriff! Der Profi** | Extrem | 6 | Profi | #Threat Hunting #Linux |
+| **Das Duell: Mann gegen Maschine** | Extrem | 6 | Profi | #Threat Hunting #Rechte #Persistenz |
 
 - **Angriff! Offene Türen** (Einsteiger): Ein Hacker-Bot greift deinen Rechner live an. Mach die Lücken dicht, bevor er Schaden anrichtet: Passwort, Rechte, Debug-Modus, Upload-Ordner, fremder Schlüssel.
 - **Angriff! Die Hintertür** (Fortgeschritten): Der Hacker wird frecher: PIN-Brute-Force, giftige Dateinamen, Hintertür mit Autostart, Schlüssel in der Git-Historie, PATH-Falle, zu weite Freigabe.
 - **Angriff! Der Profi** (Extrem): Der Profi ist längst drin: getarnte Prozesse, versteckte Autostarts, lügende Befehle, präparierter Schlüssel, Wanze, Zeitbombe, Git-Haken. Traue nichts.
+- **Das Duell: Mann gegen Maschine** (Extrem): Ein lebendiger Gegner: Der Hacker-Bot prüft live, welche Lücken offen sind, greift eine zufällige davon an und wird immer schneller. Mach alles dicht – jede geschlossene Lücke gibt einen Code.
 
 ## Hinweise
 - Jede Arena ist ein eigener, abgeschotteter Linux-Container (kein Netz, nach max. 2 Stunden gelöscht).

@@ -1,0 +1,5 @@
+#!/bin/bash
+# begriff WORT – erklärt einen Begriff aus dem Nachtfalter-Handbuch (ohne WORT: alle Begriffe auflisten)
+D=/usr/local/share/nachtfalter/begriffe.txt
+if [ -z "${1:-}" ]; then echo "Begriffe (begriff WORT zeigt die Erklärung):"; grep '^== ' "$D" | cut -c4- | column -c "${COLUMNS:-80}" 2>/dev/null || grep '^== ' "$D" | cut -c4-; exit; fi
+awk -v RS= -v q="$*" 'BEGIN{IGNORECASE=1} tolower($0) ~ tolower(q) {print; print ""; n++} END{if(!n) print "Nichts gefunden. Alle Begriffe: begriff"}' "$D"

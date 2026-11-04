@@ -183,4 +183,19 @@ export const LERNPFAD = [
     selbst: ['Spiele „Der Meister: Das Rechenzentrum“. Nimm dir Zeit – das ist die härteste Arena.', 'Nutze das Handout und begriff pivoting / begriff buffer.'],
     uebung: { label: 'Arena: Der Meister', href: 'arena:meister', erfordert: { arena: 'meister', level: 4 }, hinweis: 'Schaffe mindestens 4 der 6 Codes im Rechenzentrum.' },
   },
+  {
+    id: 's12', icon: '⚔️', titel: 'Das Duell: gegen einen lebendigen Gegner',
+    einleitung: 'Zum Abschluss: kein Drehbuch mehr. Ein Gegner schaut live, welche Lücken bei dir offen sind, nimmt sich eine zufällige davon vor und wird immer schneller. Alles, was du gelernt hast, zählt jetzt unter Zeitdruck.',
+    konzepte: [
+      ['Threat Hunting', 'Aktiv und schnell Schwachstellen bei dir selbst finden und schließen.'],
+      ['Persistenz', 'Prozess beenden reicht nicht, wenn ein Autostart ihn neu bringt – beides entfernen.'],
+      ['Least Privilege', 'Enge Rechte lassen dem Gegner weniger Angriffsfläche.'],
+    ],
+    beispiel: {
+      text: 'Lage prüfen und einen laufenden Spion samt Autostart entfernen:',
+      befehle: ['lage', 'ss -tlnp', 'kill PID', 'nano ~/.bashrc'],
+    },
+    selbst: ['Spiele „Das Duell: Mann gegen Maschine“. Je schneller du schließt, desto weniger Treffer landet der Gegner.'],
+    uebung: { label: 'Arena: Das Duell', href: 'arena:duell', erfordert: { arena: 'duell', level: 6 }, hinweis: 'Mach im Duell alle 6 Lücken dicht.' },
+  },
 ];
