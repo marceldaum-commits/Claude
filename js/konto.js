@@ -188,6 +188,10 @@ async function angemeldet() {
       <div class="card"><h3>Passwort ändern</h3><form id="pw" class="stack">
         <label>Neues Passwort (mindestens 10 Zeichen)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>
         <button class="btn">Passwort ändern</button></form></div>
+      <div class="card"><h3>Meine Daten</h3>
+        <p class="small muted" style="margin-top:0">Alles, was wir zu deinem Konto speichern, als Datei – und auf Wunsch die Löschung deines Kontos.</p>
+        <div class="row"><button class="btn small" id="export">⬇️ Meine Daten herunterladen</button>
+        <a class="btn small ghost" href="mailto:info@nachtfalter.tech?subject=${encodeURIComponent('Bitte mein Nachtfalter-Konto löschen')}&body=${encodeURIComponent(`Hallo,\n\nbitte löscht mein Nachtfalter-Konto mit allen Daten.\nE-Mail-Adresse des Kontos: ${user.email || ''}\n\nDanke!`)}">🗑️ Konto löschen lassen</a></div></div>
       <button class="btn ghost block" id="out">Abmelden</button>`);
     const cf = $('#cf');
     if (cf) cf.onsubmit = async (e) => {
@@ -209,6 +213,20 @@ async function angemeldet() {
       e.preventDefault(); busy(pw, true);
       try { await api('/auth/v1/user', { method: 'PUT', auth: true, body: { password: pw.pw.value } }); pw.reset(); msg('✓ Passwort geändert.', true); }
       catch (err) { msg(err.message); } finally { busy(pw, false); }
+    };
+    $('#export').onclick = async () => {
+      try {
+        const [prof, fort, zug] = await Promise.all([
+          api(`/rest/v1/profiles?select=*&id=eq.${user.id}`, { auth: true }),
+          api(`/rest/v1/progress?select=updated_at,state&user_id=eq.${user.id}`, { auth: true }).catch(() => []),
+          api('/rest/v1/entitlements?select=produkt,gueltig_bis,quelle,notiz', { auth: true }).catch(() => []),
+        ]);
+        const daten = { exportiert_am: new Date().toISOString(), konto: { id: user.id, email: user.email, registriert: user.created_at, zuletzt_angemeldet: user.last_sign_in_at }, profil: prof[0] || null, fortschritt: fort[0] || null, zugaenge: zug };
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(daten, null, 2)], { type: 'application/json' }));
+        a.download = `nachtfalter-meine-daten-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      } catch (err) { msg(err.message); }
     };
     $('#out').onclick = async () => { try { await api('/auth/v1/logout', { method: 'POST', auth: true }); } catch { /* */ } saveSes(null); abgemeldet(); };
   } catch (err) {
