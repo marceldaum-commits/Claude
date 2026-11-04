@@ -1,9 +1,11 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '2.17.0';
+self.KLY_VERSION = '2.18.0';
 self.KLY_FILES = [
   'index.html',
   'konto.html',
   'js/konto.js',
+  'admin.html',
+  'js/admin.js',
   'manifest.webmanifest',
   'app-files.js',
   'config.js',

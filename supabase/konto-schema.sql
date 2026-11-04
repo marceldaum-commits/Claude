@@ -69,3 +69,11 @@ begin
   return new;
 end $$;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
+
+-- Migrationen „konto_fortschritt_einladungen_admin“ und „konto_einloesen_bremse“ (04.11.2026):
+-- progress (Fortschritt am Konto, RLS nur eigene Zeile), profiles.freigeschaltet/gesperrt/last_seen,
+-- admins (ohne Policies, nur Dienst), invites + invite_redemptions + invite_fails (ohne Policies, nur Dienst),
+-- RPC einloesen(p_code) (security definer: max. 10 Fehlversuche/Stunde, schaltet frei, vergibt ggf. Zugang),
+-- RPC mein_status() (freigeschaltet/gesperrt/admin des aufrufenden Kontos).
+-- Verwaltung: Edge Function supabase/functions/admin (prüft Token beim Auth-Server + Admin-Rolle).
+-- Volltext der Migrationen: Supabase → Database → Migrations.

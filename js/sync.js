@@ -38,6 +38,12 @@ async function getClient() {
 
 export async function initSync(getState, applyState) {
   if (!syncConfigured()) { setStatus('off', 'Nur lokal – Sync nicht eingerichtet'); return; }
+  // Projektwechsel (z. B. auf das Nachtfalter-Konto): alte Anmeldung passt nicht mehr → verwerfen.
+  // Der Lernstand bleibt lokal erhalten und wird nach der neuen Anmeldung hochgeladen.
+  try {
+    const p = globalThis.KLY_CONFIG.supabaseUrl;
+    if (localStorage.getItem('kly.auth.projekt') !== p) { localStorage.removeItem('kly.auth'); localStorage.setItem('kly.auth.projekt', p); }
+  } catch { /* */ }
   try {
     setStatus('busy', 'Verbinde …');
     const c = await getClient();

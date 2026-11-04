@@ -7,7 +7,7 @@ import { initLang, protectCodes, loadUI, langNoteHTML, langPickerHTML, bindLangP
 
 const C = window.KLY_CONFIG || {};
 const URL_ = C.kontoUrl, KEY = C.kontoKey;
-const STORE = 'nf.konto';
+const STORE = 'kly.auth'; // gemeinsam mit dem Hacklab (supabase-js-Format): einmal anmelden, überall angemeldet
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const here = () => location.origin + location.pathname; // Rücksprung nach E-Mail-Links
@@ -19,8 +19,8 @@ const evtlKind = (jahr) => !!jahr && YEAR - jahr <= ADULT;
 // ---- Sitzung --------------------------------------------------------------------------------
 let ses = null;
 try { ses = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch { ses = null; }
-const saveSes = (s) => { ses = s; try { s ? localStorage.setItem(STORE, JSON.stringify(s)) : localStorage.removeItem(STORE); } catch { /* */ } };
-const fromToken = (t) => ({ access_token: t.access_token, refresh_token: t.refresh_token, expires_at: Math.floor(Date.now() / 1000) + Number(t.expires_in || 3600), user: t.user || null });
+const saveSes = (s) => { ses = s; try { s ? localStorage.setItem(STORE, JSON.stringify(s)) : localStorage.removeItem(STORE); localStorage.setItem('kly.auth.projekt', URL_); } catch { /* */ } };
+const fromToken = (t) => ({ access_token: t.access_token, refresh_token: t.refresh_token, token_type: 'bearer', expires_in: Number(t.expires_in || 3600), expires_at: Math.floor(Date.now() / 1000) + Number(t.expires_in || 3600), user: t.user || null });
 
 async function api(path, { method = 'GET', body, auth = false, prefer } = {}) {
   const headers = { apikey: KEY, 'Content-Type': 'application/json' };
@@ -146,10 +146,11 @@ async function angemeldet() {
   if (!ses) return abgemeldet();
   rahmen('<div class="card"><p class="muted">Lade dein Konto …</p></div>');
   try {
-    const [user, profile, zugaenge] = await Promise.all([
+    const [user, profile, zugaenge, st] = await Promise.all([
       api('/auth/v1/user', { auth: true }),
       api(`/rest/v1/profiles?select=display_name,lang,birth_year,parent_consent&id=eq.${ses.user?.id || ''}`, { auth: true }).catch(() => []),
       api('/rest/v1/entitlements?select=produkt,gueltig_bis,quelle&order=gueltig_bis.desc', { auth: true }),
+      api('/rest/v1/rpc/mein_status', { method: 'POST', auth: true, body: {} }).catch(() => ({})),
     ]);
     if (!ses.user) { saveSes({ ...ses, user }); }
     const p = (profile[0]) || (await api(`/rest/v1/profiles?select=display_name,lang,birth_year,parent_consent&id=eq.${user.id}`, { auth: true }))[0] || {};
@@ -162,7 +163,13 @@ async function angemeldet() {
     rahmen(`
       <div class="card"><h2 style="margin-bottom:.3rem">Hallo${p.display_name ? ' ' + esc(p.display_name) : ''}!</h2>
         <p class="small muted" style="margin:0">${esc(user.email)}${p.birth_year ? ` · Jahrgang ${esc(p.birth_year)}` : ''}${kind ? ` · Elternzustimmung: ${p.parent_consent ? '✓' : 'fehlt'}` : ''}</p></div>
+      ${st?.admin ? '<a class="card lime" href="admin.html" style="display:block;text-decoration:none;color:inherit"><b>🛠️ Verwaltung</b><br><span class="small muted">Nutzer, Einladungscodes, Zugänge</span></a>' : ''}
+      ${st && !st.freigeschaltet ? `<div class="card warn"><h3>Einladungscode einlösen</h3>
+        <p class="small" style="margin-top:0">Nachtfalter ist gerade in der Testphase. Mit deinem Einladungscode wird dein Konto freigeschaltet.</p>
+        <form id="cf" class="stack"><label>Einladungscode<input name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NF-XXXX-XXXX-XXXX" required></label>
+        <button class="btn go">Freischalten</button></form></div>` : ''}
       <div class="card"><h3>Meine Zugänge</h3>${liste}</div>
+      ${st?.freigeschaltet ? '<a class="btn primary block" href="./">▶ Zum Hacklab</a>' : ''}
       <div class="card"><h3>Profil</h3><form id="pf" class="stack">
         <label>Name<input name="name" maxlength="30" value="${esc(p.display_name || '')}"></label>
         <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option><option value="uk">Українська</option></select></label>
@@ -171,6 +178,15 @@ async function angemeldet() {
         <label>Neues Passwort (mindestens 10 Zeichen)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>
         <button class="btn">Passwort ändern</button></form></div>
       <button class="btn ghost block" id="out">Abmelden</button>`);
+    const cf = $('#cf');
+    if (cf) cf.onsubmit = async (e) => {
+      e.preventDefault(); busy(cf, true);
+      try {
+        const r = await api('/rest/v1/rpc/einloesen', { method: 'POST', auth: true, body: { p_code: cf.code.value } });
+        if (r?.ok) { hinweis = '✓ Freigeschaltet – viel Spaß!'; return angemeldet(); }
+        msg({ ungueltig: 'Diesen Code gibt es nicht. Prüfe die Schreibweise.', abgelaufen: 'Dieser Code ist abgelaufen. Frag nach einem neuen.', aufgebraucht: 'Dieser Code wurde schon zu oft benutzt.', zu_viele_versuche: 'Zu viele falsche Versuche. Bitte warte eine Stunde.' }[r?.grund] || 'Das hat nicht geklappt. Bitte versuch es nochmal.');
+      } catch (err) { msg(err.message); } finally { busy(cf, false); }
+    };
     const pf = $('#pf'); pf.lang.value = p.lang || 'de';
     pf.onsubmit = async (e) => {
       e.preventDefault(); busy(pf, true);
