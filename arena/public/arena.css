@@ -62,3 +62,9 @@ details.klein summary { cursor: pointer; color: var(--muted); font-size: .9rem; 
   code { color: #000 !important; background: #eee !important; }
 }
 .stufe.Meister { color: #fbbf24; border-color: rgba(251,191,36,.7); background: rgba(251,191,36,.08); }
+/* Premium KI-Chat */
+.kichat { max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; padding: .5rem; margin: .4rem 0; background: rgba(0,0,0,.2); }
+.kizeile { margin: .3rem 0; font-size: .92rem; }
+.kizeile.user { color: var(--text); }
+.kizeile.assistant { color: var(--lime); }
+#kiprem select { min-height: 40px; }

@@ -75,6 +75,7 @@
     LABS = l.labs; zugang = z; anfragen = a; geloest = g;
     $('#adminhinweis').hidden = !zugang.admin;
     zeichne();
+    kiPremium();
   }
 
   function anfrageStatus(produkt) { return anfragen.find(x => x.produkt === produkt) || null; }
@@ -163,6 +164,55 @@
       $('#msg').textContent = `✓ Richtig! Level ${j.level} von „${L.titel}“ geschafft.`; f.reset(); zeichne();
     } catch (err) { $('#msg').textContent = err.message; }
     finally { knopf.disabled = false; }
+  }
+
+  // ---------------------------------------------------------------- Premium: echter KI-Gegner (Edge Function ki-duell)
+  const kiApi = (aktion, body = {}) => rest('/functions/v1/ki-duell', { method: 'POST', body: JSON.stringify({ aktion, ...body }) });
+  let kiStufe = 1, kiVerlauf = [];
+  async function kiPremium() {
+    const box = $('#kiprem'); if (!box) return;
+    let info; try { info = await kiApi('info'); } catch { box.hidden = true; return; }
+    box.hidden = false;
+    if (!info.verfuegbar) {
+      box.innerHTML = `<h2 style="margin-top:0">🧠 Premium: Echter KI-Gegner</h2>
+        <p class="small">Die Arena „Der Flüsterer“ ist ein lokaler, kostenloser Übungs-Bot. <b>Premium</b> lässt dich gegen ein <b>echtes KI-Modell</b> antreten, das ein Geheimnis bewacht – du musst es per Prompt Injection herauslocken.</p>
+        <p class="hinweis warn">🔒 Noch nicht freigeschaltet. (Der Betreiber muss dafür einen KI-Schlüssel hinterlegen.)</p>`;
+      return;
+    }
+    const geloest = new Set(info.geloest || []);
+    box.innerHTML = `<h2 style="margin-top:0">🧠 Premium: Echter KI-Gegner <span class="stufe Experte">echtes Modell</span></h2>
+      <p class="small">Chatte mit einem echten KI-Modell und entlocke ihm das geheime Codewort. Je höher die Stufe, desto strenger bewacht es das Geheimnis. Gelöst: ${[...geloest].sort().join(', ') || '–'} / ${info.stufen}.</p>
+      <div class="reihe"><label class="small">Stufe
+        <select id="kistufe">${Array.from({ length: info.stufen }, (_, i) => `<option value="${i + 1}" ${geloest.has(i + 1) ? '' : ''}>${i + 1}${geloest.has(i + 1) ? ' ✓' : ''}</option>`).join('')}</select></label>
+        <button class="btn sek" id="kineu">Neu beginnen</button></div>
+      <div id="kichat" class="kichat" translate="no"></div>
+      <form id="kiform" class="reihe"><input id="kitext" placeholder="Deine Nachricht an die KI …" autocomplete="off" maxlength="1000" required><button class="btn">Senden</button></form>
+      <form id="kilos" class="reihe" style="margin-top:.4rem"><input id="kicode" placeholder="KLY{…}" translate="no" autocomplete="off"><button class="btn sek">Codewort prüfen</button></form>
+      <p id="kimsg" class="small muted"></p>`;
+    const chat = $('#kichat');
+    const mal = () => { chat.innerHTML = kiVerlauf.map(m => `<div class="kizeile ${m.rolle}"><b>${m.rolle === 'user' ? 'Du' : 'KI'}:</b> ${esc(m.text)}</div>`).join(''); chat.scrollTop = chat.scrollHeight; };
+    $('#kistufe').value = kiStufe;
+    $('#kistufe').onchange = (e) => { kiStufe = +e.target.value; kiVerlauf = []; mal(); };
+    $('#kineu').onclick = () => { kiVerlauf = []; mal(); $('#kimsg').textContent = ''; };
+    $('#kiform').onsubmit = async (e) => {
+      e.preventDefault(); const t = $('#kitext').value.trim(); if (!t) return;
+      const btn = $('#kiform').querySelector('button'); btn.disabled = true;
+      kiVerlauf.push({ rolle: 'user', text: t }); mal(); $('#kitext').value = '';
+      try {
+        const r = await kiApi('chat', { stufe: kiStufe, nachricht: t, verlauf: kiVerlauf.slice(0, -1) });
+        kiVerlauf.push({ rolle: 'assistant', text: r.text || '…' }); mal();
+        if (r.erbeutet) $('#kimsg').textContent = '🎉 Du hast das Codewort im Klartext erbeutet! Trag es unten ein.';
+      } catch (err) { $('#kimsg').textContent = err.message; kiVerlauf.pop(); mal(); }
+      btn.disabled = false;
+    };
+    $('#kilos').onsubmit = async (e) => {
+      e.preventDefault(); const c = $('#kicode').value.trim();
+      try { const r = await kiApi('loesen', { stufe: kiStufe, versuch: c });
+        if (r.ok) { $('#kimsg').textContent = `✓ Richtig! Stufe ${kiStufe} geknackt.`; kiPremium(); }
+        else $('#kimsg').textContent = 'Das ist nicht das richtige Codewort.';
+      } catch (err) { $('#kimsg').textContent = err.message; }
+    };
+    mal();
   }
 
   $('#cf').onsubmit = async (e) => {
