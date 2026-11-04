@@ -1267,7 +1267,7 @@ function sshMachineHTML(r) {
   return `<div class="card lime stack" id="machine">
     <div class="row between"><h3 style="margin:0">Server ${esc(m.name)}</h3><span class="badge real">echt · nur 127.0.0.1</span></div>
     <p class="small">SSH-Port <code>127.0.0.1:${m.port}</code> · Token: <code>${esc(state.labToken)}</code> · Nur am PC (Kali-VM mit Docker).</p>
-    ${arenaLink(m) ? `<a class="btn go" href="${arenaLink(m)}" target="_blank" rel="noopener">🌐 Online spielen – ohne Kali (Beta)</a><p class="small muted" style="margin:-.3rem 0 0">Ein eigener Server nur für dich, direkt im Browser. Oder klassisch in deiner Kali-VM:</p>` : ''}
+    ${arenaLink(m) ? `<a class="btn go" href="${arenaLink(m)}" target="_blank" rel="noopener">🌐 Online spielen – ohne Kali (Beta)</a><p class="small muted" style="margin:-.3rem 0 0">Ein eigener Server nur für dich, direkt im Browser – Anmeldung mit deinem Nachtfalter-Konto (Arena-Zugang nötig). Oder klassisch in deiner Kali-VM:</p>` : ''}
     <a class="btn small" href="#/handy-labs" style="align-self:flex-start">📱 Vom Handy spielen (über deine Kali-VM)</a>
     ${roomState(r.id).startedAt ? '' : '<button class="btn ghost" id="startm">▶ In Kali starten – Anleitung anzeigen</button>'}
     <div id="mhow" ${roomState(r.id).startedAt ? '' : 'hidden'}>

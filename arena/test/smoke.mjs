@@ -7,7 +7,7 @@ const flag = (n) => 'KLY{' + createHash('sha256').update(`${TOKEN}:w2:${n}`).dig
 let fail = 0; const ok = (c, m) => { console.log(c ? '✓' : '✗', m); if (!c) fail++; };
 
 const post = (body) => fetch(BASE + '/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-ok((await post({ lab: 'keller', token: TOKEN, code: 'falsch' })).status === 403, 'falscher Code abgewiesen');
+ok([401, 403].includes((await post({ lab: 'keller', token: TOKEN, code: 'falsch' })).status), 'falscher Code abgewiesen');
 ok((await post({ lab: 'keller', token: 'nix', code: CODE })).status === 400, 'ungültiger Token abgewiesen');
 const r = await post({ lab: 'keller', token: TOKEN, code: CODE }); const j = await r.json();
 ok(r.ok && /^[0-9a-f]{32}$/.test(j.id), 'Lab gestartet: ' + JSON.stringify(j).slice(0, 80));
