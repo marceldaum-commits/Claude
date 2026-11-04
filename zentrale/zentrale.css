@@ -1,0 +1,37 @@
+/* Zentrale – Ergänzungen zu css/app.css */
+.zmain { max-width: 1100px; padding-bottom: 3rem; }
+.ztabs { position: sticky; top: 57px; z-index: 15; display: flex; gap: .3rem; overflow-x: auto; padding: .45rem .75rem; background: rgba(11, 11, 18, .95); border-bottom: 1px solid var(--line); scrollbar-width: none; }
+.ztabs a { flex: none; padding: .5rem .8rem; border-radius: 10px; color: var(--muted); text-decoration: none; font-weight: 600; font-size: .92rem; min-height: 40px; display: flex; align-items: center; }
+.ztabs a.an { background: var(--violet-d); color: #fff; }
+.zkpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .6rem; }
+.zkpi { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: .8rem .9rem; }
+.zkpi b { display: block; font-size: 1.7rem; line-height: 1.1; }
+.zkpi span { color: var(--muted); font-size: .86rem; }
+.zkpi.lime b { color: var(--lime); } .zkpi.warn b { color: #fbbf24; }
+.zfilter { display: flex; gap: .35rem; flex-wrap: wrap; }
+.zfilter button { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 999px; padding: .35rem .75rem; font: inherit; font-size: .88rem; cursor: pointer; min-height: 36px; }
+.zfilter button.an { background: var(--card2); color: var(--text); border-color: var(--violet); }
+.ztab { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.ztab th { text-align: left; color: var(--muted); font-weight: 600; padding: .5rem .4rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.ztab td { padding: .55rem .4rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ztab tr.klick { cursor: pointer; } .ztab tr.klick:hover td { background: var(--card2); }
+.zbadges { display: inline-flex; gap: .25rem; flex-wrap: wrap; }
+.zb { font-size: .74rem; padding: .1rem .45rem; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.zb.ok { color: var(--lime); border-color: rgba(163,230,53,.4); } .zb.warn { color: #fbbf24; border-color: rgba(251,191,36,.4); }
+.zb.rot { color: #f87171; border-color: rgba(248,113,113,.4); } .zb.lila { color: var(--violet); border-color: rgba(167,139,250,.5); }
+.zgrid { display: grid; gap: .75rem; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .zgrid.zwei { grid-template-columns: 1fr 1fr; } }
+.zdl { display: grid; grid-template-columns: max-content 1fr; gap: .3rem .9rem; margin: 0; font-size: .93rem; }
+.zdl dt { color: var(--muted); } .zdl dd { margin: 0; overflow-wrap: anywhere; }
+.zbalken { height: 8px; background: var(--card2); border-radius: 99px; overflow: hidden; }
+.zbalken i { display: block; height: 100%; background: linear-gradient(90deg, var(--violet-d), var(--lime)); }
+.zaktionen { display: flex; flex-wrap: wrap; gap: .4rem; }
+.zmobil-weg { display: table-cell; }
+@media (max-width: 640px) { .zmobil-weg { display: none; } .ztab { font-size: .88rem; } }
+textarea.znotiz { width: 100%; min-height: 110px; }
+.btn.rot { border-color: rgba(248,113,113,.5); color: #fca5a5; }
+input[type=search] { width: 100%; padding: .65rem .8rem; border-radius: 10px; border: 1px solid var(--line); background: var(--bg, #0b0b12); color: var(--text); font: inherit; min-height: 44px; }
+#wer { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 40vw; }
+@media (max-width: 640px) { #wer { display: none; } }
+.ztabs { max-width: 100vw; box-sizing: border-box; }
+html, body { overflow-x: clip; }

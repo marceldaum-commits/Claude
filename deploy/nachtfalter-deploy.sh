@@ -12,6 +12,8 @@
 #   Branch „ki-live“  → KI-Werkstatt (ki-lernen/)               → systemd nachtfalter-ki, 127.0.0.1:8100
 #   Branch „live“     → Web-App (Hacklab, Konto, Verwaltung)    → /opt/nachtfalter/web/live     → app.nachtfalter.tech
 #   Arbeits-Branch    → Web-App Vorschau                         → /opt/nachtfalter/web/vorschau → vorschau.nachtfalter.tech
+#   Branch „live“     → Zentrale (Kundenverwaltung)              → /opt/nachtfalter/web/zentrale → zentrale.nachtfalter.tech
+#   Arbeits-Branch    → Zentrale-Vorschau                         → vorschau.nachtfalter.tech/zentrale/
 # Branches werden nur nach Marcels „ok“ aktualisiert. Fehlt ein Branch, wird der Teil übersprungen.
 #
 # Geheimnisse (nur root lesbar, nie im Repository):
@@ -39,7 +41,7 @@ log() { echo "$(date '+%F %T') $*" | tee -a "$LOG"; }
 
 status() {
   echo "== Nachtfalter-Dienste =="
-  for c in web-live web-vorschau arena ki; do printf '%-12s Stand: %s\n' "$c" "$(cat "$STATE/$c.commit" 2>/dev/null | cut -c1-7 || echo -)"; done
+  for c in web-live web-vorschau web-zentrale web-zentrale-vorschau arena ki; do printf '%-12s Stand: %s\n' "$c" "$(cat "$STATE/$c.commit" 2>/dev/null | cut -c1-7 || echo -)"; done
   printf 'KI-Werkstatt: %s\n' "$(systemctl is-active nachtfalter-ki 2>/dev/null || true)"
   printf 'Arena:        %s\n' "$(docker inspect -f '{{.State.Status}}' nf-arena 2>/dev/null | head -1 | grep . || echo 'nicht vorhanden')"
   printf 'Prüfung 8100: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8100/api/status >/dev/null 2>&1 && echo ok || echo -)"
@@ -152,22 +154,34 @@ arena() {
   fi
 }
 
-# ---------------------------------------------------------------- Web-App (Hacklab, Konto, Verwaltung)
+# ---------------------------------------------------------------- Web (Hacklab, Konto, Zentrale)
 # Statische Dateien nach $BASE/web/<seite>; nginx (Plesk) bindet $WEBCONF/<seite>.conf ein.
 # Die Sicherheits-Header kommen aus _headers im Repository (streng geprüft, sonst kein Wechsel).
-nginx_conf() { # $1 = _headers-Datei, $2 = Web-Ordner, $3 = vorschau|live → schreibt Konfiguration auf stdout
-  local datei=$1 root=$2 seite=$3 pfad="" zeile name wert
-  declare -A H=(); local -a P=()
+#   live / vorschau       → Hacklab (tools/build-deploy.sh, _headers)
+#   zentrale              → Zentrale (tools/build-zentrale.sh, zentrale/_headers) aus „live“
+#   zentrale-vorschau     → Zentrale aus dem Arbeits-Branch, erreichbar unter vorschau.nachtfalter.tech/zentrale/
+header_lesen() { # $1 = _headers-Datei → füllt HDR[pfad] und HPFADE
+  local datei=$1 pfad="" zeile name wert
+  declare -gA HDR=(); HPFADE=()
   while IFS= read -r zeile || [ -n "$zeile" ]; do
     zeile=${zeile%$'\r'}
     case "$zeile" in ''|'#'*) continue;; esac
-    if [[ "$zeile" =~ ^/[A-Za-z0-9._/*-]*$ ]]; then pfad=$zeile; [ "$pfad" = '/*' ] || P+=("$pfad"); continue; fi
+    if [[ "$zeile" =~ ^/[A-Za-z0-9._/*-]*$ ]]; then pfad=$zeile; [ "$pfad" = '/*' ] || HPFADE+=("$pfad"); continue; fi
     [[ "$zeile" =~ ^[[:space:]]+([A-Za-z-]+):[[:space:]]*(.+)$ ]] || { echo "unlesbare Zeile: $zeile" >&2; return 1; }
     name=${BASH_REMATCH[1]} wert=${BASH_REMATCH[2]}
     [[ "$wert" =~ [\"\\\$\{\}] ]] && { echo "unerlaubtes Zeichen in $name" >&2; return 1; }
     [ -n "$pfad" ] || { echo "Header ohne Pfad" >&2; return 1; }
-    H["$pfad"]+="add_header $name \"$wert\" always;"$'\n'
+    HDR["$pfad"]+="add_header $name \"$wert\" always;"$'\n'
   done < "$datei"
+}
+nginx_conf() { # $1 = _headers-Datei, $2 = Web-Ordner, $3 = Seite → Konfiguration auf stdout
+  local root=$2 seite=$3 p re zblock=""
+  # Zentrale-Vorschau als Unterordner der Vorschau (eigene, strengere Header)
+  if [ "$seite" = vorschau ] && [ -d "$BASE/web/zentrale-vorschau" ] && [ -s "$STATE/web-zentrale-vorschau.headers" ]; then
+    header_lesen "$STATE/web-zentrale-vorschau.headers" || return 1
+    zblock="location ~ ^/zentrale/(.*)\$ {"$'\n'"alias $BASE/web/zentrale-vorschau/\$1;"$'\n'"${HDR['/*']:-}}"$'\n'
+  fi
+  header_lesen "$1" || return 1
   echo "# Automatisch erzeugt von nachtfalter-deploy ($seite) – nicht von Hand ändern."
   echo "root $root;"
   echo "index index.html;"
@@ -175,39 +189,43 @@ nginx_conf() { # $1 = _headers-Datei, $2 = Web-Ordner, $3 = vorschau|live → sc
     echo 'auth_basic "Nachtfalter Vorschau";'
     echo "auth_basic_user_file $WEBCONF/vorschau.htpasswd;"
   fi
-  printf '%s' "${H['/*']:-}"
-  local p re
-  for p in "${P[@]}"; do
+  printf '%s' "${HDR['/*']:-}"
+  printf '%s' "$zblock"
+  for p in "${HPFADE[@]}"; do
     [[ "$p" == *'*'* ]] && continue
     re=${p//./\\.}
-    echo "location ~ ^${re}\$ {"; printf '%s' "${H['/*']:-}${H[$p]:-}"; echo "}"
+    echo "location ~ ^${re}\$ {"; printf '%s' "${HDR['/*']:-}${HDR[$p]:-}"; echo "}"
   done
-  # HTML immer frisch prüfen lassen (Cloudflare tat das von selbst)
-  echo 'location ~ \.html$ {'; printf '%s' "${H['/*']:-}"; echo 'add_header Cache-Control "no-cache" always;'; echo "}"
+  # HTML immer frisch prüfen lassen
+  echo 'location ~ \.html$ {'; printf '%s' "${HDR['/*']:-}"; echo 'add_header Cache-Control "no-cache" always;'; echo "}"
   echo 'location ~ (/\.(?!well-known/)|/_headers$) { return 404; }'
 }
 
-web() { # $1 = live|vorschau, $2 = Branch
-  local seite=$1 br=$2 dir rev ziel neu
+web() { # $1 = Seite, $2 = Branch, $3 = app|zentrale
+  local seite=$1 br=$2 art=${3:-app} dir rev ziel neu bau hdr
+  if [ "$art" = zentrale ]; then bau=tools/build-zentrale.sh hdr=zentrale/_headers; else bau=tools/build-deploy.sh hdr=_headers; fi
   dir=$(holen "$br") || { log "web-$seite: Branch $br nicht abrufbar – übersprungen"; return 0; }
   rev=$(git -C "$dir" rev-parse 'HEAD^{tree}')
   ziel="$BASE/web/$seite"; neu="$ziel.neu"
   if neu "web-$seite" "$rev" || [ ! -d "$ziel" ]; then
-    [ -f "$dir/tools/build-deploy.sh" ] && [ -f "$dir/app-files.js" ] && [ -f "$dir/_headers" ] \
-      || { log "web-$seite: Bau-Dateien fehlen in ${rev:0:7}"; return 1; }
+    if [ ! -f "$dir/$bau" ] || [ ! -f "$dir/$hdr" ]; then
+      [ "$art" = zentrale ] && return 0 # Zentrale gibt es in diesem Stand noch nicht
+      log "web-$seite: Bau-Dateien fehlen in ${rev:0:7}"; return 1
+    fi
     log "web-$seite: baue ${rev:0:7}"
     install -d -m 755 "$BASE/web"; install -d -o "$DIENST" -g "$DIENST" -m 755 "$BASE/web/bau"
     rm -rf "$BASE/web/bau/$seite"
-    if ! runuser -u "$DIENST" -- env HOME="$BASE" bash "$dir/tools/build-deploy.sh" "$BASE/web/bau/$seite" >>"$LOG" 2>&1 \
+    if ! runuser -u "$DIENST" -- env HOME="$BASE" bash "$dir/$bau" "$BASE/web/bau/$seite" >>"$LOG" 2>&1 \
        || [ ! -f "$BASE/web/bau/$seite/index.html" ]; then
       log "web-$seite: Bau fehlgeschlagen – alter Stand bleibt"; return 1
     fi
     rm -rf "$neu"; cp -r "$BASE/web/bau/$seite" "$neu"; rm -f "$neu/_headers"
     chown -R root:root "$neu"; chmod -R u=rwX,go=rX "$neu"
     rm -rf "$ziel.alt"; [ -d "$ziel" ] && mv "$ziel" "$ziel.alt"; mv "$neu" "$ziel"
-    cp "$dir/_headers" "$STATE/web-$seite.headers"
+    cp "$dir/$hdr" "$STATE/web-$seite.headers"
     echo "$rev" > "$STATE/web-$seite.commit"; log "web-$seite: Dateien aktuell (${rev:0:7})"
   fi
+  [ "$seite" = zentrale-vorschau ] && return 0 # wird im Baustein der Vorschau eingebunden
   # nginx-Baustein (bei jedem Lauf prüfen, z. B. wenn das Vorschau-Passwort neu angelegt wurde)
   install -d -m 755 "$WEBCONF"
   local conf="$WEBCONF/$seite.conf" tmp; tmp=$(mktemp)
@@ -232,7 +250,9 @@ web() { # $1 = live|vorschau, $2 = Branch
 
 fehler=0
 web live live || fehler=1
+web zentrale-vorschau "$VORSCHAU" zentrale || fehler=1
 web vorschau "$VORSCHAU" || fehler=1
+web zentrale live zentrale || fehler=1
 ki || fehler=1
 arena || fehler=1
 docker image prune -f >/dev/null 2>&1 || true

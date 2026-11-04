@@ -175,7 +175,7 @@ async function angemeldet() {
     rahmen(`
       <div class="card"><h2 style="margin-bottom:.3rem">Hallo${p.display_name ? ' ' + esc(p.display_name) : ''}!</h2>
         <p class="small muted" style="margin:0">${esc(user.email)}${p.birth_year ? ` · Jahrgang ${esc(p.birth_year)}` : ''}${kind ? ` · Elternzustimmung: ${p.parent_consent ? '✓' : 'fehlt'}` : ''}</p></div>
-      ${st?.admin ? '<a class="card lime" href="admin.html" style="display:block;text-decoration:none;color:inherit"><b>🛠️ Verwaltung</b><br><span class="small muted">Nutzer, Einladungscodes, Zugänge</span></a>' : ''}
+      ${st?.admin ? `<a class="card lime" href="${(location.hostname.startsWith('vorschau.') ? '/zentrale/' : 'https://zentrale.nachtfalter.tech/')}" style="display:block;text-decoration:none;color:inherit"><b>🛠️ Zentrale</b><br><span class="small muted">Kunden, Fortschritt, Rollen, Einladungscodes</span></a>` : ''}
       ${st?.gesperrt ? '' : '<a class="btn primary block" href="./">▶ Zum Hacklab</a>'}
       <div class="card"><h3>Meine Zugänge</h3>${liste}</div>
       <details class="card"><summary><b>Einladungscode einlösen</b> <span class="small muted">(z. B. für die Arena)</span></summary>
