@@ -85,7 +85,9 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 
 - Web-App läuft vom eigenen Server: **www.nachtfalter.tech** (Startseite, Impressum, Datenschutz), **app.nachtfalter.tech** (Hacklab, Konto, Verwaltung, Anmeldung Pflicht), **vorschau.nachtfalter.tech** (Arbeits-Branch, Passwortschutz). Cloudflare Pages ist stillgelegt.
 - Konto: offene Registrierung mit E-Mail-Bestätigung; Mails über Brevo (`noreply@nachtfalter.tech`, Domain authentifiziert). Postfach `info@nachtfalter.tech` in Plesk (MX → nachtfalter.tech, Strato-Firewall 25/993 offen, Fail2Ban aktiv).
-- Offen: AVV mit Supabase/Brevo/Strato (Marcel), Log-Rotation ≤ 30 Tage, Port 2222 prüfen/schließen, PTR-Eintrag der Server-IP, Plesk-Benachrichtigungen über Brevo, Übersetzung neuer Konto-/Start-Texte.
+- Erledigt 04.11.: AVV (Supabase/Brevo in den AGB, Strato abgeschlossen), Log-Rotation 30 Tage, Plesk-Benachrichtigungen an info@, Plesk-2FA, Backups täglich nach Google Drive (verschlüsselt, Fehler-Mail an info@), Zentrale mit 2FA-Pflicht, alte Cloudflare-Seite leitet auf www um.
+- Bewusst so gelassen: Port 2222 (Marcel), kein PTR-Eintrag (Server verschickt selbst keine Mails nach außen).
+- Offen: info@ in der Mail-App (Postausgang über Brevo), Supabase-Datensicherung, Arena ans Konto anbinden, Übersetzung neuer Texte (Konto, Start, Zentrale nicht nötig).
 
 ## Offene Punkte
 
