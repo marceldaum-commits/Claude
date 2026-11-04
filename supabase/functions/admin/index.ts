@@ -43,7 +43,10 @@ Deno.serve(async (req) => {
   if (!adm) return antwort(origin, 403, { fehler: 'Kein Zugriff.' });
   // 3) Zwei-Faktor-Pflicht: Die Zentrale braucht eine Anmeldung mit App-Code (Supabase AAL2)
   let aal = '';
-  try { aal = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).aal || ''; } catch { /* */ }
+  try {
+    const b = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    aal = JSON.parse(atob(b + '='.repeat((4 - b.length % 4) % 4))).aal || '';
+  } catch { /* */ }
   if (aal !== 'aal2') return antwort(origin, 403, { fehler: 'Bitte mit Zwei-Faktor-Code anmelden.', code: 'mfa' });
 
   // Jede ändernde Aktion wird protokolliert (Tabelle admin_log, nur für den Dienst lesbar)
