@@ -79,3 +79,14 @@ Muster mit Platzhaltern wie `💡 Tipp {i}/{n} · danach noch {p} P.`, `noch {a}
 - translateFS nötig für `stufe2/abgefangen.txt`: ROT13 zurück, übersetzen, wieder ROT13 (kyrillischer Text bleibt dabei lesbar,
   der Code wird korrekt verschoben). *.log und *.csv am besten überspringen.
 - entschluessler.sh: nur Kommentar und echo-Text übersetzt, die Logik bleibt.
+
+## arena.json und seiten.json (noch ohne Lader)
+
+- `arena.json`: Arena (`arena/public/index.html`, `arena.js` und die `fehler`-Texte aus `arena/server.js`).
+  `seiten.json`: `start.html` und die **Kurzfassung** in `datenschutz.html`. Impressum und die ausführliche
+  Datenschutzerklärung bleiben deutsch (Rechtstexte).
+- Format wie `ui.json`: Schlüssel = deutscher Text eines **Textknotens**, getrimmt, Leerraum zu einem Leerzeichen
+  zusammengefasst (der lange Arena-Absatz steht im HTML über zwei Zeilen). `<b>`-Stücke sind eigene Schlüssel,
+  z. B. „Hier läuft ein“ + „echter Linux-Server nur für dich“ + „– direkt im Browser. Melde dich mit deinem“ + „Nachtfalter-Konto“ + „an.“.
+- Muster: `noch {m} min`. `Strg+C` steht in `#keys` mit translate="no" und muss eigens ersetzt werden (EN/UK: Ctrl+C).
+- `[Verbindung beendet – …]` wird ins Terminal geschrieben (term.write) – nur über die Nachschlagefunktion, nicht über den DOM.
