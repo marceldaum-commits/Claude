@@ -125,8 +125,10 @@ function renderTop() {
     ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben"><span class="lbl">VORSCHAU </span>${esc(self.KLY_VERSION || '')}</span>` : ''}
     <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' <span class="lbl">' + U(loc.short) + '</span>' : '📍 <span class="lbl">Lernort?</span>'}</button>
     ${syncConfigured() && !st.user ? `<a class="chip" href="konto.html" title="Anmelden oder kostenloses Konto anlegen" aria-label="Anmelden">👤 <span class="lbl">Anmelden</span></a>` :
-    `<a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`}`;
+    `<a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`}
+    ${st.user ? `<button class="chip" id="logoutChip" title="Abmelden (${esc(st.user.email || '')})" aria-label="Abmelden">⏻ <span class="lbl">Abmelden</span></button>` : ''}`;
   $('#locChip').onclick = () => locationModal(true);
+  const lo = $('#logoutChip'); if (lo) lo.onclick = async () => { if (!confirm('Wirklich abmelden? Dein Fortschritt ist im Konto gespeichert.')) return; try { await signOut(); } catch { /* offline */ } try { localStorage.removeItem('kly.auth'); } catch { /* */ } zurAnmeldung(); };
 }
 
 function renderNav(route) {

@@ -249,3 +249,15 @@ a.karte:hover { border-color: var(--violet); }
   .top .chip .lbl { display: none; }
   .brand img { width: 26px; height: 26px; }
 }
+
+/* Anmeldebildschirm */
+.held-bild { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 10px 40px rgba(124, 58, 237, .25); }
+.held-titel { font-size: 1.7rem; line-height: 1.2; margin: .2rem 0 0; }
+.held-titel span { color: var(--lime); }
+.anmelde-karte { padding: 1.1rem; }
+.reiter { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem; padding: .3rem; margin-bottom: .9rem; background: var(--bg, #0b0b12); border: 1px solid var(--line); border-radius: 12px; }
+.reiter button { min-height: 44px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font: inherit; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+.reiter button.an { background: var(--violet-d); color: #fff; }
+.linkbtn { background: none; border: 0; padding: .3rem; color: var(--violet); font: inherit; text-decoration: underline; cursor: pointer; min-height: 44px; }
+
+[hidden] { display: none !important; }

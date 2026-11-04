@@ -71,23 +71,27 @@ const main = $('#main');
 const msg = (t, ok = false) => { const e = $('#msg'); if (e) e.innerHTML = t ? `<div class="feedback ${ok ? 'ok' : 'no'}">${esc(t)}</div>` : ''; };
 const busy = (form, on) => form.querySelectorAll('button, input, select').forEach(x => { x.disabled = on; });
 
-function rahmen(inner) {
+function rahmen(inner, { held = false } = {}) {
+  const zurueck = $('#zumLab'); if (zurueck) zurueck.hidden = held; // abgemeldet: kein Weg am Login vorbei
   main.innerHTML = `${langNoteHTML()}<section class="stack" style="max-width:520px;margin:0 auto">
-    <h1 style="margin-bottom:.2rem">Nachtfalter-Konto</h1>
-    <p class="small muted" style="margin-top:0">Kostenlos registrieren – dein Fortschritt im Hacklab auf allen Geräten. <span class="badge plain">Beta</span></p>
+    ${held ? `<img class="held-bild" src="icons/hero.svg" alt="Ein Nachtfalter fliegt im Mondlicht über ein Terminal">
+    <div><h1 class="held-titel">Willkommen im <span>Hacklab</span></h1>
+    <p class="muted" style="margin:.2rem 0 0">Linux und ethisches Hacken lernen – Schritt für Schritt, direkt am Handy. Kostenlos.</p></div>` :
+    `<h1 style="margin-bottom:.2rem">Nachtfalter-Konto</h1>
+    <p class="small muted" style="margin-top:0">Kostenlos registrieren – dein Fortschritt im Hacklab auf allen Geräten. <span class="badge plain">Beta</span></p>`}
     ${hinweis ? `<div class="feedback ok">${esc(hinweis)}</div>` : ''}
     ${fehlerHinweis ? `<div class="feedback no">${esc(fehlerHinweis)}</div>` : ''}
     ${inner}
     <div id="msg"></div>
     <details class="card tight small"><summary>🌍 Sprache · Language · Мова</summary><div style="margin-top:.5rem">${langPickerHTML()}</div></details>
-    <p class="small muted"><a href="./">← Zurück zum Hacklab</a></p>
+    ${held ? '' : '<p class="small muted"><a href="./">← Zurück zum Hacklab</a></p>'}
   </section>`;
   bindLangPicker(main);
   hinweis = ''; fehlerHinweis = '';
 }
 
 function abgemeldet(tab = 'login') {
-  const t = (id, label) => `<button class="btn small ${tab === id ? 'primary' : 'ghost'}" data-tab="${id}">${label}</button>`;
+  const t = (id, label) => `<button type="button" role="tab" aria-selected="${tab === id}" class="${tab === id ? 'an' : ''}" data-tab="${id}">${label}</button>`;
   const formular = {
     login: `<form id="f" class="stack">
       <label>E-Mail<input type="email" name="email" autocomplete="email" required></label>
@@ -109,7 +113,11 @@ function abgemeldet(tab = 'login') {
       <label>E-Mail<input type="email" name="email" autocomplete="email" required></label>
       <button class="btn go block">Link zum Zurücksetzen schicken</button></form>`,
   }[tab];
-  rahmen(`<div class="row">${t('login', 'Anmelden')}${t('neu', 'Registrieren')}${t('vergessen', 'Passwort vergessen')}</div><div class="card">${formular}</div>`);
+  rahmen(`<div class="card anmelde-karte">
+    ${tab === 'vergessen' ? '<h3 style="margin:0 0 .6rem">Passwort vergessen?</h3>' : `<div class="reiter" role="tablist">${t('login', 'Anmelden')}${t('neu', 'Registrieren')}</div>`}
+    ${formular}
+    <p class="small" style="margin:.8rem 0 0;text-align:center">${tab === 'vergessen' ? '<button class="linkbtn" data-tab="login">← Zurück zur Anmeldung</button>' : tab === 'login' ? '<button class="linkbtn" data-tab="vergessen">Passwort vergessen?</button>' : 'Schon ein Konto? <button class="linkbtn" data-tab="login">Hier anmelden</button>'}</p>
+  </div>`, { held: true });
   main.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => abgemeldet(b.dataset.tab));
   const f = $('#f');
   if (tab === 'neu') {

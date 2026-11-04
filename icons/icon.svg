@@ -1,14 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b1030"/><stop offset="1" stop-color="#0b0b12"/></linearGradient>
-    <linearGradient id="up" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d1236"/><stop offset="1" stop-color="#0b0b12"/></linearGradient>
+    <radialGradient id="mond" cx=".5" cy=".42" r=".5"><stop offset="0" stop-color="#a3e635" stop-opacity=".22"/><stop offset=".55" stop-color="#7c3aed" stop-opacity=".12"/><stop offset="1" stop-color="#7c3aed" stop-opacity="0"/></radialGradient>
+    <linearGradient id="fl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset=".55" stop-color="#8b5cf6"/><stop offset="1" stop-color="#5b21b6"/></linearGradient>
+    <linearGradient id="fl2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#4c1d95"/></linearGradient>
+    <g id="seite">
+      <path d="M248 236 C 222 182, 150 120, 46 112 C 34 112, 30 124, 38 134 C 70 180, 110 238, 150 262 C 186 280, 222 276, 248 264 Z" fill="url(#fl)"/>
+      <path d="M248 268 C 208 276, 150 300, 122 344 C 110 366, 126 390, 156 382 C 200 370, 236 330, 250 290 Z" fill="url(#fl2)"/>
+      <path d="M236 244 C 200 206, 140 160, 80 136" fill="none" stroke="#0b0b12" stroke-opacity=".35" stroke-width="6" stroke-linecap="round"/>
+      <path d="M236 258 C 196 252, 150 236, 112 210" fill="none" stroke="#0b0b12" stroke-opacity=".3" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="150" cy="196" r="26" fill="#0b0b12" fill-opacity=".55"/>
+      <circle cx="150" cy="196" r="26" fill="none" stroke="#a3e635" stroke-width="8"/>
+      <circle cx="150" cy="196" r="8" fill="#a3e635"/>
+      <path d="M240 178 C 226 140, 206 108, 178 84" fill="none" stroke="#c4b5fd" stroke-width="8" stroke-linecap="round"/>
+      <path d="M232 156 l-20 4 M224 138 l-20 2 M214 122 l-18 0 M202 106 l-16 -2 M190 94 l-14 -4 M236 160 l-4 -20 M226 140 l-4 -18 M214 122 l-2 -16 M200 106 l0 -14" stroke="#a78bfa" stroke-width="5" stroke-linecap="round"/>
+    </g>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <rect x="20" y="20" width="472" height="472" rx="96" fill="none" stroke="#a78bfa" stroke-opacity=".35" stroke-width="8"/>
-  <!-- Level-Up-Chevrons -->
-  <path d="M300 214 L366 148 L432 214" fill="none" stroke="url(#up)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M300 292 L366 226 L432 292" fill="none" stroke="url(#up)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
-  <!-- Prompt >_ -->
-  <path d="M92 196 L184 262 L92 328" fill="none" stroke="#a3e635" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="200" y="340" width="120" height="36" rx="18" fill="#a3e635"/>
+  <circle cx="256" cy="230" r="230" fill="url(#mond)"/>
+  <g transform="translate(256 260) scale(0.97) translate(-256 -260)">
+  <use href="#seite"/>
+  <use href="#seite" transform="translate(512 0) scale(-1 1)"/>
+  <rect x="238" y="176" width="36" height="200" rx="18" fill="#0b0b12"/>
+  <rect x="244" y="182" width="24" height="188" rx="12" fill="#a3e635"/>
+  <path d="M250 300 h12 M250 324 h12 M250 348 h12" stroke="#0b0b12" stroke-width="6" stroke-linecap="round" opacity=".5"/>
+  </g>
 </svg>
