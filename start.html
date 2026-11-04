@@ -11,17 +11,51 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <header class="top"><a class="brand" href="start.html" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter</span></a></header>
-  <main class="seite">
-    <section class="held">
-      <h1>IT-Sicherheit lernen – legal, verständlich, Schritt für Schritt.</h1>
-      <p class="muted">Nachtfalter ist ein Lernprojekt für Einsteiger: Linux, Netzwerke und ethisches Hacken in kleinen Räumen, direkt im Browser – kostenlos, mit eigenem Konto. Gerade in der Testphase (Beta).</p>
+  <header class="top"><a class="brand" href="start.html" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter</span></a><span class="spacer"></span><a class="btn small ghost" href="https://app.nachtfalter.tech/">Anmelden</a></header>
+  <main class="seite start">
+    <section class="s-held">
+      <div class="s-held-text">
+        <span class="badge plain">Beta · kostenlos</span>
+        <h1>IT-Sicherheit lernen – <span>legal, verständlich, Schritt für Schritt.</span></h1>
+        <p class="muted">Im Nachtfalter Hacklab lernst du Linux, Netzwerke und ethisches Hacken in kleinen Räumen mit echten Befehlen – direkt im Browser, am Handy oder am PC. Ohne Installation, ohne Vorwissen.</p>
+        <div class="s-cta"><a class="btn go" href="https://app.nachtfalter.tech/konto.html?neu=1">Kostenlos starten</a><a class="btn ghost" href="https://app.nachtfalter.tech/">Ich habe schon ein Konto</a></div>
+      </div>
+      <img class="s-bild" src="icons/hero.svg" alt="Ein Nachtfalter fliegt im Mondlicht über ein Terminal" width="800" height="360">
     </section>
-    <div class="stack">
-      <a class="card karte" href="https://app.nachtfalter.tech/"><span class="ico">🎮</span><span><b>Hacklab</b><br><span class="small muted">Räume, Geschichten und Prüfungen im Browser – auch am Handy. Kostenlos.</span></span></a>
-      <a class="card karte" href="https://app.nachtfalter.tech/konto.html"><span class="ico">👤</span><span><b>Nachtfalter-Konto</b><br><span class="small muted">Kostenlos registrieren – dein Fortschritt auf allen Geräten.</span></span></a>
-    </div>
-    <p class="small muted">Alles hier ist nur für Übungsumgebungen gedacht. Angriffe auf fremde Systeme ohne Erlaubnis sind verboten.</p>
+
+    <section>
+      <h2>Was du lernst</h2>
+      <div class="s-raster">
+        <div class="card"><div class="s-ico">⌨️</div><b>Das Terminal</b><p class="small muted">Dateien finden, Rechte verstehen, Spuren lesen – die Grundbefehle, auf denen alles aufbaut.</p></div>
+        <div class="card"><div class="s-ico">🌐</div><b>Netzwerke & Dienste</b><p class="small muted">Was läuft auf welchem Port? Wie reden Rechner miteinander – und wo sind sie verwundbar?</p></div>
+        <div class="card"><div class="s-ico">🕸️</div><b>Web-Sicherheit</b><p class="small muted">Wie Webseiten Fehler machen und wie man sie findet, meldet und verhindert.</p></div>
+        <div class="card"><div class="s-ico">🧭</div><b>Mit Regeln hacken</b><p class="small muted">Erlaubnis, Grenzen, sauberes Vorgehen: ethisches Hacken heißt immer auch Verantwortung.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>So funktioniert's</h2>
+      <ol class="s-schritte">
+        <li><b>Konto anlegen</b><span class="small muted">Mit E-Mail, kostenlos. Dein Fortschritt ist damit auf allen Geräten dabei.</span></li>
+        <li><b>Räume lösen</b><span class="small muted">Jeder Raum ist eine kleine Mission mit Terminal im Browser, Tipps, wenn du festhängst, und Codes als Beweis.</span></li>
+        <li><b>Weiterkommen</b><span class="small muted">Geschichten, Abzeichen und Prüfungen – und in der Arena echte Übungs-Server nur für dich.</span></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Häufige Fragen</h2>
+      <div class="stack">
+        <details class="card tight"><summary><b>Kostet das etwas?</b></summary><p class="small">Nein. Das Hacklab ist in der Testphase kostenlos. Für einzelne Zusatzangebote wie die Arena brauchst du einen Zugang, den es per Einladung gibt.</p></details>
+        <details class="card tight"><summary><b>Brauche ich Kali Linux oder einen PC?</b></summary><p class="small">Nein. Alles läuft im Browser, auch am Handy. Wer mag, kann einzelne Labs zusätzlich in einer eigenen Kali-VM spielen.</p></details>
+        <details class="card tight"><summary><b>Ist das legal?</b></summary><p class="small">Ja – geübt wird nur in eigenen, abgeschotteten Übungsumgebungen. Angriffe auf fremde Systeme ohne Erlaubnis sind verboten, und das lernst du hier auch.</p></details>
+        <details class="card tight"><summary><b>Ab welchem Alter?</b></summary><p class="small">Für Einsteiger jeden Alters. Unter 16 Jahren legst du das Konto zusammen mit einem Elternteil an.</p></details>
+      </div>
+    </section>
+
+    <section class="s-schluss card">
+      <h2 style="margin-top:0">Bereit für deinen ersten Raum?</h2>
+      <a class="btn go" href="https://app.nachtfalter.tech/konto.html?neu=1">Kostenlos starten</a>
+    </section>
   </main>
   <footer class="fuss"><a href="start.html">Nachtfalter</a> · <a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></footer>
 </body>
