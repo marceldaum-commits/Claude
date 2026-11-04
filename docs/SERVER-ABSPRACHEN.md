@@ -89,6 +89,20 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - Bewusst so gelassen: Port 2222 (Marcel), kein PTR-Eintrag (Server verschickt selbst keine Mails nach außen).
 - Offen: info@ in der Mail-App (Postausgang über Brevo), Supabase-Datensicherung, Arena ans Konto anbinden, Übersetzung neuer Texte (Konto, Start, Zentrale nicht nötig).
 
+## Stand 04.11.2026 abends (2.24.0)
+
+- Mail komplett über den eigenen Server (Marcels Entscheidung): SPF `v=spf1 ip4:217.160.61.73 ~all`, DKIM (Selektor default),
+  PTR nachtfalter.tech, smtp_helo_name, Supabase-SMTP → nachtfalter.tech:587 (noreply@). t-online sperrt neue Server
+  (554 NOWL) → Freischaltung bei tobr@rx.t-online.de angefragt (Antwort abwarten). Brevo-Einträge noch nicht entfernt.
+- Code-Review (13 Befunde) behoben, u. a. Deploy-Härtung (systemd-run, keine Symlinks), Zentrale-Vorschau abgeschaltet,
+  Arena-Limits, robuste Auswertung. Arena läuft mit Konto-Anmeldung.
+- Konto-Sicherung eingerichtet (konto-db.env, pg_dump nachts) – greift ab der nächsten Nacht.
+- Offen (Marcel, am PC): Update-Skript neu einspielen (Prüfzahl c7e054d4) – enthält die Härtung;
+  Port 587 in Plesk (Mail Server Settings) prüfen; Brevo-Schlüssel löschen; nach t-online-Freigabe Mailtest,
+  dann Brevo-DNS-Einträge (brevo-code, brevo1/2._domainkey) und DMARC-rua anpassen.
+- Hinweis 2FA: Wer zur „Verwaltung“ gemacht wird, richtet beim ersten Zentrale-Login den Code selbst ein → Rolle nur
+  vergeben, wenn die Person direkt danach einrichtet (sonst könnte jemand mit ihrem Passwort zuvorkommen).
+
 ## Offene Punkte
 
 - [ ] Domain festlegen (Marcel)
