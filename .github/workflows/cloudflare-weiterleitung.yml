@@ -1,0 +1,27 @@
+# Ersetzt die alte Cloudflare-Pages-Seite (kali-level-up.pages.dev) durch eine Umzugs-Seite,
+# die auf www.nachtfalter.tech weiterleitet und den alten Offline-Cache der App aufräumt.
+# Nur von Hand starten. Löscht nichts bei Cloudflare – lädt nur eine neue Version hoch.
+name: Cloudflare-Seite auf neue Adresse umleiten
+
+on:
+  workflow_dispatch:
+    inputs:
+      ziel:
+        description: 'Pages-Branch: main (alte Haupt-Adresse) oder vorschau'
+        required: true
+        default: main
+        type: choice
+        options: [main, vorschau]
+
+jobs:
+  umleiten:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Auf Cloudflare Pages hochladen
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx -y wrangler@3 pages deploy tools/cloudflare-weiterleitung --project-name=kali-level-up --branch=${{ inputs.ziel }} --commit-dirty=true

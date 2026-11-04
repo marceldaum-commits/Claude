@@ -52,3 +52,13 @@ ARENA=http://127.0.0.1:8090 CODE=test node test/smoke.mjs
 ```
 Der Rauchtest prüft: falscher Code/Token abgewiesen, Lab startet, Terminal als azubi, Codes passen zum Token,
 `ssh` zwischen Konten, nur localhost-Netz, kein Internet, Token in der Umgebung von PID 1 nicht lesbar.
+
+## Zugang über das Nachtfalter-Konto (ab 2.23.0)
+
+Spieler melden sich in der Arena mit ihrem Nachtfalter-Konto an. Ein Lab startet nur, wenn das Konto einen gültigen
+Zugang `arena` oder `alles` hat (vergeben in der Zentrale oder per Einladungscode, der direkt in der Arena eingelöst
+werden kann). Der Server prüft das Token beim Supabase-Auth-Server und liest Zugänge/Sperre mit dem Token des Spielers
+(RLS) – er braucht dafür **kein Geheimnis**, nur die öffentliche Adresse und den öffentlichen Schlüssel.
+
+Umgebungsvariablen: `KONTO=1` (Standard), `KONTO_URL`, `KONTO_KEY`, `MAX_PER_USER` (Standard 2).
+Der alte Einladungscode `ARENA_CODE` funktioniert übergangsweise weiter, solange er gesetzt ist.

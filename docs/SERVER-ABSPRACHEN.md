@@ -71,7 +71,7 @@ Weitere Mitarbeiter: Marcel hat erlaubt, bei Bedarf neue Sitzungen anzulegen. Vo
 
 Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtung.
 
-- **Ein Konto für alle Nachtfalter-Apps** (Hacklab, Arena, KI-Werkstatt): zentral über Supabase Auth (E-Mail + Passwort bzw. Magic Link), Login-Seite `konto.nachtfalter.dev`. Hacklab nutzt Supabase bereits für den Sync.
+- **Ein Konto für alle Nachtfalter-Apps** (Hacklab, Arena, KI-Werkstatt): zentral über Supabase Auth (E-Mail + Passwort bzw. Magic Link), Login-Seite `konto.nachtfalter.tech`. Hacklab nutzt Supabase bereits für den Sync.
 - **Tabellen** (mit Row Level Security): `profiles` (Anzeigename, Sprache, Geburtsjahr/Elternfreigabe), `entitlements` (user, produkt `arena|ki|alles`, gueltig_bis, quelle `beta|kauf|geschenk`).
 - **Dienste prüfen den Zugang serverseitig**: Arena und KI-Werkstatt verlangen ein gültiges Supabase-Token + passendes Entitlement statt Einladungscode. Kostenlos bleibt alles, was im Browser läuft.
 - **Cloudflare Access** schützt dann nur noch Vorschau/Admin; die öffentlichen Apps gehen ohne Access online.
@@ -80,6 +80,14 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - Schema-Wünsche der KI-Sitzung (eingeplant): `entitlements` nur serverseitig per service_role lesen (Dienste), RLS: Nutzer sehen nur eigene Zeilen; optionales Feld `ki_budget_usd` pro Entitlement (sonst Standard `BUDGET_USD_PER_CODE`). KI-Werkstatt hat dafür `ki-lernen/auth.js` mit `AUTH_MODE=codes|supabase` vorbereitet (0.4.0).
 - **Stand 03.11.2026:** Supabase-Projekt „nachtfalter-konto“ angelegt (Ref `sxapebxzxmathkvtuuvn`, Frankfurt), Schema `supabase/konto-schema.sql` angewendet, Sicherheits-Prüfung ohne Befund. Schlüssel (service_role) holt Marcel im Supabase-Dashboard und trägt ihn nur in die `.env` auf dem Server ein – nie in Chat oder Repo.
 - Zuständig: Kali-Sitzung (Konto, Datenbank, Sicherheit, Zahlungs-Webhook), KI-Sitzung (Anbindung KI-Werkstatt, Texte/Ablauf aus Nutzersicht), Sprache & Qualität (Übersetzung, Test).
+
+## Stand 04.11.2026
+
+- Web-App läuft vom eigenen Server: **www.nachtfalter.tech** (Startseite, Impressum, Datenschutz), **app.nachtfalter.tech** (Hacklab, Konto, Verwaltung, Anmeldung Pflicht), **vorschau.nachtfalter.tech** (Arbeits-Branch, Passwortschutz). Cloudflare Pages ist stillgelegt.
+- Konto: offene Registrierung mit E-Mail-Bestätigung; Mails über Brevo (`noreply@nachtfalter.tech`, Domain authentifiziert). Postfach `info@nachtfalter.tech` in Plesk (MX → nachtfalter.tech, Strato-Firewall 25/993 offen, Fail2Ban aktiv).
+- Erledigt 04.11.: AVV (Supabase/Brevo in den AGB, Strato abgeschlossen), Log-Rotation 30 Tage, Plesk-Benachrichtigungen an info@, Plesk-2FA, Backups täglich nach Google Drive (verschlüsselt, Fehler-Mail an info@), Zentrale mit 2FA-Pflicht, alte Cloudflare-Seite leitet auf www um.
+- Bewusst so gelassen: Port 2222 (Marcel), kein PTR-Eintrag (Server verschickt selbst keine Mails nach außen).
+- Offen: info@ in der Mail-App (Postausgang über Brevo), Supabase-Datensicherung, Arena ans Konto anbinden, Übersetzung neuer Texte (Konto, Start, Zentrale nicht nötig).
 
 ## Offene Punkte
 

@@ -19,3 +19,5 @@ input { display: block; width: 100%; margin-top: .3rem; padding: .65rem .8rem; b
 #keys { display: flex; gap: 4px; overflow-x: auto; padding: 6px; border-top: 1px solid var(--line); background: var(--card); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
 #keys button { flex: 0 0 auto; min-width: 44px; padding: .45rem .6rem; border-radius: 8px; border: 1px solid var(--line); background: #0d0d16; color: var(--text); font: 14px ui-monospace, monospace; }
 @media (min-width: 900px) { #keys { display: none; } }
+a { color: var(--lime); }
+#cf { margin-top: .6rem; border-top: 1px solid var(--line); padding-top: .4rem; }

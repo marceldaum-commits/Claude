@@ -1,4 +1,6 @@
-# Veröffentlicht die App automatisch (Freigabe-Ablauf):
+# SEIT 04.11.2026 STILLGELEGT: Die App läuft auf dem eigenen Server (app.nachtfalter.tech / vorschau.nachtfalter.tech),
+# geholt von /usr/local/sbin/nachtfalter-deploy (siehe deploy/). Dieser Workflow startet nur noch von Hand.
+# Früher: Veröffentlicht die App automatisch (Freigabe-Ablauf):
 #   Push auf den Arbeits-Branch  → VORSCHAU  https://vorschau.kali-level-up.pages.dev (Cloudflare Access wie live)
 #   Push auf den Branch „live“   → ECHTE APP https://kali-level-up.pages.dev
 # „live“ wird nur nach Marcels „ok“ im Chat aktualisiert.
@@ -7,8 +9,6 @@
 name: Veröffentlichen
 
 on:
-  push:
-    branches: [live, ccr-63912bdd-xpv8bk]
   workflow_dispatch:
 
 concurrency:

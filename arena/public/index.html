@@ -14,15 +14,30 @@
     <span id="info" class="muted"></span>
     <button id="ende" class="btn ghost" hidden>Beenden</button>
   </header>
-  <main id="start" class="card">
+  <main id="anmelden" class="card" hidden>
+    <h1>Arena · Online-Labs</h1>
+    <p>Hier läuft ein <b>echter Linux-Server nur für dich</b> – direkt im Browser. Melde dich mit deinem <b>Nachtfalter-Konto</b> an.</p>
+    <form id="lf">
+      <label>E-Mail<input type="email" name="email" autocomplete="username" required></label>
+      <label>Passwort<input type="password" name="pw" autocomplete="current-password" required></label>
+      <button class="btn">Anmelden</button>
+    </form>
+    <p id="lmsg" class="muted"></p>
+    <p class="small muted">Noch kein Konto? <a id="regLink" href="https://app.nachtfalter.tech/konto.html?neu=1">Kostenlos registrieren</a> · <a id="pwLink" href="https://app.nachtfalter.tech/konto.html">Passwort vergessen?</a></p>
+  </main>
+  <main id="start" class="card" hidden>
     <h1 id="titel">Online-Lab</h1>
+    <p class="small muted">Angemeldet als <b id="wer"></b> · <a href="#" id="aus">Abmelden</a></p>
     <p>Hier läuft ein <b>echter Linux-Server nur für dich</b> – direkt im Browser, ohne Kali und ohne Installation.
       Er ist vom Internet und von anderen Spielern abgeschottet und wird nach spätestens 2 Stunden automatisch gelöscht.</p>
-    <label>Einladungscode (Beta)<input id="code" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     <label>Dein Lab-Token (steht in der App)<input id="token" placeholder="KLY-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
     <button id="los" class="btn">▶ Lab starten</button>
     <p id="msg" class="muted"></p>
-    <p class="small muted">Codes, die du hier findest, trägst du wie gewohnt in der App ein.</p>
+    <form id="cf" hidden>
+      <label>Einladungscode<input name="code" placeholder="NF-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" required></label>
+      <button class="btn">Code einlösen</button>
+    </form>
+    <p class="small muted">Codes, die du im Lab findest, trägst du wie gewohnt in der App ein.</p>
   </main>
   <section id="termbox" hidden>
     <div id="term" translate="no"></div>

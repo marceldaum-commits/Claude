@@ -38,6 +38,12 @@ async function getClient() {
 
 export async function initSync(getState, applyState) {
   if (!syncConfigured()) { setStatus('off', 'Nur lokal – Sync nicht eingerichtet'); return; }
+  // Projektwechsel (z. B. auf das Nachtfalter-Konto): alte Anmeldung passt nicht mehr → verwerfen.
+  // Der Lernstand bleibt lokal erhalten und wird nach der neuen Anmeldung hochgeladen.
+  try {
+    const p = globalThis.KLY_CONFIG.supabaseUrl;
+    if (localStorage.getItem('kly.auth.projekt') !== p) { localStorage.removeItem('kly.auth'); localStorage.setItem('kly.auth.projekt', p); }
+  } catch { /* */ }
   try {
     setStatus('busy', 'Verbinde …');
     const c = await getClient();
@@ -68,6 +74,14 @@ export async function signUp(email, password) {
   if (!c) throw new Error('Sync ist nicht eingerichtet.');
   const { error } = await c.auth.signUp({ email, password });
   if (error) throw new Error(error.message);
+}
+// Status des eigenen Kontos (freigeschaltet/gesperrt/admin) – nur wenn angemeldet
+export async function meinStatus() {
+  if (!user) return null;
+  const c = await getClient();
+  const { data, error } = await c.rpc('mein_status');
+  if (error) throw new Error(error.message);
+  return data;
 }
 export async function signOut() {
   const c = await getClient();

@@ -13,7 +13,7 @@ import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -122,10 +122,13 @@ function renderTop() {
   $('#top').innerHTML = `
     <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter <b>Hacklab</b></span></a>
     <span class="spacer"></span>
-    ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben">VORSCHAU ${esc(self.KLY_VERSION || '')}</span>` : ''}
-    <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + U(loc.short) : '📍 Lernort?'}</button>
-    <a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`;
+    ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben"><span class="lbl">VORSCHAU </span>${esc(self.KLY_VERSION || '')}</span>` : ''}
+    <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' <span class="lbl">' + U(loc.short) + '</span>' : '📍 <span class="lbl">Lernort?</span>'}</button>
+    ${syncConfigured() && !st.user ? `<a class="chip" href="konto.html" title="Anmelden oder kostenloses Konto anlegen" aria-label="Anmelden">👤 <span class="lbl">Anmelden</span></a>` :
+    `<a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`}
+    ${st.user ? `<button class="chip" id="logoutChip" title="Abmelden (${esc(st.user.email || '')})" aria-label="Abmelden">⏻ <span class="lbl">Abmelden</span></button>` : ''}`;
   $('#locChip').onclick = () => locationModal(true);
+  const lo = $('#logoutChip'); if (lo) lo.onclick = async () => { if (!confirm('Wirklich abmelden? Dein Fortschritt ist im Konto gespeichert.')) return; try { await signOut(); } catch { /* offline */ } try { localStorage.removeItem('kly.auth'); } catch { /* */ } zurAnmeldung(); };
 }
 
 function renderNav(route) {
@@ -1045,16 +1048,17 @@ views.mehr = () => {
         <li><a href="#/handy-labs"><span class="state">📱</span><span class="grow"><span class="t">Labs vom Handy spielen</span><span class="s">Kellerserver & Co. über deine Kali-VM – mit Tailscale, gratis</span></span></a></li>
         <li><a href="#/werkzeuge"><span class="state">⚒</span><span class="grow"><span class="t">Werkzeuge</span><span class="s">Kali-Tools: Zweck, Scope, Beleg</span></span></a></li>
         <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen (freiwillig)</span><span class="s">Meisterprüfung Linux</span></span></a></li>
+        <li><a href="impressum.html"><span class="state">§</span><span class="grow"><span class="t">Impressum & Datenschutz</span><span class="s">Wer hinter Nachtfalter steht, was mit deinen Daten passiert</span></span></a></li>
         <li><button class="item" id="loc" style="width:100%;background:none;border:0;text-align:left;cursor:pointer"><span class="state">📍</span><span class="grow"><span class="t">Lernort ändern</span><span class="s">${esc(LOCATIONS[state.location]?.label || 'nicht gewählt')}</span></span></button></li>
       </ul></div>
 
       <div class="card">
-        <h2>Synchronisierung PC ↔ Handy</h2>
+        <h2>Nachtfalter-Konto · Fortschritt auf allen Geräten</h2>
         <p class="small" id="syncline">${syncLine(st)}</p>
         ${!syncConfigured() ? `<p class="small muted">Noch nicht eingerichtet. Anleitung: <code>docs/SUPABASE-SETUP.md</code> im Projekt. Bis dahin: Lernstand per Export/Import übertragen.</p>` :
-        st.user ? `<p class="small">Angemeldet als <b>${esc(st.user.email)}</b></p><div class="row"><button class="btn small" id="syncnow">Jetzt synchronisieren</button><button class="btn small ghost" id="logout">Abmelden</button></div>` :
+        st.user ? `<p class="small">Angemeldet als <b>${esc(st.user.email)}</b></p><div class="row"><button class="btn small" id="syncnow">Jetzt synchronisieren</button><button class="btn small ghost" id="logout">Abmelden</button><a class="btn small ghost" href="konto.html">Mein Konto</a><a class="btn small ghost" href="${(location.hostname.startsWith('vorschau.') ? '/zentrale/' : 'https://zentrale.nachtfalter.tech/')}" id="adminlink" hidden>🛠 Zentrale</a></div>` :
           `<label for="em">E-Mail</label><input type="email" id="em" autocomplete="username"><label for="pw">Passwort</label><input type="password" id="pw" autocomplete="current-password">
-           <div class="row" style="margin-top:.6rem"><button class="btn primary" id="login">Anmelden</button><button class="btn ghost" id="signup">Konto anlegen</button></div><div id="authfb"></div>`}
+           <div class="row" style="margin-top:.6rem"><button class="btn primary" id="login">Anmelden</button><a class="btn ghost" href="konto.html?neu=1">Konto anlegen</a></div><div id="authfb"></div>`}
         <p class="honest">Beim Zusammenführen geht nichts verloren: Bestandenes bleibt bestanden, Archiv und Belege werden vereinigt. Prüfungen gelten nur aus vollständig nachvollziehbaren Versuchen. Vor jeder Zusammenführung wird lokal gesichert.</p>
       </div>
 
@@ -1170,9 +1174,9 @@ views.mehr = () => {
           catch (e) { fb.innerHTML = `<div class="feedback no">${esc(e.message)}</div>`; }
         };
         login.onclick = () => doAuth(signIn);
-        $('#signup', root).onclick = () => doAuth(signUp);
       }
       const sn = $('#syncnow', root); if (sn) sn.onclick = () => syncNow(getState, applyState);
+      const al = $('#adminlink', root); if (al) meinStatus().then(s => { if (s?.admin) al.hidden = false; }).catch(() => {});
       const lo = $('#logout', root); if (lo) lo.onclick = async () => { await signOut(); render(); };
     },
   };
@@ -1263,7 +1267,7 @@ function sshMachineHTML(r) {
   return `<div class="card lime stack" id="machine">
     <div class="row between"><h3 style="margin:0">Server ${esc(m.name)}</h3><span class="badge real">echt · nur 127.0.0.1</span></div>
     <p class="small">SSH-Port <code>127.0.0.1:${m.port}</code> · Token: <code>${esc(state.labToken)}</code> · Nur am PC (Kali-VM mit Docker).</p>
-    ${arenaLink(m) ? `<a class="btn go" href="${arenaLink(m)}" target="_blank" rel="noopener">🌐 Online spielen – ohne Kali (Beta)</a><p class="small muted" style="margin:-.3rem 0 0">Ein eigener Server nur für dich, direkt im Browser. Oder klassisch in deiner Kali-VM:</p>` : ''}
+    ${arenaLink(m) ? `<a class="btn go" href="${arenaLink(m)}" target="_blank" rel="noopener">🌐 Online spielen – ohne Kali (Beta)</a><p class="small muted" style="margin:-.3rem 0 0">Ein eigener Server nur für dich, direkt im Browser – Anmeldung mit deinem Nachtfalter-Konto (Arena-Zugang nötig). Oder klassisch in deiner Kali-VM:</p>` : ''}
     <a class="btn small" href="#/handy-labs" style="align-self:flex-start">📱 Vom Handy spielen (über deine Kali-VM)</a>
     ${roomState(r.id).startedAt ? '' : '<button class="btn ghost" id="startm">▶ In Kali starten – Anleitung anzeigen</button>'}
     <div id="mhow" ${roomState(r.id).startedAt ? '' : 'hidden'}>
@@ -1520,10 +1524,19 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Start
+// Anmeldung ist Pflicht: ohne gespeicherte Sitzung geht es zuerst zum Nachtfalter-Konto.
+function hatSitzung() {
+  try {
+    const a = JSON.parse(localStorage.getItem('kly.auth') || 'null');
+    return !!(a && a.refresh_token) && localStorage.getItem('kly.auth.projekt') === globalThis.KLY_CONFIG?.supabaseUrl;
+  } catch { return false; }
+}
+const zurAnmeldung = () => location.replace('konto.html?app=1');
+if (syncConfigured() && !hatSitzung()) { zurAnmeldung(); await new Promise(() => {}); }
 initLang(); protectCodes(); loadShellT(); await loadUI(); L1 = makeT(await loadLevel1());
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
-onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
+onSyncStatus((st) => { if (syncConfigured() && !st.user && st.state === 'warn' && navigator.onLine) return zurAnmeldung(); renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
 render();
 locationModal(false);
 initSync(getState, applyState);

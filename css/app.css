@@ -229,3 +229,49 @@ body { top: 0 !important; }
 .goog-text-highlight { background: none !important; box-shadow: none !important; }
 .konto label { display: block; font-size: .9rem; color: var(--muted); }
 .konto label > input, .konto label > select { margin-top: .3rem; color: var(--text); }
+
+/* Startseite, Impressum, Datenschutz */
+.seite { padding-bottom: 2rem; }
+.seite.text { max-width: 720px; line-height: 1.55; }
+.held { padding: 1.2rem 0 .6rem; }
+.held h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 .6rem; }
+.karte { display: flex; gap: .9rem; align-items: center; color: var(--text); text-decoration: none; }
+a.karte:hover { border-color: var(--violet); }
+.karte .ico { font-size: 1.7rem; width: 2.2rem; text-align: center; flex: none; }
+.karte.aus { opacity: .6; }
+.fuss { text-align: center; padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)); font-size: .86rem; color: var(--muted); }
+.fuss a { color: var(--muted); }
+
+/* Kopfzeile auf schmalen Handys: nur Symbole, Marke nicht umbrechen */
+.brand span { white-space: nowrap; }
+@media (max-width: 420px) {
+  .top { gap: .4rem; padding-left: .75rem; padding-right: .75rem; }
+  .top .chip .lbl { display: none; }
+  .brand img { width: 26px; height: 26px; }
+}
+
+/* Anmeldebildschirm */
+.held-bild { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 10px 40px rgba(124, 58, 237, .25); }
+.held-titel { font-size: 1.7rem; line-height: 1.2; margin: .2rem 0 0; }
+.held-titel span { color: var(--lime); }
+.anmelde-karte { padding: 1.1rem; }
+.reiter { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem; padding: .3rem; margin-bottom: .9rem; background: var(--bg, #0b0b12); border: 1px solid var(--line); border-radius: 12px; }
+.reiter button { min-height: 44px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font: inherit; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+.reiter button.an { background: var(--violet-d); color: #fff; }
+.linkbtn { background: none; border: 0; padding: .3rem; color: var(--violet); font: inherit; text-decoration: underline; cursor: pointer; min-height: 44px; }
+
+[hidden] { display: none !important; }
+
+.anmelde-layout { max-width: 520px; margin: 0 auto; display: grid; gap: 1rem; }
+.held-links { display: grid; gap: .75rem; }
+.held-punkte { list-style: none; margin: 0; padding: 0; display: none; }
+.held-punkte li { padding: .25rem 0; }
+@media (min-width: 900px) {
+  .anmelde-layout { max-width: 1060px; grid-template-columns: 1.25fr 1fr; gap: 2.5rem; align-items: center; min-height: calc(100vh - 170px); }
+  .held-titel { font-size: 2.6rem; }
+  .held-punkte { display: block; font-size: 1rem; }
+  .held-bild { border-radius: 22px; }
+}
+
+.seite.text { overflow-wrap: anywhere; }
+.datenschutz h2 { margin-top: 1.6rem; }

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Nachtfalter ist umgezogen</title>
+  <meta http-equiv="refresh" content="3; url=https://www.nachtfalter.tech/">
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b0b12; color: #e5e7eb; font: 16px/1.5 system-ui, sans-serif; text-align: center; padding: 1rem; }
+    a { color: #a3e635; font-weight: 600; }
+    h1 { font-size: 1.5rem; margin: 0 0 .5rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>🦋 Nachtfalter ist umgezogen</h1>
+    <p>Die neue Adresse lautet <a href="https://www.nachtfalter.tech/">www.nachtfalter.tech</a>.<br>Du wirst gleich weitergeleitet.</p>
+    <p style="font-size:.9rem;color:#9ca3af">Tipp: Ändere dein Lesezeichen bzw. lege die App neu auf den Startbildschirm.</p>
+  </main>
+  <script>
+    // Alte Offline-Version (Service Worker + Cache) aufräumen, dann weiter zur neuen Adresse
+    (async () => {
+      try { for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch (e) {}
+      try { for (const k of await caches.keys()) await caches.delete(k); } catch (e) {}
+      setTimeout(() => location.replace('https://www.nachtfalter.tech/'), 1500);
+    })();
+  </script>
+</body>
+</html>
