@@ -213,4 +213,18 @@ export const LERNPFAD = [
     selbst: ['Spiele „Der Mitschnitt“. Das Handout zeigt die passenden tshark-Filter.'],
     uebung: { label: 'Arena: Der Mitschnitt', href: 'arena:mitschnitt', erfordert: { arena: 'mitschnitt', level: 4 }, hinweis: 'Beantworte mindestens 4 der 5 Fragen zum Mitschnitt.' },
   },
+  {
+    id: 's14', icon: '🔧', titel: 'Reverse Engineering: Programme ohne Quelltext',
+    einleitung: 'Eine neue Methode: Du bekommst nur ein fertiges Programm – keinen Quelltext – und findest heraus, was es tut. So knackt man „Crackmes“ und versteht fremde Software.',
+    konzepte: [
+      ['Reverse Engineering', 'Ein Programm untersuchen, ohne den Quelltext zu haben.'],
+      ['Hash', 'Prüfsummen tauchen oft in Lizenzprüfungen auf.'],
+    ],
+    beispiel: {
+      text: 'Klartext im Programm finden und Bibliotheksaufrufe mitlesen:',
+      befehle: ['strings programm', 'ltrace ./programm test', 'objdump -d programm | less'],
+    },
+    selbst: ['Spiele „Die Werkstatt“ und knacke die fünf Crackmes von leicht (strings) bis zur eigenen Keygen.'],
+    uebung: { label: 'Arena: Die Werkstatt', href: 'arena:werkstatt', erfordert: { arena: 'werkstatt', level: 4 }, hinweis: 'Knacke mindestens 4 der 5 Crackmes.' },
+  },
 ];

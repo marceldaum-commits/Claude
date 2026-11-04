@@ -2,7 +2,7 @@
 
 > Automatisch erzeugt aus `arena/server.js` mit `node tools/arena-uebersicht.mjs`. Nicht von Hand ändern.
 
-Insgesamt **16 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
+Insgesamt **17 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
 
 ## 🗝️ Hacken
 
@@ -15,6 +15,7 @@ Insgesamt **16 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 | **Web 1: Das Kleingedruckte** | Fortgeschritten | 6 | Arena | #Web |
 | **Der Tresor** | Experte | 6 | Profi | #Krypto #Web #Linux |
 | **Web 2: Umwege** | Experte | 6 | Profi | #Web #Injection #Netzwerk |
+| **Die Werkstatt** | Experte | 5 | Profi | #Reverse #Binär |
 | **Web 3: Die Kette** | Extrem | 6 | Profi | #Web #Injection |
 
 - **Der Meister: Das Rechenzentrum** (Meister): Die Königsklasse: durch ein simuliertes internes Netz (mehrere Konten = Maschinen) bis zum Kern pivotieren – Hash knacken, echter Buffer Overflow (ret2win), Rechteausweitung bis root.
@@ -24,6 +25,7 @@ Insgesamt **16 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 - **Web 1: Das Kleingedruckte** (Fortgeschritten): Web-Grundlagen mit curl: versteckte Pfade (robots.txt), HTTP-Methoden, versteckte Parameter, Pfad-Ausbruch, vergessene Backup-Datei, gefälschte Header.
 - **Der Tresor** (Experte): Für Experten: Passwort-Hash knacken, Geheimnisse in Git und Logs, PATH-Falle, Pfad-Ausbruch in einer API, verschlüsselter Tresor.
 - **Web 2: Umwege** (Experte): Web mittel: SQL-Login umgehen, mit UNION fremde Tabellen lesen, SSRF auf interne Dienste, unsicheres Zusatzfeld, Token fälschen (JWT alg=none), file://.
+- **Die Werkstatt** (Experte): Reverse Engineering: fünf kleine Programme (Crackmes) ohne Quelltext knacken – mit strings, ltrace, objdump, gdb und einer selbst gebauten Keygen.
 - **Web 3: Die Kette** (Extrem): Web extrem: Template-Injection, unsichere Deserialisierung, Race Condition, Blind-SQL-Injection, SSRF mit umgangener Sperre, XXE.
 
 ## 🔍 Ermitteln

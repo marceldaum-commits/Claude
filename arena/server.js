@@ -110,6 +110,10 @@ const LABS = {
     produkt: 'arena-profi', stufe: 'Experte', levels: 5, praefix: 'mitschnitt',
     kurz: 'Netzwerk-Forensik: einen aufgezeichneten Datenverkehr (pcap) mit tshark auswerten – Klartext-Login, Datei-Diebstahl, DNS-Ausleitung und ein verstecktes Kommando.',
     hello: hallo('SOC Nordstadt', 'analyst', 'Fall: cat ~/fall.txt   ·   Beweis: /beweise/mitschnitt.pcap   ·   begriff exfiltration') },
+  werkstatt: { image: env('WERKSTATT_IMAGE', 'nf-werkstatt'), user: 'knacker', ready: 'Werkstatt bereit', title: 'Die Werkstatt', host: 'werkstatt',
+    produkt: 'arena-profi', stufe: 'Experte', levels: 5, praefix: 'werkstatt', tmpfs: { '/opt/werkstatt': 'rw,exec,nosuid,size=8m' },
+    kurz: 'Reverse Engineering: fünf kleine Programme (Crackmes) ohne Quelltext knacken – mit strings, ltrace, objdump, gdb und einer selbst gebauten Keygen.',
+    hello: hallo('Die Werkstatt', 'knacker', 'Auftrag: cat ~/auftrag.txt   ·   Programme: /opt/werkstatt/cm1 … cm5   ·   begriff reverse') },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -123,6 +127,7 @@ const EINORDNUNG = {
   meister: ['Hacken', ['Pivoting', 'Exploitation', 'Netzwerk', 'Linux']],
   duell: ['Abwehren', ['Threat Hunting', 'Rechte', 'Persistenz']],
   mitschnitt: ['Ermitteln', ['Netzwerk', 'Forensik', 'Logs']],
+  werkstatt: ['Hacken', ['Reverse', 'Binär']],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};
