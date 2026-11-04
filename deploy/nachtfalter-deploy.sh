@@ -8,7 +8,7 @@
 #   nachtfalter-deploy status    Zustand anzeigen (nichts ändern)
 #
 # Quellen (Repository marceldaum-commits/claude):
-#   Branch „live“     → Arena (arena/, labs/kly-keller/)        → Container nf-arena, 127.0.0.1:8090
+#   Branch „live“     → Arena (arena/, labs/kly-keller/, labs/nf-*/)        → Container nf-arena, 127.0.0.1:8090
 #   Branch „ki-live“  → KI-Werkstatt (ki-lernen/)               → systemd nachtfalter-ki, 127.0.0.1:8100
 #   Branch „live“     → Web-App (Hacklab, Konto, Verwaltung)    → /opt/nachtfalter/web/live     → app.nachtfalter.tech
 #   Arbeits-Branch    → Web-App Vorschau                         → /opt/nachtfalter/web/vorschau → vorschau.nachtfalter.tech
@@ -129,12 +129,20 @@ arena() {
   local dir rev
   dir=$(holen live) || { log "arena: Branch live nicht abrufbar – übersprungen"; return 0; }
   # Nur neu bauen, wenn sich Arena oder Lab geändert haben (sonst brächen laufende Labs ab)
-  rev="$(git -C "$dir" rev-parse HEAD:arena 2>/dev/null)-$(git -C "$dir" rev-parse HEAD:labs/kly-keller 2>/dev/null)"
+  rev="$(git -C "$dir" rev-parse HEAD:arena 2>/dev/null)-$(git -C "$dir" rev-parse HEAD:labs 2>/dev/null)"
   neu arena "$rev" || return 0
   [ -f "$dir/arena/server.js" ] || { log "arena: arena/server.js fehlt in ${rev:0:7}"; return 1; }
   [ -s "$ETC/arena.env" ] || { log "arena: $ETC/arena.env fehlt – nicht gestartet"; return 1; }
   log "arena: baue ${rev:0:7}"
-  if ! docker build -q -t kly-keller "$dir/labs/kly-keller" >/dev/null 2>>"$LOG" || ! docker build -q -t nachtfalter-arena:neu "$dir/arena" >/dev/null 2>>"$LOG"; then
+  # Alle Arena-Labs bauen: der Kellerserver und jede Profi-Arena (labs/nf-*/)
+  local lab name
+  for lab in "$dir/labs/kly-keller" "$dir"/labs/nf-*/; do
+    [ -f "$lab/Dockerfile" ] || continue
+    name=$(basename "$lab")
+    [[ "$name" =~ ^[a-z0-9-]+$ ]] || continue
+    docker build -q -t "$name" "$lab" >/dev/null 2>>"$LOG" || { log "arena: Lab $name ließ sich nicht bauen – alter Stand bleibt"; return 1; }
+  done
+  if ! docker build -q -t nachtfalter-arena:neu "$dir/arena" >/dev/null 2>>"$LOG"; then
     log "arena: Bau fehlgeschlagen – alter Stand bleibt"; return 1
   fi
   docker image inspect nachtfalter-arena:live >/dev/null 2>&1 && docker tag nachtfalter-arena:live nachtfalter-arena:alt

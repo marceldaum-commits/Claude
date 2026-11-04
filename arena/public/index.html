@@ -25,19 +25,26 @@
     <p id="lmsg" class="muted"></p>
     <p class="small muted">Noch kein Konto? <a id="regLink" href="https://app.nachtfalter.tech/konto.html?neu=1">Kostenlos registrieren</a> · <a id="pwLink" href="https://app.nachtfalter.tech/konto.html">Passwort vergessen?</a></p>
   </main>
-  <main id="start" class="card" hidden>
-    <h1 id="titel">Online-Lab</h1>
-    <p class="small muted">Angemeldet als <b id="wer"></b> · <a href="#" id="aus">Abmelden</a></p>
-    <p>Hier läuft ein <b>echter Linux-Server nur für dich</b> – direkt im Browser, ohne Kali und ohne Installation.
-      Er ist vom Internet und von anderen Spielern abgeschottet und wird nach spätestens 2 Stunden automatisch gelöscht.</p>
-    <label>Dein Lab-Token (steht in der App)<input id="token" placeholder="KLY-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
-    <button id="los" class="btn">▶ Lab starten</button>
-    <p id="msg" class="muted"></p>
-    <form id="cf" hidden>
-      <label>Einladungscode<input name="code" placeholder="NF-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" required></label>
-      <button class="btn">Code einlösen</button>
-    </form>
-    <p class="small muted">Codes, die du im Lab findest, trägst du wie gewohnt in der App ein.</p>
+  <main id="start" hidden>
+    <section class="card">
+      <h1>Arena · Online-Labs</h1>
+      <p class="small muted" style="margin-top:0">Angemeldet als <b id="wer"></b><span id="adminhinweis" hidden> · <span class="lime">Verwaltung: alle Arenen offen</span></span> · <a href="#" id="aus">Abmelden</a></p>
+      <p>Jede Arena ist ein <b>echter Linux-Server nur für dich</b> – direkt im Browser, abgeschottet vom Internet und von anderen Spielern, nach spätestens 2 Stunden gelöscht.</p>
+      <details class="klein"><summary>Dein Lab-Token: <b id="tokenzeige"></b></summary>
+        <label>Lab-Token (kommt aus deinem Hacklab-Konto)<input id="token" placeholder="KLY-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+        <p class="small muted">Aus dem Token werden deine persönlichen Codes berechnet. Normalerweise musst du hier nichts ändern.</p>
+      </details>
+      <p id="msg" class="muted"></p>
+    </section>
+    <div id="labs"></div>
+    <section class="card">
+      <h2>Einladungscode einlösen</h2>
+      <form id="cf" class="reihe">
+        <input name="code" placeholder="NF-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+        <button class="btn">Einlösen</button>
+      </form>
+      <p class="small muted">Codes, die du in einem Lab findest (KLY{…}), trägst du direkt bei der jeweiligen Arena ein.</p>
+    </section>
   </main>
   <section id="termbox" hidden>
     <div id="term" translate="no"></div>

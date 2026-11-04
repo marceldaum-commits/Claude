@@ -21,3 +21,19 @@ input { display: block; width: 100%; margin-top: .3rem; padding: .65rem .8rem; b
 @media (min-width: 900px) { #keys { display: none; } }
 a { color: var(--lime); }
 #cf { margin-top: .6rem; border-top: 1px solid var(--line); padding-top: .4rem; }
+
+h2 { font-size: 1.1rem; margin: 0 0 .5rem; }
+.lab { position: relative; }
+.lab.markiert { border-color: var(--lime); }
+.lab .kopf { display: flex; gap: .5rem; align-items: baseline; flex-wrap: wrap; }
+.stufe { font-size: .75rem; padding: .1rem .5rem; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.stufe.Fortgeschritten { color: #fbbf24; border-color: rgba(251,191,36,.5); } .stufe.Experte { color: #f87171; border-color: rgba(248,113,113,.5); } .stufe.Einsteiger { color: var(--lime); border-color: rgba(182,242,60,.5); }
+.balken { height: 8px; background: #0d0d16; border-radius: 99px; overflow: hidden; margin: .4rem 0 .2rem; }
+.balken i { display: block; height: 100%; background: linear-gradient(90deg, var(--violet), var(--lime)); }
+.reihe { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+.reihe input { flex: 1; min-width: 12rem; margin: 0; }
+textarea { display: block; width: 100%; margin-top: .3rem; padding: .6rem .8rem; border-radius: 10px; border: 1px solid var(--line); background: #0d0d16; color: var(--text); font: inherit; min-height: 4rem; }
+details.klein summary { cursor: pointer; color: var(--muted); font-size: .9rem; }
+.hinweis { font-size: .88rem; margin: .5rem 0 0; }
+.ok { color: var(--lime); } .warn { color: #fbbf24; } .rot { color: #f87171; }
+.btn.sek { background: transparent; color: var(--text); border: 1px solid var(--line); }

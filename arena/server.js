@@ -41,10 +41,31 @@ const CFG = {
 };
 
 // Verfügbare Labs. user = als wer das Terminal startet; ready = Logzeile, wenn der Container bereit ist.
+// produkt = welcher Zugang nötig ist („alles“ und Verwaltung dürfen immer; „arena-profi“ schließt „arena“ ein).
+const hallo = (t, u) => `\x1b[32m${t} (Arena)\x1b[0m – du bist ${u}.\r\nNächstes Konto: ssh NAME@localhost\r\nZurück: exit\r\n\r\n`;
 const LABS = {
-  keller: { image: env('KELLER_IMAGE', 'kly-keller'), user: 'azubi', ready: 'Kellerserver bereit', title: 'Der Kellerserver',
-    hello: '\x1b[32mKellerserver (Arena)\x1b[0m – du bist azubi.\r\nNächstes Konto: ssh NAME@localhost\r\nZurück: exit\r\n\r\n' },
+  keller: { image: env('KELLER_IMAGE', 'kly-keller'), user: 'azubi', ready: 'Kellerserver bereit', title: 'Der Kellerserver', host: 'keller',
+    produkt: 'arena', stufe: 'Einsteiger', levels: 10, praefix: 'w2', codesInApp: true,
+    kurz: 'Ein alter Firmenserver: Arbeite dich Konto für Konto bis zum Chef durch – versteckte Dateien, Verläufe, Rechte, Schlüssel.',
+    hello: hallo('Kellerserver', 'azubi') },
+  leitstelle: { image: env('LEITSTELLE_IMAGE', 'nf-leitstelle'), user: 'funker', ready: 'Leitstelle bereit', title: 'Die Leitstelle', host: 'leitstelle',
+    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 6, praefix: 'leitstelle',
+    kurz: 'Netzwerk & Dienste: offene Ports finden, mit Diensten sprechen, versteckte Web-Bereiche, eigenes Protokoll, Protokolle auswerten, unsichere Automatik.',
+    hello: hallo('Leitstelle Nordhafen', 'funker') },
+  tresor: { image: env('TRESOR_IMAGE', 'nf-tresor'), user: 'gast', ready: 'Tresor bereit', title: 'Der Tresor', host: 'tresor',
+    produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'tresor',
+    kurz: 'Für Experten: Passwort-Hash knacken, Geheimnisse in Git und Logs, PATH-Falle, Pfad-Ausbruch in einer API, verschlüsselter Tresor.',
+    hello: hallo('Bankhaus Falkenstein', 'gast') },
 };
+// Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
+const vorhanden = {};
+async function imagesPruefen() { for (const [id, L] of Object.entries(LABS)) vorhanden[id] = await docker.getImage(L.image).inspect().then(() => true, () => false); }
+const labOeffentlich = () => Object.entries(LABS).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, kurz: L.kurz, produkt: L.produkt, levels: L.levels, praefix: L.praefix, codesInApp: !!L.codesInApp, bereit: vorhanden[id] !== false }));
+function darf(k, lab) {
+  const L = LABS[lab]; if (!L || !k?.ok) return false;
+  if (k.admin || k.produkte.includes('alles') || k.produkte.includes(L.produkt)) return true;
+  return L.produkt === 'arena' && k.produkte.includes('arena-profi');
+}
 
 const docker = new Docker({ socketPath: env('DOCKER_SOCKET', '/var/run/docker.sock') });
 const sessions = new Map(); // id -> { id, lab, containerId, ip, created, lastSeen, token }
@@ -62,11 +83,11 @@ function codeOk(given) {
 // Nachtfalter-Konto prüfen: Token beim Auth-Server verifizieren, dann (mit dem Token des Spielers, RLS)
 // eigene Zugänge und Sperre lesen. Ergebnis 60 s zwischenspeichern, damit nicht jeder Klick nachfragt.
 const kontoCache = new Map();
-async function kontoPruefen(token) {
+async function kontoPruefen(token, frisch = false) {
   if (!CFG.konto) return { status: 403, fehler: 'Anmeldung mit dem Nachtfalter-Konto ist hier abgeschaltet.' };
   if (!/^[A-Za-z0-9._-]{20,4096}$/.test(token)) return { status: 401, fehler: 'Bitte neu anmelden.' };
   const key = createHash('sha256').update(token).digest('hex');
-  const c = kontoCache.get(key); if (c && c.t > Date.now() - 60000) return c.r;
+  const c = kontoCache.get(key); if (!frisch && c && c.t > Date.now() - 30000) return c.r;
   const h = { apikey: CFG.kontoKey, Authorization: `Bearer ${token}` };
   const holen = (pfad) => fetch(CFG.kontoUrl + pfad, { headers: h, signal: AbortSignal.timeout(6000) });
   let r;
@@ -76,15 +97,15 @@ async function kontoPruefen(token) {
   else {
     const user = await u.json();
     const jetzt = new Date().toISOString();
-    const [z, p] = await Promise.all([
-      holen(`/rest/v1/entitlements?select=produkt,gueltig_bis&produkt=in.(arena,alles)&gueltig_bis=gt.${encodeURIComponent(jetzt)}`),
+    const [z, p, m] = await Promise.all([
+      holen(`/rest/v1/entitlements?select=produkt,gueltig_bis&produkt=in.(arena,arena-profi,alles)&gueltig_bis=gt.${encodeURIComponent(jetzt)}`),
       holen(`/rest/v1/profiles?select=gesperrt&id=eq.${encodeURIComponent(user.id)}`),
+      fetch(CFG.kontoUrl + '/rest/v1/rpc/mein_status', { method: 'POST', headers: { ...h, 'Content-Type': 'application/json' }, body: '{}', signal: AbortSignal.timeout(6000) }),
     ]);
     if (!z.ok || !p.ok) throw new Error(`Konto-Abfrage fehlgeschlagen (${z.status}/${p.status})`);
-    const zug = await z.json(), prof = (await p.json())[0] || {};
+    const zug = await z.json(), prof = (await p.json())[0] || {}, st = m.ok ? await m.json().catch(() => ({})) : {};
     if (prof.gesperrt) r = { status: 403, fehler: 'Dein Konto ist gesperrt.' };
-    else if (!zug.length) r = { status: 403, code: 'kein_zugang', fehler: 'Für die Arena brauchst du einen Arena-Zugang. Hast du einen Einladungscode? Dann löse ihn unten ein.' };
-    else r = { ok: true, userId: user.id, bis: zug.map(x => x.gueltig_bis).sort().pop() };
+    else r = { ok: true, userId: user.id, admin: !!st?.admin, produkte: [...new Set(zug.map(x => x.produkt))] };
   }
   if (r.ok) kontoCache.set(key, { t: Date.now(), r }); // nur Erfolge merken – nach Code-Einlösung sofort neu prüfen
   if (kontoCache.size > 2000) kontoCache.clear();
@@ -114,6 +135,7 @@ async function waitReady(container, marker, ms = 20000) {
 async function createSession(lab, token, ip, userId = null) {
   const L = LABS[lab];
   if (!L) throw Object.assign(new Error('Unbekanntes Lab'), { status: 400 });
+  if (vorhanden[lab] === false) throw Object.assign(new Error('Diese Arena wird gerade noch aufgebaut – bitte später noch einmal.'), { status: 503 });
   if (!/^KLY-[0-9A-F]{6}$/.test(token)) throw Object.assign(new Error('Ungültiger Lab-Token'), { status: 400 });
   if (sessions.size >= CFG.maxTotal) throw Object.assign(new Error('Die Arena ist gerade voll – bitte später noch einmal versuchen.'), { status: 503 });
   if ([...sessions.values()].filter(s => s.ip === ip).length >= CFG.maxPerIp) throw Object.assign(new Error('Du hast schon zu viele Labs offen. Schließe erst eins.'), { status: 429 });
@@ -128,7 +150,7 @@ async function createSession(lab, token, ip, userId = null) {
     name: `kly-arena-${lab}-${id.slice(0, 10)}`,
     Env: [`KLY_TOKEN=${token}`],
     Labels: { 'kly.arena': '1', 'kly.session': id, 'kly.expires': String(Date.now() + CFG.ttlMin * 60000) },
-    Hostname: 'keller',
+    Hostname: L.host,
     HostConfig: {
       NetworkMode: 'none',                       // nur localhost
       Memory: CFG.memMb * 1024 * 1024, MemorySwap: CFG.memMb * 1024 * 1024,
@@ -181,6 +203,14 @@ const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://x');
     if (req.method === 'GET' && url.pathname === '/api/status') return json(res, 200, { ok: true, labs: Object.keys(LABS), frei: CFG.maxTotal - sessions.size, offen: !!CFG.code || CFG.konto, konto: CFG.konto ? { url: CFG.kontoUrl, key: CFG.kontoKey, app: CFG.appOrigin } : null });
+    if (req.method === 'GET' && url.pathname === '/api/labs') return json(res, 200, { labs: labOeffentlich() });
+    if (req.method === 'GET' && url.pathname === '/api/zugang') {
+      const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+      if (!bearer) return json(res, 401, { fehler: 'Bitte anmelden.' });
+      let k; try { k = await kontoPruefen(bearer, url.searchParams.has('frisch')); } catch (e) { log('konto', e.message); return json(res, 502, { fehler: 'Konto gerade nicht erreichbar.' }); }
+      if (!k.ok) return json(res, k.status, { fehler: k.fehler });
+      return json(res, 200, { admin: k.admin, labs: Object.fromEntries(Object.keys(LABS).map(id => [id, darf(k, id)])) });
+    }
     if (req.method === 'POST' && url.pathname === '/api/session') {
       const ip = clientIp(req);
       let body; try { body = JSON.parse(await readBody(req)); } catch { return json(res, 400, { fehler: 'Ungültige Anfrage' }); }
@@ -189,6 +219,12 @@ const server = http.createServer(async (req, res) => {
       if (bearer) {
         let k; try { k = await kontoPruefen(bearer); } catch (e) { log('konto', e.message); return json(res, 502, { fehler: 'Konto gerade nicht erreichbar – bitte gleich noch einmal versuchen.' }); }
         if (!k.ok) return json(res, k.status, { fehler: k.fehler, code: k.code });
+        const lab = String(body.lab || '');
+        if (!LABS[lab]) return json(res, 400, { fehler: 'Unbekanntes Lab' });
+        if (!darf(k, lab)) { // vielleicht gerade erst freigeschaltet → einmal frisch nachfragen
+          let k2; try { k2 = await kontoPruefen(bearer, true); } catch { k2 = k; }
+          if (!darf(k2, lab)) return json(res, 403, { code: 'kein_zugang', produkt: LABS[lab].produkt, fehler: `Für „${LABS[lab].title}“ brauchst du einen Zugang. Du kannst ihn anfragen oder einen Einladungscode einlösen.` });
+        }
         userId = k.userId;
       } else if (!codeOk(body.code)) return json(res, 401, { fehler: 'Bitte mit deinem Nachtfalter-Konto anmelden.' });
       try { const s = await createSession(String(body.lab || ''), String(body.token || ''), ip, userId); return json(res, 200, { id: s.id, ablauf: s.created + CFG.ttlMin * 60000 }); }
@@ -237,4 +273,5 @@ async function attach(ws, s) {
 
 process.on('SIGTERM', async () => { for (const id of [...sessions.keys()]) await endSession(id, 'Dienst stoppt'); process.exit(0); });
 reap().catch(() => {});
+imagesPruefen().catch(() => {}); setInterval(() => imagesPruefen().catch(() => {}), 300000).unref();
 server.listen(CFG.port, CFG.host, () => log(`Arena lauscht auf ${CFG.host}:${CFG.port} · Labs: ${Object.keys(LABS).join(', ')} · Konto ${CFG.konto ? 'an' : 'aus'} · alter Code ${CFG.code ? 'gesetzt' : 'aus'}`));

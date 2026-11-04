@@ -15,7 +15,12 @@ const vor = (d) => {
   if (s < 86400) return `vor ${Math.round(s / 3600)} Std.`; if (s < 86400 * 45) { const t = Math.round(s / 86400); return t === 1 ? 'vor 1 Tag' : `vor ${t} Tagen`; }
   return datum(d, false);
 };
-const PRODUKT = { arena: '🖥️ Arena', ki: '🤖 KI-Werkstatt', alles: '⭐ Alles' };
+const PRODUKT = { arena: '🖥️ Arena (Einsteiger)', 'arena-profi': '🏆 Profi-Arenen', ki: '🤖 KI-Werkstatt', alles: '⭐ Alles' };
+const PRODUKT_OPT = `<option value="arena">🖥️ Arena (Einsteiger)</option><option value="arena-profi">🏆 Profi-Arenen</option><option value="alles">⭐ Alles</option><option value="ki">🤖 KI-Werkstatt</option>`;
+const DAUER_OPT = `<option value="7">7 Tage</option><option value="30" selected>30 Tage</option><option value="90">90 Tage</option><option value="180">6 Monate</option><option value="365">1 Jahr</option><option value="unbefristet">unbefristet</option>`;
+const unbefristet = (d) => d && new Date(d).getFullYear() >= 9999;
+const bis = (d) => unbefristet(d) ? 'unbefristet' : `bis ${datum(d, false)}`;
+const LABNAME = { keller: 'Kellerserver', leitstelle: 'Leitstelle', tresor: 'Tresor' };
 const main = $('#main');
 let NAMEN = { raeume: {}, reihenfolge: [], geschichten: {} };
 fetch('raeume.json').then(r => r.ok ? r.json() : null).then(j => { if (j) NAMEN = { geschichten: {}, ...j }; }).catch(() => {});
@@ -116,6 +121,7 @@ async function api(aktion, daten = {}) {
 }
 function kopf(an) {
   $('#tabs').hidden = !an; $('#aus').hidden = !an;
+  const z = $('#anfrZahl'); if (z) { z.textContent = D?.offeneAnfragen || ''; z.hidden = !D?.offeneAnfragen; }
   $('#wer').textContent = an && ses?.user?.email ? ses.user.email : '';
 }
 function anmelden(hinweis = '') {
@@ -178,6 +184,7 @@ async function uebersicht() {
   const liste = (titel, arr, leer) => `<div class="card"><h3 style="margin-top:0">${titel}</h3>${arr.length ? `<ul class="list">${arr.slice(0, 6).map(n => `<li><a href="#/kunde/${n.id}"><span class="grow"><span class="t">${esc(n.name || n.email)}</span><span class="s">${esc(n.email)} · ${vor(n.zuletzt || n.erstellt)}</span></span></a></li>`).join('')}</ul>` : `<p class="small muted" style="margin:0">${leer}</p>`}</div>`;
   main.innerHTML = `<section class="stack">
     <h1 style="margin-bottom:0">Übersicht</h1>
+    ${D.offeneAnfragen ? `<a class="card zanfrage" href="#/anfragen">📨 <b>${D.offeneAnfragen} neue Zugangsanfrage${D.offeneAnfragen === 1 ? '' : 'n'}</b> – jetzt ansehen ›</a>` : ''}
     <div class="zkpis">
       <a class="zkpi" href="#/kunden?f=alle"><b>${nutzer.length}</b><span>Konten gesamt</span></a>
       <a class="zkpi" href="#/kunden?f=kunden"><b>${k.length}</b><span>Kunden</span></a>
@@ -275,9 +282,9 @@ async function kunde(id) {
     <div class="card"><h3 style="margin-top:0">Lernfortschritt</h3><div id="fs"><p class="muted small">Lade …</p></div></div>
     <div class="zgrid zwei">
       <div class="card"><h3 style="margin-top:0">Zugänge</h3>
-        ${n.zugaenge.length ? `<ul class="list">${n.zugaenge.map(z => { const a = new Date(z.gueltig_bis) > new Date(); return `<li><div class="row" style="padding:.4rem 0;flex-wrap:nowrap"><span class="grow"><b>${esc(PRODUKT[z.produkt] || z.produkt)}</b><br><span class="small muted">${a ? 'bis' : 'abgelaufen'} ${datum(z.gueltig_bis, false)} · ${esc(z.quelle)}${z.notiz ? ' · ' + esc(z.notiz) : ''}</span></span>${a ? `<button class="btn small ghost" data-ende="${z.id}">Beenden</button>` : ''}</div></li>`; }).join('')}</ul>` : '<p class="small muted">Keine Zugänge.</p>'}
-        <form id="zf" class="row" style="margin-top:.5rem"><select name="produkt"><option value="arena">🖥️ Arena</option><option value="alles">⭐ Alles</option><option value="ki">🤖 KI-Werkstatt</option></select>
-          <input name="tage" type="number" min="1" max="3650" value="30" style="width:6rem" aria-label="Tage"><span class="small muted">Tage</span><button class="btn small">Zugang geben</button></form></div>
+        ${n.zugaenge.length ? `<ul class="list">${n.zugaenge.map(z => { const a = new Date(z.gueltig_bis) > new Date(); return `<li><div class="row" style="padding:.4rem 0;flex-wrap:nowrap"><span class="grow"><b>${esc(PRODUKT[z.produkt] || z.produkt)}</b><br><span class="small muted">${a ? bis(z.gueltig_bis) : 'abgelaufen ' + datum(z.gueltig_bis, false)} · ${esc(z.quelle)}${z.notiz ? ' · ' + esc(z.notiz) : ''}</span></span>${a ? `<button class="btn small ghost" data-ende="${z.id}">Beenden</button>` : ''}</div></li>`; }).join('')}</ul>` : '<p class="small muted">Keine Zugänge.</p>'}
+        <form id="zf" class="row" style="margin-top:.5rem"><select name="produkt">${PRODUKT_OPT}</select>
+          <select name="tage" aria-label="Dauer">${DAUER_OPT}</select><button class="btn small">Zugang geben</button></form></div>
       <div class="card"><h3 style="margin-top:0">Notiz <span class="small muted">(nur für die Verwaltung sichtbar)</span></h3>
         <textarea class="znotiz" id="nz" maxlength="2000" placeholder="z. B. Tester aus Klasse 8b, hat Feedback zu Raum w4 gegeben …">${esc(n.notiz)}</textarea>
         <button class="btn small" id="nzs" style="margin-top:.4rem">Notiz speichern</button></div>
@@ -300,7 +307,7 @@ async function kunde(id) {
     if (b === 'LÖSCHEN') tun(() => api('nutzer_loeschen', { user_id: id, bestaetigung: b }), 'Konto gelöscht.', () => { location.hash = '#/kunden'; });
   };
   main.querySelectorAll('[data-ende]').forEach(b => b.onclick = () => confirm('Zugang sofort beenden?') && tun(() => api('zugang_beenden', { zugang_id: Number(b.dataset.ende) }), 'Zugang beendet.', neu));
-  $('#zf').onsubmit = (e) => { e.preventDefault(); const f = e.target; tun(() => api('zugang_geben', { user_id: id, produkt: f.produkt.value, tage: Number(f.tage.value) }), 'Zugang vergeben.', neu); };
+  $('#zf').onsubmit = (e) => { e.preventDefault(); const f = e.target; tun(() => api('zugang_geben', { user_id: id, produkt: f.produkt.value, tage: f.tage.value === 'unbefristet' ? 'unbefristet' : Number(f.tage.value) }), 'Zugang vergeben.', neu); };
   $('#nzs').onclick = () => tun(() => api('notiz_setzen', { user_id: id, notiz: $('#nz').value }), 'Notiz gespeichert.');
   fortschritt(id);
 }
@@ -321,6 +328,8 @@ async function fortschritt(id) {
       <p class="small muted" style="margin:0 0 .5rem">Zuletzt synchronisiert: ${datum(d.aktualisiert)} (${vor(d.aktualisiert)})</p>
       ${d.pruefungen.length ? `<p class="small" style="margin:.2rem 0">Prüfungen: ${d.pruefungen.map(p => `<span class="zb ${p.bestanden ? 'ok' : ''}">${esc(p.level)} · ${p.bestanden ? 'bestanden' : 'offen'} · ${p.versuche} Versuch(e)</span>`).join(' ')}</p>` : ''}
       ${d.geschichten.length ? `<p class="small" style="margin:.2rem 0">Geschichten: ${d.geschichten.map(g => `<span class="zb ${g.fertig ? 'ok' : ''}">${esc(NAMEN.geschichten?.[g.id] || g.id)} · ${g.fertig ? 'fertig' : 'begonnen'}</span>`).join(' ')}</p>` : ''}
+      ${d.arena?.length ? `<p class="small" style="margin:.2rem 0">Arena: ${Object.entries(d.arena.reduce((m, x) => ((m[x.lab] = (m[x.lab] || 0) + 1), m), {})).map(([lab, n]) => `<span class="zb ok">${esc(LABNAME[lab] || lab)} · ${n} Code${n === 1 ? '' : 's'}</span>`).join(' ')}</p>` : ''}
+      ${d.anfragen?.length ? `<p class="small" style="margin:.2rem 0">Anfragen: ${d.anfragen.map(a => `<span class="zb ${a.status === 'offen' ? 'warn' : a.status === 'genehmigt' ? 'ok' : 'rot'}">${esc(PRODUKT[a.produkt] || a.produkt)} · ${esc(a.status)} · ${datum(a.erstellt, false)}</span>`).join(' ')}</p>` : ''}
       <div style="overflow-x:auto"><table class="ztab"><thead><tr><th>Raum</th><th>Stand</th><th class="zmobil-weg">Richtige Antworten</th><th class="zmobil-weg">Tipps</th></tr></thead><tbody>
       ${ids.map(rid => { const r = R[rid]; const m = NAMEN.raeume[rid] || { titel: rid };
         return `<tr><td>${esc(m.titel)} <span class="small muted">${esc(m.level || '')}</span></td>
@@ -328,6 +337,35 @@ async function fortschritt(id) {
           <td class="zmobil-weg">${r ? r.antworten : ''}</td><td class="zmobil-weg">${r ? r.tipps : ''}</td></tr>`; }).join('')}
       </tbody></table></div>`;
   } catch (e) { el.innerHTML = `<p class="small muted">Fortschritt nicht ladbar: ${esc(e.message)}</p>`; }
+}
+
+async function anfragenSeite() {
+  main.innerHTML = '<section class="stack"><h1 style="margin:0">Zugangsanfragen</h1><p class="muted">Lade …</p></section>';
+  const [{ anfragen }, { nutzer }] = await Promise.all([api('anfragen'), laden(true)]);
+  const M = Object.fromEntries(nutzer.map(n => [n.id, n]));
+  const offen = anfragen.filter(a => a.status === 'offen'), erledigt = anfragen.filter(a => a.status !== 'offen');
+  const wer = (id) => M[id] ? `<a href="#/kunde/${id}"><b>${esc(M[id].name || M[id].email)}</b></a><br><span class="small muted">${esc(M[id].email)}</span>` : '<span class="muted">gelöschtes Konto</span>';
+  main.innerHTML = `<section class="stack"><h1 style="margin:0">Zugangsanfragen</h1><div id="msg"></div>
+    ${offen.length ? offen.map(a => `<div class="card stack">
+      <div class="row between" style="align-items:flex-start"><div>${wer(a.user_id)}</div><span class="zb warn">offen · ${datum(a.erstellt)}</span></div>
+      <p style="margin:0">möchte Zugang zu <b>${esc(PRODUKT[a.produkt] || a.produkt)}</b></p>
+      ${a.nachricht ? `<blockquote class="small" style="margin:0;padding:.5rem .7rem;border-left:3px solid var(--violet);background:var(--card2);border-radius:6px">${esc(a.nachricht)}</blockquote>` : ''}
+      <form class="stack konto" data-anfrage="${a.id}">
+        <label>Dauer bei Genehmigung<select name="tage">${DAUER_OPT}</select></label>
+        <label>Antwort an den Kunden (freiwillig, sieht er in der Arena)<input name="antwort" maxlength="500" placeholder="z. B. Viel Spaß! / Bitte erst den Kellerserver schaffen."></label>
+        <div class="row"><button class="btn primary" name="ja" value="1">✅ Genehmigen</button><button class="btn rot" name="nein" value="1" formnovalidate>❌ Ablehnen</button></div>
+      </form></div>`).join('') : '<div class="card"><p class="muted" style="margin:0">Keine offenen Anfragen. 🎉</p></div>'}
+    ${erledigt.length ? `<div class="card" style="overflow-x:auto"><h3 style="margin-top:0">Bereits entschieden</h3><table class="ztab"><thead><tr><th>Kunde</th><th>Zugang</th><th>Ergebnis</th><th class="zmobil-weg">Wann</th></tr></thead><tbody>
+      ${erledigt.map(a => `<tr><td>${wer(a.user_id)}</td><td>${esc(PRODUKT[a.produkt] || a.produkt)}</td><td><span class="zb ${a.status === 'genehmigt' ? 'ok' : 'rot'}">${esc(a.status)}</span>${a.antwort ? `<br><span class="small muted">„${esc(a.antwort)}“</span>` : ''}</td><td class="zmobil-weg small">${datum(a.entschieden_am)}</td></tr>`).join('')}
+    </tbody></table><p class="small muted" style="margin:.5rem 0 0">Einen genehmigten Zugang entziehst du im Kundenprofil unter „Zugänge“ → Beenden.</p></div>` : ''}
+  </section>`;
+  main.querySelectorAll('[data-anfrage]').forEach(f => f.onsubmit = (e) => {
+    e.preventDefault();
+    const ja = e.submitter?.name === 'ja';
+    if (!ja && !confirm('Anfrage ablehnen?')) return;
+    tun(() => api('anfrage_entscheiden', { anfrage_id: Number(f.dataset.anfrage), entscheidung: ja ? 'ja' : 'nein', tage: f.tage.value, antwort: f.antwort.value }),
+      ja ? 'Genehmigt – der Zugang ist sofort aktiv.' : 'Abgelehnt.', anfragenSeite);
+  });
 }
 
 async function codes() {
@@ -341,7 +379,7 @@ async function codes() {
         <div class="zgrid zwei">
           <label>Wie oft einlösbar?<input name="max_uses" type="number" min="1" max="1000" value="1"></label>
           <label>Code gültig (Tage)<input name="gueltig_tage" type="number" min="1" max="365" value="30"></label>
-          <label>Schaltet frei<select name="produkt"><option value="arena">🖥️ Arena</option><option value="alles">⭐ Alles</option><option value="ki">🤖 KI-Werkstatt</option><option value="">nichts (nur Vermerk)</option></select></label>
+          <label>Schaltet frei<select name="produkt"><option value="arena">🖥️ Arena (Einsteiger)</option><option value="arena-profi">🏆 Profi-Arenen</option><option value="alles">⭐ Alles</option><option value="ki">🤖 KI-Werkstatt</option><option value="">nichts (nur Vermerk)</option></select></label>
           <label>Zugang für (Tage)<input name="tage" type="number" min="1" max="3650" value="30"></label>
         </div>
         <button class="btn primary">Code erstellen</button></form>
@@ -363,13 +401,13 @@ async function codes() {
   main.querySelectorAll('[data-w]').forEach(b => b.onclick = () => confirm(`Code ${b.dataset.w} widerrufen? Wer ihn schon eingelöst hat, behält seinen Zugang.`) && tun(() => api('code_widerrufen', { code: b.dataset.w }), 'Code widerrufen.', codes));
 }
 
-const AKTION = { code_erstellt: '🎟️ Code erstellt', code_widerrufen: '🎟️ Code widerrufen', nutzer_geaendert: '✏️ Konto geändert', zugang_gegeben: '➕ Zugang gegeben', zugang_beendet: '➖ Zugang beendet', nutzer_geloescht: '🗑️ Konto gelöscht', passwort_mail: '🔑 Passwort-Mail', rolle_gesetzt: '🛠️ Rolle geändert', notiz_geaendert: '📝 Notiz', email_bestaetigt: '✓ E-Mail bestätigt', zwei_faktor_zurueckgesetzt: '🔐 Zwei-Faktor zurückgesetzt', bestaetigung_erneut: '✉️ Bestätigung erneut' };
+const AKTION = { anfrage_genehmigt: '✅ Anfrage genehmigt', anfrage_abgelehnt: '❌ Anfrage abgelehnt', code_erstellt: '🎟️ Code erstellt', code_widerrufen: '🎟️ Code widerrufen', nutzer_geaendert: '✏️ Konto geändert', zugang_gegeben: '➕ Zugang gegeben', zugang_beendet: '➖ Zugang beendet', nutzer_geloescht: '🗑️ Konto gelöscht', passwort_mail: '🔑 Passwort-Mail', rolle_gesetzt: '🛠️ Rolle geändert', notiz_geaendert: '📝 Notiz', email_bestaetigt: '✓ E-Mail bestätigt', zwei_faktor_zurueckgesetzt: '🔐 Zwei-Faktor zurückgesetzt', bestaetigung_erneut: '✉️ Bestätigung erneut' };
 async function protokoll() {
   main.innerHTML = '<section class="stack"><h1 style="margin:0">Protokoll</h1><p class="muted">Lade …</p></section>';
   const [{ eintraege }, { nutzer }] = await Promise.all([api('protokoll'), laden()]);
   const M = Object.fromEntries(nutzer.map(n => [n.id, n]));
   const wer = (id) => M[id] ? esc(M[id].name || M[id].email) : '<span class="muted">–</span>';
-  const det = (e) => { const d = e.details || {}; return esc([d.code, d.produkt && (PRODUKT[d.produkt] || d.produkt), d.tage && `${d.tage} Tage`, d.rolle, d.email, d.gesperrt === true && 'gesperrt', d.gesperrt === false && 'entsperrt', d.parent_consent !== undefined && `Eltern: ${d.parent_consent ? 'ja' : 'nein'}`].filter(Boolean).join(' · ')); };
+  const det = (e) => { const d = e.details || {}; return esc([d.code, d.produkt && (PRODUKT[d.produkt] || d.produkt), d.tage && (d.tage === 'unbefristet' ? 'unbefristet' : `${d.tage} Tage`), d.bis && bis(d.bis), d.rolle, d.email, d.gesperrt === true && 'gesperrt', d.gesperrt === false && 'entsperrt', d.parent_consent !== undefined && `Eltern: ${d.parent_consent ? 'ja' : 'nein'}`].filter(Boolean).join(' · ')); };
   main.innerHTML = `<section class="stack"><h1 style="margin:0">Protokoll</h1><p class="small muted" style="margin:0">Alle Änderungen in der Verwaltung (die letzten 200).</p>
     <div class="card" style="overflow-x:auto">${eintraege.length ? `<table class="ztab"><thead><tr><th>Wann</th><th>Was</th><th>Betrifft</th><th class="zmobil-weg">Wer</th></tr></thead><tbody>
     ${eintraege.map(e => `<tr><td class="small">${datum(e.at)}</td><td>${esc(AKTION[e.aktion] || e.aktion)}<br><span class="small muted">${det(e)}</span></td><td>${e.ziel ? `<a href="#/kunde/${e.ziel}">${wer(e.ziel)}</a>` : ''}</td><td class="zmobil-weg small">${wer(e.admin_id)}</td></tr>`).join('')}
@@ -411,12 +449,14 @@ async function route() {
     if (teil === 'kunden') await kunden();
     else if (teil === 'kunde' && arg) await kunde(arg);
     else if (teil === 'codes') await codes();
+    else if (teil === 'anfragen') await anfragenSeite();
     else if (teil === 'protokoll') await protokoll();
     else if (teil === 'system') await system();
     else await uebersicht();
   } catch (e) {
     if (!['abgemeldet', 'kein Zugriff', 'Bitte anmelden.'].includes(e.message)) main.innerHTML = `<section class="stack"><div class="card warn">${esc(e.message)}</div><button class="btn" id="nochmal">Neu laden</button></section>`, $('#nochmal').onclick = () => { D = null; route(); };
   }
+  if (D && !$('#tabs').hidden) kopf(true); // Zähler der offenen Anfragen aktualisieren
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);

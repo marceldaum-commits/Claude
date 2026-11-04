@@ -166,10 +166,10 @@ async function angemeldet() {
     ]);
     if (!ses.user) { saveSes({ ...ses, user }); }
     const p = (profile[0]) || (await api(`/rest/v1/profiles?select=display_name,lang,birth_year,parent_consent&id=eq.${user.id}`, { auth: true }))[0] || {};
-    const NAMEN = { arena: '🖥️ Arena (Online-Labs)', ki: '🤖 KI-Werkstatt', alles: '⭐ Alles' };
-    const QUELLE = { beta: 'Beta-Zugang', kauf: 'gekauft', geschenk: 'geschenkt' };
+    const NAMEN = { arena: '🖥️ Arena (Einsteiger)', 'arena-profi': '🏆 Profi-Arenen', ki: '🤖 KI-Werkstatt', alles: '⭐ Alles' };
+    const QUELLE = { beta: 'Beta-Zugang', kauf: 'gekauft', geschenk: 'geschenkt', anfrage: 'auf Anfrage' };
     const datum = (d) => new Date(d).toLocaleDateString(currentLang() === 'uk' ? 'uk-UA' : currentLang() === 'en' ? 'en-GB' : 'de-DE');
-    const liste = zugaenge.length ? `<ul class="list">${zugaenge.map(z => { const aktiv = new Date(z.gueltig_bis) > new Date(); return `<li><div class="row" style="flex-wrap:nowrap;padding:.45rem 0"><span class="state ${aktiv ? 'done' : ''}">${aktiv ? '✓' : '–'}</span><span class="grow" style="display:flex;flex-direction:column"><b>${esc(NAMEN[z.produkt] || z.produkt)}</b><span class="small muted">${aktiv ? 'gültig bis' : 'abgelaufen am'} ${esc(datum(z.gueltig_bis))} · ${esc(QUELLE[z.quelle] || z.quelle)}</span></span></div></li>`; }).join('')}</ul>`
+    const liste = zugaenge.length ? `<ul class="list">${zugaenge.map(z => { const aktiv = new Date(z.gueltig_bis) > new Date(); return `<li><div class="row" style="flex-wrap:nowrap;padding:.45rem 0"><span class="state ${aktiv ? 'done' : ''}">${aktiv ? '✓' : '–'}</span><span class="grow" style="display:flex;flex-direction:column"><b>${esc(NAMEN[z.produkt] || z.produkt)}</b><span class="small muted">${aktiv ? (new Date(z.gueltig_bis).getFullYear() >= 9999 ? 'unbefristet' : 'gültig bis ' + esc(datum(z.gueltig_bis))) : 'abgelaufen am ' + esc(datum(z.gueltig_bis))} · ${esc(QUELLE[z.quelle] || z.quelle)}</span></span></div></li>`; }).join('')}</ul>`
       : '<p class="small muted" style="margin:0">Noch keine Zugänge. Alles, was im Browser läuft, ist kostenlos. Arena und KI-Werkstatt kommen bald.</p>';
     const kind = evtlKind(p.birth_year);
     rahmen(`

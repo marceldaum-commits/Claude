@@ -22,6 +22,7 @@ const antwort = (origin: string | null, status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors(origin), 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
 const UUID = /^[0-9a-f-]{36}$/i;
+const UNBEFRISTET = '9999-12-31T23:59:59Z'; // „ohne Ablauf“
 // Fortschritt kommt aus Kundendaten (frei beschreibbar) → immer defensiv lesen
 const obj = (v: unknown): Record<string, any> => (v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, any> : {});
 const arr = (v: unknown): any[] => (Array.isArray(v) ? v : []);
@@ -104,12 +105,13 @@ Deno.serve(async (req) => {
           };
         });
         const { data: codes } = await db.from('invites').select('*').order('created_at', { ascending: false });
-        return antwort(origin, 200, { nutzer, codes: codes || [] });
+        const { count: offeneAnfragen } = await db.from('zugangsanfragen').select('id', { count: 'exact', head: true }).eq('status', 'offen');
+        return antwort(origin, 200, { nutzer, codes: codes || [], offeneAnfragen: offeneAnfragen || 0 });
       }
       case 'code_erstellen': {
         const max = Math.min(1000, Math.max(1, Number(body.max_uses) || 1));
         const tage = body.tage ? Math.min(3650, Math.max(1, Number(body.tage))) : null;
-        const produkt = ['arena', 'ki', 'alles'].includes(String(body.produkt)) ? String(body.produkt) : null;
+        const produkt = ['arena', 'arena-profi', 'ki', 'alles'].includes(String(body.produkt)) ? String(body.produkt) : null;
         const gueltigTage = body.gueltig_tage ? Math.min(365, Math.max(1, Number(body.gueltig_tage))) : 30;
         const zeile = {
           code: zufallsCode(), notiz: String(body.notiz || '').slice(0, 200) || null, max_uses: max,
@@ -147,14 +149,15 @@ Deno.serve(async (req) => {
       case 'zugang_geben': {
         if (!UUID.test(id)) return antwort(origin, 400, { fehler: 'Unbekannter Nutzer' });
         const produkt = String(body.produkt);
-        if (!['arena', 'ki', 'alles'].includes(produkt)) return antwort(origin, 400, { fehler: 'Unbekanntes Produkt' });
+        if (!['arena', 'arena-profi', 'ki', 'alles'].includes(produkt)) return antwort(origin, 400, { fehler: 'Unbekanntes Produkt' });
+        const unbefristet = body.tage === 'unbefristet';
         const tage = Math.min(3650, Math.max(1, Number(body.tage) || 30));
         const { error } = await db.from('entitlements').insert({
-          user_id: id, produkt, gueltig_bis: new Date(Date.now() + tage * 864e5).toISOString(),
+          user_id: id, produkt, gueltig_bis: unbefristet ? UNBEFRISTET : new Date(Date.now() + tage * 864e5).toISOString(),
           quelle: 'geschenk', notiz: String(body.notiz || 'Verwaltung').slice(0, 200),
         });
         if (error) throw error;
-        await protokoll('zugang_gegeben', id, { produkt, tage });
+        await protokoll('zugang_gegeben', id, { produkt, tage: unbefristet ? 'unbefristet' : tage });
         return antwort(origin, 200, { ok: true });
       }
       case 'zugang_beenden': {
@@ -189,8 +192,12 @@ Deno.serve(async (req) => {
           return { level: String(lv).slice(0, 20), versuche: at.length, bestanden: at.some((a: any) => a?.passed === true), beste: at.reduce((m: number, a: any) => { const v = Number(a?.score); return Number.isFinite(v) ? Math.max(m, v) : m; }, 0) };
         });
         const geschichten = Object.entries(obj(st.story)).slice(0, 50).map(([sid, x]) => ({ id: String(sid).slice(0, 40), fertig: zeit(obj(x).doneAt) }));
+        const [{ data: arena }, { data: anf }] = await Promise.all([
+          db.from('arena_fortschritt').select('lab, level, geloest_am').eq('user_id', id).order('geloest_am'),
+          db.from('zugangsanfragen').select('id, produkt, status, nachricht, antwort, erstellt, entschieden_am').eq('user_id', id).order('erstellt', { ascending: false }).limit(20),
+        ]);
         return antwort(origin, 200, { aktualisiert: g?.updated_at || null, raeume, pruefungen, geschichten,
-          lektionen: anzahlFertig(st.lessons), uebungen: Object.keys(obj(st.exercises)).length });
+          lektionen: anzahlFertig(st.lessons), uebungen: Object.keys(obj(st.exercises)).length, arena: arena || [], anfragen: anf || [] });
       }
       case 'passwort_mail': {
         if (!UUID.test(id)) return antwort(origin, 400, { fehler: 'Unbekannter Nutzer' });
@@ -271,6 +278,34 @@ Deno.serve(async (req) => {
           app: { ok: app.ok, ms: app.ms, version: version(app) }, vorschau: { ok: vorschau.ok || vorschau.text.includes('401') , geschuetzt: !vorschau.ok, ms: vorschau.ms },
           arena: { ok: arena.ok, ms: arena.ms, info: arenaInfo }, www: { ok: www.ok, ms: www.ms },
         });
+      }
+      case 'anfragen': {
+        const { data, error } = await db.from('zugangsanfragen').select('id, user_id, produkt, nachricht, status, antwort, erstellt, entschieden_am, entschieden_von')
+          .order('status', { ascending: false }).order('erstellt', { ascending: false }).limit(300);
+        if (error) throw error;
+        return antwort(origin, 200, { anfragen: data || [] });
+      }
+      case 'anfrage_entscheiden': {
+        const aid = Number(body.anfrage_id);
+        if (!Number.isInteger(aid)) return antwort(origin, 400, { fehler: 'Unbekannte Anfrage' });
+        const ja = body.entscheidung === 'ja';
+        const text = String(body.antwort || '').slice(0, 500) || null;
+        const { data: a, error: ge } = await db.from('zugangsanfragen').select('id, user_id, produkt, status').eq('id', aid).maybeSingle();
+        if (ge) throw ge;
+        if (!a) return antwort(origin, 404, { fehler: 'Anfrage nicht gefunden' });
+        if (a.status !== 'offen') return antwort(origin, 400, { fehler: 'Diese Anfrage ist schon entschieden.' });
+        let bis: string | null = null;
+        if (ja) {
+          const unbefristet = body.tage === 'unbefristet';
+          const tage = Math.min(3650, Math.max(1, Number(body.tage) || 30));
+          bis = unbefristet ? UNBEFRISTET : new Date(Date.now() + tage * 864e5).toISOString();
+          const { error } = await db.from('entitlements').insert({ user_id: a.user_id, produkt: a.produkt, gueltig_bis: bis, quelle: 'anfrage', notiz: `Anfrage #${aid}` });
+          if (error) throw error;
+        }
+        const { error } = await db.from('zugangsanfragen').update({ status: ja ? 'genehmigt' : 'abgelehnt', antwort: text, entschieden_am: new Date().toISOString(), entschieden_von: u.user.id }).eq('id', aid).eq('status', 'offen');
+        if (error) throw error;
+        await protokoll(ja ? 'anfrage_genehmigt' : 'anfrage_abgelehnt', a.user_id, { produkt: a.produkt, bis });
+        return antwort(origin, 200, { ok: true });
       }
       default:
         return antwort(origin, 400, { fehler: 'Unbekannte Aktion' });

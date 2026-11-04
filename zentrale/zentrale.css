@@ -39,3 +39,6 @@ html, body { overflow-x: clip; }
 a.zkpi { color: var(--text); text-decoration: none; display: block; transition: border-color .15s; }
 a.zkpi:hover, a.zkpi:focus-visible { border-color: var(--violet); }
 a.zkpi span::after { content: ' ›'; color: var(--muted); }
+
+.zzahl { display: inline-block; min-width: 1.3rem; padding: 0 .35rem; margin-left: .25rem; border-radius: 999px; background: #f59e0b; color: #111; font-size: .78rem; font-weight: 800; text-align: center; }
+.zanfrage { display: block; text-decoration: none; color: var(--text); border-color: rgba(245,158,11,.6); background: rgba(245,158,11,.08); }
