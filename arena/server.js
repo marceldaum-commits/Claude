@@ -268,7 +268,7 @@ setInterval(() => reap().catch(e => log('reap', e.message)), 60000).unref();
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.css': 'text/css' };
 const SEC_HEADERS = {
   'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY', 'Strict-Transport-Security': 'max-age=31536000',
-  'Content-Security-Policy': `default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@xterm/; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@xterm/; connect-src 'self' ${CFG.kontoUrl}; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'`,
+  'Content-Security-Policy': `default-src 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/@xterm/ https://translate.google.com https://translate.googleapis.com https://www.gstatic.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@xterm/ https://www.gstatic.com https://fonts.googleapis.com; connect-src 'self' ${CFG.kontoUrl} https://translate.googleapis.com; img-src 'self' data: https://www.google.com https://www.gstatic.com https://translate.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; base-uri 'none'`,
 };
 
 const server = http.createServer(async (req, res) => {

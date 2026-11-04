@@ -30,14 +30,15 @@
       <h1>Arena · Online-Labs</h1>
       <p class="small muted" style="margin-top:0">Angemeldet als <b id="wer"></b><span id="adminhinweis" hidden> · <span class="lime">Verwaltung: alle Arenen offen</span></span> · <a href="#" id="aus">Abmelden</a></p>
       <p>Jede Arena ist ein <b>echter Linux-Server nur für dich</b> – direkt im Browser, abgeschottet vom Internet und von anderen Spielern, nach spätestens 2 Stunden gelöscht.</p>
-      <details class="klein"><summary>Dein Lab-Token: <b id="tokenzeige"></b></summary>
-        <label>Lab-Token (kommt aus deinem Hacklab-Konto)<input id="token" placeholder="KLY-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+      <details class="klein"><summary>Dein Lab-Token: <b id="tokenzeige" translate="no"></b></summary>
+        <label>Lab-Token (kommt aus deinem Hacklab-Konto)<input id="token" translate="no" placeholder="KLY-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
         <p class="small muted">Der Token gibt deinem Lab seine eigene Note (Namen, Daten). Deine Codes erzeugt der Server geheim nur für dein Konto – abschreiben bei anderen klappt nicht. Normalerweise musst du hier nichts ändern.</p>
       </details>
       <p id="msg" class="muted"></p>
     </section>
     <section class="card" id="register">
       <div class="reihe" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Register</h2><a class="btn ghost" href="handbuch.html">📖 Handbuch</a></div>
+      <div class="filter" id="sprache" style="margin:.4rem 0"></div>
       <div class="filter" id="fReihe"></div>
       <div class="filter" id="fStufe"></div>
       <div class="filter" id="fThema"></div>
@@ -47,7 +48,7 @@
     <section class="card">
       <h2>Einladungscode einlösen</h2>
       <form id="cf" class="reihe">
-        <input name="code" placeholder="NF-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+        <input name="code" translate="no" placeholder="NF-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
         <button class="btn">Einlösen</button>
       </form>
       <p class="small muted">Codes, die du in einem Lab findest (KLY{…}), trägst du direkt bei der jeweiligen Arena ein.</p>
@@ -63,6 +64,7 @@
   </section>
   <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.js" integrity="sha384-M169f14mRZOXm3hD/v2Ti0ThIT/RnAQagXA9nlE15yHAtrW19gdePJh/HaTzUOe/" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.js" integrity="sha384-iF+jqbuti4XlB64clWgFWYEscb+UnSRv3VgVikGYZu+otNFnSHr7y7NcKfBnGizn" crossorigin="anonymous"></script>
+  <script src="i18n-arena.js"></script>
   <script src="arena.js"></script>
 </body>
 </html>

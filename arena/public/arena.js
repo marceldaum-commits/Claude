@@ -132,7 +132,7 @@
         <p class="small muted" style="margin:0 0 .6rem">${fertig} von ${L.levels} Codes gefunden</p>
         ${status}
         <details style="margin-top:.6rem"><summary class="small">Gefundenen Code eintragen</summary>
-          <form class="reihe" data-code="${esc(L.id)}" style="margin-top:.4rem"><input name="c" placeholder="KLY{…}" autocomplete="off" spellcheck="false" required><button class="btn sek">Prüfen</button></form>
+          <form class="reihe" data-code="${esc(L.id)}" style="margin-top:.4rem"><input name="c" translate="no" placeholder="KLY{…}" autocomplete="off" spellcheck="false" required><button class="btn sek">Prüfen</button></form>
         </details>
       </section>`;
     }).join('');

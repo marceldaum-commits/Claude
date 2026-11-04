@@ -9,16 +9,16 @@
   function begriffe(f = '') {
     const q = f.trim().toLowerCase();
     $('#liste').innerHTML = BEGRIFFE.filter(([t, e]) => !q || t.toLowerCase().includes(q) || e.toLowerCase().includes(q))
-      .map(([t, e, b]) => `<dt id="${anker(t)}">${esc(t)}</dt><dd>${esc(e)}${b ? `<br><span class="beispiel">Beispiel: <code>${esc(b)}</code></span>` : ''}</dd>`).join('') || '<p class="muted">Nichts gefunden.</p>';
+      .map(([t, e, b]) => `<dt id="${anker(t)}">${esc(t)}</dt><dd>${esc(e)}${b ? `<br><span class="beispiel">Beispiel: <code translate="no">${esc(b)}</code></span>` : ''}</dd>`).join('') || '<p class="muted">Nichts gefunden.</p>';
   }
-  function befehle() { $('#cmds').innerHTML = BEFEHLE.map(([c, w]) => `<tr><td><code>${esc(c)}</code></td><td>${esc(w)}</td></tr>`).join(''); }
+  function befehle() { $('#cmds').innerHTML = BEFEHLE.map(([c, w]) => `<tr><td><code translate="no">${esc(c)}</code></td><td>${esc(w)}</td></tr>`).join(''); }
   function blatt(id) {
     const h = HANDOUTS[id]; if (!h) return '';
     const liste = (a) => `<ul>${a.map(x => `<li>${x}</li>`).join('')}</ul>`;
     return `<article class="card blatt" id="handout-${esc(id)}">
       <h2>${esc(titel[id] || id)}</h2><p><b>Worum geht es?</b> ${esc(h.ziel)}</p>
       <h3>Begriffe</h3><ul>${h.begriffe.map(b => { const e = BEGRIFFE.find(x => x[0] === b); return `<li><b>${esc(b)}</b>${e ? ' – ' + esc(e[1]) : ''}</li>`; }).join('')}</ul>
-      <h3>Werkzeuge</h3><p>${h.werkzeuge.map(w => `<code>${esc(w)}</code>`).join(' · ')}</p>
+      <h3>Werkzeuge</h3><p>${h.werkzeuge.map(w => `<code translate="no">${esc(w)}</code>`).join(' · ')}</p>
       <h3>So gehst du vor</h3>${liste(h.vorgehen.map(esc))}
       <h3>Und im echten Leben? So schützt man sich</h3>${liste(h.schutz.map(esc))}
       <p class="small muted">Nachtfalter Arena · Übungssystem, alle Daten erfunden. Nur im erlaubten Rahmen (Scope) üben.</p></article>`;
