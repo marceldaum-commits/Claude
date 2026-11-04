@@ -125,7 +125,11 @@ const LABS = {
   ki: { image: env('KI_IMAGE', 'nf-ki'), user: 'hacker', ready: 'Flüsterer bereit', title: 'Der Flüsterer', host: 'ki-assistent',
     produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'ki',
     kurz: 'KI-Sicherheit: einen lokalen KI-Assistenten per Prompt Injection austricksen, damit er sein geheimes Codewort verrät – durch sechs immer strengere Schutzregeln.',
-    hello: hallo('Der Flüsterer', 'hacker', 'Auftrag: cat ~/auftrag.txt   ·   Reden: ki 1 "Hallo"   ·   begriff prompt injection') },
+    hello: hallo('Der Flüsterer', 'hacker', 'Auftrag: cat ~/auftrag.txt   ·   Reden: ki 1 "Hallo"   ·   begriff prompt injection'),
+    helloI18n: {
+      en: `\x1b[32mThe Whisperer (Arena)\x1b[0m – you are hacker.\r\nTask: cat ~/auftrag.txt   ·   Talk: ki 1 "Hello"   ·   Terms: begriff prompt injection\r\nBack: exit\r\n\r\n`,
+      uk: `\x1b[32mШептун (Arena)\x1b[0m – ти hacker.\r\nЗавдання: cat ~/auftrag.txt   ·   Спілкування: ki 1 "Привіт"   ·   Терміни: begriff prompt injection\r\nНазад: exit\r\n\r\n`,
+    } },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -235,7 +239,8 @@ async function waitReady(container, marker, ms = 20000) {
   throw new Error('Lab nicht rechtzeitig bereit');
 }
 
-async function createSession(lab, token, ip, userId = null) {
+async function createSession(lab, token, ip, userId = null, sprache = 'de') {
+  sprache = ['de', 'en', 'uk'].includes(sprache) ? sprache : 'de';
   if (!istLab(lab)) throw Object.assign(new Error('Unbekanntes Lab'), { status: 400 });
   const L = LABS[lab];
   if (vorhanden[lab] === false) throw Object.assign(new Error('Diese Arena wird gerade noch aufgebaut – bitte später noch einmal.'), { status: 503 });
@@ -246,12 +251,12 @@ async function createSession(lab, token, ip, userId = null) {
 
   const id = randomBytes(16).toString('hex');
   // Platz sofort (vor dem ersten await) reservieren, damit parallele Anfragen die Grenzen nicht umgehen
-  sessions.set(id, { id, lab, containerId: null, ip, userId, created: Date.now(), lastSeen: Date.now(), token, startet: true });
+  sessions.set(id, { id, lab, containerId: null, ip, userId, created: Date.now(), lastSeen: Date.now(), token, sprache, startet: true });
   try {
   const container = await docker.createContainer({
     Image: L.image,
     name: `kly-arena-${lab}-${id.slice(0, 10)}`,
-    Env: [`KLY_TOKEN=${token}`, ...(CFG.geheimnis && userId ? [`KLY_SALZ=${salz(userId, lab)}`] : [])],
+    Env: [`KLY_TOKEN=${token}`, `KLY_SPRACHE=${sprache}`, ...(CFG.geheimnis && userId ? [`KLY_SALZ=${salz(userId, lab)}`] : [])],
     Labels: { 'kly.arena': '1', 'kly.session': id, 'kly.expires': String(Date.now() + CFG.ttlMin * 60000) },
     Hostname: L.host,
     HostConfig: {
@@ -334,7 +339,7 @@ const server = http.createServer(async (req, res) => {
         }
         userId = k.userId;
       } else return json(res, 401, { fehler: 'Bitte mit deinem Nachtfalter-Konto anmelden.' }); // alter Einladungscode abgeschaltet (umging die Zugangsprüfung)
-      try { const s = await createSession(String(body.lab || ''), String(body.token || ''), ip, userId); return json(res, 200, { id: s.id, ablauf: s.created + CFG.ttlMin * 60000 }); }
+      try { const s = await createSession(String(body.lab || ''), String(body.token || ''), ip, userId, String(body.sprache || 'de')); return json(res, 200, { id: s.id, ablauf: s.created + CFG.ttlMin * 60000 }); }
       catch (e) { log('fehler', e.message); return json(res, e.status || 500, { fehler: e.status ? e.message : 'Lab konnte nicht gestartet werden.' }); }
     }
     // Code prüfen – wird von der Edge Function „arena-code“ aufgerufen (die kennt das Konto aus der Anmeldung).
@@ -378,7 +383,7 @@ async function attach(ws, s) {
     const c = docker.getContainer(s.containerId);
     const exec = await c.exec({ Cmd: ['runuser', '-l', L.user], AttachStdin: true, AttachStdout: true, AttachStderr: true, Tty: true, Env: ['TERM=xterm-256color', 'LANG=C.UTF-8'] });
     const stream = await exec.start({ hijack: true, stdin: true, Tty: true });
-    ws.send(L.hello);
+    ws.send((L.helloI18n && L.helloI18n[s.sprache]) || L.hello);
     stream.on('data', (d) => { if (ws.readyState === 1) ws.send(d.toString('utf8')); });
     stream.on('end', () => { if (ws.readyState === 1) ws.close(1000, 'Sitzung beendet'); });
     ws.on('message', async (raw) => {

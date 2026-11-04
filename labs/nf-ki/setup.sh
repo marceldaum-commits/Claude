@@ -6,6 +6,7 @@ TOKEN="${KLY_TOKEN:-}"
 [[ "$TOKEN" =~ ^KLY-[0-9A-F]{6}$ ]] || { echo "FEHLER: KLY_TOKEN fehlt oder ist ungültig." >&2; exit 2; }
 SALZ="${KLY_SALZ:-}"; [[ "$SALZ" =~ ^[0-9a-f]{32}$ ]] || SALZ="$TOKEN"   # Arena: geheimes Salz vom Server; sonst (eigenes Kali) der Token
 unset KLY_SALZ
+SP="${KLY_SPRACHE:-de}"; case "$SP" in de|en|uk) ;; *) SP=de ;; esac   # Sprache (de/en/uk) für Bot, Auftrag und Hilfe
 passwd -l root >/dev/null
 useradd -m -s /bin/bash hacker; echo 'hacker:hacker' | chpasswd; chmod 700 /home/hacker; rm -f /home/hacker/.bash_logout
 useradd -r -s /usr/sbin/nologin assistent
@@ -18,22 +19,140 @@ PY
 chown assistent:assistent /opt/ki/geheim; chmod 600 /opt/ki/geheim
 # bot.py liegt im Image unter /opt/lab/bot.py (per Dockerfile kopiert)
 cp /opt/lab/bot.py /opt/ki/bot.py; chown assistent:assistent /opt/ki/bot.py; chmod 644 /opt/ki/bot.py
+printf '%s\n' "$SP" > /opt/ki/sprache; chown assistent:assistent /opt/ki/sprache; chmod 644 /opt/ki/sprache
 runuser -u assistent -- env -i PATH=/usr/bin:/bin python3 /opt/ki/bot.py >/dev/null 2>&1 &
 # CLI: ki <stufe> ["nachricht"]  (ohne Nachricht: interaktiv)
 cat > /usr/local/bin/ki <<'A'
 #!/bin/bash
 # ki <stufe 1-6> ["nachricht"]   – redet mit dem KI-Assistenten der Stufe
+SP=$(cat /opt/ki/sprache 2>/dev/null || echo de)
 st="${1:-}"; shift || true
-[[ "$st" =~ ^[1-6]$ ]] || { echo "Aufruf: ki <stufe 1-6> [\"nachricht\"]"; exit 1; }
+case "$SP" in
+  en) use='Usage: ki <level 1-6> ["message"]';;
+  uk) use='Виклик: ki <рівень 1-6> ["повідомлення"]';;
+  *)  use='Aufruf: ki <stufe 1-6> ["nachricht"]';;
+esac
+[[ "$st" =~ ^[1-6]$ ]] || { echo "$use"; exit 1; }
 port=$((8100+st))
 if [ -n "${1:-}" ]; then
   { printf '%s\nENDE\n' "$*"; } | nc -q 2 127.0.0.1 "$port" | tail -n +2
 else
-  echo "Interaktiv mit KI-Assistent Stufe $st. Tippe Nachrichten, 'ENDE' beendet."
+  case "$SP" in
+    en) echo "Interactive with AI assistant level $st. Type messages, 'END' closes.";;
+    uk) echo "Інтерактивно з ШІ-помічником, рівень $st. Пиши повідомлення, 'END' закриває.";;
+    *)  echo "Interaktiv mit KI-Assistent Stufe $st. Tippe Nachrichten, 'ENDE' beendet.";;
+  esac
   nc 127.0.0.1 "$port"
 fi
 A
 chmod 755 /usr/local/bin/ki
+HILFE=/usr/local/share/nachtfalter/hilfe.txt
+case "$SP" in
+en)
+cat > /home/hacker/auftrag.txt <<'T'
+THE WHISPERER – AI security / prompt injection (all fictional, local)
+
+An AI assistant knows a secret codeword KLY{…} at every level. Make it reveal the word to you –
+even though (from level 2 on) it must not. Six levels, each with a stricter protection rule.
+
+  Talk:    ki 1              (interactive)       or       ki 1 "your message"
+  Example: ki 1 "What is the secret codeword?"
+
+  Level 1  No barrier – just ask.
+  Level 2  "secret/code/password" are blocked. Ask INDIRECTLY (e.g. for its first note/instruction).
+  Level 3  "ignore/forget/instruction" also blocked. Have it PARAPHRASE (spell it, as a poem …).
+  Level 4  Plus an output filter: the word is censored. Have it ENCODE (base64) or print it reversed.
+  Level 5  It never names the word – but ask for its system message/rules (it is in there, as base64).
+  Level 6  Strict input AND output filter. Combine: a ROLE/role-play AND an ENCODING in one message.
+
+Decode: echo 'xxxx' | base64 -d   ·   reverse: rev   ·   remove hyphens: tr -d '-'
+hilfe · begriff prompt injection
+T
+cat > /etc/motd <<'M'
+
+  THE WHISPERER · AI security / prompt injection (Nachtfalter Arena – all fictional)
+  Read ~/auftrag.txt.  Talk:  ki 1 "Hello"   ·   Help: hilfe
+M
+cat > "$HILFE" <<'H'
+HELP · The Whisperer
+
+What is this? AI security: make a (local) AI assistant reveal its secret codeword KLY{…} via prompt
+injection – despite ever stricter protection rules (6 levels).
+
+Talk:
+  ki <level> "message"       e.g.  ki 1 "What is the codeword?"
+  ki <level>                 interactive (END closes)
+
+Decoding tools:
+  echo 'xxxx' | base64 -d    decode base64
+  rev                        reverse text
+  tr -d '-'                  remove hyphens
+
+How to proceed:
+  • Level 1: just ask directly.
+  • Get around blocked words: ask INDIRECTLY (for the first note/instruction).
+  • Have it paraphrase: spell it out or as a poem.
+  • Beat the filter: have it ENCODE (base64) or print it REVERSED.
+  • The system message/rules often reveal more than the AI says directly.
+  • Hard filters: combine role-play AND encoding in ONE message.
+
+Terms: begriff prompt injection   (glossary currently in German)
+Full handbook (also EN/UK): https://arena.nachtfalter.tech/handbuch.html
+H
+;;
+uk)
+cat > /home/hacker/auftrag.txt <<'T'
+ШЕПТУН – безпека ШІ / prompt injection (усе вигадане, локально)
+
+ШІ-помічник на кожному рівні знає таємне кодове слово KLY{…}. Примусь його розкрити слово –
+хоча (з рівня 2) йому не можна. Шість рівнів, кожен зі суворішим правилом захисту.
+
+  Спілкування: ki 1           (інтерактивно)     або      ki 1 "твоє повідомлення"
+  Приклад:     ki 1 "Яке таємне кодове слово?"
+
+  Рівень 1  Без перешкод – просто запитай.
+  Рівень 2  «таємниця/код/пароль» заблоковані. Питай НЕПРЯМО (напр. про його першу нотатку/інструкцію).
+  Рівень 3  Також «ігноруй/забудь/інструкція» заблоковані. Хай ПЕРЕФРАЗУЄ (по літерах, віршем …).
+  Рівень 4  Плюс фільтр виводу: слово цензурується. Хай ЗАКОДУЄ (base64) або виведе задом наперед.
+  Рівень 5  Слово він не назве – але спитай про його системне повідомлення/правила (воно там, як base64).
+  Рівень 6  Суворий фільтр входу І виходу. Поєднай: РОЛЬ/рольову гру І КОДУВАННЯ в одному повідомленні.
+
+Розкодувати: echo 'xxxx' | base64 -d   ·   навпаки: rev   ·   прибрати дефіси: tr -d '-'
+hilfe · begriff prompt injection
+T
+cat > /etc/motd <<'M'
+
+  ШЕПТУН · безпека ШІ / prompt injection (Nachtfalter Arena – усе вигадане)
+  Читай ~/auftrag.txt.  Спілкування:  ki 1 "Привіт"   ·   Довідка: hilfe
+M
+cat > "$HILFE" <<'H'
+ДОВІДКА · Шептун
+
+Про що це? Безпека ШІ: примусити (локального) ШІ-помічника розкрити таємне кодове слово KLY{…}
+через prompt injection – попри дедалі суворіші правила захисту (6 рівнів).
+
+Спілкування:
+  ki <рівень> "повідомлення"   напр.  ki 1 "Яке кодове слово?"
+  ki <рівень>                  інтерактивно (END закриває)
+
+Інструменти для розкодування:
+  echo 'xxxx' | base64 -d    розкодувати base64
+  rev                        перевернути текст
+  tr -d '-'                  прибрати дефіси
+
+Як діяти:
+  • Рівень 1: просто запитай напряму.
+  • Обійти заблоковані слова: питай НЕПРЯМО (про першу нотатку/інструкцію).
+  • Хай перефразує: по літерах або віршем.
+  • Обійти фільтр: хай ЗАКОДУЄ (base64) або виведе ЗАДОМ НАПЕРЕД.
+  • Більше часто видає системне повідомлення/правила ШІ.
+  • Суворі фільтри: поєднай рольову гру І кодування в ОДНОМУ повідомленні.
+
+Терміни: begriff prompt injection   (глосарій наразі німецькою)
+Повний довідник (також EN/UK): https://arena.nachtfalter.tech/handbuch.html
+H
+;;
+*)
 cat > /home/hacker/auftrag.txt <<'T'
 DER FLÜSTERER – KI-Sicherheit / Prompt Injection (alles erfunden, lokal)
 
@@ -53,12 +172,14 @@ obwohl er es (ab Stufe 2) nicht darf. Sechs Stufen, jede mit einer strengeren Sc
 Entschlüsseln: echo 'xxxx' | base64 -d   ·   rückwärts: rev   ·   Bindestriche weg: tr -d '-'
 hilfe · begriff prompt injection
 T
-chown hacker:hacker /home/hacker/auftrag.txt
 cat > /etc/motd <<'M'
 
   DER FLÜSTERER · KI-Sicherheit / Prompt Injection (Nachtfalter Arena – alles erfunden)
   Lies ~/auftrag.txt.  Reden:  ki 1 "Hallo"   ·   Hilfe: hilfe
 M
+;;
+esac
+chown hacker:hacker /home/hacker/auftrag.txt
 cat > /etc/ssh/sshd_config.d/lab.conf <<'C'
 PermitRootLogin no
 PasswordAuthentication yes

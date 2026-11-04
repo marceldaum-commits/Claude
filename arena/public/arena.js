@@ -270,7 +270,8 @@
     const s = await frisch(); if (!s) { $('#start').hidden = true; $('#anmelden').hidden = false; $('#lmsg').textContent = 'Bitte neu anmelden.'; return; }
     knopf.disabled = true; $('#msg').textContent = 'Starte dein Lab … (dauert ein paar Sekunden)'; window.scrollTo(0, 0);
     try {
-      const r = await fetch('api/session', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${s.access_token}` }, body: JSON.stringify({ lab, token: tok }) });
+      const spr = (window.ArenaI18n && window.ArenaI18n.aktuell && window.ArenaI18n.aktuell()) || 'de';
+      const r = await fetch('api/session', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${s.access_token}` }, body: JSON.stringify({ lab, token: tok, sprache: spr }) });
       const j = await r.json();
       if (r.status === 401) { speichern(null); $('#start').hidden = true; $('#anmelden').hidden = false; $('#lmsg').textContent = j.fehler || 'Bitte neu anmelden.'; return; }
       if (!r.ok) throw new Error(j.fehler || 'Fehler');
