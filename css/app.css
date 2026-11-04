@@ -302,3 +302,11 @@ a.karte:hover { border-color: var(--violet); }
 .btn.navbtn { display: flex; width: 100%; justify-content: flex-start; text-align: left; margin: .35rem 0 .5rem; font-weight: 500; }
 .btn.navbtn b { color: var(--violet); }
 .btn.navbtn .pfeil { margin-left: auto; color: var(--violet); }
+
+/* Lernpfad */
+.pfad-konzepte dt { font-weight: 700; margin-top: .5rem; color: var(--lime); }
+.pfad-konzepte dd { margin: .1rem 0 0; }
+.pfad-code { background: #0b0f14; border: 1px solid var(--line); border-radius: 8px; padding: .6rem .7rem; overflow-x: auto; font-size: .85rem; white-space: pre; }
+.pfad-selbst { margin: .3rem 0 0; padding-left: 1.2rem; }
+.pfad-selbst li { margin: .3rem 0; }
+.card.violet { border-color: var(--violet); }

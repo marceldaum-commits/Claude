@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '2.31.0';
+self.KLY_VERSION = '2.32.0';
 self.KLY_FILES = [
   'index.html',
   'konto.html',
@@ -27,6 +27,7 @@ self.KLY_FILES = [
   'js/content/level1.js',
   'js/content/level1-tipps.js',
   'js/content/story1.js',
+  'js/content/lernpfad.js',
   'js/content/tools.js',
   'js/content/rooms.js',
   'js/content/wargames.js',

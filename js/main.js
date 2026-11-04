@@ -13,11 +13,12 @@ import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
 import { STORIES } from './content/story1.js';
+import { LERNPFAD } from './content/lernpfad.js';
 import { TOOLS } from './content/tools.js';
 
 // ---------------------------------------------------------------- Daten
@@ -134,7 +135,7 @@ function renderTop() {
 function renderNav(route) {
   const L = NAV[currentLang()] || NAV.de;
   const items = [['heute', '⌂', L[0]], ['pfad', '◆', L[1]], ['terminal', '>_', L[2]], ['mehr', '≡', L[3]]];
-  const map = { extern: 'pfad', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad' };
+  const map = { extern: 'pfad', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
   const on = map[route] || route;
   $('#nav').setAttribute('translate', 'no');
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
@@ -314,6 +315,71 @@ views.pfad = () => {
   };
 };
 views.raeume = views.pfad;
+
+// ---------------------------------------------------------------- Lernpfad (geführte Lernstufen, Leiter)
+let arenaProg = {}; let arenaProgGeladen = false;
+async function ladeArenaProg() {
+  try { arenaProg = await arenaFortschritt(); } catch { /* offline/kein Konto */ }
+  arenaProgGeladen = true;
+}
+function reqErfuellt(req) {
+  if (!req) return true;
+  if (req.lektion) return lessonDone(req.lektion);
+  if (req.raum) return roomDone(req.raum);
+  if (req.arena) return (arenaProg[req.arena] || 0) >= (req.level || 1);
+  return false;
+}
+// Eine Stufe gilt als geschafft, wenn ihre Übung erfüllt ist (inkl. Alternativen auchRaum/auchArena)
+function stufeGeschafft(st) {
+  const u = st.uebung || {};
+  return reqErfuellt(u.erfordert) || (u.auchRaum && roomDone(u.auchRaum)) || (u.auchArena && reqErfuellt({ arena: u.auchArena.arena, level: u.auchArena.level }));
+}
+const stufeOffen = (i) => i === 0 || stufeGeschafft(LERNPFAD[i - 1]);
+const pfadUebungLink = (href) => href && href.startsWith('arena:') ? `${(globalThis.KLY_CONFIG || {}).arenaUrl || ''}/?lab=${href.slice(6)}` : href;
+
+views.lernpfad = () => {
+  if (!arenaProgGeladen) ladeArenaProg().then(render);
+  const geschafft = LERNPFAD.filter(stufeGeschafft).length;
+  const naechste = LERNPFAD.findIndex((st, i) => stufeOffen(i) && !stufeGeschafft(st));
+  return {
+    title: 'Lernpfad',
+    html: `<h1>📚 Lernpfad</h1>
+    <p class="small muted">Schritt für Schritt: Theorie, Beispiel und eine eigene Übung. Die nächste Stufe öffnet sich, wenn du die Übung der vorigen geschafft hast.</p>
+    ${syncConfigured() && !syncStatus().user ? '<div class="card warn small"><b>Tipp:</b> Melde dich mit deinem Konto an, damit dein Arena-Fortschritt hier zählt. <a href="konto.html">Anmelden</a></div>' : ''}
+    <div class="balken" style="margin:.4rem 0"><i style="width:${Math.round(100 * geschafft / LERNPFAD.length)}%"></i></div>
+    <p class="small muted">${geschafft} von ${LERNPFAD.length} Stufen geschafft</p>
+    <ul class="list card">${LERNPFAD.map((st, i) => {
+      const offen = stufeOffen(i), done = stufeGeschafft(st), ist = i === naechste;
+      return `<li><a href="${offen ? '#/lernstufe/' + st.id : '#'}" ${offen ? '' : 'style="opacity:.6"'} ${offen ? '' : 'onclick="return false"'}>
+        <span class="state ${done ? 'done' : ''}">${done ? '✓' : offen ? st.icon : '🔒'}</span>
+        <span class="grow"><span class="t">${esc(st.titel)}${ist ? ' <span class="badge plain">hier weiter</span>' : ''}</span>
+        <span class="s">${done ? 'geschafft' : offen ? 'offen' : 'erst die Übung der vorigen Stufe abschließen'}</span></span></a></li>`;
+    }).join('')}</ul>`,
+  };
+};
+views.lernstufe = (id) => {
+  const i = LERNPFAD.findIndex(x => x.id === id); const st = LERNPFAD[i];
+  if (!st) return views.lernpfad();
+  if (!stufeOffen(i)) return { title: st.titel, html: `<a class="back" href="#/lernpfad">← Lernpfad</a><div class="card warn"><b>🔒 Noch gesperrt.</b> Schließe erst die Übung der vorigen Stufe ab.</div>` };
+  if (!arenaProgGeladen) ladeArenaProg().then(render);
+  const u = st.uebung || {}; const done = stufeGeschafft(st);
+  const code = (c) => `<code translate="no">${esc(c)}</code>`;
+  return {
+    title: st.titel,
+    html: `<a class="back" href="#/lernpfad">← Lernpfad</a>
+    <h1>${st.icon} ${esc(st.titel)}</h1>
+    <p>${esc(st.einleitung)}</p>
+    ${st.konzepte?.length ? `<div class="card"><h3 style="margin-top:0">Das solltest du kennen</h3><dl class="pfad-konzepte">${st.konzepte.map(([w, t]) => `<dt>${esc(w)}</dt><dd>${esc(t)}</dd>`).join('')}</dl></div>` : ''}
+    ${st.beispiel ? `<div class="card"><h3 style="margin-top:0">🧪 Beispiel</h3><p class="small">${esc(st.beispiel.text)}</p><pre class="pfad-code" translate="no">${st.beispiel.befehle.map(esc).join('\n')}</pre></div>` : ''}
+    ${st.selbst?.length ? `<div class="card"><h3 style="margin-top:0">✋ Jetzt du</h3><ol class="pfad-selbst">${st.selbst.map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>` : ''}
+    <div class="card ${done ? 'lime' : 'violet'}">
+      <h3 style="margin-top:0">${done ? '✓ Übung geschafft' : '🎯 Deine Übung'}</h3>
+      <p class="small">${esc(u.hinweis || '')}</p>
+      ${u.href ? `<a class="btn primary" href="${esc(pfadUebungLink(u.href))}" ${u.href.startsWith('arena:') ? 'target="_blank" rel="noopener"' : ''}>${esc(u.label || 'Zur Übung')} →</a>` : ''}
+      ${!done ? '<p class="small muted" style="margin:.5rem 0 0">Sobald du das geschafft hast, öffnet sich die nächste Stufe. (Arena-Fortschritt zählt, wenn du angemeldet bist.)</p>' : (LERNPFAD[i + 1] ? `<p style="margin:.5rem 0 0"><a class="btn" href="#/lernstufe/${LERNPFAD[i + 1].id}">Nächste Stufe →</a></p>` : '<p class="small">🏆 Das war die letzte Stufe – stark!</p>')}
+    </div>`,
+  };
+};
 
 views.level = (id) => {
   const l = LEVELS.find(x => x.id === id) || LEVELS[0];
@@ -1041,6 +1107,7 @@ views.mehr = () => {
       <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language · Мова</h3>${langPickerHTML()}
         <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
       <div class="card"><ul class="list">
+        <li><a href="#/lernpfad"><span class="state">📚</span><span class="grow"><span class="t">Lernpfad</span><span class="s">Geführt lernen: Theorie, Beispiel, eigene Übung – Stufe für Stufe</span></span></a></li>
         ${(globalThis.KLY_CONFIG || {}).arenaUrl ? `<li><a href="${esc(KLY_CONFIG.arenaUrl)}" target="_blank" rel="noopener"><span class="state">🖥️</span><span class="grow"><span class="t">Arena – Online-Labs</span><span class="s">Echte Übungs-Server im Browser: 10 Arenen: hacken, ermitteln und Angriffe abwehren</span></span></a></li>` : ''}
         <li><a href="konto.html"><span class="state">👤</span><span class="grow"><span class="t">Nachtfalter-Konto</span><span class="s">Registrieren, anmelden, deine Zugänge (Beta)</span></span></a></li>
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>

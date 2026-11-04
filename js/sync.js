@@ -76,6 +76,16 @@ export async function signUp(email, password) {
   if (error) throw new Error(error.message);
 }
 // Status des eigenen Kontos (freigeschaltet/gesperrt/admin) – nur wenn angemeldet
+// Arena-Fortschritt lesen (für den Lernpfad): pro Lab die Anzahl geschaffter Level.
+export async function arenaFortschritt() {
+  if (!user) return {};
+  const c = await getClient();
+  const { data, error } = await c.from('arena_fortschritt').select('lab, level');
+  if (error) throw new Error(error.message);
+  const m = {};
+  for (const r of (data || [])) m[r.lab] = (m[r.lab] || 0) + 1;
+  return m;
+}
 export async function meinStatus() {
   if (!user) return null;
   const c = await getClient();
