@@ -179,14 +179,14 @@ async function uebersicht() {
   main.innerHTML = `<section class="stack">
     <h1 style="margin-bottom:0">Übersicht</h1>
     <div class="zkpis">
-      <div class="zkpi"><b>${nutzer.length}</b><span>Konten gesamt</span></div>
-      <div class="zkpi"><b>${k.length}</b><span>Kunden</span></div>
-      <div class="zkpi lime"><b>${aktiv7.length}</b><span>aktiv (7 Tage)</span></div>
-      <div class="zkpi"><b>${neu7.length}</b><span>neu (7 Tage)</span></div>
-      <div class="zkpi ${offen.length ? 'warn' : ''}"><b>${offen.length}</b><span>E-Mail unbestätigt</span></div>
-      <div class="zkpi ${elternFehlt.length ? 'warn' : ''}"><b>${elternFehlt.length}</b><span>Eltern-Zustimmung fehlt</span></div>
-      <div class="zkpi"><b>${geloest}</b><span>gelöste Räume gesamt</span></div>
-      <div class="zkpi"><b>${codesOffen.length}</b><span>offene Codes</span></div>
+      <a class="zkpi" href="#/kunden?f=alle"><b>${nutzer.length}</b><span>Konten gesamt</span></a>
+      <a class="zkpi" href="#/kunden?f=kunden"><b>${k.length}</b><span>Kunden</span></a>
+      <a class="zkpi lime" href="#/kunden?f=aktiv"><b>${aktiv7.length}</b><span>aktiv (7 Tage)</span></a>
+      <a class="zkpi" href="#/kunden?f=neu"><b>${neu7.length}</b><span>neu (7 Tage)</span></a>
+      <a class="zkpi ${offen.length ? 'warn' : ''}" href="#/kunden?f=offen"><b>${offen.length}</b><span>E-Mail unbestätigt</span></a>
+      <a class="zkpi ${elternFehlt.length ? 'warn' : ''}" href="#/kunden?f=eltern"><b>${elternFehlt.length}</b><span>Eltern-Zustimmung fehlt</span></a>
+      <a class="zkpi" href="#/kunden?f=lernen"><b>${geloest}</b><span>gelöste Räume gesamt</span></a>
+      <a class="zkpi" href="#/codes"><b>${codesOffen.length}</b><span>offene Codes</span></a>
     </div>
     <div class="zgrid zwei">
       ${liste('🆕 Neu registriert', [...neu7].sort((a, b) => String(b.erstellt).localeCompare(String(a.erstellt))), 'Diese Woche noch niemand.')}
@@ -203,12 +203,15 @@ async function kunden() {
   const F = {
     alle: () => true, kunden: n => !n.admin, verwaltung: n => n.admin, offen: n => !n.bestaetigt,
     gesperrt: n => n.gesperrt, aktiv: n => n.zuletzt && new Date(n.zuletzt) > tage(7), kinder: n => kind(n),
+    neu: n => new Date(n.erstellt) > tage(7), eltern: n => kind(n) && !n.eltern, lernen: n => (n.fortschritt?.geloest || 0) > 0,
   };
-  const L = { alle: 'Alle', kunden: 'Kunden', verwaltung: 'Verwaltung', aktiv: 'Aktiv (7 T.)', offen: 'E-Mail offen', gesperrt: 'Gesperrt', kinder: 'Unter 17' };
+  const L = { alle: 'Alle', kunden: 'Kunden', verwaltung: 'Verwaltung', aktiv: 'Aktiv (7 T.)', neu: 'Neu (7 T.)', offen: 'E-Mail offen', gesperrt: 'Gesperrt', kinder: 'Unter 17', eltern: 'Eltern fehlt', lernen: 'Mit gelösten Räumen' };
+  const wunsch = new URLSearchParams((location.hash.split('?')[1]) || '').get('f');
+  if (wunsch && F[wunsch]) filter = wunsch;
   const zeichne = () => {
     const q = suche.toLowerCase();
     const liste = nutzer.filter(F[filter]).filter(n => !q || `${n.email} ${n.name} ${n.notiz}`.toLowerCase().includes(q))
-      .sort((a, b) => String(b.zuletzt || b.erstellt).localeCompare(String(a.zuletzt || a.erstellt)));
+      .sort((a, b) => filter === 'lernen' ? (b.fortschritt?.geloest || 0) - (a.fortschritt?.geloest || 0) : String(b.zuletzt || b.erstellt).localeCompare(String(a.zuletzt || a.erstellt)));
     $('#kl').innerHTML = liste.length ? `<table class="ztab"><thead><tr><th>Name / E-Mail</th><th>Status</th><th class="zmobil-weg">Fortschritt</th><th class="zmobil-weg">Zuletzt</th></tr></thead><tbody>
       ${liste.map(n => `<tr class="klick" data-id="${n.id}"><td><b>${esc(n.name || '–')}</b><br><span class="small muted">${esc(n.email)}</span></td><td>${badges(n)}</td>
         <td class="zmobil-weg">${n.fortschritt ? `${n.fortschritt.geloest}/${gesamtRaeume()} Räume<div class="zbalken" style="margin-top:.3rem"><i style="width:${Math.min(100, 100 * n.fortschritt.geloest / gesamtRaeume())}%"></i></div>` : '<span class="muted">–</span>'}</td>
@@ -402,7 +405,7 @@ async function route() {
   if (!s) return anmelden();
   if (stufe() !== 'aal2') return zweiterFaktor();
   kopf(true);
-  const [, teil = '', arg] = (location.hash || '#/').split('/');
+  const [, teil = '', arg] = (location.hash || '#/').split('?')[0].split('/');
   document.querySelectorAll('#tabs a').forEach(a => a.classList.toggle('an', a.dataset.r === (teil === 'kunde' ? 'kunden' : teil)));
   try {
     if (teil === 'kunden') await kunden();

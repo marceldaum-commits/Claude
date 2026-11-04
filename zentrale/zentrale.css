@@ -35,3 +35,7 @@ input[type=search] { width: 100%; padding: .65rem .8rem; border-radius: 10px; bo
 @media (max-width: 640px) { #wer { display: none; } }
 .ztabs { max-width: 100vw; box-sizing: border-box; }
 html, body { overflow-x: clip; }
+
+a.zkpi { color: var(--text); text-decoration: none; display: block; transition: border-color .15s; }
+a.zkpi:hover, a.zkpi:focus-visible { border-color: var(--violet); }
+a.zkpi span::after { content: ' ›'; color: var(--muted); }
