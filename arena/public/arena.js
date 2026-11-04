@@ -189,8 +189,10 @@
       <form id="kiform" class="reihe"><input id="kitext" placeholder="Deine Nachricht an die KI …" autocomplete="off" maxlength="1000" required><button class="btn">Senden</button></form>
       <form id="kilos" class="reihe" style="margin-top:.4rem"><input id="kicode" placeholder="KLY{…}" translate="no" autocomplete="off"><button class="btn sek">Codewort prüfen</button></form>
       <p id="kimsg" class="small muted"></p>`;
+    const spr = (window.ArenaI18n && window.ArenaI18n.aktuell && window.ArenaI18n.aktuell()) || 'de';
+    const LBL = { de: { du: 'Du', ki: 'KI' }, en: { du: 'You', ki: 'AI' }, uk: { du: 'Ти', ki: 'ШІ' } }[spr] || { du: 'Du', ki: 'KI' };
     const chat = $('#kichat');
-    const mal = () => { chat.innerHTML = kiVerlauf.map(m => `<div class="kizeile ${m.rolle}"><b>${m.rolle === 'user' ? 'Du' : 'KI'}:</b> ${esc(m.text)}</div>`).join(''); chat.scrollTop = chat.scrollHeight; };
+    const mal = () => { chat.innerHTML = kiVerlauf.map(m => `<div class="kizeile ${m.rolle}"><b>${m.rolle === 'user' ? LBL.du : LBL.ki}:</b> ${esc(m.text)}</div>`).join(''); chat.scrollTop = chat.scrollHeight; };
     $('#kistufe').value = kiStufe;
     $('#kistufe').onchange = (e) => { kiStufe = +e.target.value; kiVerlauf = []; mal(); };
     $('#kineu').onclick = () => { kiVerlauf = []; mal(); $('#kimsg').textContent = ''; };
@@ -199,7 +201,7 @@
       const btn = $('#kiform').querySelector('button'); btn.disabled = true;
       kiVerlauf.push({ rolle: 'user', text: t }); mal(); $('#kitext').value = '';
       try {
-        const r = await kiApi('chat', { stufe: kiStufe, nachricht: t, verlauf: kiVerlauf.slice(0, -1) });
+        const r = await kiApi('chat', { stufe: kiStufe, nachricht: t, verlauf: kiVerlauf.slice(0, -1), sprache: spr });
         kiVerlauf.push({ rolle: 'assistant', text: r.text || '…' }); mal();
         if (r.erbeutet) $('#kimsg').textContent = '🎉 Du hast das Codewort im Klartext erbeutet! Trag es unten ein.';
       } catch (err) { $('#kimsg').textContent = err.message; kiVerlauf.pop(); mal(); }
