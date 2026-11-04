@@ -169,30 +169,51 @@
   // ---------------------------------------------------------------- Premium: echter KI-Gegner (Edge Function ki-duell)
   const kiApi = (aktion, body = {}) => rest('/functions/v1/ki-duell', { method: 'POST', body: JSON.stringify({ aktion, ...body }) });
   let kiStufe = 1, kiVerlauf = [];
+  // Premium-KI komplett dreisprachig (fest, nicht über Google) – passend dazu antwortet das Modell in der Nutzersprache.
+  const KI_T = {
+    de: { titel: '🧠 Premium: Echter KI-Gegner', badge: 'echtes Modell',
+      sperrInfo: 'Die Arena „Der Flüsterer“ ist ein lokaler, kostenloser Übungs-Bot. <b>Premium</b> lässt dich gegen ein <b>echtes KI-Modell</b> antreten, das ein Geheimnis bewacht – du musst es per Prompt Injection herauslocken.',
+      sperrWarn: '🔒 Noch nicht freigeschaltet. (Der Betreiber muss dafür einen KI-Schlüssel hinterlegen.)',
+      info: 'Chatte mit einem echten KI-Modell und entlocke ihm das geheime Codewort. Je höher die Stufe, desto strenger bewacht es das Geheimnis.',
+      geloest: 'Gelöst', stufe: 'Stufe', neu: 'Neu beginnen', platzhalter: 'Deine Nachricht an die KI …', senden: 'Senden', pruefen: 'Codewort prüfen',
+      du: 'Du', ki: 'KI', erbeutet: '🎉 Du hast das Codewort im Klartext erbeutet! Trag es unten ein.', richtig: (n) => `✓ Richtig! Stufe ${n} geknackt.`, falsch: 'Das ist nicht das richtige Codewort.' },
+    en: { titel: '🧠 Premium: Real AI Opponent', badge: 'real model',
+      sperrInfo: 'The “Whisperer” arena is a local, free practice bot. <b>Premium</b> lets you take on a <b>real AI model</b> that guards a secret – you have to coax it out with prompt injection.',
+      sperrWarn: '🔒 Not unlocked yet. (The operator needs to add an AI key first.)',
+      info: 'Chat with a real AI model and coax its secret codeword out of it. The higher the level, the more strictly it guards the secret.',
+      geloest: 'Solved', stufe: 'Level', neu: 'Start over', platzhalter: 'Your message to the AI …', senden: 'Send', pruefen: 'Check codeword',
+      du: 'You', ki: 'AI', erbeutet: '🎉 You got the codeword in plain text! Enter it below.', richtig: (n) => `✓ Correct! Level ${n} cracked.`, falsch: 'That is not the right codeword.' },
+    uk: { titel: '🧠 Преміум: справжній ШІ-суперник', badge: 'справжня модель',
+      sperrInfo: 'Арена «Шептун» — це локальний безкоштовний тренувальний бот. <b>Преміум</b> дає змогу позмагатися зі <b>справжньою моделлю ШІ</b>, що береже таємницю — її треба виманити через prompt injection.',
+      sperrWarn: '🔒 Ще не розблоковано. (Оператор має спершу додати ключ ШІ.)',
+      info: 'Спілкуйся зі справжньою моделлю ШІ та виманюй у неї таємне кодове слово. Що вищий рівень, то суворіше вона береже таємницю.',
+      geloest: 'Розв’язано', stufe: 'Рівень', neu: 'Почати знову', platzhalter: 'Твоє повідомлення для ШІ …', senden: 'Надіслати', pruefen: 'Перевірити кодове слово',
+      du: 'Ти', ki: 'ШІ', erbeutet: '🎉 Ти здобув кодове слово у відкритому вигляді! Введи його нижче.', richtig: (n) => `✓ Правильно! Рівень ${n} зламано.`, falsch: 'Це не те кодове слово.' },
+  };
   async function kiPremium() {
     const box = $('#kiprem'); if (!box) return;
     let info; try { info = await kiApi('info'); } catch { box.hidden = true; return; }
     box.hidden = false;
+    const spr = (window.ArenaI18n && window.ArenaI18n.aktuell && window.ArenaI18n.aktuell()) || 'de';
+    const T = KI_T[spr] || KI_T.de;
     if (!info.verfuegbar) {
-      box.innerHTML = `<h2 style="margin-top:0">🧠 Premium: Echter KI-Gegner</h2>
-        <p class="small">Die Arena „Der Flüsterer“ ist ein lokaler, kostenloser Übungs-Bot. <b>Premium</b> lässt dich gegen ein <b>echtes KI-Modell</b> antreten, das ein Geheimnis bewacht – du musst es per Prompt Injection herauslocken.</p>
-        <p class="hinweis warn">🔒 Noch nicht freigeschaltet. (Der Betreiber muss dafür einen KI-Schlüssel hinterlegen.)</p>`;
+      box.innerHTML = `<h2 style="margin-top:0" translate="no">${T.titel}</h2>
+        <p class="small" translate="no">${T.sperrInfo}</p>
+        <p class="hinweis warn" translate="no">${T.sperrWarn}</p>`;
       return;
     }
     const geloest = new Set(info.geloest || []);
-    box.innerHTML = `<h2 style="margin-top:0">🧠 Premium: Echter KI-Gegner <span class="stufe Experte">echtes Modell</span></h2>
-      <p class="small">Chatte mit einem echten KI-Modell und entlocke ihm das geheime Codewort. Je höher die Stufe, desto strenger bewacht es das Geheimnis. Gelöst: ${[...geloest].sort().join(', ') || '–'} / ${info.stufen}.</p>
-      <div class="reihe"><label class="small">Stufe
-        <select id="kistufe">${Array.from({ length: info.stufen }, (_, i) => `<option value="${i + 1}" ${geloest.has(i + 1) ? '' : ''}>${i + 1}${geloest.has(i + 1) ? ' ✓' : ''}</option>`).join('')}</select></label>
-        <button class="btn sek" id="kineu">Neu beginnen</button></div>
+    box.innerHTML = `<h2 style="margin-top:0" translate="no">${T.titel} <span class="stufe Experte">${T.badge}</span></h2>
+      <p class="small" translate="no">${T.info} ${T.geloest}: ${[...geloest].sort().join(', ') || '–'} / ${info.stufen}.</p>
+      <div class="reihe"><label class="small" translate="no">${T.stufe}
+        <select id="kistufe">${Array.from({ length: info.stufen }, (_, i) => `<option value="${i + 1}">${i + 1}${geloest.has(i + 1) ? ' ✓' : ''}</option>`).join('')}</select></label>
+        <button class="btn sek" id="kineu" translate="no">${T.neu}</button></div>
       <div id="kichat" class="kichat" translate="no"></div>
-      <form id="kiform" class="reihe"><input id="kitext" placeholder="Deine Nachricht an die KI …" autocomplete="off" maxlength="1000" required><button class="btn">Senden</button></form>
-      <form id="kilos" class="reihe" style="margin-top:.4rem"><input id="kicode" placeholder="KLY{…}" translate="no" autocomplete="off"><button class="btn sek">Codewort prüfen</button></form>
-      <p id="kimsg" class="small muted"></p>`;
-    const spr = (window.ArenaI18n && window.ArenaI18n.aktuell && window.ArenaI18n.aktuell()) || 'de';
-    const LBL = { de: { du: 'Du', ki: 'KI' }, en: { du: 'You', ki: 'AI' }, uk: { du: 'Ти', ki: 'ШІ' } }[spr] || { du: 'Du', ki: 'KI' };
+      <form id="kiform" class="reihe"><input id="kitext" translate="no" placeholder="${esc(T.platzhalter)}" autocomplete="off" maxlength="1000" required><button class="btn" translate="no">${T.senden}</button></form>
+      <form id="kilos" class="reihe" style="margin-top:.4rem"><input id="kicode" placeholder="KLY{…}" translate="no" autocomplete="off"><button class="btn sek" translate="no">${T.pruefen}</button></form>
+      <p id="kimsg" class="small muted" translate="no"></p>`;
     const chat = $('#kichat');
-    const mal = () => { chat.innerHTML = kiVerlauf.map(m => `<div class="kizeile ${m.rolle}"><b>${m.rolle === 'user' ? LBL.du : LBL.ki}:</b> ${esc(m.text)}</div>`).join(''); chat.scrollTop = chat.scrollHeight; };
+    const mal = () => { chat.innerHTML = kiVerlauf.map(m => `<div class="kizeile ${m.rolle}"><b>${m.rolle === 'user' ? T.du : T.ki}:</b> ${esc(m.text)}</div>`).join(''); chat.scrollTop = chat.scrollHeight; };
     $('#kistufe').value = kiStufe;
     $('#kistufe').onchange = (e) => { kiStufe = +e.target.value; kiVerlauf = []; mal(); };
     $('#kineu').onclick = () => { kiVerlauf = []; mal(); $('#kimsg').textContent = ''; };
@@ -203,15 +224,15 @@
       try {
         const r = await kiApi('chat', { stufe: kiStufe, nachricht: t, verlauf: kiVerlauf.slice(0, -1), sprache: spr });
         kiVerlauf.push({ rolle: 'assistant', text: r.text || '…' }); mal();
-        if (r.erbeutet) $('#kimsg').textContent = '🎉 Du hast das Codewort im Klartext erbeutet! Trag es unten ein.';
+        if (r.erbeutet) $('#kimsg').textContent = T.erbeutet;
       } catch (err) { $('#kimsg').textContent = err.message; kiVerlauf.pop(); mal(); }
       btn.disabled = false;
     };
     $('#kilos').onsubmit = async (e) => {
       e.preventDefault(); const c = $('#kicode').value.trim();
       try { const r = await kiApi('loesen', { stufe: kiStufe, versuch: c });
-        if (r.ok) { $('#kimsg').textContent = `✓ Richtig! Stufe ${kiStufe} geknackt.`; kiPremium(); }
-        else $('#kimsg').textContent = 'Das ist nicht das richtige Codewort.';
+        if (r.ok) { $('#kimsg').textContent = T.richtig(kiStufe); kiPremium(); }
+        else $('#kimsg').textContent = T.falsch;
       } catch (err) { $('#kimsg').textContent = err.message; }
     };
     mal();
