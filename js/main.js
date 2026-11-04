@@ -177,6 +177,7 @@ function render() {
   const v = views[route] || views.heute;
   const r = v(arg) || {};
   main.innerHTML = langNoteHTML() + (r.html || '');
+  const lb = main.querySelector('#lang-banner'); if (lb) bindLangPicker(lb);
   main.classList.toggle('wide', !!r.wide);
   // Browser-Übersetzung (z. B. Google Translate): Befehle, Codes und Terminals NICHT übersetzen
   main.querySelectorAll('pre, code, .script, .syntax, input, textarea, [data-copy]').forEach(e => e.setAttribute('translate', 'no'));

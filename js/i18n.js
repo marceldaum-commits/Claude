@@ -70,8 +70,17 @@ export function initLang() {
 export function langNoteHTML() {
   const l = currentLang();
   if (l === 'de') return '';
-  const auto = { en: 'Language set from your phone. Some texts are still German – tap your language again in “More” to translate the rest automatically (Google).', uk: 'Мову взято з налаштувань телефона. Деякі тексти ще німецькою – натисни свою мову ще раз у «Ще», щоб автоматично перекласти решту (Google).' };
-  return `<div class="card tight small" id="lang-note" translate="no">${LANGS[l].flag} ${selbstGewaehlt() ? LANGS[l].note : auto[l]}</div>`;
+  // Eigene Wahl getroffen → kleiner Hinweis (teils Hand-, teils Google-Übersetzung).
+  if (selbstGewaehlt()) return `<div class="card tight small" id="lang-note" translate="no">${LANGS[l].flag} ${LANGS[l].note}</div>`;
+  // Automatisch per Handy erkannt → auffälliges Banner mit Direkt-Umschalter.
+  const txt = { en: 'This app is in German.', uk: 'Цей застосунок німецькою.' }[l];
+  const go = { en: 'Switch to English', uk: 'Перейти українською' }[l];
+  const zu = { en: 'Keep German', uk: 'Залишити німецькою' }[l];
+  return `<div class="langbanner" id="lang-banner" translate="no">
+    <span>🌐 ${txt}</span>
+    <button class="btn small go" data-lang="${l}">${LANGS[l].flag} ${go} →</button>
+    <button class="btn small ghost" data-lang="de">${zu}</button>
+  </div>`;
 }
 
 // Auswahlknöpfe (nicht übersetzt, damit jede Sprache ihren eigenen Namen zeigt)
