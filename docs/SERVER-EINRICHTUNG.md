@@ -74,3 +74,17 @@ ersten Server am 03.11. eingerichtet hat. Hier angepasst an Nachtfalter (Arena, 
 - Vorschau der Zentrale: `vorschau.nachtfalter.tech/zentrale/` (aus dem Arbeits-Branch, im Vorschau-Baustein eingebunden).
 - Rechte: Edge Function `admin` prüft Anmeldung + Tabelle `admins` („Verwaltung“); jede Änderung landet in `admin_log`,
   Notizen in `kunden_notizen` (beide ohne Policies, nur für den Dienst).
+
+## Konto-Daten (Supabase, kostenloser Tarif)
+
+- Kostenlose Projekte werden nach 7 Tagen ohne Nutzung pausiert → `nachtfalter-deploy` ruft einmal täglich Auth und
+  Datenbank auf (Stand in `nachtfalter-deploy status` unter „Konto-Ping“).
+- Supabase sichert im kostenlosen Tarif nichts zum Herunterladen → nächtliche Sicherung per `pg_dump` (Schemas `auth`
+  und `public`) nach `/var/www/vhosts/nachtfalter.tech/private/konto-sicherung/` (14 Tage, nur root lesbar); von dort
+  nimmt sie das Plesk-Backup verschlüsselt mit nach Google Drive. Einrichtung (einmalig, als root):
+  1. `apt install -y postgresql-client`
+  2. Supabase → Projekt → **Connect** → „Session pooler“ → URI kopieren (Datenbank-Passwort ggf. unter
+     Database → Settings neu setzen, in Bitwarden ablegen).
+  3. `install -m 600 /dev/null /etc/nachtfalter/konto-db.env && nano /etc/nachtfalter/konto-db.env` →
+     eine Zeile `KONTO_DB_URL=postgresql://…` eintragen, speichern.
+  4. Die Sicherung läuft dann zwischen 2 und 5 Uhr; Ergebnis in `nachtfalter-deploy status` („Sicherung“).
