@@ -111,3 +111,13 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - [ ] Arena installieren (Kali-Sitzung)
 - [ ] KI-Dienst installieren (KI-Sitzung)
 - [ ] Gegenseitige Links
+
+## Stand 04.11.2026 spät (2.26.0)
+
+- Brevo wird nicht mehr genutzt: aus Datenschutzerklärung, Zentrale und Doku entfernt. Marcel löscht die Brevo-Schlüssel
+  bzw. das Konto; DNS (Plesk, Nameserver Strato): brevo-code-TXT und brevo1/2._domainkey entfernen, DMARC-rua → info@.
+- Port 587 in Plesk aktiv, Strato-Firewall 587 offen (2222 bleibt).
+- Deploy-Skript aktualisiert sich selbst aus „live“ (Funktion selbst); „claude“ darf per sudo nur nachtfalter-deploy
+  (auch --force/status) ausführen (/etc/sudoers.d/nachtfalter-claude). Keine Neuinstallation von Hand mehr nötig.
+- Arena: Leitstelle (Fortgeschritten) und Tresor (Experte) live, Zugangsanfragen in der Zentrale, Sicherheitsprüfung umgesetzt.
+- App startet in der Handy-Sprache (de/en/uk, sonst en).

@@ -429,7 +429,7 @@ async function system() {
       <button class="btn small ghost" id="neu" style="margin-top:.6rem">Neu prüfen</button></div>
     <div class="card"><h3 style="margin-top:0">Schnellzugriff</h3><ul class="list">
       ${link('https://www.nachtfalter.tech/', '🦋 Startseite')}${link(APP + '/', '🎮 Hacklab')}${link('https://vorschau.nachtfalter.tech/', '🧪 Vorschau')}${link('https://arena.nachtfalter.tech/', '🖥️ Arena')}
-      ${link('https://supabase.com/dashboard/project/sxapebxzxmathkvtuuvn', '🗄️ Supabase (Konten, E-Mail-Vorlagen)')}${link('https://app.brevo.com/', '✉️ Brevo (Mail-Versand, Protokolle)')}
+      ${link('https://supabase.com/dashboard/project/sxapebxzxmathkvtuuvn', '🗄️ Supabase (Konten, E-Mail-Vorlagen)')}
     </ul><p class="small muted" style="margin:.5rem 0 0">Plesk und Strato öffnest du wie gewohnt über deine Lesezeichen.</p></div>
   </section>`;
   $('#neu').onclick = system;

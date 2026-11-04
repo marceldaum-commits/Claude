@@ -1,6 +1,6 @@
 # E-Mail-Vorlagen (Supabase → Authentication → Emails → Templates)
 
-Absender: Nachtfalter <noreply@nachtfalter.tech> (SMTP über Brevo). Jeweils **Subject** und **Body** (HTML) einfügen.
+Absender: Nachtfalter <noreply@nachtfalter.tech> (SMTP über den eigenen Server nachtfalter.tech:587). Jeweils **Subject** und **Body** (HTML) einfügen.
 
 ## Confirm signup
 
