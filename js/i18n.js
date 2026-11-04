@@ -5,12 +5,11 @@
 export const LANGS = {
   de: { name: 'Deutsch', flag: '🇩🇪', note: '' },
   en: { name: 'English', flag: '🇬🇧', note: 'Partly translated by hand, the rest by Google. Commands and the terminal stay in the original – type them exactly as shown.' },
-  uk: { name: 'Українська', flag: '🇺🇦', note: 'Частково перекладено вручну, решту – Google. Команди й термінал залишаються в оригіналі – вводь їх саме так, як показано.' },
 };
 const KEY = 'kly.lang';
 // Wenige feste Begriffe übersetzen wir selbst (zuverlässiger als die Maschine)
-export const NAV = { de: ['Start', 'Lernen', 'Terminal', 'Mehr'], en: ['Home', 'Learn', 'Terminal', 'More'], uk: ['Головна', 'Навчання', 'Термінал', 'Ще'] };
-const FAIL = { en: 'Translation service not reachable right now – showing the German original.', uk: 'Сервіс перекладу зараз недоступний – показано німецький оригінал.' };
+export const NAV = { de: ['Start', 'Lernen', 'Terminal', 'Mehr'], en: ['Home', 'Learn', 'Terminal', 'More'] };
+const FAIL = { en: 'Translation service not reachable right now – showing the German original.' };
 
 export function currentLang() {
   try { const l = localStorage.getItem(KEY); if (LANGS[l]) return l; } catch { /* */ }
@@ -22,7 +21,7 @@ export function selbstGewaehlt() {
   try { return !!LANGS[localStorage.getItem(KEY)]; } catch { return false; }
 }
 
-// Ohne eigene Wahl: Handy-Sprache nehmen (Deutsch, Ukrainisch, Englisch), sonst Englisch
+// Ohne eigene Wahl: Handy-Sprache nehmen (Deutsch oder Englisch), sonst Englisch
 export function geraeteSprache() {
   const liste = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])
     .map(x => String(x).toLowerCase().slice(0, 2));
@@ -54,7 +53,7 @@ export function initLang() {
   setCookie(`/de/${l}`);
   const holder = document.createElement('div'); holder.id = 'gt-el'; holder.hidden = true; document.body.appendChild(holder);
   window.klyGtInit = () => {
-    try { new window.google.translate.TranslateElement({ pageLanguage: 'de', includedLanguages: 'en,uk', autoDisplay: false }, 'gt-el'); } catch { /* */ }
+    try { new window.google.translate.TranslateElement({ pageLanguage: 'de', includedLanguages: 'en', autoDisplay: false }, 'gt-el'); } catch { /* */ }
   };
   const s = document.createElement('script');
   s.src = 'https://translate.google.com/translate_a/element.js?cb=klyGtInit';
@@ -73,9 +72,9 @@ export function langNoteHTML() {
   // Eigene Wahl getroffen → kleiner Hinweis (teils Hand-, teils Google-Übersetzung).
   if (selbstGewaehlt()) return `<div class="card tight small" id="lang-note" translate="no">${LANGS[l].flag} ${LANGS[l].note}</div>`;
   // Automatisch per Handy erkannt → auffälliges Banner mit Direkt-Umschalter.
-  const txt = { en: 'This app is in German.', uk: 'Цей застосунок німецькою.' }[l];
-  const go = { en: 'Switch to English', uk: 'Перейти українською' }[l];
-  const zu = { en: 'Keep German', uk: 'Залишити німецькою' }[l];
+  const txt = { en: 'This app is in German.' }[l];
+  const go = { en: 'Switch to English' }[l];
+  const zu = { en: 'Keep German' }[l];
   return `<div class="langbanner" id="lang-banner" translate="no">
     <span>🌐 ${txt}</span>
     <button class="btn small go" data-lang="${l}">${LANGS[l].flag} ${go} →</button>
@@ -206,7 +205,7 @@ export function protectCodes() {
 // Datei i18n/<sprache>/<raumid>.json = { "<deutscher Originaltext>": "<Übersetzung>" } (Team „Sprache & Qualität“).
 // {code} steht für einen Code KLY{16 Zeichen}. Was nicht im Wörterbuch steht, bleibt original
 // (und wird dann wie bisher von Google übersetzt). Handübersetzte Stellen sind translate="no".
-export const HAND = { en: ['w1', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'w9', 'p5', 'p6', 'p7', 'p8', 'p10', 'h1', 'n1', 'b1'], uk: ['w1', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'w9', 'p5', 'p6', 'p7', 'p8', 'p10', 'h1', 'n1', 'b1'] };
+export const HAND = { en: ['w1', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8', 'w9', 'p5', 'p6', 'p7', 'p8', 'p10', 'h1', 'n1', 'b1'] };
 const DICTS = {};
 const CODE_IN = /KLY\{[0-9a-f]{16}\}/g;
 

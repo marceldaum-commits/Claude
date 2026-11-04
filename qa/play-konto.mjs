@@ -19,7 +19,7 @@ const fake = (route) => {
 };
 const b = await chromium.launch();
 let problems = 0;
-for (const [dev, vp] of [['handy', { width: 390, height: 844 }], ['pc', { width: 1366, height: 768 }]]) for (const lang of ['de', 'en', 'uk']) for (const view of ['login', 'neu', 'vergessen', 'konto']) {
+for (const [dev, vp] of [['handy', { width: 390, height: 844 }], ['pc', { width: 1366, height: 768 }]]) for (const lang of ['de', 'en']) for (const view of ['login', 'neu', 'vergessen', 'konto']) {
   const ctx = await b.newContext({ viewport: vp });
   await ctx.route(/supabase\.co/, fake);
   await ctx.route(/translate\.goog|googleapis|gstatic/, r => r.abort());

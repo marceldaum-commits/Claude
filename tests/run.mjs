@@ -358,7 +358,7 @@ await at('R0 Sandbox-Raum lösbar', async () => {
 });
 
 const offen = []; // noch nicht (neu) übersetzte Tipps: kein Fehler, Google springt ein
-for (const lang of ['de', 'en', 'uk']) await at(`W1 Nachtfalter komplett lösbar (Sandbox, ${lang})`, async () => {
+for (const lang of ['de', 'en']) await at(`W1 Nachtfalter komplett lösbar (Sandbox, ${lang})`, async () => {
   const r = ROOMS.find(x => x.id === 'w1'); const F = {};
   for (const f of r.flags) F[f] = await flagFor(TOKEN, 'w1', f);
   const solved = [];
@@ -648,7 +648,7 @@ t('Serie (Streak)', () => {
 });
 
 t('Terminal-Meldungen EN/UK (shell.json)', () => {
-  for (const lang of ['en', 'uk']) {
+  for (const lang of ['en']) {
     const T = makeLineT(JSON.parse(readFileSync(join(ROOT, `i18n/${lang}/shell.json`), 'utf8')));
     const s = new Shell({ fs: baseFS() });
     const e = s.exec('cat nix').err.trim(); const tr = T(e);

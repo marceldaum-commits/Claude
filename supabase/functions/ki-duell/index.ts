@@ -31,7 +31,7 @@ async function geheim(uid: string, stufe: number): Promise<string> {
 }
 
 const SPRACHEN: Record<string, string> = {
-  de: 'Deutsch', en: 'English', uk: 'Ukrainian (українською)',
+  de: 'Deutsch', en: 'English',
 };
 function systemPrompt(stufe: number, s: string, sprache: string): string {
   const lang = SPRACHEN[sprache] || 'Deutsch';
@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
     verlauf = verlauf.slice(-MAX_VERLAUF).filter((m: any) => m && (m.rolle === 'user' || m.rolle === 'assistant') && typeof m.text === 'string');
     const nachricht = String(b?.nachricht || '').slice(0, MAX_NACHRICHT);
     if (!nachricht.trim()) return antwort(o, 400, { fehler: 'Leere Nachricht.' });
-    const sprache = ['de', 'en', 'uk'].includes(String(b?.sprache)) ? String(b.sprache) : 'de';
+    const sprache = ['de', 'en'].includes(String(b?.sprache)) ? String(b.sprache) : 'de';
     const messages = [...verlauf.map((m: any) => ({ role: m.rolle, content: m.text.slice(0, MAX_NACHRICHT) })), { role: 'user', content: nachricht }];
     try {
       const r = await fetch('https://api.anthropic.com/v1/messages', {

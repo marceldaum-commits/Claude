@@ -83,14 +83,14 @@ const ROOMDEF = {
       go(13); step(13, 'cat ' + run('find .anlagen -perm 600').trim());
       go(14); step(14, `cat schloss/${run("cat messungen/* | awk '{s+=$1} END {print s}'").trim()}.txt`);
       go(15); step(15, 'while read w; do [ -f $w ] && cat $w; done < wegbeschreibung.txt');
-      go(16); if (!/Usage|Використання|Aufruf/.test(run('./tor.sh'))) err('Etage 16: tor.sh ohne Zahl zeigt keine Aufruf-Zeile');
+      go(16); if (!/Usage|Aufruf/.test(run('./tor.sh'))) err('Etage 16: tor.sh ohne Zahl zeigt keine Aufruf-Zeile');
       step(16, './tor.sh 43');
       go(17); const nums = run('grep -n GEHEIM tagebuch.txt').trim().split('\n').map(l => parseInt(l, 10));
       step(17, `sed -n '${nums[0] + 1},${nums[1] - 1}p' tagebuch.txt | tr -d "\\n"`);
       go(18); step(18, `cat spinde/${run('grep "^0[23]:" anmeldungen.log | cut -d= -f2 | sort | uniq -c | sort -nr | head -1').trim().split(/\s+/)[1]}.txt`);
       go(19); const k = run('for k in sender/*; do if [ "$(cat $k/status)" = "AKTIV" ] && [ $(cat $k/frequenz) -gt 1030 ]; then echo $k; fi; done').trim();
       step(19, `cat ${k}/schluessel`);
-      if (!run('cat ~/turm/dach/sender.txt').includes('Albers') && !run('cat ~/turm/dach/sender.txt').includes('Альберс')) err('Dach: Albers fehlt');
+      if (!run('cat ~/turm/dach/sender.txt').includes('Albers')) err('Dach: Albers fehlt');
     },
   },
   w5: {
@@ -171,14 +171,13 @@ const technisch = (s) => s.trim().split(/\s+/).filter(w => /[a-zäöüß]{2}/i.t
 
 // ---------------------------------------------------------------- Prüfen
 const un = (s) => s.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-for (const lang of ['en', 'uk']) {
+for (const lang of ['en']) {
   console.log(`\n== ${lang}: i18n/${lang}/${ROOM}.json`);
   const dict = JSON.parse(readFileSync(new URL(`../i18n/${lang}/${ROOM}.json`, import.meta.url), 'utf8'));
   for (const [k, v] of Object.entries(dict)) {
     if (!quelle.has(k)) err(`Schlüssel nicht im Original: ${JSON.stringify(k)}`);
     if (!v || !v.trim()) err(`leere Übersetzung: ${JSON.stringify(k)}`);
     if ((k.match(/\{code\}/g) || []).length !== (v.match(/\{code\}/g) || []).length) err(`{code} fehlt: ${JSON.stringify(v)}`);
-    if (lang === 'uk' && /[ыэъё]/i.test(v)) err(`russische Buchstaben: ${JSON.stringify(v)}`);
     if (!hintSet.has(k)) continue;
     // Befehle (codeify) unverändert? Platzhalter in Großbuchstaben (DATEI, NUMMER …) dürfen übersetzt sein.
     for (const m of codeify(k).matchAll(/<code translate="no">(.*?)<\/code>/g)) {

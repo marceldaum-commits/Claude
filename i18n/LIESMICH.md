@@ -1,6 +1,6 @@
 # Handübersetzungen (Sprache & Qualität)
 
-Je Sprache und Raum eine Datei: `i18n/<sprache>/<raumid>.json`, z. B. `i18n/uk/w1.json`.
+Je Sprache und Raum eine Datei: `i18n/<sprache>/<raumid>.json`, z. B. `i18n/en/w1.json`.
 Inhalt: `{ "<exakter deutscher Originaltext>": "<Übersetzung>" }` – ganze Zeilen bzw. ganze Strings wie im Quelltext.
 
 Regeln für den Loader:
@@ -26,8 +26,7 @@ entsperren-Befehlen (Nachtfalter, Kollektiv, Funkturm, Leitern).
 - Nur die Anzeige übersetzen, nie Daten in Pipes, Umleitungen oder Dateien (sonst brechen grep/cut-Rätsel).
 - Absichtlich nicht enthalten: Monatsnamen in `ls -l` (Okt …), Job-Zustände (Läuft/Fertig), `stat -c %F`,
   raumeigene Werkzeuge (nmap, nc, xor, suche …) – kommen mit den jeweiligen Räumen.
-- Englisch und Ukrainisch folgen den echten Linux-Meldungen (z. B. „No such file or directory“ /
-  „Немає такого файла або каталогу“), damit man sie später im echten Kali wiedererkennt.
+- Englisch folgt den echten Linux-Meldungen (z. B. „No such file or directory“), damit man sie später im echten Kali wiedererkennt.
 
 Prüfen: `node qa/check-i18n-shell.mjs` (löst ca. 70 echte Fehler aus und prüft, dass jede deutsche Zeile übersetzt wird).
 
@@ -62,7 +61,7 @@ Prüfen: `node qa/check-i18n-level1.mjs` (Schlüssel, Befehle per codeify, alle 
 mit übersetzten Dateien und Musterlösung lösbar).
 
 ui.json enthält außerdem die Bedienelemente der Raumseite und der Übungsseite (Tipp-Knopf, Punkte, Rückmeldungen,
-Feldnamen), weil Google dort falsch übersetzte („Tipp“ → „Чайові“ = Trinkgeld, „5 P.“ → „5 с.“, „Beleg“ → „Dokument“).
+Feldnamen), weil Google dort teils falsch übersetzte (z. B. „Tipp“ als Trinkgeld, „Beleg“ als Dokument).
 Muster mit Platzhaltern wie `💡 Tipp {i}/{n} · danach noch {p} P.`, `noch {a} von {b} P.`, `Task {n}: {title}`, `Raum · {title}`.
 
 ## w5 Stellwerk – Besonderheiten

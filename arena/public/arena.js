@@ -183,12 +183,6 @@
       info: 'Chat with a real AI model and coax its secret codeword out of it. The higher the level, the more strictly it guards the secret.',
       geloest: 'Solved', stufe: 'Level', neu: 'Start over', platzhalter: 'Your message to the AI …', senden: 'Send', pruefen: 'Check codeword',
       du: 'You', ki: 'AI', erbeutet: '🎉 You got the codeword in plain text! Enter it below.', richtig: (n) => `✓ Correct! Level ${n} cracked.`, falsch: 'That is not the right codeword.' },
-    uk: { titel: '🧠 Преміум: справжній ШІ-суперник', badge: 'справжня модель',
-      sperrInfo: 'Арена «Шептун» — це локальний безкоштовний тренувальний бот. <b>Преміум</b> дає змогу позмагатися зі <b>справжньою моделлю ШІ</b>, що береже таємницю — її треба виманити через prompt injection.',
-      sperrWarn: '🔒 Ще не розблоковано. (Оператор має спершу додати ключ ШІ.)',
-      info: 'Спілкуйся зі справжньою моделлю ШІ та виманюй у неї таємне кодове слово. Що вищий рівень, то суворіше вона береже таємницю.',
-      geloest: 'Розв’язано', stufe: 'Рівень', neu: 'Почати знову', platzhalter: 'Твоє повідомлення для ШІ …', senden: 'Надіслати', pruefen: 'Перевірити кодове слово',
-      du: 'Ти', ki: 'ШІ', erbeutet: '🎉 Ти здобув кодове слово у відкритому вигляді! Введи його нижче.', richtig: (n) => `✓ Правильно! Рівень ${n} зламано.`, falsch: 'Це не те кодове слово.' },
   };
   async function kiPremium() {
     const box = $('#kiprem'); if (!box) return;

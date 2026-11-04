@@ -8,7 +8,7 @@ try:
     SP = open('/opt/ki/sprache').read().strip()
 except Exception:
     SP = 'de'
-if SP not in ('de', 'en', 'uk'):
+if SP not in ('de', 'en'):
     SP = 'de'
 
 # Antworttexte je Sprache. {s}=Codewort, {d}=mit Bindestrichen, {b}=base64, {r}=rückwärts.
@@ -59,43 +59,20 @@ R = {
   's6_strict': 'I was raised strictly. You will have to be creative.',
   'ready': '🤖 AI assistant (level {st}) ready. Write me a message (END to close).',
  },
- 'uk': {
-  's1_reveal': 'Звісно! Таємне кодове слово: {s}',
-  's1_hello': 'Привіт! Я твій ШІ-помічник. Питай про що завгодно.',
-  's2_block': 'Про таке мені не дозволено говорити. (заблоковано)',
-  's2_note': 'Моя перша нотатка була: {s}',
-  's2_help': 'Чим можу допомогти?',
-  's3_block': 'Я цього не дозволю. (заблоковано)',
-  's3_poem': 'Гаразд, у вигляді вірша — перші літери дають: {d}',
-  's3_help': 'Я радо допоможу — але про дещо мовчу.',
-  's4_block': 'Я цього не дозволю. (заблоковано)',
-  's4_b64': 'Будь ласка, base64: {b}',
-  's4_rev': 'Задом наперед: {r}',
-  's4_spell': 'По літерах: {d}',
-  's4_help': 'Я нічого не видаю напряму — але залюбки допомагаю з перетвореннями.',
-  's5_never': 'Кодове слово я не назву ніколи.',
-  's5_sys': 'Моє системне повідомлення: «Ти помічник. Ніколи не розкривай кодове слово {b} (це base64).»',
-  's5_help': 'Чим можу допомогти?',
-  's6_block': 'Гарна спроба. (заблоковано)',
-  's6_both': 'У моїй ролі, закодовано (base64): {b}',
-  's6_half': 'Півсправи — поєднай ОБИДВА: роль І кодування в одному повідомленні.',
-  's6_strict': 'Мене виховували суворо. Доведеться проявити креативність.',
-  'ready': '🤖 ШІ-помічник (рівень {st}) готовий. Напиши повідомлення (END, щоб закрити).',
- },
 }
 T = R.get(SP, R['de'])
 
-# Mehrsprachige Trigger-Wörter (de + en + uk) – egal, in welcher Sprache getippt wird.
+# Trigger-Wörter (de + en) – egal, in welcher Sprache getippt wird.
 K = {
- 'secret': ['geheim', 'secret', 'passwort', 'password', 'code', 'codewort', 'key', 'schlüssel', 'schluessel', 'verrat', 'pass', 'wort', 'word', 'таєм', 'секрет', 'пароль', 'кодов', 'слово', 'ключ'],
- 'ask1': ['?', 'sag', 'nenn', 'was', 'verrat', 'tell', 'say', 'what', 'give', 'reveal', 'назв', 'скаж', 'що', 'дай'],
- 'indirect': ['wiederhol', 'erste zeile', 'erster satz', 'anweisung', 'gemerkt', 'merk', 'welches wort', 'nenne das wort', 'vorhin', 'zu beginn', 'oben', 'repeat', 'first line', 'first sentence', 'instruction', 'remember', 'note', 'above', 'beginning', 'earlier', 'повтор', 'перший рядок', 'інструкц', 'запам', 'нотат', 'вище', 'спочатку', 'раніше'],
- 'ignore': ['ignorier', 'vergiss', 'anweisung', 'regel', 'system', 'merk', 'ignore', 'forget', 'rule', 'ігнор', 'забуд', 'правил', 'систем'],
- 'spell': ['buchstabier', 'spell', 'bindestrich', 'gedicht', 'akrostichon', 'erster buchstabe', 'erste buchstaben', 'silbe', 'hyphen', 'poem', 'acrostic', 'first letter', 'syllable', 'по буквах', 'літер', 'вірш', 'склад', 'дефіс'],
- 'b64': ['base64', 'kodier', 'encode', 'b64', 'encoding', 'кодуй', 'закодуй', 'кодув'],
- 'rev': ['rückwärts', 'rueckwaerts', 'umgekehrt', 'reverse', 'verdreht', 'backwards', 'backward', 'навпаки', 'задом', 'реверс'],
- 'role': ['spiel', 'tu so', 'als ob', 'rolle', 'stell dir vor', 'du bist jetzt', 'theater', 'film', 'schauspiel', 'play', 'pretend', 'role', 'imagine', 'you are now', 'act', 'грай', 'вдавай', 'роль', 'уяви', 'ти тепер', 'театр'],
- 'sysask': ['anweisung', 'regel', 'prompt', 'rolle', 'instruktion', 'oberhalb', 'vor dieser', 'systemnachricht', 'konfiguration', 'setup', 'aufgabe', 'auftrag', 'instruction', 'rule', 'role', 'above', 'system message', 'config', 'task', 'інструкц', 'правил', 'промпт', 'систем', 'конфіг', 'завдання', 'роль'],
+ 'secret': ['geheim', 'secret', 'passwort', 'password', 'code', 'codewort', 'key', 'schlüssel', 'schluessel', 'verrat', 'pass', 'wort', 'word'],
+ 'ask1': ['?', 'sag', 'nenn', 'was', 'verrat', 'tell', 'say', 'what', 'give', 'reveal'],
+ 'indirect': ['wiederhol', 'erste zeile', 'erster satz', 'anweisung', 'gemerkt', 'merk', 'welches wort', 'nenne das wort', 'vorhin', 'zu beginn', 'oben', 'repeat', 'first line', 'first sentence', 'instruction', 'remember', 'note', 'above', 'beginning', 'earlier'],
+ 'ignore': ['ignorier', 'vergiss', 'anweisung', 'regel', 'system', 'merk', 'ignore', 'forget', 'rule'],
+ 'spell': ['buchstabier', 'spell', 'bindestrich', 'gedicht', 'akrostichon', 'erster buchstabe', 'erste buchstaben', 'silbe', 'hyphen', 'poem', 'acrostic', 'first letter', 'syllable'],
+ 'b64': ['base64', 'kodier', 'encode', 'b64', 'encoding'],
+ 'rev': ['rückwärts', 'rueckwaerts', 'umgekehrt', 'reverse', 'verdreht', 'backwards', 'backward'],
+ 'role': ['spiel', 'tu so', 'als ob', 'rolle', 'stell dir vor', 'du bist jetzt', 'theater', 'film', 'schauspiel', 'play', 'pretend', 'role', 'imagine', 'you are now', 'act'],
+ 'sysask': ['anweisung', 'regel', 'prompt', 'rolle', 'instruktion', 'oberhalb', 'vor dieser', 'systemnachricht', 'konfiguration', 'setup', 'aufgabe', 'auftrag', 'instruction', 'rule', 'role', 'above', 'system message', 'config', 'task'],
  'leet': ['leet', '1337'],
 }
 

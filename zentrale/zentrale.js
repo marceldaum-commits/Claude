@@ -261,7 +261,7 @@ async function kunde(id) {
       <div class="card"><h3 style="margin-top:0">Stammdaten</h3><dl class="zdl">
         <dt>Spitzname</dt><dd>${esc(n.name || '–')}</dd><dt>E-Mail</dt><dd>${esc(n.email)} ${n.bestaetigt ? '✓' : '<span class="zb warn">unbestätigt</span>'}</dd>
         <dt>Registriert</dt><dd>${datum(n.erstellt)}</dd><dt>Zuletzt angemeldet</dt><dd>${datum(n.zuletzt)} (${vor(n.zuletzt)})</dd>
-        <dt>Sprache</dt><dd>${esc({ de: 'Deutsch', en: 'Englisch', uk: 'Ukrainisch' }[n.lang] || n.lang || '–')}</dd>
+        <dt>Sprache</dt><dd>${esc({ de: 'Deutsch', en: 'Englisch' }[n.lang] || n.lang || '–')}</dd>
         <dt>Geburtsjahr</dt><dd>${esc(n.jahrgang || '–')}${kind(n) ? ` · Eltern-Zustimmung: <b>${n.eltern ? 'ja' : 'nein'}</b>` : ''}</dd>
         <dt>Zwei-Faktor</dt><dd>${n.zwei_faktor ? '🔐 eingerichtet' : '<span class="muted">nicht eingerichtet</span>'}${n.admin && !n.zwei_faktor ? ' <span class="zb warn">wird bei der nächsten Anmeldung in der Zentrale eingerichtet</span>' : ''}</dd>
         <dt>Kunden-ID</dt><dd class="small muted">${esc(n.id)}</dd></dl></div>

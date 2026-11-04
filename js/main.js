@@ -732,7 +732,7 @@ views.story = (id = 's1') => {
       const stepDone = (sc) => {
         if (complete(sc)) {
           say('sys', Ut('✓ Szene abgeschlossen.'));
-          say(L1.t('Mara (Schichtleitung)'), L1.t(sc.debrief).replace(/^(Mara|Мара): /, '').replace(/^["„«]|["“»]$/g, ''));
+          say(L1.t('Mara (Schichtleitung)'), L1.t(sc.debrief).replace(/^Mara: /, '').replace(/^["„«]|["“»]$/g, ''));
           if (ss.scene < s.scenes.length - 1) term.printHTML(`<span class="good">${esc(Ut('Weiter mit: weiter'))}</span>`);
           else {
             if (!ss.done) { ss.done = true; ss.doneAt = Date.now(); }
@@ -784,7 +784,7 @@ views.story = (id = 's1') => {
         $('#rpok', root).onclick = () => {
           const v = collect(); ss.report = v;
           const short = sc.reportFields.filter(([k]) => v[k].length < 25);
-          const grenzenOk = /(nicht|offen|unklar|nachbau|original|log|not|unknown|unclear|replica|open|не|невідом|неясн|відтвор|оригінал|лог)/i.test(v.grenzen);
+          const grenzenOk = /(nicht|offen|unklar|nachbau|original|log|not|unknown|unclear|replica|open)/i.test(v.grenzen);
           if (short.length || !grenzenOk) {
             fail(sc);
             $('#rpfb', root).innerHTML = `<div class="feedback no">${short.length ? esc(Ut('Zu knapp: {fields}. Ein Kollege muss den Bericht ohne Rückfrage verstehen.', { fields: short.map(x => L1.t(x[1])).join(', ') })) : ''} ${!grenzenOk ? 'Grenzen: Was weißt du ausdrücklich NICHT? Und worin unterscheidet sich dein Nachbau vom Original?' : ''}</div>`;
@@ -1120,8 +1120,8 @@ views.mehr = () => {
   return {
     html: `<h1>Mehr</h1>
     <div class="stack">
-      <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language · Мова</h3>${langPickerHTML()}
-        <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
+      <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language</h3>${langPickerHTML()}
+        <p class="small muted" style="margin-bottom:0">Englisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
       <div class="card"><ul class="list">
         <li><a href="#/lernpfad"><span class="state">📚</span><span class="grow"><span class="t">Lernpfad</span><span class="s">Geführt lernen: Theorie, Beispiel, eigene Übung – Stufe für Stufe</span></span></a></li>
         ${(globalThis.KLY_CONFIG || {}).arenaUrl ? `<li><a href="${esc(KLY_CONFIG.arenaUrl)}" target="_blank" rel="noopener"><span class="state">🖥️</span><span class="grow"><span class="t">Arena – Online-Labs</span><span class="s">Echte Übungs-Server im Browser: 10 Arenen: hacken, ermitteln und Angriffe abwehren</span></span></a></li>` : ''}

@@ -75,7 +75,7 @@ function rahmen(inner, { held = false } = {}) {
   const zurueck = $('#zumLab'); if (zurueck) zurueck.hidden = held; // abgemeldet: kein Weg am Login vorbei
   const meldungen = `${hinweis ? `<div class="feedback ok">${esc(hinweis)}</div>` : ''}
     ${fehlerHinweis ? `<div class="feedback no">${esc(fehlerHinweis)}</div>` : ''}`;
-  const sprache = `<details class="card tight small"><summary>🌍 Sprache · Language · Мова</summary><div style="margin-top:.5rem">${langPickerHTML()}</div></details>`;
+  const sprache = `<details class="card tight small"><summary>🌍 Sprache · Language</summary><div style="margin-top:.5rem">${langPickerHTML()}</div></details>`;
   main.innerHTML = held ? `${langNoteHTML()}<section class="anmelde-layout">
     <div class="held-links">
       <img class="held-bild" src="icons/hero.svg" alt="Ein Nachtfalter fliegt im Mondlicht über ein Terminal">
@@ -106,7 +106,7 @@ function abgemeldet(tab = 'login') {
       <label>E-Mail<input type="email" name="email" autocomplete="email" required></label>
       <label>Passwort (mindestens 10 Zeichen – Tipp: drei Wörter mit Bindestrich, z. B. Mond-Kakao-Fahrrad)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>
       <label>Geburtsjahr<input type="number" name="jahr" inputmode="numeric" min="1900" max="${YEAR}" placeholder="z. B. 2012" required></label>
-      <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option><option value="uk">Українська</option></select></label>
+      <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option></select></label>
       <div id="eltern" class="card warn small" hidden>
         <b>Unter ${ADULT} Jahren:</b> Hol jetzt bitte deine Mama, deinen Papa oder wer sonst für dich sorgt – ihr legt das Konto zusammen an.
         <label class="row" style="flex-wrap:nowrap;margin-top:.4rem"><input type="checkbox" name="eltern" style="width:auto"> Ich bin Elternteil bzw. erziehungsberechtigt und stimme zu, dass mein Kind dieses Konto nutzt.</label>
@@ -168,7 +168,7 @@ async function angemeldet() {
     const p = (profile[0]) || (await api(`/rest/v1/profiles?select=display_name,lang,birth_year,parent_consent&id=eq.${user.id}`, { auth: true }))[0] || {};
     const NAMEN = { arena: '🖥️ Arena (Einsteiger)', 'arena-profi': '🏆 Profi-Arenen', ki: '🤖 KI-Werkstatt', alles: '⭐ Alles' };
     const QUELLE = { beta: 'Beta-Zugang', kauf: 'gekauft', geschenk: 'geschenkt', anfrage: 'auf Anfrage' };
-    const datum = (d) => new Date(d).toLocaleDateString(currentLang() === 'uk' ? 'uk-UA' : currentLang() === 'en' ? 'en-GB' : 'de-DE');
+    const datum = (d) => new Date(d).toLocaleDateString(currentLang() === 'en' ? 'en-GB' : 'de-DE');
     const liste = zugaenge.length ? `<ul class="list">${zugaenge.map(z => { const aktiv = new Date(z.gueltig_bis) > new Date(); return `<li><div class="row" style="flex-wrap:nowrap;padding:.45rem 0"><span class="state ${aktiv ? 'done' : ''}">${aktiv ? '✓' : '–'}</span><span class="grow" style="display:flex;flex-direction:column"><b>${esc(NAMEN[z.produkt] || z.produkt)}</b><span class="small muted">${aktiv ? (new Date(z.gueltig_bis).getFullYear() >= 9999 ? 'unbefristet' : 'gültig bis ' + esc(datum(z.gueltig_bis))) : 'abgelaufen am ' + esc(datum(z.gueltig_bis))} · ${esc(QUELLE[z.quelle] || z.quelle)}</span></span></div></li>`; }).join('')}</ul>`
       : '<p class="small muted" style="margin:0">Noch keine Zugänge. Alles, was im Browser läuft, ist kostenlos. Arena und KI-Werkstatt kommen bald.</p>';
     const kind = evtlKind(p.birth_year);
@@ -183,7 +183,7 @@ async function angemeldet() {
         <button class="btn go">Einlösen</button></form></details>
       <div class="card"><h3>Profil</h3><form id="pf" class="stack">
         <label>Name<input name="name" maxlength="30" value="${esc(p.display_name || '')}"></label>
-        <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option><option value="uk">Українська</option></select></label>
+        <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option></select></label>
         <button class="btn primary">Speichern</button></form></div>
       <div class="card"><h3>Passwort ändern</h3><form id="pw" class="stack">
         <label>Neues Passwort (mindestens 10 Zeichen)<input type="password" name="pw" autocomplete="new-password" minlength="10" required></label>

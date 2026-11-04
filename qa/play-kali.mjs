@@ -12,15 +12,14 @@ const VIEWS = { handy: { width: 390, height: 844 }, pc: { width: 1366, height: 7
 const EXPECT = { // je Sprache ein paar Texte, die von Hand übersetzt sein müssen
   de: { story: 'Der stille Alarm', welcome: 'Willkommen!', home: 'Hallo', liesmich: 'Dieses Handy hast du im Zug gefunden', err: 'Datei oder Verzeichnis nicht gefunden', unlock: 'Richtig!', turm: 'RADIO TALHEIM', lesson: 'Terminal, Prompt und Benutzer' },
   en: { story: 'The Silent Alarm', welcome: 'Welcome!', home: 'Hello', liesmich: 'You found this phone on a train', err: 'No such file or directory', unlock: 'Correct!', turm: 'internship, day 1', lesson: 'Terminal, prompt and user' },
-  uk: { story: 'Тиха тривога', welcome: 'Ласкаво просимо!', home: 'Привіт', liesmich: 'Цей телефон лежав у потязі', err: 'Немає такого файла або каталогу', unlock: 'Правильно!', turm: 'практика, день 1', lesson: 'Термінал, запрошення і користувач' },
 };
 // Typische Google-Fehlübersetzungen, die wir schon kennen
-const BAD = { uk: ['Чайові', 'Військова гра', 'молі', ' с.'], en: ['Tip money'] };
+const BAD = { en: ['Tip money'] };
 const befunde = [];
 const note = (m) => { befunde.push(m); console.log('  ✗ ' + m); };
 
 const browser = await chromium.launch();
-for (const lang of ['de', 'en', 'uk']) for (const [vn, vp] of Object.entries(VIEWS)) {
+for (const lang of ['de', 'en']) for (const [vn, vp] of Object.entries(VIEWS)) {
   console.log(`== ${lang} / ${vn}`);
   const X = EXPECT[lang];
   const ctx = await browser.newContext({ viewport: vp, serviceWorkers: 'allow' });
@@ -70,7 +69,7 @@ for (const lang of ['de', 'en', 'uk']) for (const [vn, vp] of Object.entries(VIE
   await shot('funkturm');
 
   // 3b. Weitere Leitern: Start + erste Stufe (verpackte Dateien in w9)
-  const LANGTEST = { de: /\b(der|die|das|und|ist|ich|bin|nicht)\b/i, en: /\b(the|and|is|you)\b/i, uk: /[а-яіїєґ]{3}/i };
+  const LANGTEST = { de: /\b(der|die|das|und|ist|ich|bin|nicht)\b/i, en: /\b(the|and|is|you)\b/i, };
   for (const [room, dir, cmds] of [
     ['w5', 'posten00', ['cat hinweis.txt', 'cat $(grep -ril "weiche 17" meldungen)']],
     ['w6', 'runde00', ['cat hinweis.txt']],
@@ -103,7 +102,7 @@ for (const lang of ['de', 'en', 'uk']) for (const [vn, vp] of Object.entries(VIE
 
   // 5. Sprachwechsel unter „Mehr“ (nur einmal je Sprache, am Handy)
   if (vn === 'handy') {
-    const next = { de: 'uk', uk: 'en', en: 'de' }[lang];
+    const next = { de: 'en', en: 'de' }[lang];
     await p.goto(URL_ + '/#/mehr'); await p.waitForTimeout(500);
     await p.click(`[data-lang=${next}]`); await p.waitForTimeout(1500);
     const t2 = await p.evaluate(() => document.body.innerText);

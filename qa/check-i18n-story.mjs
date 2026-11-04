@@ -69,7 +69,7 @@ const TECH = [
 const nums = (s) => (s.match(/\d+/g) || []).sort().join(',');
 
 // ---------------------------------------------------------------- Prüfen
-for (const lang of ['en', 'uk']) {
+for (const lang of ['en']) {
   console.log(`\n== ${lang}: i18n/${lang}/${ID}.json`);
   const dict = JSON.parse(readFileSync(new URL(`../i18n/${lang}/${ID}.json`, import.meta.url), 'utf8'));
   for (const [k, v] of Object.entries(dict)) {
@@ -88,17 +88,10 @@ for (const lang of ['en', 'uk']) {
     for (const re of TECH) for (const t of k.match(re) || []) if (!v.includes(t)) err(`„${t}“ fehlt/verändert in: ${short(v, 160)}`);
     // e) keine neuen oder verschwundenen Zahlen (Port, PID, Uhrzeit, Ticket …)
     if (nums(k) !== nums(v)) err(`Zahlen anders (${nums(k)} → ${nums(v)}): ${short(v)}`);
-    if (k.startsWith('Mara: „') && !(lang === 'en' ? /^Mara: ".*"(  antwort a \| b \| c)?$/s : /^Мара: «.*»(  antwort a \| b \| c)?$/s).test(v)) err(`Mara-Zitat nicht im Format „Mara: …“: ${short(v)}`);
-    // d) Sprache/Typografie
-    if (lang === 'uk') {
-      if (/[ыэъёЫЭЪЁ]/.test(v)) err(`russische Buchstaben: ${short(v)}`);
-      if (/[а-яіїєґ]'[а-яіїєґ]/i.test(v)) err(`Apostroph ' statt ’: ${short(v)}`);
-      if (/[„“]/.test(v)) err(`Anführungszeichen „…“ statt «…»: ${short(v)}`);
-      if (/[a-zäöüß]{5,} [a-zäöüß]{5,} [a-zäöüß]{5,}/i.test(v.replace(/"[^"]*"|«[^»]*»/g, '')) && v !== k) console.log(`  · viel Latein im UK-Text: ${short(v)}`);
-    } else {
-      if (/[„“«»]/.test(v)) err(`deutsche/ukrainische Anführungszeichen im Englischen: ${short(v)}`);
-      if (/[äöüßÄÖÜ]/.test(v) && v !== k) err(`Umlaut im Englischen: ${short(v)}`);
-    }
+    if (k.startsWith('Mara: „') && !/^Mara: ".*"(  antwort a \| b \| c)?$/s.test(v)) err(`Mara-Zitat nicht im Format „Mara: …“: ${short(v)}`);
+    // d) Sprache/Typografie (nur noch Englisch)
+    if (/[„“«»]/.test(v)) err(`deutsche Anführungszeichen im Englischen: ${short(v)}`);
+    if (/[äöüßÄÖÜ]/.test(v) && v !== k) err(`Umlaut im Englischen: ${short(v)}`);
   }
   const fehlt = [...quelle.keys()].filter(k => !(k in dict));
   fehlt.forEach(k => err(`ohne Übersetzung (${quelle.get(k)}): ${short(k)}`));

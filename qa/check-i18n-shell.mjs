@@ -40,13 +40,12 @@ const CMDS = ['cat nix', 'cat /root', 'cd nix', 'cd a b', 'cd /etc/hosts', 'ls n
   'command ls', 'help', 'nano x', 'sudo ls', 'foobar', './nix', 'for x', 'if x', 'echo "a', "echo 'a", 'echo a >', 'cat <', 'ls &&& ', 'seq', 'tr', 'sed', "sed 'q'",
   'awk', "awk 'xyz'", 'xxd -r', 'basename', 'dirname', 'read', 'bash', '[ 1 = 1', 'while true', 'ls / & ls'];
 
-for (const lang of ['en', 'uk']) {
+for (const lang of ['en']) {
   console.log(`== ${lang}: i18n/${lang}/shell.json`);
   const dict = JSON.parse(readFileSync(new URL(`../i18n/${lang}/shell.json`, import.meta.url), 'utf8'));
   for (const [k, v] of Object.entries(dict)) {
     const a = [...new Set(k.match(/\{\d\}/g) || [])].sort().join(), b = [...new Set(v.match(/\{\d\}/g) || [])].sort().join();
     if (a !== b) err(`Platzhalter anders: ${JSON.stringify(k)} → ${JSON.stringify(v)}`);
-    if (lang === 'uk' && /[ыэъё]/i.test(v)) err(`russische Buchstaben: ${v}`);
     for (const c of (k.match(/cd \.\.\/\S*|man [a-z{]\S*|entsperren|KLY\{…\}|(?<=[\s\[(|])--?[a-z][\w-]*/g) || [])) if (!v.includes(c)) err(`„${c}“ fehlt in ${JSON.stringify(v)}`);
   }
   const T = makeLineT(dict);
@@ -71,7 +70,6 @@ for (const lang of ['en', 'uk']) {
     }
   }
   console.log(`  ${Object.keys(dict).length} Einträge, ${used.size} verschiedene echte Ausgabezeilen übersetzt.`);
-  if (lang === 'uk') console.log('  Beispiele:\n' + [...used].slice(0, 6).map(l => `    ${l}\n    → ${T(l)}`).join('\n'));
 }
 console.log(fehler ? `\n${fehler} Problem(e).` : '\nAlles in Ordnung ✓');
 process.exit(fehler ? 1 : 0);

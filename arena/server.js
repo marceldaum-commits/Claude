@@ -128,7 +128,6 @@ const LABS = {
     hello: hallo('Der Flüsterer', 'hacker', 'Auftrag: cat ~/auftrag.txt   ·   Reden: ki 1 "Hallo"   ·   begriff prompt injection'),
     helloI18n: {
       en: `\x1b[32mThe Whisperer (Arena)\x1b[0m – you are hacker.\r\nTask: cat ~/auftrag.txt   ·   Talk: ki 1 "Hello"   ·   Terms: begriff prompt injection\r\nBack: exit\r\n\r\n`,
-      uk: `\x1b[32mШептун (Arena)\x1b[0m – ти hacker.\r\nЗавдання: cat ~/auftrag.txt   ·   Спілкування: ki 1 "Привіт"   ·   Терміни: begriff prompt injection\r\nНазад: exit\r\n\r\n`,
     } },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
@@ -240,7 +239,7 @@ async function waitReady(container, marker, ms = 20000) {
 }
 
 async function createSession(lab, token, ip, userId = null, sprache = 'de') {
-  sprache = ['de', 'en', 'uk'].includes(sprache) ? sprache : 'de';
+  sprache = ['de', 'en'].includes(sprache) ? sprache : 'de';
   if (!istLab(lab)) throw Object.assign(new Error('Unbekanntes Lab'), { status: 400 });
   const L = LABS[lab];
   if (vorhanden[lab] === false) throw Object.assign(new Error('Diese Arena wird gerade noch aufgebaut – bitte später noch einmal.'), { status: 503 });
