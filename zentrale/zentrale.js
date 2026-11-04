@@ -436,6 +436,25 @@ async function system() {
 }
 
 // ---------------------------------------------------------------- Router
+async function markt() {
+  let daten;
+  try { const r = await fetch('markt.json', { cache: 'no-store' }); daten = await r.json(); }
+  catch { main.innerHTML = '<section class="stack"><div class="card warn">Noch keine Marktberichte.</div></section>'; return; }
+  const b = daten.berichte || [];
+  main.innerHTML = `<section class="stack">
+    <h1>🔭 Markt & Trends</h1>
+    <p class="small muted">${esc(daten.hinweis || '')} Stand: ${esc(daten.stand || '')}.</p>
+    ${b.length ? b.map((x, i) => `<details class="card" ${i === 0 ? 'open' : ''}>
+      <summary><b>${esc(x.titel || 'Bericht')}</b> <span class="small muted">· ${esc(x.datum || '')}</span></summary>
+      ${x.kurz ? `<p>${esc(x.kurz)}</p>` : ''}
+      ${Array.isArray(x.punkte) && x.punkte.length ? `<h3>Beobachtungen</h3><ul class="list">${x.punkte.map(p => `<li><span class="grow"><span class="t">${esc(p.t)}</span><span class="s">${esc(p.d)}</span></span></li>`).join('')}</ul>` : ''}
+      ${Array.isArray(x.ideen) && x.ideen.length ? `<h3>Ideen für Nachtfalter</h3><ul class="small">${x.ideen.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+      ${Array.isArray(x.quellen) && x.quellen.length ? `<h3>Quellen</h3><ul class="small">${x.quellen.map(q => `<li><a href="${esc(q.u)}" target="_blank" rel="noopener noreferrer">${esc(q.t)}</a></li>`).join('')}</ul>` : ''}
+    </details>`).join('') : '<div class="card"><p class="muted">Noch keine Berichte.</p></div>'}
+    <p class="small muted">Diese Berichte erstellt eine automatische Recherche-Routine (monatlich). Du kannst sie jederzeit pausieren lassen.</p>
+  </section>`;
+}
+
 async function route() {
   let s;
   try { s = await frisch(); }
@@ -452,6 +471,7 @@ async function route() {
     else if (teil === 'anfragen') await anfragenSeite();
     else if (teil === 'protokoll') await protokoll();
     else if (teil === 'system') await system();
+    else if (teil === 'markt') await markt();
     else await uebersicht();
   } catch (e) {
     if (!['abgemeldet', 'kein Zugriff', 'Bitte anmelden.'].includes(e.message)) main.innerHTML = `<section class="stack"><div class="card warn">${esc(e.message)}</div><button class="btn" id="nochmal">Neu laden</button></section>`, $('#nochmal').onclick = () => { D = null; route(); };

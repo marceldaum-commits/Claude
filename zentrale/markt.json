@@ -1,0 +1,35 @@
+{
+  "stand": "2026-11-04",
+  "hinweis": "Automatisch erstellte Markt- & Trendberichte. Quellen sind Blogs/Vergleichsseiten – als Richtung verstehen, nicht als Studie. Neuester Bericht oben.",
+  "berichte": [
+    {
+      "datum": "2026-11-04",
+      "titel": "Start: Konkurrenz-Schwächen & Trends 2026",
+      "kurz": "Erste Marktbeobachtung. Was Nutzer an TryHackMe/Hack The Box bemängeln – und welche Themen 2026 gefragt sind.",
+      "punkte": [
+        { "t": "Kritik: zu viel an die Hand genommen", "d": "Geführte Rooms sagen Schritt für Schritt, was zu tippen ist. Danach stehen Lernende vor freien Maschinen und wissen nicht weiter („Tutorial-Falle“)." },
+        { "t": "Kritik: Schwierigkeit ≠ Lernen", "d": "Stundenlanges Raten an konstruierten „Rabbit Holes“ fühlt sich hart an, bringt aber wenig – und hat mit echter Arbeit nichts zu tun." },
+        { "t": "Kritik: der Flag beendet die Box", "d": "Man lernt nicht, warum die Lücke zählt und wie man sie behebt. Echte Arbeit heißt erklären und absichern (Bericht)." },
+        { "t": "Kritik: uneinheitliche Qualität", "d": "Community-Rooms sind unterschiedlich gut gemacht." },
+        { "t": "Trend: KI-Sicherheit ist das Top-Thema", "d": "ISC2-Workforce-Study 2025: KI-Sicherheit (41%) vor Cloud-Sicherheit (36%) als dringendster Skill. Umfasst: KI-Systeme absichern (Prompt Injection, Modell-Sicherheit) UND KI in der Verteidigung nutzen." },
+        { "t": "Trend: Cloud & Offensive weiter stark", "d": "Cloud-Sicherheit (AWS/Azure) und Penetration Testing / SOC-Betrieb bleiben die großen Nachfragefelder. Arbeitgeber wollen nachgewiesene Praxis, nicht nur Zertifikate." },
+        { "t": "Trend: KI personalisiert das Lernen", "d": "Plattformen passen Inhalte an Schwächen der Lernenden an; Gamification (Punkte, Abzeichen, Ranglisten) ist Standard; Labs werden laufend aktualisiert." }
+      ],
+      "ideen": [
+        "✅ Umgesetzt: „Verstanden-Check“ pro Lernpfad-Stufe (eigener Mini-Bericht statt nur Flag).",
+        "KI-Sicherheits-Arena: einen verwundbaren Chatbot per Prompt Injection austricksen (Gandalf-Stil) – komplett offline, lokales Mini-Modell oder Regel-Logik.",
+        "Cloud-Grundlagen-Arena: fehlkonfigurierte „Objektspeicher“/Metadaten-Dienste lokal simulieren (ohne echte Cloud).",
+        "„Auftrag mit Bericht“: eine Arena als echter Mini-Pentest – am Ende ein kurzer Bericht (Lücke, Risiko, Empfehlung) statt nur Flags.",
+        "Methoden-Tipp nach Festhängen: in schweren Arenen nach X Minuten einen Tipp zur METHODE anbieten (nie die Lösung), gegen stundenlanges Raten.",
+        "„Ohne Tipps“-Challenge-Modus mit eigenem Abzeichen."
+      ],
+      "quellen": [
+        { "t": "HackerDNA – TryHackMe Review 2026", "u": "https://hackerdna.com/blog/what-is-tryhackme" },
+        { "t": "The Cybersecurity Trail – HTB vs TryHackMe 2026", "u": "https://thecybersecuritytrail.com/guide/hack-the-box-vs-tryhackme/" },
+        { "t": "DEV – HackTheBox vs Real-World Hacking", "u": "https://dev.to/ghrake/hackthebox-vs-real-world-hacking-1500" },
+        { "t": "EC-Council University – Skills 2026", "u": "https://www.eccu.edu/blog/cybersecurity-skills-you-need-to-stay-ahead-in-2026/" },
+        { "t": "ACSMI – AI Security Skills Roadmap 2026", "u": "https://acsmi.org/blogs/ai-security-skills-roadmap-2026-what-cybersecurity-candidates-should-learn-now" }
+      ]
+    }
+  ]
+}
