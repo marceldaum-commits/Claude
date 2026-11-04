@@ -229,3 +229,15 @@ body { top: 0 !important; }
 .goog-text-highlight { background: none !important; box-shadow: none !important; }
 .konto label { display: block; font-size: .9rem; color: var(--muted); }
 .konto label > input, .konto label > select { margin-top: .3rem; color: var(--text); }
+
+/* Startseite, Impressum, Datenschutz */
+.seite { padding-bottom: 2rem; }
+.seite.text { max-width: 720px; line-height: 1.55; }
+.held { padding: 1.2rem 0 .6rem; }
+.held h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 .6rem; }
+.karte { display: flex; gap: .9rem; align-items: center; color: var(--text); text-decoration: none; }
+a.karte:hover { border-color: var(--violet); }
+.karte .ico { font-size: 1.7rem; width: 2.2rem; text-align: center; flex: none; }
+.karte.aus { opacity: .6; }
+.fuss { text-align: center; padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)); font-size: .86rem; color: var(--muted); }
+.fuss a { color: var(--muted); }
