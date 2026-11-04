@@ -427,12 +427,22 @@ async function system() {
       <dt>Arena</dt><dd>${z(s.arena.ok, s.arena.info ? `· ${s.arena.info.offen ? 'offen' : 'geschlossen'} · ${esc(s.arena.info.frei ?? '?')} freie Plätze` : '')}</dd>
       <dt>Konto-Datenbank</dt><dd>${z(true, '· Supabase Frankfurt')}</dd></dl>`}
       <button class="btn small ghost" id="neu" style="margin-top:.6rem">Neu prüfen</button></div>
+    <div class="card"><h3 style="margin-top:0" id="standkopf">Stand (Git ↔ Server)</h3><div id="stand" class="small muted">Prüfe …</div>
+      <p class="small muted" style="margin:.4rem 0 0">Der Abend-Check vergleicht automatisch, ob der Server den aktuellen Git-Stand ausliefert, und meldet dir das Ergebnis.</p></div>
     <div class="card"><h3 style="margin-top:0">Schnellzugriff</h3><ul class="list">
       ${link('https://www.nachtfalter.tech/', '🦋 Startseite')}${link(APP + '/', '🎮 Hacklab')}${link('https://vorschau.nachtfalter.tech/', '🧪 Vorschau')}${link('https://arena.nachtfalter.tech/', '🖥️ Arena')}
       ${link('https://supabase.com/dashboard/project/sxapebxzxmathkvtuuvn', '🗄️ Supabase (Konten, E-Mail-Vorlagen)')}
     </ul><p class="small muted" style="margin:.5rem 0 0">Plesk und Strato öffnest du wie gewohnt über deine Lesezeichen.</p></div>
   </section>`;
   $('#neu').onclick = system;
+  (async () => {
+    const el = $('#stand'); if (!el) return;
+    try {
+      const r = await fetch('stand.json', { cache: 'no-store' }); const d = await r.json();
+      const alter = d.gebaut ? Math.round((Date.now() - Date.parse(d.gebaut)) / 60000) : null;
+      el.innerHTML = `Diese Zentrale wurde zuletzt gebaut: <b>${d.gebaut ? new Date(d.gebaut).toLocaleString('de-DE') : '?'}</b>${alter != null ? ` (vor ${alter < 60 ? alter + ' Min' : Math.round(alter / 60) + ' Std'})` : ''}<br>Commit: <code>${esc((d.commit || '').slice(0, 10))}</code> · Branch <code>${esc(d.branch || '?')}</code>`;
+    } catch { el.textContent = 'Stand-Datei (stand.json) noch nicht verfügbar – erscheint nach dem nächsten Server-Build.'; }
+  })();
 }
 
 // ---------------------------------------------------------------- Router

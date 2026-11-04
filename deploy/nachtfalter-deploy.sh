@@ -256,6 +256,9 @@ web() { # $1 = Seite, $2 = Branch, $3 = app|zentrale
       log "web-$seite: Bau enthält Verknüpfungen – abgelehnt, alter Stand bleibt"; rm -rf "$neu"; return 1
     fi
     rm -f "$neu/_headers"
+    # Stand-Datei: welcher Commit wird ausgeliefert? (für den Abend-Check „Git == Server“)
+    printf '{"seite":"%s","branch":"%s","commit":"%s","tree":"%s","gebaut":"%s"}\n' \
+      "$seite" "$br" "$(git -C "$dir" rev-parse HEAD)" "$rev" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$neu/stand.json"
     chown -R root:root "$neu"; chmod -R u=rwX,go=rX "$neu"
     rm -rf "$ziel.alt"; [ -d "$ziel" ] && mv "$ziel" "$ziel.alt"; mv "$neu" "$ziel"
     cp "$dir/$hdr" "$STATE/web-$seite.headers"
