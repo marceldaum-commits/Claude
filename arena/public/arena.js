@@ -113,7 +113,6 @@
         ${status}
         <details style="margin-top:.6rem"><summary class="small">Gefundenen Code eintragen</summary>
           <form class="reihe" data-code="${esc(L.id)}" style="margin-top:.4rem"><input name="c" placeholder="KLY{…}" autocomplete="off" spellcheck="false" required><button class="btn sek">Prüfen</button></form>
-          ${L.codesInApp ? '<p class="small muted">Diese Codes kannst du zusätzlich im Hacklab im Raum „Der Kellerserver“ eintragen.</p>' : ''}
         </details>
       </section>`;
     }).join('');
@@ -131,17 +130,19 @@
     if (markiert) document.getElementById('lab-' + markiert)?.scrollIntoView({ block: 'center' });
   }
 
-  async function sha256hex(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+  // Codes prüft nur der Server (Edge Function „arena-code“ fragt die Arena) – im Browser lässt sich nichts ausrechnen.
   async function codePruefen(lab, code, f) {
-    const L = LABS.find(x => x.id === lab); const tok = $('#token').value.trim().toUpperCase();
-    let level = 0;
-    for (let n = 1; n <= L.levels; n++) if (`KLY{${(await sha256hex(`${tok}:${L.praefix}:l${n}`)).slice(0, 16)}}` === code) { level = n; break; }
-    if (!level) { $('#msg').textContent = `Dieser Code passt nicht zu „${L.titel}“ (oder zu einem anderen Lab-Token).`; return; }
+    const L = LABS.find(x => x.id === lab); const knopf = f.querySelector('button'); knopf.disabled = true;
     try {
-      await rest('/rest/v1/arena_fortschritt?on_conflict=user_id,lab,level', { method: 'POST', headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' }, body: JSON.stringify({ user_id: uid(), lab, level }) });
-      if (!geloest.some(x => x.lab === lab && x.level === level)) geloest.push({ lab, level });
-      $('#msg').textContent = `✓ Richtig! Level ${level} von „${L.titel}“ geschafft.`; f.reset(); zeichne();
+      const s = await frisch(); if (!s) throw new Error('Bitte neu anmelden.');
+      const r = await fetch(`${K.url}/functions/v1/arena-code`, { method: 'POST', headers: { apikey: K.key, Authorization: `Bearer ${s.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ lab, code }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.fehler || `Fehler ${r.status}`);
+      if (!j.level) { $('#msg').textContent = `Dieser Code passt nicht zu „${L.titel}“. Achte auf die geschweiften Klammern: KLY{…}`; return; }
+      if (!geloest.some(x => x.lab === lab && x.level === j.level)) geloest.push({ lab, level: j.level });
+      $('#msg').textContent = `✓ Richtig! Level ${j.level} von „${L.titel}“ geschafft.`; f.reset(); zeichne();
     } catch (err) { $('#msg').textContent = err.message; }
+    finally { knopf.disabled = false; }
   }
 
   $('#cf').onsubmit = async (e) => {

@@ -12,7 +12,7 @@
 
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { randomBytes, createHash } from 'node:crypto';
+import { randomBytes, createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { extname, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Docker from 'dockerode';
@@ -37,6 +37,8 @@ const CFG = {
   kontoUrl: env('KONTO_URL', 'https://sxapebxzxmathkvtuuvn.supabase.co'),
   kontoKey: env('KONTO_KEY', 'sb_publishable_04l6lOd2uIPsErdWDOMvew_U6vsFGbn'),
   maxPerUser: +env('MAX_PER_USER', 2),
+  // Geheimnis für die Codes (nur auf dem Server, vom Deploy-Skript erzeugt). Ohne Geheimnis keine Code-Prüfung.
+  geheimnis: env('ARENA_GEHEIMNIS', ''),
   origin: env('ARENA_ORIGIN', 'https://arena.nachtfalter.tech'), // eigene Adresse (für die WebSocket-Prüfung)
 };
 
@@ -60,13 +62,29 @@ const LABS = {
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};
 async function imagesPruefen() { for (const [id, L] of Object.entries(LABS)) vorhanden[id] = await docker.getImage(L.image).inspect().then(() => true, () => false); }
-const labOeffentlich = () => Object.entries(LABS).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, kurz: L.kurz, produkt: L.produkt, levels: L.levels, praefix: L.praefix, codesInApp: !!L.codesInApp, bereit: vorhanden[id] !== false }));
+const labOeffentlich = () => Object.entries(LABS).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, kurz: L.kurz, produkt: L.produkt, levels: L.levels, bereit: vorhanden[id] !== false }));
 const istLab = (lab) => Object.hasOwn(LABS, lab);
 function darf(k, lab) {
   if (!istLab(lab)) return false;
   const L = LABS[lab]; if (!k?.ok) return false;
   if (k.admin || k.produkte.includes('alles') || k.produkte.includes(L.produkt)) return true;
   return L.produkt === 'arena' && k.produkte.includes('arena-profi');
+}
+
+// Codes: pro Konto und Lab ein eigenes „Salz“ aus dem Server-Geheimnis. Der Container bekommt nur das Salz,
+// niemand außerhalb des Servers kann Codes ausrechnen. Geprüft wird nur hier (über die Edge Function arena-code).
+const salz = (userId, lab) => createHmac('sha256', CFG.geheimnis).update(`nachtfalter-arena:${userId}:${lab}`).digest('hex').slice(0, 32);
+const labCode = (s, praefix, n) => `KLY{${createHash('sha256').update(`${s}:${praefix}:l${n}`).digest('hex').slice(0, 16)}}`;
+function codeLevel(userId, lab, code) {
+  const L = LABS[lab], s = salz(userId, lab), c = Buffer.from(String(code));
+  for (let n = 1; n <= L.levels; n++) { const soll = Buffer.from(labCode(s, L.praefix, n)); if (soll.length === c.length && timingSafeEqual(soll, c)) return n; }
+  return 0;
+}
+const pruefZaehler = new Map(); // ip -> [zeitfenster, anzahl]
+function pruefBremse(ip) {
+  const fenster = Math.floor(Date.now() / 60000), e = pruefZaehler.get(ip);
+  if (!e || e[0] !== fenster) { pruefZaehler.set(ip, [fenster, 1]); if (pruefZaehler.size > 5000) pruefZaehler.clear(); return true; }
+  return ++e[1] <= 300; // alle Prüfungen kommen über die Edge Function (wenige IPs)
 }
 
 const docker = new Docker({ socketPath: env('DOCKER_SOCKET', '/var/run/docker.sock') });
@@ -148,7 +166,7 @@ async function createSession(lab, token, ip, userId = null) {
   const container = await docker.createContainer({
     Image: L.image,
     name: `kly-arena-${lab}-${id.slice(0, 10)}`,
-    Env: [`KLY_TOKEN=${token}`],
+    Env: [`KLY_TOKEN=${token}`, ...(CFG.geheimnis && userId ? [`KLY_SALZ=${salz(userId, lab)}`] : [])],
     Labels: { 'kly.arena': '1', 'kly.session': id, 'kly.expires': String(Date.now() + CFG.ttlMin * 60000) },
     Hostname: L.host,
     HostConfig: {
@@ -233,6 +251,16 @@ const server = http.createServer(async (req, res) => {
       } else return json(res, 401, { fehler: 'Bitte mit deinem Nachtfalter-Konto anmelden.' }); // alter Einladungscode abgeschaltet (umging die Zugangsprüfung)
       try { const s = await createSession(String(body.lab || ''), String(body.token || ''), ip, userId); return json(res, 200, { id: s.id, ablauf: s.created + CFG.ttlMin * 60000 }); }
       catch (e) { log('fehler', e.message); return json(res, e.status || 500, { fehler: e.status ? e.message : 'Lab konnte nicht gestartet werden.' }); }
+    }
+    // Code prüfen – wird von der Edge Function „arena-code“ aufgerufen (die kennt das Konto aus der Anmeldung).
+    // Antwortet nur „welches Level“ – ohne den Code selbst zu kennen, lässt sich daraus nichts gewinnen.
+    if (req.method === 'POST' && url.pathname === '/api/pruefen') {
+      if (!CFG.geheimnis) return json(res, 503, { fehler: 'Code-Prüfung nicht eingerichtet' });
+      if (!pruefBremse(clientIp(req))) return json(res, 429, { fehler: 'Zu viele Versuche' });
+      let b; try { b = JSON.parse(await readBody(req, 1024)); } catch { return json(res, 400, { fehler: 'Ungültige Anfrage' }); }
+      const lab = String(b.lab || ''), uid = String(b.user || ''), code = String(b.code || '').trim();
+      if (!istLab(lab) || !/^[0-9a-f-]{36}$/.test(uid) || !/^KLY\{[0-9a-f]{16}\}$/.test(code)) return json(res, 200, { level: 0 });
+      return json(res, 200, { level: codeLevel(uid, lab, code) });
     }
     if (req.method === 'DELETE' && url.pathname.startsWith('/api/session/')) { await endSession(url.pathname.split('/').pop(), 'beendet'); return json(res, 200, { ok: true }); }
     if (req.method === 'GET') {

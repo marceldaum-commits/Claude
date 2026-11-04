@@ -4,7 +4,9 @@
 set -euo pipefail
 TOKEN="${KLY_TOKEN:-}"
 [[ "$TOKEN" =~ ^KLY-[0-9A-F]{6}$ ]] || { echo "FEHLER: KLY_TOKEN fehlt oder ist ungültig." >&2; exit 2; }
-code() { printf 'KLY{%s}' "$(printf '%s' "$TOKEN:leitstelle:$1" | sha256sum | cut -c1-16)"; }
+SALZ="${KLY_SALZ:-}"; [[ "$SALZ" =~ ^[0-9a-f]{32}$ ]] || SALZ="$TOKEN"   # Arena: geheimes Salz vom Server; sonst (eigenes Kali) der Token
+unset KLY_SALZ
+code() { printf 'KLY{%s}' "$(printf '%s' "$SALZ:leitstelle:$1" | sha256sum | cut -c1-16)"; }
 L1=$(code l1); L2=$(code l2); L3=$(code l3); L4=$(code l4); L5=$(code l5); L6=$(code l6)
 
 mkuser() { useradd -m -s /bin/bash "$1"; echo "$1:$2" | chpasswd; chmod 700 "/home/$1"; rm -f "/home/$1/.bash_logout"; }
@@ -56,8 +58,8 @@ Was Suchmaschinen NICHT anschauen sollen, verrät oft genau, wo man suchen muss.
 Werkzeug:  curl -i http://localhost:8080/
 Header mitschicken:  curl -H "Name: Wert" …
 T
-printf 'Ausweis-Header für die Wartung:\n  X-Leitstelle-Ausweis: %s\n' "$(printf '%s' "$TOKEN:leitstelle:ausweis" | sha256sum | cut -c1-12)" > $H/.ausweis
-geheim portal "$(printf '%s' "$TOKEN:leitstelle:ausweis" | sha256sum | cut -c1-12) $L2"
+printf 'Ausweis-Header für die Wartung:\n  X-Leitstelle-Ausweis: %s\n' "$(printf '%s' "$SALZ:leitstelle:ausweis" | sha256sum | cut -c1-12)" > $H/.ausweis
+geheim portal "$(printf '%s' "$SALZ:leitstelle:ausweis" | sha256sum | cut -c1-12) $L2"
 as technik $H
 
 # ---------- Level 2 · netz: eigenes Protokoll + verpackte Daten
@@ -80,7 +82,7 @@ as netz $H
 # ---------- Level 3 · archiv: Protokolle auswerten, Hex dekodieren
 H=/home/archiv
 install -d -m 755 /var/log/leitstelle
-python3 - "$TOKEN" "$L4" > /var/log/leitstelle/zugriffe.log <<'PY'
+python3 - "$SALZ" "$L4" > /var/log/leitstelle/zugriffe.log <<'PY'
 import sys, random, hashlib
 tok, pw = sys.argv[1], sys.argv[2]
 r = random.Random(hashlib.sha256((tok + 'log').encode()).hexdigest())

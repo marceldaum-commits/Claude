@@ -10,7 +10,9 @@ if ! [[ "$TOKEN" =~ ^KLY-[0-9A-F]{6}$ ]]; then
   exit 2
 fi
 
-code() { printf 'KLY{%s}' "$(printf '%s' "$TOKEN:w2:$1" | sha256sum | cut -c1-16)"; }
+SALZ="${KLY_SALZ:-}"; [[ "$SALZ" =~ ^[0-9a-f]{32}$ ]] || SALZ="$TOKEN"   # Arena: geheimes Salz vom Server; sonst (eigenes Kali) der Token
+unset KLY_SALZ
+code() { printf 'KLY{%s}' "$(printf '%s' "$SALZ:w2:$1" | sha256sum | cut -c1-16)"; }
 L1=$(code l1); L2=$(code l2); L3=$(code l3); L4=$(code l4); L5=$(code l5)
 L6=$(code l6); L7=$(code l7); L8=$(code l8); L9=$(code l9); L10=$(code l10)
 
@@ -217,11 +219,11 @@ Code für die App: $L9
 Eine Sache noch: Auf diesem Server läuft ein interner Dienst nur für den Chef,
 auf Port 7070 (nur von diesem Server aus erreichbar). Er will ein Token sehen.
 T
-printf '# Zugang interner Dienst\nheader=X-Chef-Token\ntoken=%s\n' "$(printf '%s' "$TOKEN:w2:dienst" | sha256sum | cut -c1-24)" > $H/.config/dienst.conf
+printf '# Zugang interner Dienst\nheader=X-Chef-Token\ntoken=%s\n' "$(printf '%s' "$SALZ:w2:dienst" | sha256sum | cut -c1-24)" > $H/.config/dienst.conf
 as chef $H
 
 # Hintergrunddienste (unprivilegiert)
-DIENST_TOKEN=$(printf '%s' "$TOKEN:w2:dienst" | sha256sum | cut -c1-24)
+DIENST_TOKEN=$(printf '%s' "$SALZ:w2:dienst" | sha256sum | cut -c1-24)
 useradd -r -s /usr/sbin/nologin dienst
 chmod 711 /opt/keller
 # Token und Code liegen in einer Datei, die nur der Dienstbenutzer lesen kann (nicht in der Prozessliste).

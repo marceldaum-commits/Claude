@@ -72,5 +72,13 @@ Der alte Einladungscode `ARENA_CODE` ist abgeschaltet (er umging die Zugangsprü
 - xterm vom CDN mit SRI-Prüfsummen, CSP nur für `cdn.jsdelivr.net/npm/@xterm/`.
 - Labs: Dienste prüfen über `/proc/net/tcp`, welcher Benutzer anfragt (Gateway nur für `netz`, Tresor-API nur für
   `tresorwart`); Protokolle nur für das zuständige Konto lesbar; der Keller-Nachtjob startet erst bei Anmeldung von `nacht`.
-- Offen (Empfehlung): Die Arena hat Zugriff auf den Docker-Socket (= root auf dem Host). Am sichersten auf einem
-  eigenen kleinen Server statt neben Plesk, oder mit gVisor/Socket-Proxy.
+- **Docker-Wächter** (`waechter.js`, Container `nf-waechter`): hat als einziger den Docker-Socket und lässt nur
+  Lab-Befehle durch (erlaubte Images, Container nur ohne Netz/Host-Ordner/Sonderrechte, nur eigene Arena-Container,
+  Terminal nur `runuser -l <lab-benutzer>`). Die Arena (`nf-arena`) läuft als `node` ohne root, schreibgeschützt,
+  ohne Capabilities und spricht nur über das Volume `nf-waechter` mit ihm.
+- **Codes nicht ausrechenbar:** Pro Konto und Lab erzeugt der Server aus `ARENA_GEHEIMNIS` (Datei
+  `/etc/nachtfalter/arena-geheimnis.env`, vom Deploy-Skript erzeugt) ein Salz `KLY_SALZ`; die Labs berechnen daraus
+  Codes und Zwischenpasswörter. Prüfen: Edge Function `arena-code` → `POST /api/pruefen` → Eintrag in
+  `arena_fortschritt` (Spieler dürfen dort nicht selbst schreiben). Ohne Salz (eigenes Kali) gilt weiter der Token.
+- Rest-Risiko: Lab-Container teilen sich den Kernel mit dem Host (kein gVisor). Ein Ausbruch bräuchte eine
+  Kernel-Lücke; Server aktuell halten (Plesk-Updates/Kernel).

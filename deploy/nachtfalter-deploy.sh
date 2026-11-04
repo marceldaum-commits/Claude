@@ -45,6 +45,7 @@ status() {
   for c in web-live web-vorschau web-zentrale arena ki; do printf '%-12s Stand: %s\n' "$c" "$(cat "$STATE/$c.commit" 2>/dev/null | cut -c1-7 || echo -)"; done
   printf 'KI-Werkstatt: %s\n' "$(systemctl is-active nachtfalter-ki 2>/dev/null || true)"
   printf 'Arena:        %s\n' "$(docker inspect -f '{{.State.Status}}' nf-arena 2>/dev/null | head -1 | grep . || echo 'nicht vorhanden')"
+  printf 'Wächter:      %s\n' "$(docker inspect -f '{{.State.Status}}' nf-waechter 2>/dev/null | head -1 | grep . || echo 'nicht vorhanden')"
   printf 'Prüfung 8100: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8100/api/status >/dev/null 2>&1 && echo ok || echo -)"
   printf 'Prüfung 8090: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8090/api/status >/dev/null 2>&1 && echo ok || echo -)"
   printf 'Konto-Ping:   %s\n' "$(cat "$STATE/konto-ping" 2>/dev/null || echo -)"
@@ -131,6 +132,7 @@ arena() {
   dir=$(holen live) || { log "arena: Branch live nicht abrufbar – übersprungen"; return 0; }
   # Nur neu bauen, wenn sich Arena oder Lab geändert haben (sonst brächen laufende Labs ab)
   rev="$(git -C "$dir" rev-parse HEAD:arena 2>/dev/null)-$(git -C "$dir" rev-parse HEAD:labs 2>/dev/null)"
+  rev="$rev-w1"   # Startart (w1 = mit Docker-Wächter); ändert sich die Startart, wird neu gestartet
   neu arena "$rev" || return 0
   [ -f "$dir/arena/server.js" ] || { log "arena: arena/server.js fehlt in ${rev:0:7}"; return 1; }
   [ -s "$ETC/arena.env" ] || { log "arena: $ETC/arena.env fehlt – nicht gestartet"; return 1; }
@@ -148,11 +150,26 @@ arena() {
   fi
   docker image inspect nachtfalter-arena:live >/dev/null 2>&1 && docker tag nachtfalter-arena:live nachtfalter-arena:alt
   docker tag nachtfalter-arena:neu nachtfalter-arena:live
+  # Geheimnis für die Arena-Codes: einmalig zufällig erzeugen, nur root lesbar, nie im Repository
+  if [ ! -s "$ETC/arena-geheimnis.env" ]; then
+    ( umask 077; printf 'ARENA_GEHEIMNIS=%s\n' "$(head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')" > "$ETC/arena-geheimnis.env" )
+    log "arena: Code-Geheimnis neu erzeugt"
+  fi
+  chmod 600 "$ETC/arena-geheimnis.env"
+  docker volume inspect nf-waechter >/dev/null 2>&1 || docker volume create nf-waechter >/dev/null
+  # Zwei Container: Der Wächter hat als EINZIGER den Docker-Socket und lässt nur Lab-Befehle durch.
+  # Die Arena selbst läuft ohne root, ohne Schreibrechte und spricht nur mit dem Wächter.
   starten() {
-    docker rm -f nf-arena >/dev/null 2>&1 || true
-    docker run -d --name nf-arena --restart unless-stopped --env-file "$ETC/arena.env" \
-      -e HOST=0.0.0.0 -e PORT=8090 -e TRUST_PROXY=1 -p 127.0.0.1:8090:8090 \
-      -v /var/run/docker.sock:/var/run/docker.sock --memory 512m \
+    docker rm -f nf-arena nf-waechter >/dev/null 2>&1 || true
+    docker run -d --name nf-waechter --restart unless-stopped --network none \
+      --read-only --cap-drop ALL --security-opt no-new-privileges --memory 128m --pids-limit 64 \
+      -v /var/run/docker.sock:/var/run/docker.sock -v nf-waechter:/run/waechter \
+      --log-opt max-size=10m --log-opt max-file=3 "nachtfalter-arena:$1" node waechter.js >/dev/null
+    for _ in $(seq 1 20); do docker exec nf-waechter test -S /run/waechter/docker.sock 2>/dev/null && break; sleep 0.5; done
+    docker run -d --name nf-arena --restart unless-stopped --env-file "$ETC/arena.env" --env-file "$ETC/arena-geheimnis.env" \
+      -e HOST=0.0.0.0 -e PORT=8090 -e TRUST_PROXY=1 -e DOCKER_SOCKET=/run/waechter/docker.sock -p 127.0.0.1:8090:8090 \
+      -v nf-waechter:/run/waechter --user node --read-only --tmpfs /tmp:rw,noexec,nosuid,size=16m \
+      --cap-drop ALL --security-opt no-new-privileges --memory 512m --pids-limit 256 \
       --log-opt max-size=10m --log-opt max-file=3 "nachtfalter-arena:$1" >/dev/null
   }
   starten live
@@ -160,7 +177,7 @@ arena() {
     echo "$rev" > "$STATE/arena.commit"; log "arena: läuft (${rev:0:7})"
   else
     log "arena: startet nicht – stelle alten Stand wieder her"
-    docker logs --tail 20 nf-arena >>"$LOG" 2>&1 || true
+    docker logs --tail 20 nf-arena >>"$LOG" 2>&1 || true; docker logs --tail 10 nf-waechter >>"$LOG" 2>&1 || true
     docker image inspect nachtfalter-arena:alt >/dev/null 2>&1 && starten alt
     return 1
   fi

@@ -4,13 +4,15 @@
 set -euo pipefail
 TOKEN="${KLY_TOKEN:-}"
 [[ "$TOKEN" =~ ^KLY-[0-9A-F]{6}$ ]] || { echo "FEHLER: KLY_TOKEN fehlt oder ist ungültig." >&2; exit 2; }
-h() { printf '%s' "$TOKEN:tresor:$1" | sha256sum | cut -c1-"$2"; }
-code() { printf 'KLY{%s}' "$(h "$1" 16)"; }
+h() { printf '%s' "$SALZ:tresor:$1" | sha256sum | cut -c1-"$2"; }
+SALZ="${KLY_SALZ:-}"; [[ "$SALZ" =~ ^[0-9a-f]{32}$ ]] || SALZ="$TOKEN"   # Arena: geheimes Salz vom Server; sonst (eigenes Kali) der Token
+unset KLY_SALZ
+code() { printf 'KLY{%s}' "$(printf '%s' "$SALZ:tresor:$1" | sha256sum | cut -c1-16)"; }
 L1=$(code l1); L2=$(code l2); L3=$(code l3); L4=$(code l4); L5=$(code l5); L6=$(code l6)
 
 # Wortliste (erfunden) und das Passwort von „pruefer“ daraus
 install -d -m 755 /usr/share/tresor
-python3 - "$TOKEN" > /usr/share/tresor/woerter.txt <<'PY'
+python3 - "$SALZ" > /usr/share/tresor/woerter.txt <<'PY'
 import sys, random, hashlib
 r = random.Random(hashlib.sha256((sys.argv[1] + 'woerter').encode()).hexdigest())
 silben = ['ka','lo','mi','ne','ru','sa','ti','bo','fe','gu','ha','ji','ke','la','mo','nu','pi','ra','se','to','va','we','zo','an','el','in','or','um']
@@ -18,7 +20,7 @@ w = set()
 while len(w) < 3000: w.add(''.join(r.choice(silben) for _ in range(r.randrange(3, 5))) + str(r.randrange(10, 99)))
 print('\n'.join(sorted(w)))
 PY
-WORT=$(python3 -c "import sys,hashlib; w=open('/usr/share/tresor/woerter.txt').read().split(); print(w[int(hashlib.sha256((sys.argv[1]+':tresor:wort').encode()).hexdigest(),16)%len(w)])" "$TOKEN")
+WORT=$(python3 -c "import sys,hashlib; w=open('/usr/share/tresor/woerter.txt').read().split(); print(w[int(hashlib.sha256((sys.argv[1]+':tresor:wort').encode()).hexdigest(),16)%len(w)])" "$SALZ")
 PW_ENT=$(h pw:entwickler 12); PW_BET=$(h pw:betrieb 12); PW_WART=$(h pw:tresorwart 12); KOMBI=$(h kombi 4 | tr 'a-f' '1-6')-$(h kombi2 4 | tr 'a-f' '1-6')
 
 mkuser() { useradd -m -s /bin/bash "$1"; echo "$1:$2" | chpasswd; chmod 700 "/home/$1"; rm -f "/home/$1/.bash_logout"; }
@@ -70,7 +72,7 @@ chown pruefer:pruefer $H/hinweis.txt
 # ---------- Level 2 · entwickler: Zugangsdaten im Protokoll
 H=/home/entwickler; merke entwickler "$L2"
 install -d -m 755 /var/log/tresor
-python3 - "$TOKEN" "$PW_BET" > /var/log/tresor/sicherung.log <<'PY'
+python3 - "$SALZ" "$PW_BET" > /var/log/tresor/sicherung.log <<'PY'
 import sys, random, hashlib
 r = random.Random(hashlib.sha256((sys.argv[1] + 'sich').encode()).hexdigest())
 for d in range(1, 29):
