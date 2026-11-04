@@ -186,6 +186,38 @@ Beispiel: ssh name@localhost
 Schlüsselpaar: privat (geheim, bei dir) und öffentlich (auf dem Server in authorized_keys). Wer den privaten hat, kommt rein.
 Beispiel: ~/.ssh/authorized_keys
 
+== SSRF
+Server-Side Request Forgery: Man bringt den Server dazu, selbst Adressen abzurufen – auch interne, die man von außen nicht erreicht.
+Beispiel: /vorschau?url=http://127.0.0.1:9000/
+
+== SSTI
+Server-Side Template Injection: Eingaben werden als Vorlage ausgewertet und können Code ausführen.
+Beispiel: {{ 7*7 }} ergibt 49 statt der Zeichen.
+
+== Deserialisierung
+Gespeicherte Objekte (z. B. aus einem Cookie) wieder einlesen. Unsicher, wenn dabei beliebiger Code/Objekte entstehen.
+Beispiel: Ein eval-artiges Cookie-Format.
+
+== Race Condition
+Zwei Vorgänge laufen gleichzeitig und stören sich – etwa Prüfen und Buchen mit Lücke dazwischen (TOCTOU).
+Beispiel: Ein Gutschein wird doppelt eingelöst.
+
+== XXE
+XML External Entity: Ein XML-Parser lädt über Entities fremde Dateien oder Adressen.
+Beispiel: <!ENTITY x SYSTEM "file:///etc/passwd">
+
+== Mass Assignment
+Ein Formular übernimmt mehr Felder als vorgesehen – z. B. rolle=admin.
+Beispiel: POST mit zusätzlichem Feld rolle=admin.
+
+== JWT
+JSON Web Token: ein signiertes Token (drei base64url-Teile). Gefährlich, wenn alg=none akzeptiert wird.
+Beispiel: kopf.payload.signatur
+
+== UNION (SQL)
+Hängt an eine SQL-Abfrage eine zweite an und liest so fremde Tabellen. Spaltenzahl muss passen.
+Beispiel: id=0 UNION SELECT wert FROM tresor
+
 == Steganografie
 Daten so verstecken, dass niemand ahnt, dass dort etwas ist.
 Beispiel: Eine Nachricht in einem Bild.

@@ -127,3 +127,7 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
   Maulwurf; Antworten über `akte`), Abwehren (Angriff! 1–3; Spielleiter als root lässt Hacker-Bot in Wellen angreifen,
   Angriffe laufen als `hacker`/`verteidiger`, root führt keine Spielerdateien aus). Spurensuche + Angriff! 1 mit
   Grundzugang „arena“, alle anderen „arena-profi“. Spieler-beschreibbare Ordner als tmpfs.
+- 2.30.0: Web-Reihe (3 Arenen, Reihe „Hacken“): Web 1 Das Kleingedruckte (Fortgeschritten: robots, Methoden,
+  versteckte Parameter, LFI, Backup, Header-Spoofing), Web 2 Umwege (Experte: SQLi-Login/UNION, SSRF, Mass Assignment,
+  JWT alg=none, file://), Web 3 Die Kette (Extrem: SSTI, Deserialisierung, Race Condition, Blind-SQLi, SSRF-Bypass, XXE).
+  Alle sechs Stufen je Lab durchgespielt. Jetzt 13 Arenen.

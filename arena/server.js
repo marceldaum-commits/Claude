@@ -86,6 +86,18 @@ const LABS = {
     produkt: 'arena-profi', stufe: 'Extrem', levels: 6, praefix: 'abwehr3',
     kurz: 'Der Profi ist längst drin: getarnte Prozesse, versteckte Autostarts, lügende Befehle, präparierter Schlüssel, Wanze, Zeitbombe, Git-Haken. Traue nichts.',
     hello: hallo('Angriff! Stufe 3', 'verteidiger', 'Lagebild: lage   ·   live: tail -f /var/log/angriff.log   ·   cat ~/LIESMICH.txt') },
+  web1: { image: env('WEB1_IMAGE', 'nf-web1'), user: 'besucher', ready: 'Web1 bereit', title: 'Web 1: Das Kleingedruckte', host: 'katalog',
+    produkt: 'arena', stufe: 'Fortgeschritten', levels: 6, praefix: 'web1', tmpfs: { '/opt/web/seiten': 'rw,nosuid,size=4m' },
+    kurz: 'Web-Grundlagen mit curl: versteckte Pfade (robots.txt), HTTP-Methoden, versteckte Parameter, Pfad-Ausbruch, vergessene Backup-Datei, gefälschte Header.',
+    hello: hallo('Katalog-Pentest', 'besucher', 'Auftrag: cat ~/auftrag.txt   ·   Hilfe: hilfe   ·   Begriffe: begriff WORT') },
+  web2: { image: env('WEB2_IMAGE', 'nf-web2'), user: 'tester', ready: 'Web2 bereit', title: 'Web 2: Umwege', host: 'portal',
+    produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'web2',
+    kurz: 'Web mittel: SQL-Login umgehen, mit UNION fremde Tabellen lesen, SSRF auf interne Dienste, unsicheres Zusatzfeld, Token fälschen (JWT alg=none), file://.',
+    hello: hallo('Portal-Pentest', 'tester', 'Auftrag: cat ~/auftrag.txt   ·   Hilfe: hilfe   ·   begriff ssrf') },
+  web3: { image: env('WEB3_IMAGE', 'nf-web3'), user: 'angreifer', ready: 'Web3 bereit', title: 'Web 3: Die Kette', host: 'kette',
+    produkt: 'arena-profi', stufe: 'Extrem', levels: 6, praefix: 'web3',
+    kurz: 'Web extrem: Template-Injection, unsichere Deserialisierung, Race Condition, Blind-SQL-Injection, SSRF mit umgangener Sperre, XXE.',
+    hello: hallo('Die Kette', 'angreifer', 'Auftrag: cat ~/auftrag.txt   ·   Hilfe: hilfe   ·   begriff ssti') },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -95,6 +107,7 @@ const EINORDNUNG = {
   spuren: ['Ermitteln', ['Forensik', 'Logs']], einbruch: ['Ermitteln', ['Forensik', 'Logs', 'Schadsoftware']],
   maulwurf: ['Ermitteln', ['Forensik', 'Netzwerk', 'Krypto']],
   abwehr1: ['Abwehren', ['Rechte', 'Passwörter']], abwehr2: ['Abwehren', ['Web', 'Injection', 'Linux']], abwehr3: ['Abwehren', ['Threat Hunting', 'Linux']],
+  web1: ['Hacken', ['Web']], web2: ['Hacken', ['Web', 'Injection', 'Netzwerk']], web3: ['Hacken', ['Web', 'Injection']],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};

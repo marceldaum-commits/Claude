@@ -1,0 +1,3 @@
+#!/bin/bash
+# hilfe – Werkzeuge und Vorgehen für dieses Lab
+LESSCHARSET=utf-8 less -FRX /usr/local/share/nachtfalter/hilfe.txt 2>/dev/null || cat /usr/local/share/nachtfalter/hilfe.txt
