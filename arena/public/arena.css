@@ -38,3 +38,4 @@ details.klein summary { cursor: pointer; color: var(--muted); font-size: .9rem; 
 .ok { color: var(--lime); } .warn { color: #fbbf24; } .rot { color: #f87171; }
 .btn.sek { background: transparent; color: var(--text); border: 1px solid var(--line); }
 .hinweis.gruen { color: var(--lime); }
+.stufe.Extrem { color: #e879f9; border-color: rgba(232,121,249,.55); }

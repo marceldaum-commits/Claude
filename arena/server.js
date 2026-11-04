@@ -59,18 +59,39 @@ const LABS = {
     kurz: 'Für Experten: Passwort-Hash knacken, Geheimnisse in Git und Logs, PATH-Falle, Pfad-Ausbruch in einer API, verschlüsselter Tresor.',
     hello: hallo('Bankhaus Falkenstein', 'gast') },
   webshop: { image: env('WEBSHOP_IMAGE', 'nf-webshop'), user: 'kunde', ready: 'Webshop bereit', title: 'Der Webshop', host: 'kontor',
-    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 6, praefix: 'webshop',
+    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 6, praefix: 'webshop', tmpfs: { '/opt/shop': 'rw,nosuid,size=16m' },
     kurz: 'Web-Hacking mit curl: vergessener Testzugang, fremde Bestellungen, Rollen-Cookie fälschen, SQL-Injection, Befehle einschleusen, Signatur selbst bauen.',
     hello: hallo('Kräuterkontor-Shop', 'kunde', 'Dein Auftrag: cat ~/auftrag.txt   ·   Shop: curl http://localhost:8000/') },
   einbruch: { image: env('EINBRUCH_IMAGE', 'nf-einbruch'), user: 'ermittler', ready: 'Einbruch bereit', title: 'Der Einbruch', host: 'forensik',
     produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'einbruch',
     kurz: 'Blue Team: Ein Server wurde gehackt. Finde in Protokollen, Verlauf, Cronjobs und verschleierter Schadsoftware heraus, wer, wie und was gestohlen hat.',
     hello: hallo('Ermittlung Kräuterkontor', 'ermittler', 'Dein Fall: cat ~/fall.txt   ·   Fragen: akte fragen') },
+  spuren: { image: env('SPUREN_IMAGE', 'nf-spuren'), user: 'ermittler', ready: 'Spurensuche bereit', title: 'Die Spurensuche', host: 'gartenbau',
+    produkt: 'arena', stufe: 'Einsteiger', levels: 5, praefix: 'spuren',
+    kurz: 'Deine erste Ermittlung: Wer hat nachts die Firmen-Webseite verändert? Mit ls, grep, diff und base64 den Spuren folgen.',
+    hello: hallo('Ermittlung Gartenbau Grün', 'ermittler', 'Dein Fall: cat ~/fall.txt   ·   Fragen: akte fragen') },
+  maulwurf: { image: env('MAULWURF_IMAGE', 'nf-maulwurf'), user: 'ermittler', ready: 'Maulwurf bereit', title: 'Der Maulwurf', host: 'nordwerk',
+    produkt: 'arena-profi', stufe: 'Extrem', levels: 6, praefix: 'maulwurf',
+    kurz: 'Werksspionage von innen: Zeitzonen, wiederverwendete IP-Adressen, DNS-Ausleitung zusammensetzen, Prüfsummen, Zeitstempel, verschlüsseltes Archiv.',
+    hello: hallo('Ermittlung Nordwerk', 'ermittler', 'Dein Fall: cat ~/fall.txt   ·   Fragen: akte fragen') },
+  abwehr1: { image: env('ABWEHR1_IMAGE', 'nf-abwehr1'), user: 'verteidiger', ready: 'Abwehr bereit', title: 'Angriff! Offene Türen', host: 'mein-pc',
+    produkt: 'arena', stufe: 'Einsteiger', levels: 5, praefix: 'abwehr1', tmpfs: { '/srv/app': 'rw,exec,nosuid,size=16m' },
+    kurz: 'Ein Hacker-Bot greift deinen Rechner live an. Mach die Lücken dicht, bevor er Schaden anrichtet: Passwort, Rechte, Debug-Modus, Upload-Ordner, fremder Schlüssel.',
+    hello: hallo('Angriff! Stufe 1', 'verteidiger', 'Lagebild: lage   ·   live: tail -f /var/log/angriff.log   ·   cat ~/LIESMICH.txt') },
+  abwehr2: { image: env('ABWEHR2_IMAGE', 'nf-abwehr2'), user: 'verteidiger', ready: 'Abwehr bereit', title: 'Angriff! Die Hintertür', host: 'mein-server',
+    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 6, praefix: 'abwehr2', tmpfs: { '/srv/app': 'rw,exec,nosuid,size=16m' },
+    kurz: 'Der Hacker wird frecher: PIN-Brute-Force, giftige Dateinamen, Hintertür mit Autostart, Schlüssel in der Git-Historie, PATH-Falle, zu weite Freigabe.',
+    hello: hallo('Angriff! Stufe 2', 'verteidiger', 'Lagebild: lage   ·   live: tail -f /var/log/angriff.log   ·   cat ~/LIESMICH.txt') },
+  abwehr3: { image: env('ABWEHR3_IMAGE', 'nf-abwehr3'), user: 'verteidiger', ready: 'Abwehr bereit', title: 'Angriff! Der Profi', host: 'mein-pc',
+    produkt: 'arena-profi', stufe: 'Extrem', levels: 6, praefix: 'abwehr3',
+    kurz: 'Der Profi ist längst drin: getarnte Prozesse, versteckte Autostarts, lügende Befehle, präparierter Schlüssel, Wanze, Zeitbombe, Git-Haken. Traue nichts.',
+    hello: hallo('Angriff! Stufe 3', 'verteidiger', 'Lagebild: lage   ·   live: tail -f /var/log/angriff.log   ·   cat ~/LIESMICH.txt') },
 };
+const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem'];
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};
 async function imagesPruefen() { for (const [id, L] of Object.entries(LABS)) vorhanden[id] = await docker.getImage(L.image).inspect().then(() => true, () => false); }
-const labOeffentlich = () => Object.entries(LABS).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, kurz: L.kurz, produkt: L.produkt, levels: L.levels, bereit: vorhanden[id] !== false }));
+const labOeffentlich = () => Object.entries(LABS).sort((a, b) => STUFEN.indexOf(a[1].stufe) - STUFEN.indexOf(b[1].stufe)).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, kurz: L.kurz, produkt: L.produkt, levels: L.levels, bereit: vorhanden[id] !== false }));
 const istLab = (lab) => Object.hasOwn(LABS, lab);
 function darf(k, lab) {
   if (!istLab(lab)) return false;

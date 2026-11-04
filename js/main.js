@@ -1041,7 +1041,7 @@ views.mehr = () => {
       <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language · Мова</h3>${langPickerHTML()}
         <p class="small muted" style="margin-bottom:0">Englisch und Ukrainisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
       <div class="card"><ul class="list">
-        ${(globalThis.KLY_CONFIG || {}).arenaUrl ? `<li><a href="${esc(KLY_CONFIG.arenaUrl)}" target="_blank" rel="noopener"><span class="state">🖥️</span><span class="grow"><span class="t">Arena – Online-Labs</span><span class="s">Echte Übungs-Server im Browser: Kellerserver, Leitstelle, Webshop, Tresor, Einbruch</span></span></a></li>` : ''}
+        ${(globalThis.KLY_CONFIG || {}).arenaUrl ? `<li><a href="${esc(KLY_CONFIG.arenaUrl)}" target="_blank" rel="noopener"><span class="state">🖥️</span><span class="grow"><span class="t">Arena – Online-Labs</span><span class="s">Echte Übungs-Server im Browser: 10 Arenen: hacken, ermitteln und Angriffe abwehren</span></span></a></li>` : ''}
         <li><a href="konto.html"><span class="state">👤</span><span class="grow"><span class="t">Nachtfalter-Konto</span><span class="s">Registrieren, anmelden, deine Zugänge (Beta)</span></span></a></li>
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
         <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>

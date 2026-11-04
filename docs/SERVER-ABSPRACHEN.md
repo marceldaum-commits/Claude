@@ -123,3 +123,7 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - App startet in der Handy-Sprache (de/en/uk, sonst en).
 - Neue Arenen (2.27.0): Webshop (Fortgeschritten, Web-Hacking mit curl) und Einbruch (Experte, Forensik/Blue Team,
   Antworten über `akte`). Alle Arenen: Codes aus geheimem Salz pro Konto, Prüfung nur serverseitig; Docker-Wächter.
+- 2.28.0: 10 Arenen in drei Reihen – Hacken (Keller, Leitstelle, Webshop, Tresor), Ermitteln (Spurensuche, Einbruch,
+  Maulwurf; Antworten über `akte`), Abwehren (Angriff! 1–3; Spielleiter als root lässt Hacker-Bot in Wellen angreifen,
+  Angriffe laufen als `hacker`/`verteidiger`, root führt keine Spielerdateien aus). Spurensuche + Angriff! 1 mit
+  Grundzugang „arena“, alle anderen „arena-profi“. Spieler-beschreibbare Ordner als tmpfs.
