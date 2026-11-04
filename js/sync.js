@@ -75,6 +75,14 @@ export async function signUp(email, password) {
   const { error } = await c.auth.signUp({ email, password });
   if (error) throw new Error(error.message);
 }
+// Status des eigenen Kontos (freigeschaltet/gesperrt/admin) – nur wenn angemeldet
+export async function meinStatus() {
+  if (!user) return null;
+  const c = await getClient();
+  const { data, error } = await c.rpc('mein_status');
+  if (error) throw new Error(error.message);
+  return data;
+}
 export async function signOut() {
   const c = await getClient();
   if (c) await c.auth.signOut();

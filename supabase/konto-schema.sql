@@ -77,3 +77,7 @@ revoke execute on function public.handle_new_user() from public, anon, authentic
 -- RPC mein_status() (freigeschaltet/gesperrt/admin des aufrufenden Kontos).
 -- Verwaltung: Edge Function supabase/functions/admin (prüft Token beim Auth-Server + Admin-Rolle).
 -- Volltext der Migrationen: Supabase → Database → Migrations.
+
+-- Migration konto_offene_registrierung (04.11.2026): Registrierung ohne Freischaltung durch den Admin.
+-- Neue Konten sind sofort nutzbar (E-Mail-Bestätigung bleibt Pflicht, über Supabase Auth).
+alter table public.profiles alter column freigeschaltet set default true;

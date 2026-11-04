@@ -13,7 +13,7 @@ import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -122,9 +122,10 @@ function renderTop() {
   $('#top').innerHTML = `
     <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter <b>Hacklab</b></span></a>
     <span class="spacer"></span>
-    ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben">VORSCHAU ${esc(self.KLY_VERSION || '')}</span>` : ''}
-    <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' ' + U(loc.short) : '📍 Lernort?'}</button>
-    <a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`;
+    ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben"><span class="lbl">VORSCHAU </span>${esc(self.KLY_VERSION || '')}</span>` : ''}
+    <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' <span class="lbl">' + U(loc.short) + '</span>' : '📍 <span class="lbl">Lernort?</span>'}</button>
+    ${syncConfigured() && !st.user ? `<a class="chip" href="konto.html" title="Anmelden oder kostenloses Konto anlegen" aria-label="Anmelden">👤 <span class="lbl">Anmelden</span></a>` :
+    `<a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`}`;
   $('#locChip').onclick = () => locationModal(true);
 }
 
@@ -1053,7 +1054,7 @@ views.mehr = () => {
         <h2>Nachtfalter-Konto · Fortschritt auf allen Geräten</h2>
         <p class="small" id="syncline">${syncLine(st)}</p>
         ${!syncConfigured() ? `<p class="small muted">Noch nicht eingerichtet. Anleitung: <code>docs/SUPABASE-SETUP.md</code> im Projekt. Bis dahin: Lernstand per Export/Import übertragen.</p>` :
-        st.user ? `<p class="small">Angemeldet als <b>${esc(st.user.email)}</b></p><div class="row"><button class="btn small" id="syncnow">Jetzt synchronisieren</button><button class="btn small ghost" id="logout">Abmelden</button><a class="btn small ghost" href="konto.html">Mein Konto</a></div>` :
+        st.user ? `<p class="small">Angemeldet als <b>${esc(st.user.email)}</b></p><div class="row"><button class="btn small" id="syncnow">Jetzt synchronisieren</button><button class="btn small ghost" id="logout">Abmelden</button><a class="btn small ghost" href="konto.html">Mein Konto</a><a class="btn small ghost" href="admin.html" id="adminlink" hidden>🛠 Verwaltung</a></div>` :
           `<label for="em">E-Mail</label><input type="email" id="em" autocomplete="username"><label for="pw">Passwort</label><input type="password" id="pw" autocomplete="current-password">
            <div class="row" style="margin-top:.6rem"><button class="btn primary" id="login">Anmelden</button><a class="btn ghost" href="konto.html?neu=1">Konto anlegen</a></div><div id="authfb"></div>`}
         <p class="honest">Beim Zusammenführen geht nichts verloren: Bestandenes bleibt bestanden, Archiv und Belege werden vereinigt. Prüfungen gelten nur aus vollständig nachvollziehbaren Versuchen. Vor jeder Zusammenführung wird lokal gesichert.</p>
@@ -1173,6 +1174,7 @@ views.mehr = () => {
         login.onclick = () => doAuth(signIn);
       }
       const sn = $('#syncnow', root); if (sn) sn.onclick = () => syncNow(getState, applyState);
+      const al = $('#adminlink', root); if (al) meinStatus().then(s => { if (s?.admin) al.hidden = false; }).catch(() => {});
       const lo = $('#logout', root); if (lo) lo.onclick = async () => { await signOut(); render(); };
     },
   };

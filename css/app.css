@@ -241,3 +241,11 @@ a.karte:hover { border-color: var(--violet); }
 .karte.aus { opacity: .6; }
 .fuss { text-align: center; padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)); font-size: .86rem; color: var(--muted); }
 .fuss a { color: var(--muted); }
+
+/* Kopfzeile auf schmalen Handys: nur Symbole, Marke nicht umbrechen */
+.brand span { white-space: nowrap; }
+@media (max-width: 420px) {
+  .top { gap: .4rem; padding-left: .75rem; padding-right: .75rem; }
+  .top .chip .lbl { display: none; }
+  .brand img { width: 26px; height: 26px; }
+}

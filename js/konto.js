@@ -74,7 +74,7 @@ const busy = (form, on) => form.querySelectorAll('button, input, select').forEac
 function rahmen(inner) {
   main.innerHTML = `${langNoteHTML()}<section class="stack" style="max-width:520px;margin:0 auto">
     <h1 style="margin-bottom:.2rem">Nachtfalter-Konto</h1>
-    <p class="small muted" style="margin-top:0">Ein Konto für alle Nachtfalter-Apps: Hacklab, Arena und KI-Werkstatt. <span class="badge plain">Beta</span></p>
+    <p class="small muted" style="margin-top:0">Kostenlos registrieren – dein Fortschritt im Hacklab auf allen Geräten. <span class="badge plain">Beta</span></p>
     ${hinweis ? `<div class="feedback ok">${esc(hinweis)}</div>` : ''}
     ${fehlerHinweis ? `<div class="feedback no">${esc(fehlerHinweis)}</div>` : ''}
     ${inner}
@@ -164,12 +164,11 @@ async function angemeldet() {
       <div class="card"><h2 style="margin-bottom:.3rem">Hallo${p.display_name ? ' ' + esc(p.display_name) : ''}!</h2>
         <p class="small muted" style="margin:0">${esc(user.email)}${p.birth_year ? ` · Jahrgang ${esc(p.birth_year)}` : ''}${kind ? ` · Elternzustimmung: ${p.parent_consent ? '✓' : 'fehlt'}` : ''}</p></div>
       ${st?.admin ? '<a class="card lime" href="admin.html" style="display:block;text-decoration:none;color:inherit"><b>🛠️ Verwaltung</b><br><span class="small muted">Nutzer, Einladungscodes, Zugänge</span></a>' : ''}
-      ${st && !st.freigeschaltet ? `<div class="card warn"><h3>Einladungscode einlösen</h3>
-        <p class="small" style="margin-top:0">Nachtfalter ist gerade in der Testphase. Mit deinem Einladungscode wird dein Konto freigeschaltet.</p>
-        <form id="cf" class="stack"><label>Einladungscode<input name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NF-XXXX-XXXX-XXXX" required></label>
-        <button class="btn go">Freischalten</button></form></div>` : ''}
+      ${st?.gesperrt ? '' : '<a class="btn primary block" href="./">▶ Zum Hacklab</a>'}
       <div class="card"><h3>Meine Zugänge</h3>${liste}</div>
-      ${st?.freigeschaltet ? '<a class="btn primary block" href="./">▶ Zum Hacklab</a>' : ''}
+      <details class="card"><summary><b>Einladungscode einlösen</b> <span class="small muted">(z. B. für die Arena)</span></summary>
+        <form id="cf" class="stack" style="margin-top:.6rem"><label>Einladungscode<input name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NF-XXXX-XXXX-XXXX" required></label>
+        <button class="btn go">Einlösen</button></form></details>
       <div class="card"><h3>Profil</h3><form id="pf" class="stack">
         <label>Name<input name="name" maxlength="30" value="${esc(p.display_name || '')}"></label>
         <label>Sprache<select name="lang"><option value="de">Deutsch</option><option value="en">English</option><option value="uk">Українська</option></select></label>
@@ -183,7 +182,7 @@ async function angemeldet() {
       e.preventDefault(); busy(cf, true);
       try {
         const r = await api('/rest/v1/rpc/einloesen', { method: 'POST', auth: true, body: { p_code: cf.code.value } });
-        if (r?.ok) { hinweis = '✓ Freigeschaltet – viel Spaß!'; return angemeldet(); }
+        if (r?.ok) { hinweis = '✓ Code eingelöst – viel Spaß!'; return angemeldet(); }
         msg({ ungueltig: 'Diesen Code gibt es nicht. Prüfe die Schreibweise.', abgelaufen: 'Dieser Code ist abgelaufen. Frag nach einem neuen.', aufgebraucht: 'Dieser Code wurde schon zu oft benutzt.', zu_viele_versuche: 'Zu viele falsche Versuche. Bitte warte eine Stunde.' }[r?.grund] || 'Das hat nicht geklappt. Bitte versuch es nochmal.');
       } catch (err) { msg(err.message); } finally { busy(cf, false); }
     };
