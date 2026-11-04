@@ -252,6 +252,7 @@ async function kunde(id) {
           <button data-rolle="verwaltung" class="${n.admin ? 'an' : ''}">🛠️ Verwaltung</button></div>
           <p class="small muted" style="margin:.3rem 0 0">Verwaltung = Zugriff auf diese Zentrale.</p></div>
         <div class="zaktionen">
+          <a class="btn small ghost" href="mailto:${esc(n.email)}?subject=${encodeURIComponent('Dein Nachtfalter-Konto')}">✉️ E-Mail schreiben</a>
           <button class="btn small" id="pw">🔑 Passwort-Mail senden</button>
           ${n.bestaetigt ? '' : '<button class="btn small" id="best">✉️ Bestätigung erneut senden</button><button class="btn small ghost" id="bestH">✓ E-Mail manuell bestätigen</button>'}
           ${n.zwei_faktor && !ich ? '<button class="btn small ghost" id="mfa">🔐 Zwei-Faktor zurücksetzen</button>' : ''}

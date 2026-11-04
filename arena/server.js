@@ -167,7 +167,7 @@ setInterval(() => reap().catch(e => log('reap', e.message)), 60000).unref();
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.css': 'text/css' };
 const SEC_HEADERS = {
-  'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'X-Frame-Options': 'DENY', 'Strict-Transport-Security': 'max-age=31536000',
   'Content-Security-Policy': `default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' ${CFG.kontoUrl}; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'`,
 };
 
