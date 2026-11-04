@@ -81,6 +81,12 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
 - **Stand 03.11.2026:** Supabase-Projekt „nachtfalter-konto“ angelegt (Ref `sxapebxzxmathkvtuuvn`, Frankfurt), Schema `supabase/konto-schema.sql` angewendet, Sicherheits-Prüfung ohne Befund. Schlüssel (service_role) holt Marcel im Supabase-Dashboard und trägt ihn nur in die `.env` auf dem Server ein – nie in Chat oder Repo.
 - Zuständig: Kali-Sitzung (Konto, Datenbank, Sicherheit, Zahlungs-Webhook), KI-Sitzung (Anbindung KI-Werkstatt, Texte/Ablauf aus Nutzersicht), Sprache & Qualität (Übersetzung, Test).
 
+## Stand 04.11.2026
+
+- Web-App läuft vom eigenen Server: **www.nachtfalter.tech** (Startseite, Impressum, Datenschutz), **app.nachtfalter.tech** (Hacklab, Konto, Verwaltung, Anmeldung Pflicht), **vorschau.nachtfalter.tech** (Arbeits-Branch, Passwortschutz). Cloudflare Pages ist stillgelegt.
+- Konto: offene Registrierung mit E-Mail-Bestätigung; Mails über Brevo (`noreply@nachtfalter.tech`, Domain authentifiziert). Postfach `info@nachtfalter.tech` in Plesk (MX → nachtfalter.tech, Strato-Firewall 25/993 offen, Fail2Ban aktiv).
+- Offen: AVV mit Supabase/Brevo/Strato (Marcel), Log-Rotation ≤ 30 Tage, Port 2222 prüfen/schließen, PTR-Eintrag der Server-IP, Plesk-Benachrichtigungen über Brevo, Übersetzung neuer Konto-/Start-Texte.
+
 ## Offene Punkte
 
 - [ ] Domain festlegen (Marcel)
