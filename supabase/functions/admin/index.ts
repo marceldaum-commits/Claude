@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
             id: x.id, email: x.email, bestaetigt: !!x.email_confirmed_at, erstellt: x.created_at, zuletzt: x.last_sign_in_at,
             name: p.display_name || '', lang: p.lang, jahrgang: p.birth_year, eltern: p.parent_consent,
             freigeschaltet: !!p.freigeschaltet, gesperrt: !!p.gesperrt, admin: A.has(x.id),
-            fortschritt: g ? { geloest, lektionen, pruefungen, aktualisiert: g.updated_at } : null, zuletzt_gesehen: p.last_seen || null, notiz: N.get(x.id) || '', gesperrt_auth: !!(x as any).banned_until && new Date((x as any).banned_until) > new Date(),
+            fortschritt: g ? { geloest, lektionen, pruefungen, aktualisiert: g.updated_at } : null, zuletzt_gesehen: p.last_seen || null, notiz: N.get(x.id) || '', zwei_faktor: ((x as any).factors || []).some((f: any) => f.status === 'verified'), gesperrt_auth: !!(x as any).banned_until && new Date((x as any).banned_until) > new Date(),
             zugaenge: (ents || []).filter((e) => e.user_id === x.id),
           };
         });
@@ -225,6 +225,16 @@ Deno.serve(async (req) => {
         if (error) throw error;
         await protokoll('bestaetigung_erneut', id);
         return antwort(origin, 200, { ok: true });
+      }
+      case 'zwei_faktor_zuruecksetzen': {
+        if (!UUID.test(id)) return antwort(origin, 400, { fehler: 'Unbekannter Nutzer' });
+        if (id === u.user.id) return antwort(origin, 400, { fehler: 'Die eigene Zwei-Faktor-Anmeldung kann hier nicht entfernt werden – das macht eine andere Verwaltungs-Person bzw. Claude.' });
+        const { data: fl, error: le } = await db.auth.admin.mfa.listFactors({ userId: id });
+        if (le) throw le;
+        let n = 0;
+        for (const f of fl?.factors || []) { const { error: de } = await db.auth.admin.mfa.deleteFactor({ id: f.id, userId: id }); if (de) throw de; n++; }
+        await protokoll('zwei_faktor_zurueckgesetzt', id, { anzahl: n });
+        return antwort(origin, 200, { ok: true, anzahl: n });
       }
       case 'protokoll': {
         const { data, error } = await db.from('admin_log').select('id, at, admin_id, aktion, ziel, details').order('at', { ascending: false }).limit(200);

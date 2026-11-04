@@ -147,7 +147,7 @@ const status = (n) => n.gesperrt ? ['gesperrt', 'rot'] : !n.bestaetigt ? ['E-Mai
 const kind = (n) => n.jahrgang && new Date().getFullYear() - n.jahrgang <= 16;
 function badges(n) {
   const [st, k] = status(n);
-  return `<span class="zbadges">${n.admin ? '<span class="zb lila">Verwaltung</span>' : '<span class="zb">Kunde</span>'}<span class="zb ${k}">${st}</span>${kind(n) ? `<span class="zb ${n.eltern ? '' : 'warn'}">unter 17${n.eltern ? ' · Eltern ✓' : ' · Eltern fehlt'}</span>` : ''}${n.zugaenge.some(z => new Date(z.gueltig_bis) > new Date()) ? '<span class="zb ok">Zugang</span>' : ''}</span>`;
+  return `<span class="zbadges">${n.admin ? '<span class="zb lila">Verwaltung</span>' : '<span class="zb">Kunde</span>'}${n.zwei_faktor ? '<span class="zb ok">🔐 2FA</span>' : ''}<span class="zb ${k}">${st}</span>${kind(n) ? `<span class="zb ${n.eltern ? '' : 'warn'}">unter 17${n.eltern ? ' · Eltern ✓' : ' · Eltern fehlt'}</span>` : ''}${n.zugaenge.some(z => new Date(z.gueltig_bis) > new Date()) ? '<span class="zb ok">Zugang</span>' : ''}</span>`;
 }
 const gesamtRaeume = () => NAMEN.reihenfolge.length || 22;
 
@@ -239,6 +239,7 @@ async function kunde(id) {
         <dt>Registriert</dt><dd>${datum(n.erstellt)}</dd><dt>Zuletzt angemeldet</dt><dd>${datum(n.zuletzt)} (${vor(n.zuletzt)})</dd>
         <dt>Sprache</dt><dd>${esc({ de: 'Deutsch', en: 'Englisch', uk: 'Ukrainisch' }[n.lang] || n.lang || '–')}</dd>
         <dt>Geburtsjahr</dt><dd>${esc(n.jahrgang || '–')}${kind(n) ? ` · Eltern-Zustimmung: <b>${n.eltern ? 'ja' : 'nein'}</b>` : ''}</dd>
+        <dt>Zwei-Faktor</dt><dd>${n.zwei_faktor ? '🔐 eingerichtet' : '<span class="muted">nicht eingerichtet</span>'}${n.admin && !n.zwei_faktor ? ' <span class="zb warn">wird bei der nächsten Anmeldung in der Zentrale eingerichtet</span>' : ''}</dd>
         <dt>Kunden-ID</dt><dd class="small muted">${esc(n.id)}</dd></dl></div>
       <div class="card"><h3 style="margin-top:0">Aktionen</h3><div class="stack">
         <div><b class="small">Rolle</b><div class="zfilter" style="margin-top:.3rem">
@@ -248,6 +249,7 @@ async function kunde(id) {
         <div class="zaktionen">
           <button class="btn small" id="pw">🔑 Passwort-Mail senden</button>
           ${n.bestaetigt ? '' : '<button class="btn small" id="best">✉️ Bestätigung erneut senden</button><button class="btn small ghost" id="bestH">✓ E-Mail manuell bestätigen</button>'}
+          ${n.zwei_faktor && !ich ? '<button class="btn small ghost" id="mfa">🔐 Zwei-Faktor zurücksetzen</button>' : ''}
           ${kind(n) ? `<button class="btn small ghost" id="eltern">${n.eltern ? 'Eltern-Zustimmung entfernen' : '👪 Eltern-Zustimmung vermerken'}</button>` : ''}
           ${ich ? '' : `<button class="btn small ${n.gesperrt ? '' : 'ghost'}" id="sperre">${n.gesperrt ? '🔓 Entsperren' : '⛔ Sperren'}</button><button class="btn small rot" id="weg">🗑️ Konto löschen</button>`}
         </div></div></div>
@@ -272,6 +274,7 @@ async function kunde(id) {
   $('#pw').onclick = () => confirm(`Eine Mail zum Zurücksetzen des Passworts an ${n.email} senden?`) && tun(() => api('passwort_mail', { user_id: id }), 'Passwort-Mail ist unterwegs.');
   if ($('#best')) $('#best').onclick = () => tun(() => api('bestaetigung_erneut', { user_id: id }), 'Bestätigungs-Mail erneut gesendet.');
   if ($('#bestH')) $('#bestH').onclick = () => confirm('E-Mail-Adresse ohne Klick des Kunden als bestätigt markieren?') && tun(() => api('email_bestaetigen', { user_id: id }), 'E-Mail als bestätigt markiert.', neu);
+  if ($('#mfa')) $('#mfa').onclick = () => confirm(`Zwei-Faktor-Anmeldung von ${n.email} entfernen? (z. B. Handy verloren) Bei Verwaltungs-Konten wird sie bei der nächsten Anmeldung in der Zentrale neu eingerichtet.`) && tun(() => api('zwei_faktor_zuruecksetzen', { user_id: id }), 'Zwei-Faktor-Anmeldung zurückgesetzt.', neu);
   if ($('#eltern')) $('#eltern').onclick = () => tun(() => api('nutzer_setzen', { user_id: id, eltern: !n.eltern }), 'Gespeichert.', neu);
   if ($('#sperre')) $('#sperre').onclick = () => confirm(n.gesperrt ? 'Konto wieder freigeben?' : 'Konto sperren? Der Kunde kann sich dann nicht mehr anmelden.') && tun(() => api('nutzer_setzen', { user_id: id, gesperrt: !n.gesperrt }), n.gesperrt ? 'Konto entsperrt.' : 'Konto gesperrt.', neu);
   if ($('#weg')) $('#weg').onclick = () => {
@@ -342,7 +345,7 @@ async function codes() {
   main.querySelectorAll('[data-w]').forEach(b => b.onclick = () => confirm(`Code ${b.dataset.w} widerrufen? Wer ihn schon eingelöst hat, behält seinen Zugang.`) && tun(() => api('code_widerrufen', { code: b.dataset.w }), 'Code widerrufen.', codes));
 }
 
-const AKTION = { code_erstellt: '🎟️ Code erstellt', code_widerrufen: '🎟️ Code widerrufen', nutzer_geaendert: '✏️ Konto geändert', zugang_gegeben: '➕ Zugang gegeben', zugang_beendet: '➖ Zugang beendet', nutzer_geloescht: '🗑️ Konto gelöscht', passwort_mail: '🔑 Passwort-Mail', rolle_gesetzt: '🛠️ Rolle geändert', notiz_geaendert: '📝 Notiz', email_bestaetigt: '✓ E-Mail bestätigt', bestaetigung_erneut: '✉️ Bestätigung erneut' };
+const AKTION = { code_erstellt: '🎟️ Code erstellt', code_widerrufen: '🎟️ Code widerrufen', nutzer_geaendert: '✏️ Konto geändert', zugang_gegeben: '➕ Zugang gegeben', zugang_beendet: '➖ Zugang beendet', nutzer_geloescht: '🗑️ Konto gelöscht', passwort_mail: '🔑 Passwort-Mail', rolle_gesetzt: '🛠️ Rolle geändert', notiz_geaendert: '📝 Notiz', email_bestaetigt: '✓ E-Mail bestätigt', zwei_faktor_zurueckgesetzt: '🔐 Zwei-Faktor zurückgesetzt', bestaetigung_erneut: '✉️ Bestätigung erneut' };
 async function protokoll() {
   main.innerHTML = '<section class="stack"><h1 style="margin:0">Protokoll</h1><p class="muted">Lade …</p></section>';
   const [{ eintraege }, { nutzer }] = await Promise.all([api('protokoll'), laden()]);
