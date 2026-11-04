@@ -44,7 +44,7 @@ const CFG = {
 
 // Verfügbare Labs. user = als wer das Terminal startet; ready = Logzeile, wenn der Container bereit ist.
 // produkt = welcher Zugang nötig ist („alles“ und Verwaltung dürfen immer; „arena-profi“ schließt „arena“ ein).
-const hallo = (t, u) => `\x1b[32m${t} (Arena)\x1b[0m – du bist ${u}.\r\nNächstes Konto: ssh NAME@localhost\r\nZurück: exit\r\n\r\n`;
+const hallo = (t, u, tipp = 'Nächstes Konto: ssh NAME@localhost') => `\x1b[32m${t} (Arena)\x1b[0m – du bist ${u}.\r\n${tipp}\r\nZurück: exit\r\n\r\n`;
 const LABS = {
   keller: { image: env('KELLER_IMAGE', 'kly-keller'), user: 'azubi', ready: 'Kellerserver bereit', title: 'Der Kellerserver', host: 'keller',
     produkt: 'arena', stufe: 'Einsteiger', levels: 10, praefix: 'w2', codesInApp: true,
@@ -58,6 +58,14 @@ const LABS = {
     produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'tresor', tmpfs: { '/opt/tresor/werkzeuge': 'rw,exec,nosuid,size=4m', '/opt/tresor/pruefung': 'rw,exec,nosuid,size=1m' },
     kurz: 'Für Experten: Passwort-Hash knacken, Geheimnisse in Git und Logs, PATH-Falle, Pfad-Ausbruch in einer API, verschlüsselter Tresor.',
     hello: hallo('Bankhaus Falkenstein', 'gast') },
+  webshop: { image: env('WEBSHOP_IMAGE', 'nf-webshop'), user: 'kunde', ready: 'Webshop bereit', title: 'Der Webshop', host: 'kontor',
+    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 6, praefix: 'webshop',
+    kurz: 'Web-Hacking mit curl: vergessener Testzugang, fremde Bestellungen, Rollen-Cookie fälschen, SQL-Injection, Befehle einschleusen, Signatur selbst bauen.',
+    hello: hallo('Kräuterkontor-Shop', 'kunde', 'Dein Auftrag: cat ~/auftrag.txt   ·   Shop: curl http://localhost:8000/') },
+  einbruch: { image: env('EINBRUCH_IMAGE', 'nf-einbruch'), user: 'ermittler', ready: 'Einbruch bereit', title: 'Der Einbruch', host: 'forensik',
+    produkt: 'arena-profi', stufe: 'Experte', levels: 6, praefix: 'einbruch',
+    kurz: 'Blue Team: Ein Server wurde gehackt. Finde in Protokollen, Verlauf, Cronjobs und verschleierter Schadsoftware heraus, wer, wie und was gestohlen hat.',
+    hello: hallo('Ermittlung Kräuterkontor', 'ermittler', 'Dein Fall: cat ~/fall.txt   ·   Fragen: akte fragen') },
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};

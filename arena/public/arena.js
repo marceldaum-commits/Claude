@@ -79,8 +79,8 @@
 
   function anfrageStatus(produkt) { return anfragen.find(x => x.produkt === produkt) || null; }
 
-  // Empfohlene Reihenfolge: Keller → Leitstelle → Tresor
-  const VORHER = { leitstelle: 'keller', tresor: 'leitstelle' };
+  // Empfohlene Reihenfolge: Keller → Leitstelle/Webshop → Tresor/Einbruch
+  const VORHER = { leitstelle: 'keller', webshop: 'keller', tresor: 'leitstelle', einbruch: 'leitstelle' };
 
   function zeichne() {
     $('#labs').innerHTML = LABS.map((L) => {

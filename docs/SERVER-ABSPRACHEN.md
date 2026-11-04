@@ -121,3 +121,5 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
   (auch --force/status) ausführen (/etc/sudoers.d/nachtfalter-claude). Keine Neuinstallation von Hand mehr nötig.
 - Arena: Leitstelle (Fortgeschritten) und Tresor (Experte) live, Zugangsanfragen in der Zentrale, Sicherheitsprüfung umgesetzt.
 - App startet in der Handy-Sprache (de/en/uk, sonst en).
+- Neue Arenen (2.27.0): Webshop (Fortgeschritten, Web-Hacking mit curl) und Einbruch (Experte, Forensik/Blue Team,
+  Antworten über `akte`). Alle Arenen: Codes aus geheimem Salz pro Konto, Prüfung nur serverseitig; Docker-Wächter.
