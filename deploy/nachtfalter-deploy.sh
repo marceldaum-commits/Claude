@@ -2,6 +2,7 @@
 # nachtfalter-deploy – holt freigegebene Stände aus GitHub und startet die Nachtfalter-Dienste neu.
 # Läuft als root (per Cron alle 10 Min und auf Wunsch über sudo durch den Benutzer „claude“).
 # Gehört root, Rechte 755 – „claude“ kann es ausführen, aber nicht ändern.
+# Aktualisiert sich nach jedem Lauf selbst aus dem Branch „live“ (Funktion selbst) – Neuinstallation nicht mehr nötig.
 #
 #   nachtfalter-deploy           neue Stände holen; nur bei Änderungen bauen und neu starten
 #   nachtfalter-deploy --force   alles neu bauen und starten
@@ -307,6 +308,22 @@ konto() {
   local rc=$?; echo "$heute" > "$STATE/konto-sicherung"; return $rc
 }
 
+# ---------------------------------------------------------------- Selbst-Aktualisierung
+# Ab dieser Version aktualisiert sich das Skript selbst aus dem Branch „live“ (nur freigegebene Stände).
+# Kein neues Risiko: Wer auf „live“ schreiben darf, steuert über die Arena (Docker) ohnehin schon den Server.
+SELBST=/usr/local/sbin/nachtfalter-deploy
+selbst() {
+  local neu="$STATE/src-live/deploy/nachtfalter-deploy.sh" tmp
+  [ -f "$neu" ] && [ ! -L "$neu" ] || return 0
+  cmp -s "$neu" "$SELBST" && return 0
+  bash -n "$neu" 2>>"$LOG" || { log "selbst: neue Version hat Syntaxfehler – bleibt beim alten Stand"; return 1; }
+  grep -q '^selbst() {' "$neu" || { log "selbst: neue Version kann sich nicht selbst aktualisieren – nicht übernommen"; return 1; }
+  tmp=$(mktemp "$SELBST.XXXXXX"); cp "$neu" "$tmp"; chown root:root "$tmp"; chmod 755 "$tmp"
+  cp -p "$SELBST" "$SELBST.alt" 2>/dev/null || true
+  mv -f "$tmp" "$SELBST"
+  log "selbst: Deploy-Skript aktualisiert ($(sha256sum "$SELBST" | cut -c1-8)) – gilt ab dem nächsten Lauf"
+}
+
 fehler=0
 web live live || fehler=1
 rm -rf "$BASE/web/zentrale-vorschau" "$STATE/web-zentrale-vorschau.headers" "$STATE/web-zentrale-vorschau.commit"
@@ -315,5 +332,6 @@ web zentrale live zentrale || fehler=1
 ki || fehler=1
 arena || fehler=1
 konto || fehler=1
+selbst || fehler=1
 docker image prune -f >/dev/null 2>&1 || true
 exit $fehler
