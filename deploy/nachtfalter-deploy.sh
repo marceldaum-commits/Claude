@@ -20,6 +20,7 @@
 #   /etc/nachtfalter/github-token   GitHub-Fine-grained-Token, nur „Contents: Read-only“ für dieses Repository
 #   /etc/nachtfalter/ki.env         Einstellungen der KI-Werkstatt (API-Schlüssel, Supabase …)
 #   /etc/nachtfalter/arena.env      Einstellungen der Arena (Einladungscode …)
+#   /etc/nachtfalter/konto-db.env   (optional) KONTO_DB_URL=postgresql://… der Supabase-Datenbank für die nächtliche Sicherung
 set -euo pipefail
 umask 022
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -46,6 +47,8 @@ status() {
   printf 'Arena:        %s\n' "$(docker inspect -f '{{.State.Status}}' nf-arena 2>/dev/null | head -1 | grep . || echo 'nicht vorhanden')"
   printf 'Prüfung 8100: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8100/api/status >/dev/null 2>&1 && echo ok || echo -)"
   printf 'Prüfung 8090: %s\n' "$(curl -fsS -m 5 http://127.0.0.1:8090/api/status >/dev/null 2>&1 && echo ok || echo -)"
+  printf 'Konto-Ping:   %s\n' "$(cat "$STATE/konto-ping" 2>/dev/null || echo -)"
+  printf 'Sicherung:    %s\n' "$(ls -1t /var/www/vhosts/nachtfalter.tech/private/konto-sicherung 2>/dev/null | head -1 | grep . || echo 'noch keine')"
   echo "== Letzte Meldungen =="; tail -n 8 "$LOG" 2>/dev/null || true
 }
 [ "$MODE" = status ] && { status; exit 0; }
@@ -249,6 +252,39 @@ web() { # $1 = Seite, $2 = Branch, $3 = app|zentrale
   fi
 }
 
+# ---------------------------------------------------------------- Konto (Supabase): Lebenszeichen + Sicherung
+# Einmal täglich: kleiner Aufruf, damit das kostenlose Supabase-Projekt nicht wegen „Inaktivität“ pausiert wird.
+# Optional nachts: Sicherung von Konten (auth) und App-Daten (public) mit pg_dump in den Webspace-Ordner „private“
+# – dort erfasst sie das Plesk-Backup (verschlüsselt, Google Drive). Nur root kann die Dateien lesen.
+KONTO_URL=https://sxapebxzxmathkvtuuvn.supabase.co
+KONTO_KEY=sb_publishable_04l6lOd2uIPsErdWDOMvew_U6vsFGbn
+SICHERUNG=/var/www/vhosts/nachtfalter.tech/private/konto-sicherung
+konto() {
+  local heute; heute=$(date +%F)
+  if [ "$(cat "$STATE/konto-ping" 2>/dev/null)" != "$heute" ]; then
+    # Auth-Dienst und Datenbank (über die REST-Schnittstelle) je einmal ansprechen
+    if curl -fsS -m 15 -o /dev/null -H "apikey: $KONTO_KEY" "$KONTO_URL/auth/v1/health" \
+       && curl -sS -m 15 -o /dev/null -X POST -H "apikey: $KONTO_KEY" -H "Content-Type: application/json" -d '{}' "$KONTO_URL/rest/v1/rpc/mein_status"; then echo "$heute" > "$STATE/konto-ping"
+    else log "konto: Supabase nicht erreichbar"; fi
+  fi
+  [ -s "$ETC/konto-db.env" ] || return 0
+  [ "$(date +%H)" -ge 2 ] && [ "$(date +%H)" -lt 5 ] || return 0           # nur nachts
+  [ "$(cat "$STATE/konto-sicherung" 2>/dev/null)" != "$heute" ] || return 0
+  command -v pg_dump >/dev/null || { log "konto: pg_dump fehlt (apt install postgresql-client)"; echo "$heute" > "$STATE/konto-sicherung"; return 1; }
+  local url; url=$(sed -n 's/^KONTO_DB_URL=//p' "$ETC/konto-db.env" | head -1)
+  [ -n "$url" ] || { log "konto: KONTO_DB_URL fehlt in $ETC/konto-db.env"; return 1; }
+  install -d -m 700 "$SICHERUNG"
+  local ziel="$SICHERUNG/konto-$heute.dump"
+  if PGCONNECT_TIMEOUT=20 pg_dump --dbname="$url" --format=custom --no-owner --no-privileges \
+       --schema=public --schema=auth --file="$ziel.tmp" 2>>"$LOG"; then
+    mv "$ziel.tmp" "$ziel"; chmod 600 "$ziel"; echo "$heute" > "$STATE/konto-sicherung"
+    find "$SICHERUNG" -name 'konto-*.dump' -mtime +14 -delete
+    log "konto: Sicherung $(du -h "$ziel" | cut -f1) gespeichert"
+  else
+    rm -f "$ziel.tmp"; log "konto: Sicherung fehlgeschlagen"; echo "$heute" > "$STATE/konto-sicherung"; return 1
+  fi
+}
+
 fehler=0
 web live live || fehler=1
 web zentrale-vorschau "$VORSCHAU" zentrale || fehler=1
@@ -256,5 +292,6 @@ web vorschau "$VORSCHAU" || fehler=1
 web zentrale live zentrale || fehler=1
 ki || fehler=1
 arena || fehler=1
+konto || fehler=1
 docker image prune -f >/dev/null 2>&1 || true
 exit $fehler
