@@ -122,7 +122,7 @@ function abgemeldet(tab = 'login') {
     try {
       if (tab === 'login') {
         saveSes(fromToken(await api('/auth/v1/token?grant_type=password', { method: 'POST', body: { email: f.email.value.trim(), password: f.pw.value } })));
-        return angemeldet();
+        return location.replace('./'); // nach der Anmeldung direkt ins Hacklab
       }
       if (tab === 'neu') {
         const jahr = +f.jahr.value, kind = evtlKind(jahr);

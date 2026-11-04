@@ -1522,10 +1522,19 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Start
+// Anmeldung ist Pflicht: ohne gespeicherte Sitzung geht es zuerst zum Nachtfalter-Konto.
+function hatSitzung() {
+  try {
+    const a = JSON.parse(localStorage.getItem('kly.auth') || 'null');
+    return !!(a && a.refresh_token) && localStorage.getItem('kly.auth.projekt') === globalThis.KLY_CONFIG?.supabaseUrl;
+  } catch { return false; }
+}
+const zurAnmeldung = () => location.replace('konto.html?app=1');
+if (syncConfigured() && !hatSitzung()) { zurAnmeldung(); await new Promise(() => {}); }
 initLang(); protectCodes(); loadShellT(); await loadUI(); L1 = makeT(await loadLevel1());
 window.addEventListener('hashchange', render);
 function syncLine(st) { return `<span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : 'warn'}"></span> ${esc(st.msg)}`; }
-onSyncStatus((st) => { renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
+onSyncStatus((st) => { if (syncConfigured() && !st.user && st.state === 'warn' && navigator.onLine) return zurAnmeldung(); renderTop(); const el = document.getElementById('syncline'); if (el) el.innerHTML = syncLine(st); });
 render();
 locationModal(false);
 initSync(getState, applyState);
