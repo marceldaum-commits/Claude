@@ -32,7 +32,7 @@ const CFG = {
   cpus: +env('CPUS', 0.5),
   pids: +env('PIDS', 128),
   trustProxy: env('TRUST_PROXY', '1') === '1',
-  appOrigin: env('APP_ORIGIN', 'https://app.nachtfalter.tech'),
+  appOrigin: env('KONTO_APP', 'https://app.nachtfalter.tech'), // (alte Variable APP_ORIGIN zeigte noch auf Cloudflare)
   // Nachtfalter-Konto: öffentliche Adresse + öffentlicher Schlüssel (kein Geheimnis – steht auch in der App)
   konto: env('KONTO', '1') === '1',
   kontoUrl: env('KONTO_URL', 'https://sxapebxzxmathkvtuuvn.supabase.co'),
