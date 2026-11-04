@@ -73,18 +73,22 @@ const busy = (form, on) => form.querySelectorAll('button, input, select').forEac
 
 function rahmen(inner, { held = false } = {}) {
   const zurueck = $('#zumLab'); if (zurueck) zurueck.hidden = held; // abgemeldet: kein Weg am Login vorbei
-  main.innerHTML = `${langNoteHTML()}<section class="stack" style="max-width:520px;margin:0 auto">
-    ${held ? `<img class="held-bild" src="icons/hero.svg" alt="Ein Nachtfalter fliegt im Mondlicht über ein Terminal">
-    <div><h1 class="held-titel">Willkommen im <span>Hacklab</span></h1>
-    <p class="muted" style="margin:.2rem 0 0">Linux und ethisches Hacken lernen – Schritt für Schritt, direkt am Handy. Kostenlos.</p></div>` :
-    `<h1 style="margin-bottom:.2rem">Nachtfalter-Konto</h1>
-    <p class="small muted" style="margin-top:0">Kostenlos registrieren – dein Fortschritt im Hacklab auf allen Geräten. <span class="badge plain">Beta</span></p>`}
-    ${hinweis ? `<div class="feedback ok">${esc(hinweis)}</div>` : ''}
-    ${fehlerHinweis ? `<div class="feedback no">${esc(fehlerHinweis)}</div>` : ''}
-    ${inner}
-    <div id="msg"></div>
-    <details class="card tight small"><summary>🌍 Sprache · Language · Мова</summary><div style="margin-top:.5rem">${langPickerHTML()}</div></details>
-    ${held ? '' : '<p class="small muted"><a href="./">← Zurück zum Hacklab</a></p>'}
+  const meldungen = `${hinweis ? `<div class="feedback ok">${esc(hinweis)}</div>` : ''}
+    ${fehlerHinweis ? `<div class="feedback no">${esc(fehlerHinweis)}</div>` : ''}`;
+  const sprache = `<details class="card tight small"><summary>🌍 Sprache · Language · Мова</summary><div style="margin-top:.5rem">${langPickerHTML()}</div></details>`;
+  main.innerHTML = held ? `${langNoteHTML()}<section class="anmelde-layout">
+    <div class="held-links">
+      <img class="held-bild" src="icons/hero.svg" alt="Ein Nachtfalter fliegt im Mondlicht über ein Terminal">
+      <div><h1 class="held-titel">Willkommen im <span>Hacklab</span></h1>
+      <p class="muted" style="margin:.3rem 0 0">Linux und ethisches Hacken lernen – Schritt für Schritt, am Handy oder am PC. Kostenlos.</p></div>
+      <ul class="held-punkte small muted"><li>🧩 Räume, Rätsel und Geschichten</li><li>💬 Tipps, wenn du festhängst</li><li>☁️ Fortschritt auf allen Geräten</li></ul>
+    </div>
+    <div class="held-rechts stack">${meldungen}${inner}<div id="msg"></div>${sprache}</div>
+  </section>` : `${langNoteHTML()}<section class="stack" style="max-width:520px;margin:0 auto">
+    <h1 style="margin-bottom:.2rem">Nachtfalter-Konto</h1>
+    <p class="small muted" style="margin-top:0">Kostenlos registrieren – dein Fortschritt im Hacklab auf allen Geräten. <span class="badge plain">Beta</span></p>
+    ${meldungen}${inner}<div id="msg"></div>${sprache}
+    <p class="small muted"><a href="./">← Zurück zum Hacklab</a></p>
   </section>`;
   bindLangPicker(main);
   hinweis = ''; fehlerHinweis = '';
