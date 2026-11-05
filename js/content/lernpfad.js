@@ -303,4 +303,19 @@ export const LERNPFAD = [
     selbst: ['Spiele „Die Härtung“ und behebe die sechs Schwachstellen.'],
     uebung: { label: 'Arena: Die Härtung', href: 'arena:haertung', erfordert: { arena: 'haertung', level: 4 }, hinweis: 'Schließe mindestens 4 der 6 Lücken.' },
   },
+  {
+    id: 's19', icon: '🟣', titel: 'Purple Team: beide Seiten derselben Lücke',
+    schutz: 'Was man angreifen kann, muss man auch schließen können: jede ausgenutzte Lücke (offene Datei, offener Dienst, Hintertür) wird danach eng gemacht – Angriff und Verteidigung gehören zusammen.',
+    einleitung: 'Rot und Blau in einem: „Purple Team“ heißt, man kennt beide Seiten. Du nutzt eine Lücke erst aus (findest den Code), und schließt dann genau diese Lücke. So verstehst du Angriffe tief genug, um sie wirklich abzuwehren.',
+    konzepte: [
+      ['Purple Team', 'Angriff (Rot) und Verteidigung (Blau) zusammen denken – wer angreift, versteht, was zu schützen ist.'],
+      ['Exposition', 'Offene Dateien und Dienste geben Angreifern Informationen; sichtbar heißt nicht harmlos.'],
+    ],
+    beispiel: {
+      text: 'Erst den offenen Dienst ausfragen (Angriff), dann stoppen (Abwehr):',
+      befehle: ['nc 127.0.0.1 2525', 'ss -ltn', 'kill PID'],
+    },
+    selbst: ['Spiele „Der Spiegel“: finde die zwei Angriffs-Codes und schließe dann alle Lücken.'],
+    uebung: { label: 'Arena: Der Spiegel', href: 'arena:spiegel', erfordert: { arena: 'spiegel', level: 4 }, hinweis: 'Hol dir mindestens 4 der 5 Codes (Angriff + Abwehr).' },
+  },
 ];

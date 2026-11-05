@@ -2,7 +2,7 @@
 
 > Automatisch erzeugt aus `arena/server.js` mit `node tools/arena-uebersicht.mjs`. Nicht von Hand ändern.
 
-Insgesamt **21 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
+Insgesamt **22 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
 
 ## 🗝️ Hacken
 
@@ -55,12 +55,14 @@ Insgesamt **21 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 | **Angriff! Offene Türen** | 🔵 Blau | Einsteiger | 5 | Arena | #Rechte #Passwörter |
 | **Angriff! Die Hintertür** | 🔵 Blau | Fortgeschritten | 6 | Profi | #Web #Injection #Linux |
 | **Die Härtung** | 🔵 Blau | Fortgeschritten | 6 | Profi | #Härtung #Rechte #Linux |
+| **Der Spiegel** | 🟣 Lila | Experte | 5 | Profi | #Rechte #Dienste #Härtung |
 | **Angriff! Der Profi** | 🔵 Blau | Extrem | 6 | Profi | #Threat Hunting #Linux |
 | **Das Duell: Mann gegen Maschine** | 🔵 Blau | Extrem | 6 | Profi | #Threat Hunting #Rechte #Persistenz |
 
 - **Angriff! Offene Türen** (Einsteiger): Ein Hacker-Bot greift deinen Rechner live an. Mach die Lücken dicht, bevor er Schaden anrichtet: Passwort, Rechte, Debug-Modus, Upload-Ordner, fremder Schlüssel.
 - **Angriff! Die Hintertür** (Fortgeschritten): Der Hacker wird frecher: PIN-Brute-Force, giftige Dateinamen, Hintertür mit Autostart, Schlüssel in der Git-Historie, PATH-Falle, zu weite Freigabe.
 - **Die Härtung** (Fortgeschritten): Blue Team: einen absichtlich unsicheren Server absichern – Rechte, SSH-Konfig, unnötige Dienste, Autostart-Hintertür und ein schwaches Passwort. Der Prüfdienst gibt pro behobener Lücke einen Code.
+- **Der Spiegel** (Experte): Purple Team: erst dieselbe Lücke ausnutzen (Code in offener Datei und offenem Dienst finden), dann sie schließen. Du siehst beide Seiten – Angriff und Verteidigung.
 - **Angriff! Der Profi** (Extrem): Der Profi ist längst drin: getarnte Prozesse, versteckte Autostarts, lügende Befehle, präparierter Schlüssel, Wanze, Zeitbombe, Git-Haken. Traue nichts.
 - **Das Duell: Mann gegen Maschine** (Extrem): Ein lebendiger Gegner: Der Hacker-Bot prüft live, welche Lücken offen sind, greift eine zufällige davon an und wird immer schneller. Mach alles dicht – jede geschlossene Lücke gibt einen Code.
 

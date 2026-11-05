@@ -1,0 +1,14 @@
+HILFE · Der Spiegel (Purple Team)
+
+Idee: Jede Lücke hat zwei Seiten. Erst ANGREIFEN (den Code in der offenen Datei / im offenen
+Dienst finden), dann ABWEHREN (die Lücke schließen – danach gibt dir  pruefen  den Code).
+
+  cat DATEI           eine Datei lesen
+  nc 127.0.0.1 2525   mit einem Dienst sprechen
+  ss -ltn             welche Ports lauschen
+  ps aux / kill PID   einen Prozess finden und beenden
+  chmod 600 DATEI     nur der Besitzer darf lesen/schreiben
+  nano DATEI          Datei bearbeiten (Strg+O speichern, Strg+X beenden)
+  pruefen             Stand zeigen und Abwehr-Codes holen
+
+Komplettes Handbuch (auch EN): https://arena.nachtfalter.tech/handbuch.html

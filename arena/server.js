@@ -136,6 +136,13 @@ const LABS = {
     helloI18n: {
       en: `\x1b[32mThe Hardening (Arena)\x1b[0m – you are admin.\r\nTask: cat ~/auftrag.txt   ·   Check: pruefen   ·   Help: hilfe\r\nBack: exit\r\n\r\n`,
     } },
+  spiegel: { image: env('SPIEGEL_IMAGE', 'nf-spiegel'), user: 'admin', ready: 'Spiegel bereit', title: 'Der Spiegel', host: 'spiegel',
+    produkt: 'arena-profi', stufe: 'Experte', levels: 5, praefix: 'spiegel',
+    kurz: 'Purple Team: erst dieselbe Lücke ausnutzen (Code in offener Datei und offenem Dienst finden), dann sie schließen. Du siehst beide Seiten – Angriff und Verteidigung.',
+    hello: hallo('Der Spiegel', 'admin', 'Auftrag: cat ~/auftrag.txt   ·   Prüfen: pruefen   ·   Hilfe: hilfe'),
+    helloI18n: {
+      en: `\x1b[32mThe Mirror (Arena)\x1b[0m – you are admin.\r\nTask: cat ~/auftrag.txt   ·   Check: pruefen   ·   Help: hilfe\r\nBack: exit\r\n\r\n`,
+    } },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -154,6 +161,7 @@ const EINORDNUNG = {
   versteck: ['Ermitteln', ['Steganografie', 'Forensik']],
   ki: ['Hacken', ['KI-Sicherheit', 'Prompt Injection']],
   haertung: ['Abwehren', ['Härtung', 'Rechte', 'Linux'], 'Blau'],
+  spiegel: ['Abwehren', ['Rechte', 'Dienste', 'Härtung'], 'Lila'],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};
