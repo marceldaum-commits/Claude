@@ -13,6 +13,7 @@ import { NETZ_PFAD } from './content/netz.js';
 import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
+import { KALIPRAXIS, KALIPRAXIS_GEPLANT } from './content/kalipraxis.js';
 import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
@@ -135,7 +136,7 @@ function renderTop() {
 function renderNav(route) {
   const L = NAV[currentLang()] || NAV.de;
   const items = [['heute', '⌂', L[0]], ['pfad', '◆', L[1]], ['terminal', '>_', L[2]], ['mehr', '≡', L[3]]];
-  const map = { extern: 'pfad', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
+  const map = { extern: 'pfad', kalipraxis: 'pfad', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
   const on = map[route] || route;
   $('#nav').setAttribute('translate', 'no');
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
@@ -282,6 +283,10 @@ views.pfad = () => {
   return {
     html: `<h1>Lernen</h1>
     <p class="muted small">Vom Linux-Anfänger bis zum eJPT. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
+    <a class="card lime" href="#/kalipraxis" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
+      <b>🧰 Kali anwenden – Praxis</b> <span class="badge plain">neu</span><br>
+      <span class="small muted">Echte Kali-Werkzeuge (nmap, gobuster …) gegen lokale Docker-Ziele. Vom Verstehen zum Können.</span>
+    </a>
     <h2 style="margin-top:1rem">🎮 Leitern</h2>
     <p class="small muted">Rätsel-Ketten mit Story: Jede Lösung öffnet die nächste Stufe. Fang oben an und arbeite dich hoch.</p>
     ${[['linux', '🐧 Linux-Leitern', ['Einstieg', 'mittel', 'Skripte', 'schwerer', 'schwer']], ['hacking', '🏴 Hacking-Leitern (CTF)', ['leicht', 'mittel', 'schwer']], ['purple', '🟣 Purple-Team-Leitern (prüfen, finden, absichern)', ['Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 10']], ['kali', '🖥️ In deiner Kali-VM', ['echtes SSH']]].filter(([tr]) => ROOMS.some(r => r.track === tr && visible(r))).map(([tr, title, order]) => `
@@ -1052,6 +1057,62 @@ views.extern = () => {
   };
 };
 
+// ---------------------------------------------------------------- Kali anwenden (Praxis-Strang mit Docker-Zielen)
+views.kalipraxis = () => {
+  const done = (k) => !!state.kalipraxis?.[k];
+  return {
+    html: `<a class="back" href="#/pfad">← Lernen</a>
+    <h1>🧰 Kali anwenden</h1>
+    <p class="muted small">Hier übst du mit den <b>echten Kali-Werkzeugen</b> gegen sichere Übungsziele, die du per Docker auf deinem eigenen Rechner startest. Vom Verstehen zum Können.</p>
+    <div class="card warn small"><b>Nur auf deinem eigenen Rechner.</b> Alle Ziele laufen lokal (127.0.0.1). Scanne oder greife niemals fremde Systeme an – das ist illegal. Diese Ziele sind ausdrücklich zum Üben gebaut.</div>
+    <div class="stack">${KALIPRAXIS.map(m => {
+      const st = m.schritte, n = st.filter(x => done(`${m.id}.${x.id}`)).length;
+      return `<details class="card" open>
+        <summary><b>${m.icon} ${esc(m.titel)}</b> <span class="badge ${n === st.length ? 'ok' : 'plain'}">${n}/${st.length}</span></summary>
+        <div class="bar" style="margin:.5rem 0"><i style="width:${Math.round(n / st.length * 100)}%"></i></div>
+        <p class="small">${esc(m.einleitung)}</p>
+        <div class="card tight"><b>🎯 Ziel starten: <span translate="no">${esc(m.ziel.name)}</span></b>
+          <pre class="syntax" translate="no">${esc(m.ziel.start)}</pre>
+          <p class="small muted">${codeify(m.ziel.hinweis)}</p>
+          <p class="small muted">✅ ${codeify(m.ziel.pruef)}</p>
+        </div>
+        ${st.map((x, i) => { const key = `${m.id}.${x.id}`, ok = done(key);
+          return `<div class="card tight" style="margin-top:.5rem">
+            <div class="row between"><b>${i + 1}. <span translate="no">${esc(x.werkzeug)}</span></b><span class="badge ${ok ? 'ok' : 'plain'}">${ok ? '✓ erledigt' : 'offen'}</span></div>
+            <p class="small">${esc(x.aufgabe)}</p>
+            <pre class="syntax" translate="no">${esc(x.befehl)}</pre>
+            <p class="small muted">Erwartet: ${esc(x.erwartet)}</p>
+            ${ok ? '' : x.frage_art === 'antwort'
+              ? `<label class="small">${esc(x.frage)}</label><div class="row"><input data-kp-in="${esc(key)}" placeholder="Antwort …" autocomplete="off" spellcheck="false" style="max-width:12rem"><button class="btn small" data-kp-check="${esc(key)}">Prüfen</button></div><p class="small muted">💡 ${esc(x.tipp)}</p><p class="small rot" data-kp-fb="${esc(key)}"></p>`
+              : `<button class="btn small" data-kp-hak="${esc(key)}">✓ ${esc(x.frage)}</button>`}
+          </div>`;
+        }).join('')}
+        ${n === st.length ? `<p class="hinweis gruen small" style="margin-top:.6rem">🎉 ${esc(m.abschluss)}</p>` : ''}
+      </details>`;
+    }).join('')}</div>
+    <div class="card"><h3 style="margin-top:0">Als Nächstes in diesem Strang</h3>
+      <ul class="list">${KALIPRAXIS_GEPLANT.map(g => `<li><span class="state">🔜</span><span class="grow"><span class="t">${g.icon} ${esc(g.titel)}</span><span class="s">in Arbeit</span></span></li>`).join('')}</ul></div>
+    <p class="honest">Übe nur in deinem eigenen, abgeschotteten Labor (localhost / eigene VMs). Die Docker-Ziele sind absichtlich verwundbare Trainings-Apps.</p>`,
+    keepScroll: false,
+    mount(root) {
+      const mark = (key) => { state.kalipraxis = state.kalipraxis || {}; state.kalipraxis[key] = Date.now(); markActivity(state); save(); const y = window.scrollY; render(); window.scrollTo(0, y); };
+      root.addEventListener('click', (e) => {
+        const hak = e.target.closest('[data-kp-hak]'); if (hak) { e.preventDefault(); mark(hak.dataset.kpHak); return; }
+        const chk = e.target.closest('[data-kp-check]'); if (!chk) return;
+        e.preventDefault();
+        const key = chk.dataset.kpCheck;
+        const m = KALIPRAXIS.find(mm => mm.schritte.some(s => `${mm.id}.${s.id}` === key));
+        const step = m && m.schritte.find(s => `${m.id}.${s.id}` === key);
+        if (!step) return;
+        const inp = root.querySelector(`[data-kp-in="${key}"]`), fb = root.querySelector(`[data-kp-fb="${key}"]`);
+        const val = (inp?.value || '').trim().toLowerCase().replace(/^\//, '');
+        const ok = (step.antwort || []).some(a => a.toLowerCase().replace(/^\//, '') === val);
+        if (ok) mark(key); else if (fb) fb.textContent = 'Noch nicht ganz – schau in die Ausgabe und probier es nochmal.';
+      });
+    },
+  };
+};
+
 // ---------------------------------------------------------------- Labs vom Handy (Variante A: Tailscale + SSH in die Kali-VM)
 views['handy-labs'] = () => {
   const ip = state.settings.tsip || '';
@@ -1129,6 +1190,7 @@ views.mehr = () => {
         <p class="small muted" style="margin-bottom:0">Englisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
       <div class="card"><h3 class="gruppe" style="margin-top:0">📚 Lernen & Üben</h3><ul class="list">
         <li><a href="#/lernpfad"><span class="state">📚</span><span class="grow"><span class="t">Lernpfad</span><span class="s">Geführt lernen: Theorie, Beispiel, eigene Übung – Stufe für Stufe</span></span></a></li>
+        <li><a href="#/kalipraxis"><span class="state">🧰</span><span class="grow"><span class="t">Kali anwenden – Praxis</span><span class="s">Echte Kali-Werkzeuge gegen lokale Docker-Ziele</span></span></a></li>
         ${(globalThis.KLY_CONFIG || {}).arenaUrl ? `<li><a href="${esc(KLY_CONFIG.arenaUrl)}" target="_blank" rel="noopener"><span class="state">🖥️</span><span class="grow"><span class="t">Arena – Online-Labs</span><span class="s">Echte Übungs-Server im Browser: 🔴 Rot (Angriff), 🔵 Blau (Verteidigung), 🟣 Lila (beides)</span></span></a></li>` : ''}
         <li><a href="#/extern"><span class="state">🌍</span><span class="grow"><span class="t">Externe Lernpfade</span><span class="s">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF – zum Abhaken</span></span></a></li>
         <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen (freiwillig)</span><span class="s">Meisterprüfung Linux</span></span></a></li>
