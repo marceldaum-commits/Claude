@@ -278,7 +278,11 @@
 
   function oeffnen(ablauf, titel) {
     $('#start').hidden = true; $('#termbox').hidden = false; $('#ende').hidden = false; $('#info').textContent = titel;
-    term.open($('#term')); resize(); term.focus();
+    term.open($('#term'));
+    // Zentrale Terminal-Härtung (gilt für ALLE Arena-Räume): Handy-Autokorrektur/Groß­schreibung/Vorschläge aus,
+    // sonst wird aus „cat ~/auftrag.txt" schnell „cat ~/Auftrag.tut" und der Cursor springt.
+    { const ta = term.textarea; if (ta) { ta.setAttribute('autocapitalize', 'none'); ta.setAttribute('autocorrect', 'off'); ta.setAttribute('autocomplete', 'off'); ta.setAttribute('spellcheck', 'false'); ta.setAttribute('inputmode', 'text'); ta.setAttribute('enterkeyhint', 'send'); ta.setAttribute('data-gramm', 'false'); } }
+    resize(); term.focus();
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
     ws = new WebSocket(`${proto}://${location.host}${location.pathname.replace(/[^/]*$/, '')}api/term/${id}`);
     ws.onopen = resize;
