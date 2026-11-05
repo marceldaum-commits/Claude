@@ -118,6 +118,18 @@ export function mountTerminal(container, shell, opts = {}) {
 
   out.addEventListener('click', () => { if (!window.getSelection().toString()) input.focus({ preventScroll: true }); });
 
+  // Eingabe + Sondertasten über der Handy-Tastatur halten (wie im Arena-Terminal):
+  // Bei eingeblendeter Tastatur schrumpft der sichtbare Bereich (visualViewport). Verdeckt er
+  // die Tastenreihe, scrollen wir die Seite so weit, dass Eingabe und Tasten sichtbar bleiben.
+  const keysEl = el.querySelector('.keys');
+  const ueberTastatur = () => {
+    const vv = window.visualViewport; if (!vv || !keysEl) return;
+    const diff = keysEl.getBoundingClientRect().bottom - (vv.offsetTop + vv.height);
+    if (diff > 0) window.scrollBy(0, Math.ceil(diff) + 8);
+  };
+  input.addEventListener('focus', () => setTimeout(ueberTastatur, 300));
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', () => { if (document.activeElement === input) setTimeout(ueberTastatur, 50); });
+
   setPrompt();
   if (opts.welcome) print(opts.welcome, 'sys');
 
