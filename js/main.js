@@ -255,13 +255,7 @@ views.heute = () => {
 
       <a class="card" href="#/pfad" style="display:block;text-decoration:none;color:inherit"><b>${U('Alles ansehen →')}</b><br><span class="small muted">${U('Alle Wargames, Räume und Level bis zum eJPT')}</span></a>
 
-      <details class="card">
-        <summary><b>${U('Außerhalb der App weitertrainieren')}</b></summary>
-        <ul class="list" style="margin-top:.4rem">
-          ${EXTERNAL.map(x => `<li><a href="${x.url}" target="_blank" rel="noopener noreferrer"><span class="state">↗</span><span class="grow"><span class="t" translate="no">${esc(x.name)}</span><span class="s">${U(x.why)}</span></span><span class="badge ${x.free ? 'ok' : 'plain'}">${x.free ? U('gratis') : U('teils gratis')}</span></a></li>`).join('')}
-        </ul>
-        <p class="small muted">${U('Alles legale Übungsumgebungen. Hacke nur Ziele, die dir gehören oder für die du ausdrücklich eine Erlaubnis hast.')}</p>
-      </details>
+      <p class="small muted" style="margin-top:.8rem">${U('Später, als Ergänzung:')} <a href="#/extern">${U('externe Übungsplattformen')} →</a></p>
     </section>`,
   };
 };
@@ -288,10 +282,6 @@ views.pfad = () => {
   return {
     html: `<h1>Lernen</h1>
     <p class="muted small">Vom Linux-Anfänger bis zum eJPT. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
-    <a class="card lime" href="#/extern" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
-      <b>🌍 Externe Lernpfade</b> <span class="badge plain">${Object.keys(state.extern || {}).length} abgehakt</span><br>
-      <span class="small muted">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF, Metasploitable – hier lernst du das Ausnutzen, legal. Mit Checklisten.</span>
-    </a>
     <h2 style="margin-top:1rem">🎮 Leitern</h2>
     <p class="small muted">Rätsel-Ketten mit Story: Jede Lösung öffnet die nächste Stufe. Fang oben an und arbeite dich hoch.</p>
     ${[['linux', '🐧 Linux-Leitern', ['Einstieg', 'mittel', 'Skripte', 'schwerer', 'schwer']], ['hacking', '🏴 Hacking-Leitern (CTF)', ['leicht', 'mittel', 'schwer']], ['purple', '🟣 Purple-Team-Leitern (prüfen, finden, absichern)', ['Level 5', 'Level 6', 'Level 7', 'Level 8', 'Level 10']], ['kali', '🖥️ In deiner Kali-VM', ['echtes SSH']]].filter(([tr]) => ROOMS.some(r => r.track === tr && visible(r))).map(([tr, title, order]) => `
@@ -312,7 +302,8 @@ views.pfad = () => {
       ${ROOMS.filter(needsKali).map(roomCard).join('')}</details>` : ''}
     ${later.length ? `<h2 style="margin-top:1.2rem">Demnächst</h2>
     <p class="small muted">Für diese Level gibt es noch keine eigenen Räume – aber einen Lernpfad mit kostenlosen Übungsquellen.</p>
-    <ul class="list card">${later.map(l => `<li><a href="#/level/${l.id}"><span class="state">${l.n}</span><span class="grow"><span class="t">${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span>${PFADE[l.id] ? '<span class="badge plain">Lernpfad</span>' : ''}</a></li>`).join('')}</ul>` : ''}`,
+    <ul class="list card">${later.map(l => `<li><a href="#/level/${l.id}"><span class="state">${l.n}</span><span class="grow"><span class="t">${esc(l.title)}</span><span class="s">${esc(l.goal)}</span></span>${PFADE[l.id] ? '<span class="badge plain">Lernpfad</span>' : ''}</a></li>`).join('')}</ul>` : ''}
+    <p class="small muted" style="margin-top:1.4rem">${U('Ergänzend, wenn du mehr üben willst:')} <a href="#/extern">${U('externe Übungsplattformen')} →</a></p>`,
   };
 };
 views.raeume = views.pfad;
