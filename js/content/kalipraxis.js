@@ -242,10 +242,45 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'Ausbruch geschafft: Ein in den Container eingehängter Docker-Socket (oder --privileged) ist faktisch Root auf dem ganzen Host – ein sehr häufiger echter Fehler (CI-Runner, Monitoring-Agenten). Schutz: Socket niemals einhängen, rootless-Docker nutzen oder einen Socket-Proxy mit Positivliste davorschalten (genau das macht übrigens unser „Docker-Wächter" in der Arena).',
   },
+  {
+    id: 'wlan', icon: '📡', titel: 'WLAN in echt: WPA-Handshake knacken', stufe: 'Aufbau', team: 'Rot',
+    einleitung: 'WLAN-Passwörter knackt man in zwei Schritten: Beim Verbinden eines Geräts schneidet man den „Handshake" mit, dann probiert man ihn offline mit einem Wörterbuch durch. Das Mitschneiden braucht spezielle WLAN-Hardware und darf NUR im eigenen Netz passieren. Den entscheidenden Teil – das Knacken – übst du hier an einem offiziellen Beispiel-Mitschnitt von aircrack-ng. Kein fremdes Netz, keine Spezial-Hardware.',
+    ziel: {
+      name: 'aircrack-ng Beispiel-Handshake (WLAN „test")',
+      start: 'curl -L -O https://github.com/aircrack-ng/aircrack-ng/raw/master/test/wpa.cap\ncurl -L -O https://github.com/aircrack-ng/aircrack-ng/raw/master/test/password.lst',
+      hinweis: 'Das ist der offizielle Test-Mitschnitt des aircrack-ng-Projekts – völlig legal, kein echtes fremdes Netz. Fremde WLANs mitzuschneiden/zu knacken ist strafbar; übe nur am eigenen.',
+      pruef: 'Beide Dateien da: `ls -l wpa.cap password.lst`.',
+    },
+    schritte: [
+      {
+        id: 'netz', werkzeug: 'aircrack-ng', frage_art: 'antwort',
+        aufgabe: 'Schau zuerst, welches WLAN im Mitschnitt steckt und ob ein Handshake enthalten ist.',
+        befehl: 'aircrack-ng wpa.cap',
+        erwartet: 'aircrack-ng listet ein Netz mit „WPA (1 handshake)" auf.',
+        frage: 'Wie heißt das WLAN (ESSID) im Mitschnitt?', antwort: ['test'], tipp: 'Steht in der Liste in der Spalte ESSID.',
+      },
+      {
+        id: 'crack', werkzeug: 'aircrack-ng', frage_art: 'antwort',
+        aufgabe: 'Knacke das WLAN-Passwort offline mit dem Wörterbuch. Falls nach der Netz-Nummer gefragt wird: „1" eingeben und Enter.',
+        befehl: 'aircrack-ng -w password.lst wpa.cap',
+        erwartet: 'Am Ende erscheint „KEY FOUND! [ ... ]".',
+        frage: 'Wie lautet das gefundene WLAN-Passwort?', antwort: ['biscotte'], tipp: 'Steht hinter „KEY FOUND!". Ein französisches Wort (ein Keks).',
+      },
+      {
+        id: 'lehre', werkzeug: 'Einordnung', frage_art: 'abhaken',
+        aufgabe: 'Begreife, warum das klappte: „biscotte" stand im Wörterbuch. Ein Wörterbuch-Angriff probiert nur bekannte Wörter – ein langes, zufälliges WLAN-Passwort steht in keiner Liste und bleibt praktisch unknackbar.',
+        befehl: '# Merksatz: WLAN-Passwort = lang + zufaellig, WPA2/WPA3, kein Woerterbuch-Wort.',
+        erwartet: 'Dir ist klar: Nur schwache (erratbare) Passwörter fallen beim Wörterbuch-Angriff.',
+        frage: 'Verstanden, warum nur schwache WLAN-Passwörter fallen?', tipp: 'Starkes Passwort = der beste WLAN-Schutz.',
+      },
+    ],
+    abschluss: 'So läuft WLAN-Knacken wirklich: Handshake mitschneiden (nur im eigenen Netz, mit passender Hardware) → offline mit Wörterbuch knacken. Den Knack-Teil hast du an einem offiziellen Beispiel geübt. Schutz: ein langes, zufälliges WPA2/WPA3-Passwort – dann läuft jeder Wörterbuch-Angriff ins Leere.',
+  },
 ];
 
 // Noch geplante Module dieses Strangs (werden nach und nach gebaut).
 export const KALIPRAXIS_GEPLANT = [
-  { icon: '📡', titel: 'WLAN in echt: WPA-Handshake offline knacken (aircrack-ng)' },
   { icon: '🪟', titel: 'Windows & Active Directory (eigenes Mini-Labor)' },
+  { icon: '📱', titel: 'Android-App in echt: APK auseinandernehmen' },
+  { icon: '🔌', titel: 'APIs angreifen: kaputte Authentifizierung & BOLA' },
 ];
