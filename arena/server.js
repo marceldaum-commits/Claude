@@ -311,6 +311,48 @@ async function endSession(id, why) {
 }
 
 // Aufräumen: abgelaufene/leerlaufende Sitzungen und verwaiste Container (z. B. nach Neustart des Dienstes)
+// ---- Selbsttest: startet jedes Lab-Image kurz und prüft den „…bereit"-Marker (findet kaputte Räume) ----
+let gesundheit = { zeit: null, hinweis: 'Selbsttest läuft nach dem Start einmal und danach täglich.' };
+let selbsttestLaeuft = false;
+async function pruefeImage(id, L) {
+  if (vorhanden[id] === false) return { id, titel: L.title, ok: false, grund: 'Image nicht gebaut' };
+  let c;
+  try {
+    c = await docker.createContainer({
+      Image: L.image, name: `kly-selbsttest-${id}-${randomBytes(4).toString('hex')}`,
+      Env: ['KLY_TOKEN=KLY-ABCDEF'], Hostname: 'test', Labels: { 'kly.selbsttest': '1' },
+      HostConfig: {
+        NetworkMode: 'none', Memory: CFG.memMb * 1024 * 1024, MemorySwap: CFG.memMb * 1024 * 1024,
+        NanoCpus: Math.round(CFG.cpus * 1e9), PidsLimit: CFG.pids, CapDrop: ['ALL'],
+        CapAdd: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'AUDIT_WRITE', 'SYS_CHROOT', 'NET_BIND_SERVICE'],
+        SecurityOpt: ['no-new-privileges'], AutoRemove: false,
+        Tmpfs: { '/tmp': 'rw,noexec,nosuid,size=16m', '/var/tmp': 'rw,nosuid,size=16m', '/run/lock': 'rw,noexec,nosuid,size=1m', '/home': 'rw,exec,nosuid,size=48m,mode=755', ...(L.tmpfs || {}) },
+      },
+    });
+    await c.start();
+    await waitReady(c, L.ready, 30000);
+    return { id, titel: L.title, ok: true };
+  } catch (e) {
+    return { id, titel: L.title, ok: false, grund: String(e.message || e).slice(0, 200) };
+  } finally {
+    if (c) { try { await c.remove({ force: true }); } catch { /* */ } }
+  }
+}
+async function selbsttest() {
+  if (selbsttestLaeuft) return; selbsttestLaeuft = true;
+  const raeume = [];
+  try {
+    for (const [id, L] of Object.entries(LABS)) {
+      let warte = 0; while (sessions.size >= CFG.maxTotal - 1 && warte < 120) { await new Promise(r => setTimeout(r, 5000)); warte++; }
+      raeume.push(await pruefeImage(id, L));
+    }
+    const defekt = raeume.filter(r => !r.ok);
+    gesundheit = { zeit: new Date().toISOString(), gesamt: raeume.length, ok: raeume.length - defekt.length, defekt: defekt.length, raeume };
+    log('selbsttest', defekt.length ? `${defekt.length} defekt: ${defekt.map(d => d.id).join(', ')}` : `alle ${raeume.length} ok`);
+  } catch (e) { log('selbsttest', e.message); }
+  finally { selbsttestLaeuft = false; }
+}
+
 async function reap() {
   const now = Date.now();
   for (const s of sessions.values()) {
@@ -333,6 +375,7 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
     if (req.method === 'GET' && url.pathname === '/api/status') return json(res, 200, { ok: true, labs: Object.keys(LABS), frei: CFG.maxTotal - sessions.size, offen: CFG.konto, konto: CFG.konto ? { url: CFG.kontoUrl, key: CFG.kontoKey, app: CFG.appOrigin } : null });
     if (req.method === 'GET' && url.pathname === '/api/labs') return json(res, 200, { labs: labOeffentlich() });
+    if (req.method === 'GET' && url.pathname === '/api/gesundheit') return json(res, 200, gesundheit);
     if (req.method === 'GET' && url.pathname === '/api/zugang') {
       const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
       if (!bearer) return json(res, 401, { fehler: 'Bitte anmelden.' });
@@ -416,4 +459,7 @@ async function attach(ws, s) {
 process.on('SIGTERM', async () => { for (const id of [...sessions.keys()]) await endSession(id, 'Dienst stoppt'); process.exit(0); });
 reap().catch(() => {});
 imagesPruefen().catch(() => {}); setInterval(() => imagesPruefen().catch(() => {}), 300000).unref();
+// Selbsttest: 15 Min nach dem Start (so laufen schnelle Deploy-Neustarts nicht jedes Mal rein), danach täglich.
+setTimeout(() => selbsttest().catch(() => {}), 900000);
+setInterval(() => selbsttest().catch(() => {}), 24 * 3600 * 1000).unref();
 server.listen(CFG.port, CFG.host, () => log(`Arena lauscht auf ${CFG.host}:${CFG.port} · Labs: ${Object.keys(LABS).join(', ')} · Konto ${CFG.konto ? 'an' : 'aus'}`));
