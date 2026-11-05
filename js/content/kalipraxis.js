@@ -426,10 +426,75 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'Das ist BOLA (Broken Object Level Authorization) – die Nummer 1 der API-Lücken: Daten werden nach ID herausgegeben, ohne die Besitzrechte zu prüfen. Schutz: Der Server muss bei JEDER Anfrage prüfen, ob der angemeldete Nutzer genau auf dieses Objekt zugreifen darf – niemals nur auf die ID vertrauen.',
   },
+  {
+    id: 'cloud', icon: '☁️', titel: 'Cloud in echt: offener S3-Bucket', stufe: 'Aufbau', team: 'Rot',
+    einleitung: 'Unzählige Datenlecks entstehen durch falsch konfigurierte Cloud-Speicher („S3-Buckets"), die versehentlich öffentlich sind – jeder kann die Dateien herunterladen, ganz ohne Login. Du übst das mit den echten AWS-Befehlen, aber gegen einen lokalen AWS-Nachbau (LocalStack): kein AWS-Konto, keine Kosten, völlig legal.',
+    ziel: {
+      name: 'LocalStack (lokaler AWS-Nachbau, Docker)',
+      start: '# Lokalen AWS-Nachbau starten (eigenes Fenster, offen lassen):\ndocker run --rm -p 4566:4566 localstack/localstack',
+      hinweis: 'LocalStack ahmt AWS lokal nach – echte aws-Befehle, kein Konto, keine Kosten. Im ZWEITEN Terminal weiterarbeiten. aws-CLI nötig (Kali: sudo apt install awscli).',
+      pruef: 'Zweites Terminal: `curl http://localhost:4566/_localstack/health` antwortet mit JSON.',
+    },
+    schritte: [
+      {
+        id: 'setup', werkzeug: 'aws s3', frage_art: 'abhaken',
+        aufgabe: 'Spiele die „Firma": Lege mit Dummy-Zugangsdaten einen Bucket an und lade versehentlich eine sensible Datei hoch.',
+        befehl: 'export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1\necho \'GEHEIM{offener_bucket}\' > kundenliste.txt\naws --endpoint-url=http://localhost:4566 s3 mb s3://firma-backups\naws --endpoint-url=http://localhost:4566 s3 cp kundenliste.txt s3://firma-backups/',
+        erwartet: 'Bucket „firma-backups" wird angelegt, Datei hochgeladen.',
+        frage: 'Bucket angelegt und Datei hochgeladen?', tipp: 'make-bucket (mb) + copy (cp) – die aws-Grundbefehle.',
+      },
+      {
+        id: 'list', werkzeug: 'aws s3 (ohne Login)', frage_art: 'abhaken',
+        aufgabe: 'Jetzt der Angreifer: OHNE Zugangsdaten den Bucket durchstöbern. „--no-sign-request" heißt „anonym, ohne Anmeldung".',
+        befehl: 'aws --endpoint-url=http://localhost:4566 s3 ls s3://firma-backups --no-sign-request',
+        erwartet: 'Du siehst „kundenliste.txt" – ganz ohne Login.',
+        frage: 'Bucket-Inhalt ohne Login aufgelistet?', tipp: 'Genau das ist die Lücke: öffentlich lesbar.',
+      },
+      {
+        id: 'get', werkzeug: 'aws s3 (ohne Login)', frage_art: 'antwort',
+        aufgabe: 'Lade die fremde Datei anonym herunter und lies sie direkt aus.',
+        befehl: 'aws --endpoint-url=http://localhost:4566 s3 cp s3://firma-backups/kundenliste.txt - --no-sign-request',
+        erwartet: 'Der Inhalt der Datei erscheint im Terminal.',
+        frage: 'Wie lautet der Inhalt der Datei?', antwort: ['GEHEIM{offener_bucket}', 'offener_bucket'], tipp: 'Das „-" am Ende gibt den Inhalt direkt aus.',
+      },
+    ],
+    abschluss: 'Offene S3-Buckets sind eine der häufigsten Cloud-Lücken: ohne Login auflisten (s3 ls --no-sign-request) und herunterladen. In echt finden Angreifer sie durch Namen-Raten und öffentliche Listen. Schutz: „Block Public Access" an, strikte Bucket-Policies, nichts Sensibles öffentlich speichern.',
+  },
+  {
+    id: 'osint', icon: '🕵️', titel: 'OSINT: welche Spuren du im Netz hinterlässt', stufe: 'Einstieg', team: 'Rot',
+    einleitung: 'OSINT (Open Source Intelligence) heißt: ein Ziel allein mit öffentlich zugänglichen Infos ausleuchten – ganz ohne „Hacken". Fast jeder echte Angriff startet damit. Du lernst die wichtigsten Handgriffe – und siehst, welche Spuren DU selbst hinterlässt und wie du sie entfernst. Wichtig: nur bei dir selbst oder mit Erlaubnis – fremde Menschen auszuspähen ist tabu und strafbar.',
+    ziel: {
+      name: 'exiftool + Suchmaschinen (dein eigener Rechner)',
+      start: '# Kein Server noetig. Du brauchst exiftool (in Kali dabei; sonst: sudo apt install libimage-exiftool-perl)\n# und ein eigenes Foto vom Handy (z. B. mein_foto.jpg).',
+      hinweis: 'Alles legal, nur mit eigenen Daten oder ausdrücklicher Erlaubnis.',
+      pruef: '`exiftool -ver` zeigt eine Versionsnummer.',
+    },
+    schritte: [
+      {
+        id: 'exif', werkzeug: 'exiftool', frage_art: 'abhaken',
+        aufgabe: 'Schau, was ein ganz normales Foto über dich verrät: Kamera, genaues Datum – und bei Handyfotos oft den GPS-Aufnahmeort.',
+        befehl: 'exiftool mein_foto.jpg',
+        erwartet: 'Du siehst Kamera-/Handymodell, Datum und evtl. GPS-Koordinaten.',
+        frage: 'Metadaten in einem eigenen Foto gesehen?', tipp: 'GPS-Koordinaten in eine Karte kopieren → exakter Aufnahmeort.',
+      },
+      {
+        id: 'dork', werkzeug: 'Such-Operatoren', frage_art: 'abhaken',
+        aufgabe: 'Gezielt suchen statt blättern („Google Dorking"): mit Operatoren findest du Dokumente und offene Verzeichnisse, die niemand verlinkt hat.',
+        befehl: '# Im Browser, Beispiele:\nsite:deine-domain.de filetype:pdf\nintitle:"index of" "backup"',
+        erwartet: 'Die Suche liefert gezielt bestimmte Dateitypen/Seiten.',
+        frage: 'Einen gezielten Such-Operator (Dork) ausprobiert?', tipp: 'Nur zu Übungszwecken und auf eigenen/erlaubten Zielen.',
+      },
+      {
+        id: 'clean', werkzeug: 'exiftool (Schutz)', frage_art: 'abhaken',
+        aufgabe: 'Jetzt die Verteidigung: Entferne alle Metadaten aus einer Datei, bevor du sie teilst.',
+        befehl: 'exiftool -all= -overwrite_original mein_foto.jpg\nexiftool mein_foto.jpg   # zur Kontrolle: jetzt ist fast nichts mehr drin',
+        erwartet: 'Nach dem Befehl sind Kamera/GPS/Autor aus der Datei verschwunden.',
+        frage: 'Metadaten aus einer Datei entfernt (so schützt du dich)?', tipp: 'Angewohnheit: Fotos/Dokumente vor dem Teilen „säubern".',
+      },
+    ],
+    abschluss: 'OSINT ist der erste Schritt echter Angriffe – und dein bester Schutz ist zu wissen, was über dich auffindbar ist. Lehre: Fotos/Dokumente vor dem Teilen von Metadaten befreien (exiftool -all=), sparsam posten und ab und zu den eigenen Namen/E-Mail selbst suchen. Üben nur bei dir selbst oder mit Erlaubnis.',
+  },
 ];
 
-// Noch geplante Module dieses Strangs (werden nach und nach gebaut).
-export const KALIPRAXIS_GEPLANT = [
-  { icon: '☁️', titel: 'Cloud (AWS/S3): offene Buckets & Fehlkonfigurationen' },
-  { icon: '🕵️', titel: 'OSINT: öffentliche Spuren über ein Ziel sammeln' },
-];
+// Der Strang ist aktuell vollständig ausgebaut. Neue Ideen kommen hier rein.
+export const KALIPRAXIS_GEPLANT = [];

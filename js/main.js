@@ -1148,8 +1148,8 @@ views.kalipraxis = () => {
         ${n === st.length ? `<p class="hinweis gruen small" style="margin-top:.6rem">🎉 ${esc(m.abschluss)}</p>` : ''}
       </details>`;
     }).join('')}</div>
-    <div class="card"><h3 style="margin-top:0">Als Nächstes in diesem Strang</h3>
-      <ul class="list">${KALIPRAXIS_GEPLANT.map(g => `<li><span class="state">🔜</span><span class="grow"><span class="t">${g.icon} ${esc(g.titel)}</span><span class="s">in Arbeit</span></span></li>`).join('')}</ul></div>
+    ${KALIPRAXIS_GEPLANT.length ? `<div class="card"><h3 style="margin-top:0">Als Nächstes in diesem Strang</h3>
+      <ul class="list">${KALIPRAXIS_GEPLANT.map(g => `<li><span class="state">🔜</span><span class="grow"><span class="t">${g.icon} ${esc(g.titel)}</span><span class="s">in Arbeit</span></span></li>`).join('')}</ul></div>` : ''}
     <p class="honest">Übe nur in deinem eigenen, abgeschotteten Labor (localhost / eigene VMs). Die Docker-Ziele sind absichtlich verwundbare Trainings-Apps.</p>`,
     keepScroll: false,
     mount(root) {
