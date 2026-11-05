@@ -254,7 +254,7 @@
   }).catch(() => { $('#anmelden').hidden = false; $('#lmsg').textContent = 'Arena nicht erreichbar – bitte später noch einmal versuchen.'; });
 
   // ---------------------------------------------------------------- Lab
-  let ws = null, id = null, timer = null;
+  let ws = null, id = null, timer = null, schluessel = null;
   const term = new window.Terminal({ cursorBlink: true, fontSize: window.innerWidth < 600 ? 13 : 15, fontFamily: 'ui-monospace, Menlo, Consolas, monospace', theme: { background: '#0b0b12', foreground: '#e9e9f2', cursor: '#b6f23c' }, scrollback: 3000 });
   const fit = new window.FitAddon.FitAddon();
   term.loadAddon(fit);
@@ -281,7 +281,7 @@
       const j = await r.json();
       if (r.status === 401) { speichern(null); $('#start').hidden = true; $('#anmelden').hidden = false; $('#lmsg').textContent = j.fehler || 'Bitte neu anmelden.'; return; }
       if (!r.ok) throw new Error(j.fehler || 'Fehler');
-      id = j.id; oeffnen(j.ablauf, LABS.find(x => x.id === lab)?.titel || 'Lab');
+      id = j.id; schluessel = j.schluessel || ''; oeffnen(j.ablauf, LABS.find(x => x.id === lab)?.titel || 'Lab');
     } catch (e) { $('#msg').textContent = e.message; knopf.disabled = false; }
   }
 
@@ -293,7 +293,7 @@
     { const ta = term.textarea; if (ta) { ta.setAttribute('autocapitalize', 'none'); ta.setAttribute('autocorrect', 'off'); ta.setAttribute('autocomplete', 'off'); ta.setAttribute('spellcheck', 'false'); ta.setAttribute('inputmode', 'text'); ta.setAttribute('enterkeyhint', 'send'); ta.setAttribute('data-gramm', 'false'); } }
     resize(); fitViewport(); const cb = $('#cmd'); if (cb) { cb.addEventListener('focus', () => setTimeout(fitViewport, 100)); cb.addEventListener('blur', () => { $('#termbox').style.bottom = ''; setTimeout(resize, 100); }); cb.focus(); } else term.focus();
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    ws = new WebSocket(`${proto}://${location.host}${location.pathname.replace(/[^/]*$/, '')}api/term/${id}`);
+    ws = new WebSocket(`${proto}://${location.host}${location.pathname.replace(/[^/]*$/, '')}api/term/${id}?k=${encodeURIComponent(schluessel)}`);
     ws.onopen = resize;
     ws.onmessage = (e) => term.write(e.data);
     ws.onclose = () => { term.write('\r\n\x1b[33m[Verbindung beendet – „Beenden“ führt zurück zur Übersicht]\x1b[0m\r\n'); clearInterval(timer); };
@@ -306,5 +306,5 @@
   document.querySelectorAll('#keys button').forEach(b => b.onclick = () => { send(b.dataset.s ?? KEYS[b.dataset.k]); term.focus(); });
   // Stabile Befehlszeile (Handy): ganze Zeile + Enter senden – umgeht die Autokorrektur/Komposition von xterm.
   $('#cmdbar').onsubmit = (e) => { e.preventDefault(); const i = $('#cmd'); const v = i.value; i.value = ''; if (v !== '') send(v + '\r'); i.focus(); };
-  $('#ende').onclick = async () => { if (id) await fetch(`api/session/${id}`, { method: 'DELETE' }).catch(() => {}); location.href = location.pathname; };
+  $('#ende').onclick = async () => { if (id) await fetch(`api/session/${id}?k=${encodeURIComponent(schluessel || '')}`, { method: 'DELETE' }).catch(() => {}); location.href = location.pathname; };
 })();

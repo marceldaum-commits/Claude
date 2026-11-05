@@ -182,6 +182,8 @@ function darf(k, lab) {
 // niemand außerhalb des Servers kann Codes ausrechnen. Geprüft wird nur hier (über die Edge Function arena-code).
 const salz = (userId, lab) => createHmac('sha256', CFG.geheimnis).update(`nachtfalter-arena:${userId}:${lab}`).digest('hex').slice(0, 32);
 const labCode = (s, praefix, n) => `KLY{${createHash('sha256').update(`${s}:${praefix}:l${n}`).digest('hex').slice(0, 16)}}`;
+// Konstant-Zeit-Vergleich zweier Strings (fuer das pro-Sitzung-Geheimnis, bindet Terminal/DELETE ans Konto).
+const gleich = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
 function codeLevel(userId, lab, code) {
   const L = LABS[lab], s = salz(userId, lab), c = Buffer.from(String(code));
   for (let n = 1; n <= L.levels; n++) { const soll = Buffer.from(labCode(s, L.praefix, n)); if (soll.length === c.length && timingSafeEqual(soll, c)) return n; }
@@ -268,8 +270,9 @@ async function createSession(lab, token, ip, userId = null, sprache = 'de') {
   if (userId && [...sessions.values()].filter(s => s.userId === userId).length >= CFG.maxPerUser) throw Object.assign(new Error('Du hast schon zu viele Labs offen. Schließe erst eins.'), { status: 429 });
 
   const id = randomBytes(16).toString('hex');
+  const schluessel = randomBytes(24).toString('hex'); // pro Sitzung geheim; nur der Ersteller bekommt ihn -> bindet Terminal/DELETE ans Konto
   // Platz sofort (vor dem ersten await) reservieren, damit parallele Anfragen die Grenzen nicht umgehen
-  sessions.set(id, { id, lab, containerId: null, ip, userId, created: Date.now(), lastSeen: Date.now(), token, sprache, startet: true });
+  sessions.set(id, { id, lab, containerId: null, ip, userId, created: Date.now(), lastSeen: Date.now(), token, sprache, schluessel, startet: true });
   try {
   const container = await docker.createContainer({
     Image: L.image,
@@ -297,7 +300,7 @@ async function createSession(lab, token, ip, userId = null, sprache = 'de') {
   await container.start();
   try { await waitReady(container, L.ready); }
   catch (e) { await container.remove({ force: true }).catch(() => {}); throw e; }
-  const s = { id, lab, containerId: container.id, ip, userId, created: Date.now(), lastSeen: Date.now(), token, sprache };
+  const s = { id, lab, containerId: container.id, ip, userId, created: Date.now(), lastSeen: Date.now(), token, sprache, schluessel };
   sessions.set(id, s);
   log('start', lab, id.slice(0, 8), ip);
   return s;
@@ -439,7 +442,7 @@ const server = http.createServer(async (req, res) => {
         }
         userId = k.userId;
       } else return json(res, 401, { fehler: 'Bitte mit deinem Nachtfalter-Konto anmelden.' }); // alter Einladungscode abgeschaltet (umging die Zugangsprüfung)
-      try { const s = await createSession(String(body.lab || ''), String(body.token || ''), ip, userId, String(body.sprache || 'de')); return json(res, 200, { id: s.id, ablauf: s.created + CFG.ttlMin * 60000 }); }
+      try { const s = await createSession(String(body.lab || ''), String(body.token || ''), ip, userId, String(body.sprache || 'de')); return json(res, 200, { id: s.id, schluessel: s.schluessel, ablauf: s.created + CFG.ttlMin * 60000 }); }
       catch (e) { log('fehler', e.message); return json(res, e.status || 500, { fehler: e.status ? e.message : 'Lab konnte nicht gestartet werden.' }); }
     }
     // Code prüfen – wird von der Edge Function „arena-code“ aufgerufen (die kennt das Konto aus der Anmeldung).
@@ -452,7 +455,12 @@ const server = http.createServer(async (req, res) => {
       if (!istLab(lab) || !/^[0-9a-f-]{36}$/.test(uid) || !/^KLY\{[0-9a-f]{16}\}$/.test(code)) return json(res, 200, { level: 0 });
       return json(res, 200, { level: codeLevel(uid, lab, code) });
     }
-    if (req.method === 'DELETE' && url.pathname.startsWith('/api/session/')) { await endSession(url.pathname.split('/').pop(), 'beendet'); return json(res, 200, { ok: true }); }
+    if (req.method === 'DELETE' && url.pathname.startsWith('/api/session/')) {
+      const sid = url.pathname.split('/').pop();
+      const s = /^[0-9a-f]{32}$/.test(sid) ? sessions.get(sid) : null;
+      if (!s || !gleich(url.searchParams.get('k') || '', s.schluessel)) return json(res, 403, { fehler: 'Nicht erlaubt' });
+      await endSession(sid, 'beendet'); return json(res, 200, { ok: true });
+    }
     if (req.method === 'GET') {
       const p = url.pathname === '/' ? '/index.html' : url.pathname;
       if (!/^\/[a-z0-9._-]+$/i.test(p)) { res.writeHead(404); return res.end(); }
@@ -468,12 +476,16 @@ const server = http.createServer(async (req, res) => {
 // Terminal: /api/term/<id> – verbindet WebSocket mit einer TTY im Container
 const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
 server.on('upgrade', (req, socket, head) => {
-  const m = req.url.match(/^\/api\/term\/([0-9a-f]{32})$/);
+  let u; try { u = new URL(req.url, 'http://x'); } catch { socket.destroy(); return; }
+  const m = u.pathname.match(/^\/api\/term\/([0-9a-f]{32})$/);
   const s = m && sessions.get(m[1]);
   if (!s || s.startet) { socket.destroy(); return; }
+  // Nur wer das pro-Sitzung-Geheimnis hat (bekam nur der Ersteller), darf das Terminal verbinden.
+  if (!gleich(u.searchParams.get('k') || '', s.schluessel)) { log('ws', 'falscher Schluessel'); socket.destroy(); return; }
+  // Herkunft hart verlangen (leerer/fremder Origin wird abgelehnt – Browser senden bei WS immer einen Origin).
   const origin = String(req.headers.origin || '');
   const erlaubt = [CFG.origin, `https://${req.headers.host}`, `http://${req.headers.host}`];
-  if (origin && !erlaubt.includes(origin)) { log('ws', 'fremde Herkunft', origin); socket.destroy(); return; }
+  if (!origin || !erlaubt.includes(origin)) { log('ws', 'fremde/fehlende Herkunft', origin); socket.destroy(); return; }
   wss.handleUpgrade(req, socket, head, (ws) => attach(ws, s));
 });
 
