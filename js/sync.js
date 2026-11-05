@@ -88,10 +88,20 @@ export async function arenaFortschritt() {
 }
 export async function meldungSenden(payload) {
   const c = await getClient();
-  if (!c) throw new Error('Nicht verbunden – bitte anmelden.');
-  const { data, error } = await c.functions.invoke('melden', { body: payload });
-  if (error) throw new Error(error.message || 'Senden fehlgeschlagen');
-  return data;
+  if (!c) throw new Error('nicht-angemeldet');
+  // Frisches Token sichern (sonst schickt invoke evtl. nur den anonymen Schlüssel → 401).
+  const { data: s } = await c.auth.getSession();
+  let token = s?.session?.access_token;
+  if (!token) throw new Error('nicht-angemeldet');
+  let res = await c.functions.invoke('melden', { body: payload, headers: { Authorization: `Bearer ${token}` } });
+  if (res.error) {
+    // Token evtl. abgelaufen → einmal auffrischen und erneut versuchen.
+    const { data: r } = await c.auth.refreshSession().catch(() => ({ data: null }));
+    token = r?.session?.access_token;
+    if (token) res = await c.functions.invoke('melden', { body: payload, headers: { Authorization: `Bearer ${token}` } });
+  }
+  if (res.error) throw new Error(res.error.message || 'Senden fehlgeschlagen');
+  return res.data;
 }
 export async function meinStatus() {
   if (!user) return null;

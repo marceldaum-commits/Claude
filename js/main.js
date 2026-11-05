@@ -1104,7 +1104,11 @@ views.melden = (vor = '') => {
           fb.className = 'small ok'; fb.textContent = '✓ Danke! Deine Meldung ist angekommen – wir kümmern uns.';
           $('#m-text', root).value = '';
         } catch (e) {
-          fb.className = 'small rot'; fb.textContent = 'Senden klappt gerade nicht. Nutz bitte den Knopf „Stattdessen per E-Mail“.';
+          if (e.message === 'nicht-angemeldet') {
+            fb.className = 'small rot'; fb.textContent = 'Bitte melde dich zuerst an (Konto) – dann kommt deine Meldung direkt bei uns an. Oder nutz den E-Mail-Knopf.';
+          } else {
+            fb.className = 'small rot'; fb.textContent = 'Senden klappt gerade nicht. Nutz bitte den Knopf „Stattdessen per E-Mail“.';
+          }
           const mt = $('#m-mailto', root); mt.href = mailtoFallback(bereich, text); mt.hidden = false;
         }
         btn.disabled = false;
