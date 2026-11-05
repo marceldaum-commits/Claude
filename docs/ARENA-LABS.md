@@ -2,23 +2,23 @@
 
 > Automatisch erzeugt aus `arena/server.js` mit `node tools/arena-uebersicht.mjs`. Nicht von Hand ändern.
 
-Insgesamt **20 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
+Insgesamt **21 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) oder **Profi-Arena-Zugang**.
 
 ## 🗝️ Hacken
 
-| Arena | Stufe | Codes | Zugang | Themen |
-|---|---|---|---|---|
-| **Der Meister: Das Rechenzentrum** | Meister | 6 | Profi | #Pivoting #Exploitation #Netzwerk #Linux |
-| **Der Kellerserver** | Einsteiger | 10 | Arena | #Linux #Rechte #Passwörter |
-| **Die Leitstelle** | Fortgeschritten | 6 | Profi | #Netzwerk #Dienste #Linux |
-| **Der Webshop** | Fortgeschritten | 6 | Profi | #Web #Injection |
-| **Web 1: Das Kleingedruckte** | Fortgeschritten | 6 | Arena | #Web |
-| **Der Chiffrensaal** | Fortgeschritten | 5 | Profi | #Krypto |
-| **Der Tresor** | Experte | 6 | Profi | #Krypto #Web #Linux |
-| **Web 2: Umwege** | Experte | 6 | Profi | #Web #Injection #Netzwerk |
-| **Die Werkstatt** | Experte | 5 | Profi | #Reverse #Binär |
-| **Der Flüsterer** | Experte | 6 | Profi | #KI-Sicherheit #Prompt Injection |
-| **Web 3: Die Kette** | Extrem | 6 | Profi | #Web #Injection |
+| Arena | Team | Stufe | Codes | Zugang | Themen |
+|---|---|---|---|---|---|
+| **Der Meister: Das Rechenzentrum** | 🔴 Rot | Meister | 6 | Profi | #Pivoting #Exploitation #Netzwerk #Linux |
+| **Der Kellerserver** | 🔴 Rot | Einsteiger | 10 | Arena | #Linux #Rechte #Passwörter |
+| **Die Leitstelle** | 🔴 Rot | Fortgeschritten | 6 | Profi | #Netzwerk #Dienste #Linux |
+| **Der Webshop** | 🔴 Rot | Fortgeschritten | 6 | Profi | #Web #Injection |
+| **Web 1: Das Kleingedruckte** | 🔴 Rot | Fortgeschritten | 6 | Arena | #Web |
+| **Der Chiffrensaal** | 🔴 Rot | Fortgeschritten | 5 | Profi | #Krypto |
+| **Der Tresor** | 🔴 Rot | Experte | 6 | Profi | #Krypto #Web #Linux |
+| **Web 2: Umwege** | 🔴 Rot | Experte | 6 | Profi | #Web #Injection #Netzwerk |
+| **Die Werkstatt** | 🔴 Rot | Experte | 5 | Profi | #Reverse #Binär |
+| **Der Flüsterer** | 🔴 Rot | Experte | 6 | Profi | #KI-Sicherheit #Prompt Injection |
+| **Web 3: Die Kette** | 🔴 Rot | Extrem | 6 | Profi | #Web #Injection |
 
 - **Der Meister: Das Rechenzentrum** (Meister): Die Königsklasse: durch ein simuliertes internes Netz (mehrere Konten = Maschinen) bis zum Kern pivotieren – Hash knacken, echter Buffer Overflow (ret2win), Rechteausweitung bis root.
 - **Der Kellerserver** (Einsteiger): Ein alter Firmenserver: Arbeite dich Konto für Konto bis zum Chef durch – versteckte Dateien, Verläufe, Rechte, Schlüssel.
@@ -34,13 +34,13 @@ Insgesamt **20 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 
 ## 🔍 Ermitteln
 
-| Arena | Stufe | Codes | Zugang | Themen |
-|---|---|---|---|---|
-| **Die Spurensuche** | Einsteiger | 5 | Arena | #Forensik #Logs |
-| **Das Versteck** | Fortgeschritten | 5 | Profi | #Steganografie #Forensik |
-| **Der Einbruch** | Experte | 6 | Profi | #Forensik #Logs #Schadsoftware |
-| **Der Mitschnitt** | Experte | 5 | Profi | #Netzwerk #Forensik #Logs |
-| **Der Maulwurf** | Extrem | 6 | Profi | #Forensik #Netzwerk #Krypto |
+| Arena | Team | Stufe | Codes | Zugang | Themen |
+|---|---|---|---|---|---|
+| **Die Spurensuche** | 🔵 Blau | Einsteiger | 5 | Arena | #Forensik #Logs |
+| **Das Versteck** | 🔵 Blau | Fortgeschritten | 5 | Profi | #Steganografie #Forensik |
+| **Der Einbruch** | 🔵 Blau | Experte | 6 | Profi | #Forensik #Logs #Schadsoftware |
+| **Der Mitschnitt** | 🔵 Blau | Experte | 5 | Profi | #Netzwerk #Forensik #Logs |
+| **Der Maulwurf** | 🔵 Blau | Extrem | 6 | Profi | #Forensik #Netzwerk #Krypto |
 
 - **Die Spurensuche** (Einsteiger): Deine erste Ermittlung: Wer hat nachts die Firmen-Webseite verändert? Mit ls, grep, diff und base64 den Spuren folgen.
 - **Das Versteck** (Fortgeschritten): Steganografie: versteckte Daten finden – hinter Bildern, in Archiven, in Leerzeichen und im niederwertigsten Bit von Pixeln.
@@ -50,15 +50,17 @@ Insgesamt **20 Arenen** in drei Reihen. Zugang: **Arena-Zugang** (Grundstufe) od
 
 ## 🛡️ Abwehren
 
-| Arena | Stufe | Codes | Zugang | Themen |
-|---|---|---|---|---|
-| **Angriff! Offene Türen** | Einsteiger | 5 | Arena | #Rechte #Passwörter |
-| **Angriff! Die Hintertür** | Fortgeschritten | 6 | Profi | #Web #Injection #Linux |
-| **Angriff! Der Profi** | Extrem | 6 | Profi | #Threat Hunting #Linux |
-| **Das Duell: Mann gegen Maschine** | Extrem | 6 | Profi | #Threat Hunting #Rechte #Persistenz |
+| Arena | Team | Stufe | Codes | Zugang | Themen |
+|---|---|---|---|---|---|
+| **Angriff! Offene Türen** | 🔵 Blau | Einsteiger | 5 | Arena | #Rechte #Passwörter |
+| **Angriff! Die Hintertür** | 🔵 Blau | Fortgeschritten | 6 | Profi | #Web #Injection #Linux |
+| **Die Härtung** | 🔵 Blau | Fortgeschritten | 6 | Profi | #Härtung #Rechte #Linux |
+| **Angriff! Der Profi** | 🔵 Blau | Extrem | 6 | Profi | #Threat Hunting #Linux |
+| **Das Duell: Mann gegen Maschine** | 🔵 Blau | Extrem | 6 | Profi | #Threat Hunting #Rechte #Persistenz |
 
 - **Angriff! Offene Türen** (Einsteiger): Ein Hacker-Bot greift deinen Rechner live an. Mach die Lücken dicht, bevor er Schaden anrichtet: Passwort, Rechte, Debug-Modus, Upload-Ordner, fremder Schlüssel.
 - **Angriff! Die Hintertür** (Fortgeschritten): Der Hacker wird frecher: PIN-Brute-Force, giftige Dateinamen, Hintertür mit Autostart, Schlüssel in der Git-Historie, PATH-Falle, zu weite Freigabe.
+- **Die Härtung** (Fortgeschritten): Blue Team: einen absichtlich unsicheren Server absichern – Rechte, SSH-Konfig, unnötige Dienste, Autostart-Hintertür und ein schwaches Passwort. Der Prüfdienst gibt pro behobener Lücke einen Code.
 - **Angriff! Der Profi** (Extrem): Der Profi ist längst drin: getarnte Prozesse, versteckte Autostarts, lügende Befehle, präparierter Schlüssel, Wanze, Zeitbombe, Git-Haken. Traue nichts.
 - **Das Duell: Mann gegen Maschine** (Extrem): Ein lebendiger Gegner: Der Hacker-Bot prüft live, welche Lücken offen sind, greift eine zufällige davon an und wird immer schneller. Mach alles dicht – jede geschlossene Lücke gibt einen Code.
 

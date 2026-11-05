@@ -287,4 +287,20 @@ export const LERNPFAD = [
     selbst: ['Spiele „Der Flüsterer“ und entlocke dem Assistenten alle sechs Codewörter.'],
     uebung: { label: 'Arena: Der Flüsterer', href: 'arena:ki', erfordert: { arena: 'ki', level: 4 }, hinweis: 'Trickse mindestens 4 der 6 Stufen aus.' },
   },
+  {
+    id: 's18', icon: '🛡️', titel: 'Blue Team: einen Server härten',
+    schutz: 'Jedem nur die Rechte geben, die er braucht (Least Privilege); unnötige Dienste abschalten; Standard- und schwache Passwörter ersetzen; Autostarts und Konfigurationen regelmäßig prüfen.',
+    einleitung: 'Bisher hast du Lücken gesucht – jetzt schließt du sie. „Härten“ heißt: einen Server so einstellen, dass möglichst wenig angreifbar ist. Wir üben die wichtigsten Handgriffe: Dateirechte, Dienste, SSH-Konfiguration, Autostarts und Passwörter.',
+    konzepte: [
+      ['Least Privilege', 'Jeder bekommt nur die Rechte, die er wirklich braucht – nicht mehr.'],
+      ['Angriffsfläche', 'Alles, worüber jemand hereinkommen könnte: offene Ports, Dienste, zu weite Rechte. Je kleiner, desto besser.'],
+      ['Härtung', 'Ein System absichern: Rechte eng setzen, Unnötiges abschalten, Standardwerte ersetzen.'],
+    ],
+    beispiel: {
+      text: 'Rechte eng setzen, offene Ports sehen und einen Dienst beenden:',
+      befehle: ['chmod 600 ~/geheim.txt', 'ss -ltn', 'kill PID'],
+    },
+    selbst: ['Spiele „Die Härtung“ und behebe die sechs Schwachstellen.'],
+    uebung: { label: 'Arena: Die Härtung', href: 'arena:haertung', erfordert: { arena: 'haertung', level: 4 }, hinweis: 'Schließe mindestens 4 der 6 Lücken.' },
+  },
 ];

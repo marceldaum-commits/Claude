@@ -129,6 +129,13 @@ const LABS = {
     helloI18n: {
       en: `\x1b[32mThe Whisperer (Arena)\x1b[0m – you are hacker.\r\nTask: cat ~/auftrag.txt   ·   Talk: ki 1 "Hello"   ·   Terms: begriff prompt injection\r\nBack: exit\r\n\r\n`,
     } },
+  haertung: { image: env('HAERTUNG_IMAGE', 'nf-haertung'), user: 'admin', ready: 'Haertung bereit', title: 'Die Härtung', host: 'server',
+    produkt: 'arena-profi', stufe: 'Fortgeschritten', levels: 6, praefix: 'haertung',
+    kurz: 'Blue Team: einen absichtlich unsicheren Server absichern – Rechte, SSH-Konfig, unnötige Dienste, Autostart-Hintertür und ein schwaches Passwort. Der Prüfdienst gibt pro behobener Lücke einen Code.',
+    hello: hallo('Die Härtung', 'admin', 'Auftrag: cat ~/auftrag.txt   ·   Prüfen: pruefen   ·   Hilfe: hilfe'),
+    helloI18n: {
+      en: `\x1b[32mThe Hardening (Arena)\x1b[0m – you are admin.\r\nTask: cat ~/auftrag.txt   ·   Check: pruefen   ·   Help: hilfe\r\nBack: exit\r\n\r\n`,
+    } },
 };
 const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
 // Register: Reihe und Themen je Arena (für den Filter in der Übersicht)
@@ -146,6 +153,7 @@ const EINORDNUNG = {
   chiffren: ['Hacken', ['Krypto']],
   versteck: ['Ermitteln', ['Steganografie', 'Forensik']],
   ki: ['Hacken', ['KI-Sicherheit', 'Prompt Injection']],
+  haertung: ['Abwehren', ['Härtung', 'Rechte', 'Linux'], 'Blau'],
 };
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};

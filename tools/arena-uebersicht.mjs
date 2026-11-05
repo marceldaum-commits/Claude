@@ -4,10 +4,12 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const src = readFileSync('arena/server.js', 'utf8');
 const block = src.slice(src.indexOf('const LABS = {'), src.indexOf('\n};', src.indexOf('const LABS = {')));
 const ein = {}; const mE = src.match(/const EINORDNUNG = \{([\s\S]*?)\n\};/)[1];
-for (const m of mE.matchAll(/(\w+): \['([^']+)', \[([^\]]*)\]\]/g)) ein[m[1]] = [m[2], m[3].split(',').map(s => s.trim().replace(/'/g, '')).filter(Boolean)];
+for (const m of mE.matchAll(/(\w+): \['([^']+)', \[([^\]]*)\](?:, '([^']+)')?\]/g)) ein[m[1]] = [m[2], m[3].split(',').map(s => s.trim().replace(/'/g, '')).filter(Boolean), m[4] || ''];
+const teamVon = (reihe, t) => t || (reihe === 'Hacken' ? 'Rot' : 'Blau');
+const TEAMIcon = { Rot: '🔴 Rot', Blau: '🔵 Blau', Lila: '🟣 Lila' };
 const labs = [];
 for (const m of block.matchAll(/(\w+): \{ image:[\s\S]*?stufe: '([^']+)', levels: (\d+), praefix: '([^']+)'[\s\S]*?kurz: '([^']*)',/g)) {
-  const id = m[1]; labs.push({ id, stufe: m[2], levels: +m[3], kurz: m[5].replace(/\\'/g, "'"), reihe: ein[id]?.[0] || '', themen: ein[id]?.[1] || [] });
+  const id = m[1]; const reihe = ein[id]?.[0] || ''; labs.push({ id, stufe: m[2], levels: +m[3], kurz: m[5].replace(/\\'/g, "'"), reihe, themen: ein[id]?.[1] || [], team: teamVon(reihe, ein[id]?.[2]) });
 }
 const titel = {}; for (const m of block.matchAll(/(\w+): \{ image:[\s\S]*?title: '([^']+)'/g)) titel[m[1]] = m[2];
 const prod = {}; for (const m of block.matchAll(/(\w+): \{ image:[\s\S]*?produkt: '([^']+)'/g)) prod[m[1]] = m[2];
@@ -19,8 +21,8 @@ md += `Insgesamt **${labs.length} Arenen** in drei Reihen. Zugang: **Arena-Zugan
 for (const r of reihen) {
   const rl = labs.filter(l => l.reihe === r);
   md += `\n## ${({ Hacken: '🗝️ Hacken', Ermitteln: '🔍 Ermitteln', Abwehren: '🛡️ Abwehren' })[r]}\n\n`;
-  md += `| Arena | Stufe | Codes | Zugang | Themen |\n|---|---|---|---|---|\n`;
-  for (const l of rl) md += `| **${titel[l.id]}** | ${l.stufe} | ${l.levels} | ${prod[l.id] === 'arena' ? 'Arena' : 'Profi'} | ${l.themen.map(t => '#' + t).join(' ')} |\n`;
+  md += `| Arena | Team | Stufe | Codes | Zugang | Themen |\n|---|---|---|---|---|---|\n`;
+  for (const l of rl) md += `| **${titel[l.id]}** | ${TEAMIcon[l.team] || l.team} | ${l.stufe} | ${l.levels} | ${prod[l.id] === 'arena' ? 'Arena' : 'Profi'} | ${l.themen.map(t => '#' + t).join(' ')} |\n`;
   for (const l of rl) md += `\n- **${titel[l.id]}** (${l.stufe}): ${l.kurz}`;
   md += '\n';
 }

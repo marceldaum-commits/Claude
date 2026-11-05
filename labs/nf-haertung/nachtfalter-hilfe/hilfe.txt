@@ -1,0 +1,16 @@
+HILFE · Die Härtung (Blue Team)
+
+Ziel: einen schlecht eingerichteten Server absichern. 6 Schwachstellen, je ein Code.
+Mit  pruefen  siehst du, was noch offen ist, und bekommst die Codes des Behobenen.
+
+Nützliche Befehle:
+  ls -l / stat DATEI     Besitzer und Rechte zeigen (rwx für Besitzer, Gruppe, andere)
+  chmod 600 DATEI        nur der Besitzer darf lesen/schreiben
+  chmod o-w DATEI        Schreibrecht für „andere" entfernen
+  nano DATEI             Datei bearbeiten (Strg+O speichern, Strg+X beenden)
+  ss -ltn                welche Ports lauschen
+  ps aux                 laufende Prozesse (PID finden)
+  kill PID               Prozess beenden
+  grep -n WORT DATEI     eine Zeile finden
+
+Komplettes Handbuch (auch EN): https://arena.nachtfalter.tech/handbuch.html
