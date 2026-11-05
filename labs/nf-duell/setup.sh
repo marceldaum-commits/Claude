@@ -98,6 +98,8 @@ luecken = [
 ]
 json.dump({'luecken':luecken}, open('/opt/duell/luecken.json','w'))
 PY
+# Codes gehoeren NICHT dem Spieler: nur der Gegner (root) darf die Loesungsdatei lesen.
+chown root:root /opt/duell/luecken.json; chmod 600 /opt/duell/luecken.json
 
 # ---------- Der Gegner (Spielleiter, root): adaptiv + zufällig, wird schneller ----------
 cat > /opt/duell/gegner.py <<'PY'

@@ -23,12 +23,15 @@ open('/opt/web/.besucherzaehler.txt', 'w').write('nichts Spannendes\n')
 open('/opt/web/secret_backup.txt', 'w').write(f'Datenbank-Backup-Hinweis.\nCode: {code(5)}\n')
 open('/etc/katalog_geheim', 'w').write(f'Systemweite Katalog-Konfiguration.\nCode: {code(4)}\n')
 PY
-chmod 644 /opt/web/konto_geheim.txt /opt/web/secret_backup.txt /opt/web/intern-alt-3f9/notiz.txt; chmod 644 /etc/katalog_geheim
+# Flag-Dateien werden ueber den Webserver/LFI (als Nutzer 'web') ausgeliefert, duerfen aber NICHT
+# direkt von der Spieler-Shell (besucher) lesbar sein -> 640 web:web statt weltlesbar.
+chown web:web /opt/web/konto_geheim.txt /opt/web/secret_backup.txt /opt/web/intern-alt-3f9/notiz.txt /etc/katalog_geheim
+chmod 640 /opt/web/konto_geheim.txt /opt/web/secret_backup.txt /opt/web/intern-alt-3f9/notiz.txt /etc/katalog_geheim
 cat > /opt/web/server.py <<'PY'
 # Stadtbuecherei-Katalog – ABSICHTLICH mit Lehr-Schwachstellen. Nie so bauen!
 import http.server, urllib.parse, os, hashlib
-SALZ = open('/opt/web/.salz').read().strip()
-code = lambda n: 'KLY{' + hashlib.sha256(f'{SALZ}:web1:l{n}'.encode()).hexdigest()[:16] + '}'
+C3 = '__C3__'   # vom Setup eingesetzt – KEIN rohes Salz im Container (sonst per LFI abgreifbar)
+C6 = '__C6__'
 START = '''<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Stadtbuecherei Lindenbach</title></head><body>
 <h1>Stadtbuecherei Lindenbach – Online-Katalog</h1>
 <p><a href="/suche?q=roman">Suche</a> · <a href="/seite?datei=hilfe.txt">Hilfe</a> · <a href="/konto">Mein Konto</a></p>
@@ -54,7 +57,7 @@ class H(http.server.BaseHTTPRequestHandler):
             except Exception: return self.s(404, 'nichts\n')
         if u.path == '/suche':
             ansicht = p.get('ansicht', [''])[0]   # versteckter Parameter
-            if ansicht == 'debug': return self.s(200, f'DEBUG-Ansicht aktiv.\nInterner Hinweis – Code: {code(3)}\n')
+            if ansicht == 'debug': return self.s(200, f'DEBUG-Ansicht aktiv.\nInterner Hinweis – Code: {C3}\n')
             return self.s(200, f'Suche nach "{p.get("q", [""])[0][:40]}": 3 Treffer (Romane).\n')
         if u.path == '/seite':
             datei = p.get('datei', ['hilfe.txt'])[0]
@@ -65,7 +68,7 @@ class H(http.server.BaseHTTPRequestHandler):
         if u.path == '/admin':
             if not self.lokal(): return self.s(403, 'Nur aus dem internen Netz (per X-Forwarded-For geprueft).\n')
             if self.headers.get('X-Intern', '') != 'ja': return self.s(403, 'Header X-Intern fehlt.\n')
-            return self.s(200, f'Adminbereich.\nCode: {code(6)}\n')
+            return self.s(200, f'Adminbereich.\nCode: {C6}\n')
         return self.s(404, 'Nicht gefunden.\n')
     def do_POST(self):
         if urllib.parse.urlparse(self.path).path == '/konto': return self.s(200, open('/opt/web/konto_geheim.txt').read())
@@ -73,7 +76,12 @@ class H(http.server.BaseHTTPRequestHandler):
 os.makedirs('/opt/web/seiten', exist_ok=True); open('/opt/web/seiten/hilfe.txt', 'w').write(HILFE)
 http.server.ThreadingHTTPServer(('127.0.0.1', 8000), H).serve_forever()
 PY
-printf '%s' "$SALZ" > /opt/web/.salz; chmod 600 /opt/web/.salz; chown web:web /opt/web/.salz /opt/web/server.py; chmod 644 /opt/web/server.py
+# Die zwei vom Server benoetigten Codes (L3/L6) einsetzen – es wird KEIN rohes Salz im Container abgelegt,
+# sonst koennte man es ueber die LFI-Luecke lesen und alle Codes offline berechnen.
+C3=$(python3 -c 'import hashlib,sys;print("KLY{"+hashlib.sha256((sys.argv[1]+":web1:l3").encode()).hexdigest()[:16]+"}")' "$SALZ")
+C6=$(python3 -c 'import hashlib,sys;print("KLY{"+hashlib.sha256((sys.argv[1]+":web1:l6").encode()).hexdigest()[:16]+"}")' "$SALZ")
+sed -i "s|__C3__|$C3|; s|__C6__|$C6|" /opt/web/server.py
+chown web:web /opt/web/server.py; chmod 640 /opt/web/server.py
 # Backup-Datei im Web-Wurzelverzeichnis erreichbar (Welle 5) – über /seite?datei=../secret_backup.txt
 runuser -u web -- env -i PATH=/usr/bin:/bin python3 /opt/web/server.py >/dev/null 2>&1 &
 cat > /home/besucher/auftrag.txt <<'T'

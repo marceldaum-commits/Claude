@@ -104,7 +104,9 @@ class Hd(http.server.BaseHTTPRequestHandler):
         self.send_header('Content-Length',str(len(b))); self.end_headers(); self.wfile.write(b)
 http.server.ThreadingHTTPServer(('127.0.0.1',8099),Hd).serve_forever()
 PY
-chmod 644 /opt/meister/inventar.py
+# Quelltext enthaelt das DB-Passwort + L2 (wird nur ueber die API an 'webadmin' ausgeliefert):
+# darf NICHT vom Spieler (extern) lesbar sein -> nur 'dienst' (startet die API) darf ihn lesen.
+chown dienst:dienst /opt/meister/inventar.py; chmod 400 /opt/meister/inventar.py
 runuser -u dienst -- env -i PATH=/usr/bin:/bin python3 /opt/meister/inventar.py >/dev/null 2>&1 &
 
 # ---------- L3 · db: knackbarer Passwort-Hash für kern + Wortliste
