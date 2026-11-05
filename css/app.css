@@ -59,6 +59,9 @@ main { max-width: 980px; margin: 0 auto; padding: 1rem 1rem calc(var(--nav-h) + 
 .langbanner { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .6rem .8rem; margin: 0 0 .8rem; border-radius: 12px; border: 1px solid var(--line); background: var(--violet-bg); }
 .langbanner > span { font-weight: 600; margin-right: .2rem; }
 .gruppe { font-size: .95rem; color: var(--muted); letter-spacing: .02em; margin: 0 0 .4rem; }
+/* Präsenter „Problem melden"-Knopf (über der unteren Navigation) */
+.meldfab { position: fixed; right: 14px; bottom: calc(64px + env(safe-area-inset-bottom)); z-index: 60; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; text-decoration: none; background: var(--card2); border: 1px solid var(--line); box-shadow: 0 3px 10px rgba(0,0,0,.4); }
+.meldfab:hover { border-color: var(--violet); }
 .card h2, .card h3 { margin-top: 0; }
 .card.violet { border-color: rgba(167, 139, 250, .45); background: linear-gradient(180deg, var(--violet-bg), var(--card) 60%); }
 .card.lime { border-color: rgba(163, 230, 53, .45); background: linear-gradient(180deg, var(--lime-bg), var(--card) 60%); }

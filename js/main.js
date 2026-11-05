@@ -14,7 +14,7 @@ import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { KALIPRAXIS, KALIPRAXIS_GEPLANT } from './content/kalipraxis.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -136,7 +136,7 @@ function renderTop() {
 function renderNav(route) {
   const L = NAV[currentLang()] || NAV.de;
   const items = [['heute', '⌂', L[0]], ['pfad', '◆', L[1]], ['terminal', '>_', L[2]], ['mehr', '≡', L[3]]];
-  const map = { extern: 'pfad', kalipraxis: 'pfad', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
+  const map = { extern: 'pfad', kalipraxis: 'pfad', melden: 'mehr', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
   const on = map[route] || route;
   $('#nav').setAttribute('translate', 'no');
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
@@ -1057,6 +1057,62 @@ views.extern = () => {
   };
 };
 
+// ---------------------------------------------------------------- Problem melden / Support
+views.melden = (vor = '') => {
+  return {
+    html: `<a class="back" href="#/mehr">← Mehr</a>
+    <h1>🐞 Problem melden</h1>
+    <p class="muted small">Etwas kaputt, verwirrend oder falsch? Sag es uns – wir kümmern uns darum. Je genauer, desto schneller gefixt.</p>
+    <div class="card stack">
+      <label>Wo tritt das Problem auf?
+        <select id="m-bereich"><option value="">Lädt …</option></select></label>
+      <label>Was ist passiert? Was hast du erwartet?
+        <textarea id="m-text" rows="5" placeholder="z. B. In „Die Härtung“ springt der Cursor beim Tippen, und „txt“ wird zu „tut“."></textarea></label>
+      <label>Deine E-Mail für Rückfragen (freiwillig)
+        <input id="m-mail" type="email" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="nur, wenn wir dich erreichen dürfen"></label>
+      <div class="row"><button class="btn primary" id="m-send">Absenden</button><a class="btn ghost" id="m-mailto" href="#" hidden>Stattdessen per E-Mail</a></div>
+      <p class="small" id="m-fb"></p>
+    </div>
+    <p class="small muted">Geht an das Nachtfalter-Team. Zur Fehlersuche hängen wir automatisch technische Infos an (App-Version, Gerät, Sprache) – keine Inhalte, die du nicht hier eingibst.</p>`,
+    keepScroll: false,
+    mount(root) {
+      const sel = $('#m-bereich', root);
+      // Live-Liste: App-Bereiche + App-Räume + (nachgeladen) Arena-Räume. Aktualisiert sich automatisch.
+      const bereiche = ['Startseite', 'Lernpfad', 'Leitern & Räume', 'Terminal', 'Kali-Praxis', 'Prüfung', 'Konto & Anmeldung', 'Übersetzung/Sprache', 'Sonstiges / weiß nicht'];
+      const opt = (v, t) => `<option value="${esc(v)}" ${v === vor ? 'selected' : ''}>${esc(t)}</option>`;
+      const bau = (arena) => {
+        sel.innerHTML = `<optgroup label="App-Bereiche">${bereiche.map(b => opt(b, b)).join('')}</optgroup>`
+          + `<optgroup label="Räume (App)">${ROOMS.map(r => opt('Raum: ' + r.title, r.title)).join('')}</optgroup>`
+          + (arena && arena.length ? `<optgroup label="Arena-Räume">${arena.map(a => opt('Arena: ' + a.titel, a.titel)).join('')}</optgroup>` : '');
+      };
+      bau(null);
+      const base = (globalThis.KLY_CONFIG || {}).arenaUrl;
+      if (base) fetch(`${base}/api/labs`).then(r => r.ok ? r.json() : null).then(j => { if (j && j.labs) bau(j.labs); }).catch(() => { /* Arena offline → nur App-Räume */ });
+
+      const fb = $('#m-fb', root);
+      const kontext = () => ({ version: globalThis.KLY_VERSION || '?', lernort: state.location || '-', sprache: currentLang(), geraet: (navigator.userAgent || '').slice(0, 200) });
+      const mailtoFallback = (bereich, text) => {
+        const body = `${text}\n\n--\nBereich: ${bereich}\nVersion: ${kontext().version} · Gerät: ${kontext().geraet}`;
+        return `mailto:info@nachtfalter.tech?subject=${encodeURIComponent('Nachtfalter: Problem – ' + bereich)}&body=${encodeURIComponent(body)}`;
+      };
+      $('#m-send', root).onclick = async () => {
+        const bereich = sel.value || 'Sonstiges', text = $('#m-text', root).value.trim(), mail = $('#m-mail', root).value.trim();
+        if (text.length < 5) { fb.className = 'small rot'; fb.textContent = 'Bitte beschreib kurz, was los ist.'; return; }
+        const btn = $('#m-send', root); btn.disabled = true; fb.className = 'small muted'; fb.textContent = 'Wird gesendet …';
+        try {
+          await meldungSenden({ bereich, text, kontakt: mail, kontext: kontext() });
+          fb.className = 'small ok'; fb.textContent = '✓ Danke! Deine Meldung ist angekommen – wir kümmern uns.';
+          $('#m-text', root).value = '';
+        } catch (e) {
+          fb.className = 'small rot'; fb.textContent = 'Senden klappt gerade nicht. Nutz bitte den Knopf „Stattdessen per E-Mail“.';
+          const mt = $('#m-mailto', root); mt.href = mailtoFallback(bereich, text); mt.hidden = false;
+        }
+        btn.disabled = false;
+      };
+    },
+  };
+};
+
 // ---------------------------------------------------------------- Kali anwenden (Praxis-Strang mit Docker-Zielen)
 views.kalipraxis = () => {
   const done = (k) => !!state.kalipraxis?.[k];
@@ -1203,6 +1259,7 @@ views.mehr = () => {
       <div class="card"><h3 class="gruppe" style="margin-top:0">⚙️ Sonstiges</h3><ul class="list">
         <li><a href="#/handy-labs"><span class="state">📱</span><span class="grow"><span class="t">Labs vom Handy spielen</span><span class="s">Kellerserver & Co. über deine Kali-VM – mit Tailscale, gratis</span></span></a></li>
         <li><a href="#/werkzeuge"><span class="state">⚒</span><span class="grow"><span class="t">Werkzeuge</span><span class="s">Kali-Tools: Zweck, Scope, Beleg</span></span></a></li>
+        <li><a href="#/melden"><span class="state">🐞</span><span class="grow"><span class="t">Problem melden</span><span class="s">Fehler oder etwas Verwirrendes? Sag es uns – wir fixen es</span></span></a></li>
         <li><button class="item" id="loc" style="width:100%;background:none;border:0;text-align:left;cursor:pointer"><span class="state">📍</span><span class="grow"><span class="t">Lernort ändern</span><span class="s">${esc(LOCATIONS[state.location]?.label || 'nicht gewählt')}</span></span></button></li>
         <li><a href="impressum.html"><span class="state">§</span><span class="grow"><span class="t">Impressum & Datenschutz</span><span class="s">Wer hinter Nachtfalter steht, was mit deinen Daten passiert</span></span></a></li>
       </ul></div>

@@ -86,6 +86,13 @@ export async function arenaFortschritt() {
   for (const r of (data || [])) m[r.lab] = (m[r.lab] || 0) + 1;
   return m;
 }
+export async function meldungSenden(payload) {
+  const c = await getClient();
+  if (!c) throw new Error('Nicht verbunden – bitte anmelden.');
+  const { data, error } = await c.functions.invoke('melden', { body: payload });
+  if (error) throw new Error(error.message || 'Senden fehlgeschlagen');
+  return data;
+}
 export async function meinStatus() {
   if (!user) return null;
   const c = await getClient();
