@@ -276,11 +276,92 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'So läuft WLAN-Knacken wirklich: Handshake mitschneiden (nur im eigenen Netz, mit passender Hardware) → offline mit Wörterbuch knacken. Den Knack-Teil hast du an einem offiziellen Beispiel geübt. Schutz: ein langes, zufälliges WPA2/WPA3-Passwort – dann läuft jeder Wörterbuch-Angriff ins Leere.',
   },
+  {
+    id: 'windows', icon: '🪟', titel: 'Windows-Passwörter knacken (NTLM)', stufe: 'Aufbau', team: 'Rot',
+    einleitung: 'Windows speichert Passwörter als NTLM-Hashes – lokal in der SAM, im Active Directory in der NTDS.dit. Wer sie erbeutet, knackt sie offline oder nutzt sie direkt („Pass-the-Hash"). Du übst hier den Kern: NTLM-Hashes mit hashcat knacken. Das volle AD-Szenario baust du im nächsten Modul (AD-Labor).',
+    ziel: {
+      name: 'Erbeutete NTLM-Hashes (Beispiel)',
+      start: 'cat > ntlm.txt <<EOF\nadministrator:64f12cddaa88057e06a81b54e73b949b\nbuchhaltung:72f5cfa80f07819ccbcfb72feb9eb9b7\nEOF',
+      hinweis: 'Diese NTLM-Hashes sehen genau so aus wie aus einer echten Windows-SAM/NTDS – hier nur zum Üben, lokal. (rockyou ggf. entpacken: gunzip /usr/share/wordlists/rockyou.txt.gz)',
+      pruef: 'Datei da: `cat ntlm.txt` zeigt zwei Zeilen „benutzer:hash".',
+    },
+    schritte: [
+      {
+        id: 'admin', werkzeug: 'Hashcat', frage_art: 'antwort',
+        aufgabe: 'Knacke die NTLM-Hashes offline. „-m 1000" ist NTLM, „--username" sagt hashcat, dass vor dem Hash ein Benutzername steht.',
+        befehl: 'hashcat -m 1000 --username ntlm.txt /usr/share/wordlists/rockyou.txt',
+        erwartet: 'hashcat zeigt zu den Hashes die Klartext-Passwörter.',
+        frage: 'Wie lautet das Passwort von „administrator"?', antwort: ['Password1', 'password1'], tipp: 'Erneut zeigen: hashcat -m 1000 --username ntlm.txt --show. Großes P, endet auf 1.',
+      },
+      {
+        id: 'buch', werkzeug: 'Hashcat', frage_art: 'antwort',
+        aufgabe: 'Und das zweite Konto? Lass dir alle geknackten Treffer anzeigen.',
+        befehl: 'hashcat -m 1000 --username ntlm.txt --show',
+        erwartet: 'Zeigt je Zeile „benutzer:hash:klartext".',
+        frage: 'Wie lautet das Passwort von „buchhaltung"?', antwort: ['superman'], tipp: 'Ein Superheld – kennst du aus dem Passwörter-Modul.',
+      },
+      {
+        id: 'pth', werkzeug: 'Pass-the-Hash', frage_art: 'abhaken',
+        aufgabe: 'Begreife die eigentliche Gefahr: In Windows-Netzen muss man NTLM oft nicht mal knacken – man meldet sich mit dem HASH direkt an („Pass-the-Hash"). Darum ist ein erbeuteter Hash schon fast das Passwort.',
+        befehl: '# Prinzip (nur im eigenen Labor): impacket-psexec -hashes <LM:NT> administrator@ZIEL',
+        erwartet: 'Dir ist klar: NTLM-Hash = oft so gut wie das Passwort selbst.',
+        frage: 'Verstanden, warum NTLM-Hashes so wertvoll sind (Pass-the-Hash)?', tipp: 'Schutz: lange, einzigartige Passwörter + LAPS für lokale Admins.',
+      },
+    ],
+    abschluss: 'Das ist der Kern von Windows-/AD-Angriffen: NTLM-Hashes erbeuten → offline knacken (hashcat -m 1000) oder direkt per Pass-the-Hash nutzen. Schwache Passwörter fallen in Sekunden. Weiter geht es mit den „großen" AD-Angriffen im AD-Labor-Modul.',
+  },
+  {
+    id: 'adlab', icon: '🏢', titel: 'Großes Projekt: eigenes Windows/AD-Labor', stufe: 'Experte', team: 'Rot',
+    einleitung: 'Die „großen" AD-Angriffe (Kerberoasting, AS-REP-Roasting, Angriffspfade mit BloodHound) zeigt man live in einem echten Active Directory. Das braucht Windows-VMs und etwas Zeit – kein „1 Befehl". Diese Anleitung bringt dich Schritt für Schritt dorthin; die Haken setzt du selbst, wenn ein Schritt klappt. Am besten am Laptop/PC mit genügend RAM (16 GB+). Alles kostenlos und legal (eigenes Labor).',
+    ziel: {
+      name: 'VirtualBox + „GOAD"-Lernlabor (eigener PC)',
+      start: '# Nichts zum Kopieren – folge den Schritten. Du brauchst: VirtualBox, ~16 GB RAM, Zeit.',
+      hinweis: 'GOAD (Game of Active Directory) ist ein fertiges, absichtlich verwundbares AD-Labor zum gefahrlosen Üben. Nur im eigenen Labor angreifen – nie echte fremde Netze.',
+      pruef: 'Steht, wenn du dich von Kali aus am Domänencontroller des Labors anmelden kannst.',
+    },
+    schritte: [
+      {
+        id: 'tools', werkzeug: 'VirtualBox + Vagrant', frage_art: 'abhaken',
+        aufgabe: 'Virtualisierung einrichten: VirtualBox und Vagrant installieren (damit sich die VMs automatisch aufsetzen lassen).',
+        befehl: '# virtualbox.org  und  developer.hashicorp.com/vagrant',
+        erwartet: 'VirtualBox startet, „vagrant --version" funktioniert.',
+        frage: 'VirtualBox + Vagrant installiert?', tipp: 'Unter Kali/Debian oft: sudo apt install virtualbox vagrant.',
+      },
+      {
+        id: 'goad', werkzeug: 'GOAD', frage_art: 'abhaken',
+        aufgabe: 'Das fertige Lernlabor holen (mehrere verwundbare Windows-Server als Domäne).',
+        befehl: 'git clone https://github.com/Orange-Cyberdefense/GOAD',
+        erwartet: 'Der Ordner GOAD mit dem Installations-Skript liegt vor dir.',
+        frage: 'GOAD geladen?', tipp: 'Die README erklärt die Varianten (GOAD, GOAD-Light für weniger RAM).',
+      },
+      {
+        id: 'start', werkzeug: 'GOAD', frage_art: 'abhaken',
+        aufgabe: 'Labor aufsetzen und hochfahren (läuft eine Weile – VMs werden gebaut und konfiguriert).',
+        befehl: 'cd GOAD && ./goad.sh -t install -l GOAD-Light -p virtualbox',
+        erwartet: 'Am Ende laufen die Domänencontroller/Clients als VMs.',
+        frage: 'Labor läuft (VMs hochgefahren)?', tipp: 'Bei wenig RAM „GOAD-Light" nehmen. Fehler? Erst einzelne VM prüfen.',
+      },
+      {
+        id: 'kerb', werkzeug: 'impacket', frage_art: 'abhaken',
+        aufgabe: 'Kerberoasting live: Dienst-Konten haben oft schwache Passwörter. Fordere ihre Tickets an – die bekommst du als knackbaren Hash.',
+        befehl: 'impacket-GetUserSPNs <DOMAENE>/<user>:<pass> -dc-ip <DC-IP> -request\nhashcat -m 13100 kerb.hash /usr/share/wordlists/rockyou.txt',
+        erwartet: 'Du erhältst krb5tgs-Hashes und knackst sie offline mit hashcat (-m 13100).',
+        frage: 'Dienst-Ticket erhalten und mit hashcat geknackt?', tipp: 'Genau hier schließt sich der Kreis zum Passwörter-Modul.',
+      },
+      {
+        id: 'bloodhound', werkzeug: 'BloodHound', frage_art: 'abhaken',
+        aufgabe: 'Angriffspfade sichtbar machen: BloodHound zeichnet, wie man vom kleinen Konto zum Domänen-Admin kommt.',
+        befehl: '# Daten sammeln (bloodhound-python / SharpHound), dann in BloodHound:\n# "Shortest Path to Domain Admins" ansehen',
+        erwartet: 'Du siehst einen Graphen mit dem kürzesten Weg zu „Domain Admins".',
+        frage: 'Angriffspfad in BloodHound gesehen?', tipp: 'Das ist das Werkzeug, das Profis bei AD-Tests zuerst öffnen.',
+      },
+    ],
+    abschluss: 'Jetzt hast du ein echtes AD-Labor: Kerberoasting, AS-REP-Roasting und Angriffspfade (BloodHound) kannst du gefahrlos üben. Die geknackten Kerberos-Tickets wandern zu hashcat (-m 13100) – die direkte Brücke zum Passwörter-Modul. Mehr AD-Praxis geht kaum sicherer.',
+  },
 ];
 
 // Noch geplante Module dieses Strangs (werden nach und nach gebaut).
 export const KALIPRAXIS_GEPLANT = [
-  { icon: '🪟', titel: 'Windows & Active Directory (eigenes Mini-Labor)' },
   { icon: '📱', titel: 'Android-App in echt: APK auseinandernehmen' },
   { icon: '🔌', titel: 'APIs angreifen: kaputte Authentifizierung & BOLA' },
 ];
