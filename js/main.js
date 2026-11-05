@@ -1122,18 +1122,22 @@ views.mehr = () => {
     <div class="stack">
       <div class="card"><h3 style="margin-top:0" translate="no">🌍 Sprache · Language</h3>${langPickerHTML()}
         <p class="small muted" style="margin-bottom:0">Englisch: Die meisten Texte sind von Hand übersetzt. Was noch fehlt, übersetzt Google automatisch (diese Texte gehen dazu an Google). Befehle und Terminals bleiben im Original.</p></div>
-      <div class="card"><ul class="list">
+      <div class="card"><h3 class="gruppe" style="margin-top:0">📚 Lernen & Üben</h3><ul class="list">
         <li><a href="#/lernpfad"><span class="state">📚</span><span class="grow"><span class="t">Lernpfad</span><span class="s">Geführt lernen: Theorie, Beispiel, eigene Übung – Stufe für Stufe</span></span></a></li>
-        ${(globalThis.KLY_CONFIG || {}).arenaUrl ? `<li><a href="${esc(KLY_CONFIG.arenaUrl)}" target="_blank" rel="noopener"><span class="state">🖥️</span><span class="grow"><span class="t">Arena – Online-Labs</span><span class="s">Echte Übungs-Server im Browser: 10 Arenen: hacken, ermitteln und Angriffe abwehren</span></span></a></li>` : ''}
+        ${(globalThis.KLY_CONFIG || {}).arenaUrl ? `<li><a href="${esc(KLY_CONFIG.arenaUrl)}" target="_blank" rel="noopener"><span class="state">🖥️</span><span class="grow"><span class="t">Arena – Online-Labs</span><span class="s">Echte Übungs-Server im Browser: 🔴 Rot (Angriff), 🔵 Blau (Verteidigung), 🟣 Lila (beides)</span></span></a></li>` : ''}
+        <li><a href="#/extern"><span class="state">🌍</span><span class="grow"><span class="t">Externe Lernpfade</span><span class="s">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF – zum Abhaken</span></span></a></li>
+        <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen (freiwillig)</span><span class="s">Meisterprüfung Linux</span></span></a></li>
+        <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
+      </ul></div>
+      <div class="card"><h3 class="gruppe" style="margin-top:0">👤 Konto & Profil</h3><ul class="list">
         <li><a href="konto.html"><span class="state">👤</span><span class="grow"><span class="t">Nachtfalter-Konto</span><span class="s">Registrieren, anmelden, deine Zugänge (Beta)</span></span></a></li>
         <li><a href="#/profil"><span class="state">★</span><span class="grow"><span class="t">Profil & Abzeichen</span><span class="s">${earnedBadges().length} von ${BADGES.length} · Serie ${streak(state)} Tage</span></span></a></li>
-        <li><a href="#/archiv"><span class="state">≡</span><span class="grow"><span class="t">Aufgabenarchiv</span><span class="s">Alle Aufgaben wiederholen (ohne Punkte)</span></span></a></li>
-        <li><a href="#/extern"><span class="state">🌍</span><span class="grow"><span class="t">Externe Lernpfade</span><span class="s">Hack The Box, Juice Shop, PortSwigger, Bandit, picoCTF – zum Abhaken</span></span></a></li>
+      </ul></div>
+      <div class="card"><h3 class="gruppe" style="margin-top:0">⚙️ Sonstiges</h3><ul class="list">
         <li><a href="#/handy-labs"><span class="state">📱</span><span class="grow"><span class="t">Labs vom Handy spielen</span><span class="s">Kellerserver & Co. über deine Kali-VM – mit Tailscale, gratis</span></span></a></li>
         <li><a href="#/werkzeuge"><span class="state">⚒</span><span class="grow"><span class="t">Werkzeuge</span><span class="s">Kali-Tools: Zweck, Scope, Beleg</span></span></a></li>
-        <li><a href="#/pruefung/L1"><span class="state">★</span><span class="grow"><span class="t">Prüfungen (freiwillig)</span><span class="s">Meisterprüfung Linux</span></span></a></li>
-        <li><a href="impressum.html"><span class="state">§</span><span class="grow"><span class="t">Impressum & Datenschutz</span><span class="s">Wer hinter Nachtfalter steht, was mit deinen Daten passiert</span></span></a></li>
         <li><button class="item" id="loc" style="width:100%;background:none;border:0;text-align:left;cursor:pointer"><span class="state">📍</span><span class="grow"><span class="t">Lernort ändern</span><span class="s">${esc(LOCATIONS[state.location]?.label || 'nicht gewählt')}</span></span></button></li>
+        <li><a href="impressum.html"><span class="state">§</span><span class="grow"><span class="t">Impressum & Datenschutz</span><span class="s">Wer hinter Nachtfalter steht, was mit deinen Daten passiert</span></span></a></li>
       </ul></div>
 
       <div class="card">

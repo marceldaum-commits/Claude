@@ -58,6 +58,7 @@ main { max-width: 980px; margin: 0 auto; padding: 1rem 1rem calc(var(--nav-h) + 
 .card.tight { padding: .75rem .9rem; }
 .langbanner { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .6rem .8rem; margin: 0 0 .8rem; border-radius: 12px; border: 1px solid var(--line); background: var(--violet-bg); }
 .langbanner > span { font-weight: 600; margin-right: .2rem; }
+.gruppe { font-size: .95rem; color: var(--muted); letter-spacing: .02em; margin: 0 0 .4rem; }
 .card h2, .card h3 { margin-top: 0; }
 .card.violet { border-color: rgba(167, 139, 250, .45); background: linear-gradient(180deg, var(--violet-bg), var(--card) 60%); }
 .card.lime { border-color: rgba(163, 230, 53, .45); background: linear-gradient(180deg, var(--lime-bg), var(--card) 60%); }
