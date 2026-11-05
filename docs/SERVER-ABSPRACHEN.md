@@ -170,3 +170,11 @@ Wunsch von Marcel (03.11.2026). Noch nicht gebaut – erst nach Server-Einrichtu
   regelbasierter KI-Assistent (kein Internet), 6 Stufen mit immer strengeren Schutzregeln (Stichwort-Sperre,
   Umschreiben, Ausgabefilter, System-Prompt-Leak, Kombi). Secrets nur für den Bot-Benutzer lesbar. Durchgespielt.
   Lernpfad-Stufe s17. Jetzt 20 Arenen, 18 Lernpfad-Stufen.
+- Problem-Meldungen per E-Mail (Weg A): Supabase-Edge blockiert ausgehenden SMTP, darum verschickt der
+  ARENA-SERVER die Mails. meldungenMailen() in arena/server.js holt alle 3 Min neue Zeilen aus
+  support_meldungen (gemeldet_am IS NULL) per Supabase-REST, mailt sie via nodemailer ans Team und setzt
+  gemeldet_am. Läuft nur, wenn in /etc/nachtfalter/arena-geheimnis.env hinterlegt ist (sonst still):
+  SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SMTP_PASS (Postfach info@); optional SMTP_HOST (Std.
+  mail.nachtfalter.tech), SMTP_PORT (587), SMTP_USER/MELDE_AN (info@). Die Meldungen stehen unabhängig davon
+  immer in der Zentrale (🐞 Meldungen). Edge-Function „melden“ speichert nur noch (kein SMTP) und nimmt auch
+  anonyme Meldungen (user_id NULL) an.

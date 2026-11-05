@@ -17,6 +17,7 @@ import { extname, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Docker from 'dockerode';
 import { WebSocketServer } from 'ws';
+import nodemailer from 'nodemailer';
 
 const DIR = dirname(fileURLToPath(import.meta.url));
 const env = (k, d) => process.env[k] ?? d;
@@ -353,6 +354,44 @@ async function selbsttest() {
   finally { selbsttestLaeuft = false; }
 }
 
+// --- Problem-Meldungen per E-Mail (Weg A: dieser Server verschickt, da Supabase-Edge SMTP blockiert) ---
+// Holt neue Meldungen aus Supabase (support_meldungen, gemeldet_am IS NULL), mailt sie ans Team und
+// markiert sie als gemeldet. Läuft nur, wenn die Zugänge hinterlegt sind – sonst still (nichts geht verloren,
+// die Meldungen stehen weiter in der Zentrale). Secrets kommen aus arena-geheimnis.env.
+const MAIL = {
+  sbUrl: env('SUPABASE_URL', ''), sbKey: env('SUPABASE_SERVICE_ROLE_KEY', ''),
+  host: env('SMTP_HOST', 'mail.nachtfalter.tech'), port: +env('SMTP_PORT', 587),
+  user: env('SMTP_USER', 'info@nachtfalter.tech'), pass: env('SMTP_PASS', ''),
+  an: env('MELDE_AN', 'info@nachtfalter.tech'),
+};
+let mailLaeuft = false;
+async function meldungenMailen() {
+  if (!MAIL.sbUrl || !MAIL.sbKey || !MAIL.pass) return; // nicht eingerichtet → still
+  if (mailLaeuft) return; mailLaeuft = true;
+  try {
+    const sel = 'id,user_id,bereich,text,kontakt,kontext,erstellt';
+    const r = await fetch(`${MAIL.sbUrl}/rest/v1/support_meldungen?gemeldet_am=is.null&select=${sel}&order=erstellt.asc&limit=20`,
+      { headers: { apikey: MAIL.sbKey, Authorization: `Bearer ${MAIL.sbKey}` } });
+    if (!r.ok) { log('mail', `laden ${r.status}`); return; }
+    const liste = await r.json();
+    if (!Array.isArray(liste) || !liste.length) return;
+    const tx = nodemailer.createTransport({ host: MAIL.host, port: MAIL.port, secure: MAIL.port === 465, auth: { user: MAIL.user, pass: MAIL.pass } });
+    for (const m of liste) {
+      const k = m.kontext || {};
+      const body = `Bereich: ${m.bereich}\nKontakt: ${m.kontakt || '(keiner)'}\nKonto: ${m.user_id || '(nicht angemeldet)'}\nZeit: ${m.erstellt}\n\n${m.text}\n\n-- technisch --\nVersion: ${k.version || '?'}\nLernort: ${k.lernort || '?'}\nSprache: ${k.sprache || '?'}\nGerät: ${k.geraet || '?'}`;
+      try {
+        await tx.sendMail({ from: MAIL.user, to: MAIL.an, replyTo: m.kontakt || undefined, subject: `Nachtfalter: Problem – ${m.bereich}`.slice(0, 160), text: body });
+      } catch (e) { log('mail', `senden ${m.id}: ${e.message}`); continue; } // nicht markieren → nächster Lauf erneut
+      await fetch(`${MAIL.sbUrl}/rest/v1/support_meldungen?id=eq.${m.id}`,
+        { method: 'PATCH', headers: { apikey: MAIL.sbKey, Authorization: `Bearer ${MAIL.sbKey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ gemeldet_am: new Date().toISOString() }) })
+        .then(x => { if (!x.ok) log('mail', `markieren ${m.id}: ${x.status}`); }, e => log('mail', `markieren ${m.id}: ${e.message}`));
+    }
+    try { tx.close(); } catch { /* */ }
+    log('mail', `${liste.length} Meldung(en) verschickt`);
+  } catch (e) { log('mail', e.message); }
+  finally { mailLaeuft = false; }
+}
+
 async function reap() {
   const now = Date.now();
   for (const s of sessions.values()) {
@@ -462,4 +501,7 @@ imagesPruefen().catch(() => {}); setInterval(() => imagesPruefen().catch(() => {
 // Selbsttest: 15 Min nach dem Start (so laufen schnelle Deploy-Neustarts nicht jedes Mal rein), danach täglich.
 setTimeout(() => selbsttest().catch(() => {}), 900000);
 setInterval(() => selbsttest().catch(() => {}), 24 * 3600 * 1000).unref();
+// Problem-Meldungen alle 3 Min abholen und mailen (nur wenn Zugänge hinterlegt – sonst still).
+setTimeout(() => meldungenMailen().catch(() => {}), 20000);
+setInterval(() => meldungenMailen().catch(() => {}), 180000).unref();
 server.listen(CFG.port, CFG.host, () => log(`Arena lauscht auf ${CFG.host}:${CFG.port} · Labs: ${Object.keys(LABS).join(', ')} · Konto ${CFG.konto ? 'an' : 'aus'}`));
