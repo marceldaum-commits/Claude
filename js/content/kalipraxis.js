@@ -38,11 +38,44 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'Das war echtes Recon: offene Dienste (nmap) → versteckte Pfade (gobuster) → Auffälligkeiten (nikto). Genau in dieser Reihenfolge fängt fast jeder Test an. Dieselben Werkzeuge nutzt du gleich für alle weiteren Ziele.',
   },
+  {
+    id: 'web', icon: '🌐', titel: 'Web-Angriff in echt: Login umgehen & Zugriffsfehler', stufe: 'Aufbau', team: 'Rot',
+    einleitung: 'Jetzt geht es um echte Web-Lücken – die häufigsten der Welt (OWASP Top 10). Du findest einen versteckten Bereich, hebelst den Login per SQL-Injection aus und greifst über die API auf fremde Daten zu (IDOR). Alles im selben Juice-Shop-Ziel wie beim Recon.',
+    ziel: {
+      name: 'OWASP Juice Shop (Docker)',
+      start: 'docker run --rm -p 3000:3000 bkimminich/juice-shop',
+      hinweis: 'Falls noch vom Recon-Modul offen: einfach weiterlaufen lassen. Sonst neu starten und das Fenster offen lassen.',
+      pruef: 'Öffne http://localhost:3000 – lädt der Shop, kann es losgehen.',
+    },
+    schritte: [
+      {
+        id: 'scoreboard', werkzeug: 'Browser + DevTools', frage_art: 'antwort',
+        aufgabe: 'Finde die versteckte Übersichtsseite, auf der alle Challenges stehen. Sie ist nicht verlinkt – aber im JavaScript-Code zu finden.',
+        befehl: 'Im Browser: F12 → Reiter „Quellen/Sources" → main.js öffnen → mit Strg+F nach „score" suchen.',
+        erwartet: 'Im Code taucht ein Routen-Name auf, der auf eine Tafel mit allen Aufgaben zeigt.',
+        frage: 'Wie heißt die versteckte Seite (der Teil nach #/)?', antwort: ['score-board', 'scoreboard', '#/score-board'], tipp: 'Zwei Wörter mit Bindestrich. Danach kannst du sie per http://localhost:3000/#/score-board öffnen.',
+      },
+      {
+        id: 'sqli', werkzeug: 'SQL-Injection (Login)', frage_art: 'antwort',
+        aufgabe: 'Melde dich an, OHNE das Passwort zu kennen. Trick: Das E-Mail-Feld wird ungeprüft in eine Datenbank-Abfrage gesteckt. Mit einem Hochkomma brichst du die Abfrage auf.',
+        befehl: "E-Mail:  ' OR 1=1--     Passwort: egal (irgendwas)",
+        erwartet: 'Login klappt – du landest als allererster Benutzer (der Admin) im Shop.',
+        frage: 'Als welche E-Mail-Adresse bist du jetzt eingeloggt?', antwort: ['admin@juice-sh.op'], tipp: 'Oben rechts im Konto-Menü steht die Mail. Es ist das erste Konto der Datenbank.',
+      },
+      {
+        id: 'idor', werkzeug: 'curl (API / IDOR)', frage_art: 'abhaken',
+        aufgabe: 'Zugriffsfehler ausnutzen (IDOR): Die API prüft nicht, OB dir ein Warenkorb gehört – sie gibt ihn nur nach Nummer heraus. Zähl die Nummer hoch und sieh einen fremden Korb.',
+        befehl: 'curl http://127.0.0.1:3000/rest/basket/2',
+        erwartet: 'Du bekommst JSON zu einem Warenkorb, der dir nicht gehört – obwohl du nur für deinen eigenen berechtigt wärst.',
+        frage: 'Fremden Warenkorb (andere Nummer) abgerufen?', tipp: 'Probier /rest/basket/1, /2, /3 … Jede Nummer ist ein anderer Nutzer.',
+      },
+    ],
+    abschluss: 'Drei Welt-Klassiker erlebt: versteckten Bereich gefunden, Login per SQL-Injection umgangen, Zugriffskontrolle per IDOR ausgehebelt. Genau solche Fehler stehen oben in den OWASP Top 10 – und genau danach suchst du bei echten Web-Tests.',
+  },
 ];
 
 // Noch geplante Module dieses Strangs (werden nach und nach gebaut).
 export const KALIPRAXIS_GEPLANT = [
-  { icon: '🌐', titel: 'Web-Angriff in echt: Login umgehen & IDOR (Juice Shop)' },
   { icon: '💉', titel: 'SQL-Injection in echt (DVWA)' },
   { icon: '🔑', titel: 'Passwörter in echt: Hydra & John/Hashcat (lokal)' },
   { icon: '🧨', titel: 'Exploitation in echt: Metasploit gegen eine Übungs-VM' },
