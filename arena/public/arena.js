@@ -260,6 +260,15 @@
   term.loadAddon(fit);
   const send = (s) => { if (ws && ws.readyState === 1) ws.send(s); };
   const resize = () => { try { fit.fit(); send(`\u0000resize:${term.cols}x${term.rows}`); } catch { /* */ } };
+  // Terminal über der Handy-Tastatur halten: #termbox endet oberhalb der eingeblendeten Tastatur,
+  // damit Eingabezeile und Tasten immer sichtbar sind (kein Scrollen). Nutzt die visualViewport-API.
+  const vv = window.visualViewport;
+  const fitViewport = () => {
+    const tb = $('#termbox'); if (!tb || tb.hidden) return;
+    if (vv) tb.style.bottom = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) + 'px';
+    resize();
+  };
+  if (vv) { vv.addEventListener('resize', fitViewport); vv.addEventListener('scroll', fitViewport); }
 
   async function starten(lab, knopf) {
     const tok = $('#token').value.trim().toUpperCase();
@@ -282,7 +291,7 @@
     // Zentrale Terminal-Härtung (gilt für ALLE Arena-Räume): Handy-Autokorrektur/Groß­schreibung/Vorschläge aus,
     // sonst wird aus „cat ~/auftrag.txt" schnell „cat ~/Auftrag.tut" und der Cursor springt.
     { const ta = term.textarea; if (ta) { ta.setAttribute('autocapitalize', 'none'); ta.setAttribute('autocorrect', 'off'); ta.setAttribute('autocomplete', 'off'); ta.setAttribute('spellcheck', 'false'); ta.setAttribute('inputmode', 'text'); ta.setAttribute('enterkeyhint', 'send'); ta.setAttribute('data-gramm', 'false'); } }
-    resize(); const cb = $('#cmd'); if (cb) cb.focus(); else term.focus();
+    resize(); fitViewport(); const cb = $('#cmd'); if (cb) { cb.addEventListener('focus', () => setTimeout(fitViewport, 100)); cb.addEventListener('blur', () => { $('#termbox').style.bottom = ''; setTimeout(resize, 100); }); cb.focus(); } else term.focus();
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
     ws = new WebSocket(`${proto}://${location.host}${location.pathname.replace(/[^/]*$/, '')}api/term/${id}`);
     ws.onopen = resize;
