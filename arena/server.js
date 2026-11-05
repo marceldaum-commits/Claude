@@ -150,7 +150,9 @@ const EINORDNUNG = {
 // Ist das Image eines Labs gebaut? (Neue Labs erscheinen erst, wenn der Server sie gebaut hat.)
 const vorhanden = {};
 async function imagesPruefen() { for (const [id, L] of Object.entries(LABS)) vorhanden[id] = await docker.getImage(L.image).inspect().then(() => true, () => false); }
-const labOeffentlich = () => Object.entries(LABS).sort((a, b) => STUFEN.indexOf(a[1].stufe) - STUFEN.indexOf(b[1].stufe)).map(([id, L]) => ({ id, titel: L.title, stufe: L.stufe, reihe: EINORDNUNG[id]?.[0] || 'Hacken', themen: EINORDNUNG[id]?.[1] || [], kurz: L.kurz, produkt: L.produkt, levels: L.levels, bereit: vorhanden[id] !== false }));
+// Team-Zuordnung (Red/Blue/Purple): Hacken = Rot, Ermitteln/Abwehren = Blau, explizit 'Lila' je Lab möglich (3. Eintrag).
+const teamVon = (id, reihe) => EINORDNUNG[id]?.[2] || (reihe === 'Hacken' ? 'Rot' : 'Blau');
+const labOeffentlich = () => Object.entries(LABS).sort((a, b) => STUFEN.indexOf(a[1].stufe) - STUFEN.indexOf(b[1].stufe)).map(([id, L]) => { const reihe = EINORDNUNG[id]?.[0] || 'Hacken'; return ({ id, titel: L.title, stufe: L.stufe, reihe, team: teamVon(id, reihe), themen: EINORDNUNG[id]?.[1] || [], kurz: L.kurz, produkt: L.produkt, levels: L.levels, bereit: vorhanden[id] !== false }); });
 const istLab = (lab) => Object.hasOwn(LABS, lab);
 function darf(k, lab) {
   if (!istLab(lab)) return false;

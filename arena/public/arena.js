@@ -83,20 +83,23 @@
   // Empfohlene Reihenfolge je Reihe: Hacken (Keller → …), Ermitteln (Spurensuche → Einbruch → Maulwurf), Abwehren (Angriff! 1 → 2 → 3)
   const VORHER = { leitstelle: 'keller', webshop: 'keller', tresor: 'leitstelle', einbruch: 'spuren', maulwurf: 'einbruch', abwehr2: 'abwehr1', abwehr3: 'abwehr2', web2: 'web1', web3: 'web2', meister: 'web3', duell: 'abwehr3', mitschnitt: 'spuren', werkstatt: 'tresor', chiffren: 'leitstelle', versteck: 'spuren', ki: 'web2' };
 
-  // ---------------------------------------------------------------- Register (Filter nach Reihe, Stufe, Thema)
+  // ---------------------------------------------------------------- Register (Filter nach Team, Reihe, Stufe, Thema)
   const REIHEN = { Hacken: '🗝️ Hacken', Ermitteln: '🔍 Ermitteln', Abwehren: '🛡️ Abwehren' };
-  const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem'];
-  let F = { reihe: '', stufe: '', thema: '' };
+  const TEAMS = { Rot: '🔴 Rot · Angriff', Blau: '🔵 Blau · Verteidigung', Lila: '🟣 Lila · beides' };
+  const teamVon = (L) => L.team || (L.reihe === 'Hacken' ? 'Rot' : 'Blau');
+  const STUFEN = ['Einsteiger', 'Fortgeschritten', 'Experte', 'Extrem', 'Meister'];
+  let F = { team: '', reihe: '', stufe: '', thema: '' };
   try { F = { ...F, ...JSON.parse(store.get('arena.filter') || '{}') }; } catch { /* */ }
   function filterZeichnen() {
     const knopf = (art, wert, text) => `<button data-f="${art}" data-w="${esc(wert)}" class="${F[art] === wert ? 'an' : ''}">${esc(text)}</button>`;
     const themen = [...new Set(LABS.flatMap(l => l.themen || []))].sort();
+    if ($('#fTeam')) $('#fTeam').innerHTML = knopf('team', '', 'Alle Teams') + Object.entries(TEAMS).filter(([k]) => LABS.some(l => teamVon(l) === k)).map(([k, t]) => knopf('team', k, t)).join('');
     $('#fReihe').innerHTML = knopf('reihe', '', 'Alle') + Object.entries(REIHEN).map(([k, t]) => knopf('reihe', k, t)).join('');
     $('#fStufe').innerHTML = knopf('stufe', '', 'Jede Stufe') + STUFEN.filter(x => LABS.some(l => l.stufe === x)).map(x => knopf('stufe', x, x)).join('');
     $('#fThema').innerHTML = knopf('thema', '', 'Alle Themen') + themen.map(x => knopf('thema', x, '#' + x)).join('');
     document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { F[b.dataset.f] = F[b.dataset.f] === b.dataset.w ? '' : b.dataset.w; store.set('arena.filter', JSON.stringify(F)); zeichne(); });
   }
-  const passt = (L) => (!F.reihe || L.reihe === F.reihe) && (!F.stufe || L.stufe === F.stufe) && (!F.thema || (L.themen || []).includes(F.thema));
+  const passt = (L) => (!F.team || teamVon(L) === F.team) && (!F.reihe || L.reihe === F.reihe) && (!F.stufe || L.stufe === F.stufe) && (!F.thema || (L.themen || []).includes(F.thema));
 
   function zeichne() {
     filterZeichnen();
@@ -125,7 +128,7 @@
       }
       return `<section class="card lab ${markiert === L.id ? 'markiert' : ''}" id="lab-${esc(L.id)}">
         <div class="kopf"><h2 style="margin:0">${esc(L.titel)}</h2><span class="stufe ${esc(L.stufe)}">${esc(L.stufe)}</span></div>
-        <div class="themen"><span>${esc(REIHEN[L.reihe] || L.reihe)}</span>${(L.themen || []).map(t => `<span>#${esc(t)}</span>`).join('')}</div>
+        <div class="themen"><span class="team ${esc(teamVon(L))}">${esc((TEAMS[teamVon(L)] || '').split(' · ')[0] || teamVon(L))}</span><span>${esc(REIHEN[L.reihe] || L.reihe)}</span>${(L.themen || []).map(t => `<span>#${esc(t)}</span>`).join('')}</div>
         <p class="small">${esc(L.kurz)}</p>
         <p class="small" style="margin:.2rem 0 .5rem"><a href="handbuch.html#handout-${esc(L.id)}">📄 Handout: Begriffe, Werkzeuge, Vorgehen</a></p>
         ${empf}

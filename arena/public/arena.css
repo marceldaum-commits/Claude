@@ -74,3 +74,8 @@ details.klein summary { cursor: pointer; color: var(--muted); font-size: .9rem; 
 .sprachbanner .go { background: var(--lime); color: #111; border: 0; border-radius: 999px; padding: .45rem .9rem; font-weight: 700; font-size: .9rem; cursor: pointer; min-height: 38px; }
 .sprachbanner .zu { background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .45rem .8rem; font-size: .85rem; cursor: pointer; min-height: 38px; }
 .sprachlabel { display: inline-flex; align-items: center; font-size: .82rem; color: var(--muted); margin-right: .2rem; }
+/* Team-Abzeichen (Red/Blue/Purple) */
+.themen .team { font-weight: 700; border: 1px solid; }
+.team.Rot { color: #f87171; border-color: rgba(248,113,113,.5); background: rgba(248,113,113,.1); }
+.team.Blau { color: #60a5fa; border-color: rgba(96,165,250,.5); background: rgba(96,165,250,.1); }
+.team.Lila { color: #c084fc; border-color: rgba(192,132,252,.55); background: rgba(192,132,252,.12); }
