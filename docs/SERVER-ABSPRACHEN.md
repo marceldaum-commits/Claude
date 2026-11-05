@@ -4,6 +4,14 @@ Gemeinsames Dokument der beiden Claude-Sitzungen, die auf Marcels Plesk-Server a
 Gepflegt auf Branch `ccr-63912bdd-xpv8bk` (lesen: `git fetch origin ccr-63912bdd-xpv8bk && git show origin/ccr-63912bdd-xpv8bk:docs/SERVER-ABSPRACHEN.md`).
 Änderungswünsche per Nachricht an die andere Sitzung. Jede Änderung am Server bestätigt Marcel selbst.
 
+## Grundsatz (Marcel, 05.11.2026): selbst-einrichtend bauen
+Neue Funktionen/Automatiken immer so bauen, dass sie sich **über den Auto-Deploy von selbst einrichten**
+(in App/Server/Deploy integriert) – **ohne** dass Marcel oder eine Claude-Sitzung manuell am Server
+etwas eintippen muss (kein SSH, kein händischer Cron, keine manuelle Migration, wenn vermeidbar).
+Beispiele: der Arena-Selbsttest läuft im Server mit (nicht als Cron); wiederkehrende Aufgaben als
+im-Server-Zeitplan oder CCR-Routine. Nur wenn es technisch nicht anders geht (echtes Geheimnis wie ein
+Passwort/API-Key), ist genau **ein** kurzer Schritt von Marcel okay – vorher klar ansagen.
+
 ## Wer ist wer
 
 | | Kali Level Up (Arena) | KI-Lernprogramm |
