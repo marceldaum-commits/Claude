@@ -122,6 +122,7 @@ async function api(aktion, daten = {}) {
 function kopf(an) {
   $('#tabs').hidden = !an; $('#aus').hidden = !an;
   const z = $('#anfrZahl'); if (z) { z.textContent = D?.offeneAnfragen || ''; z.hidden = !D?.offeneAnfragen; }
+  const zm = $('#meldZahl'); if (zm) { zm.textContent = D?.offeneMeldungen || ''; zm.hidden = !D?.offeneMeldungen; }
   $('#wer').textContent = an && ses?.user?.email ? ses.user.email : '';
 }
 function anmelden(hinweis = '') {
@@ -185,6 +186,7 @@ async function uebersicht() {
   main.innerHTML = `<section class="stack">
     <h1 style="margin-bottom:0">Übersicht</h1>
     ${D.offeneAnfragen ? `<a class="card zanfrage" href="#/anfragen">📨 <b>${D.offeneAnfragen} neue Zugangsanfrage${D.offeneAnfragen === 1 ? '' : 'n'}</b> – jetzt ansehen ›</a>` : ''}
+    ${D.offeneMeldungen ? `<a class="card zanfrage" href="#/meldungen">🐞 <b>${D.offeneMeldungen} offene Problem-Meldung${D.offeneMeldungen === 1 ? '' : 'en'}</b> – jetzt ansehen ›</a>` : ''}
     <div class="zkpis">
       <a class="zkpi" href="#/kunden?f=alle"><b>${nutzer.length}</b><span>Konten gesamt</span></a>
       <a class="zkpi" href="#/kunden?f=kunden"><b>${k.length}</b><span>Kunden</span></a>
@@ -368,6 +370,31 @@ async function anfragenSeite() {
   });
 }
 
+async function meldungenSeite() {
+  main.innerHTML = '<section class="stack"><h1 style="margin:0">Problem-Meldungen</h1><p class="muted">Lade …</p></section>';
+  const [{ meldungen }, { nutzer }] = await Promise.all([api('meldungen'), laden(true)]);
+  const M = Object.fromEntries(nutzer.map(n => [n.id, n]));
+  const offen = meldungen.filter(m => !m.erledigt), erledigt = meldungen.filter(m => m.erledigt);
+  const wer = (id) => M[id] ? `<a href="#/kunde/${id}"><b>${esc(M[id].name || M[id].email)}</b></a> <span class="small muted">${esc(M[id].email)}</span>` : '<span class="muted">gelöschtes Konto</span>';
+  const ktx = (k) => { k = k || {}; const t = [k.version && `v${k.version}`, k.lernort, k.sprache, k.geraet].filter(Boolean).join(' · '); return t ? `<p class="small muted" style="margin:.2rem 0 0">🔧 ${esc(t)}</p>` : ''; };
+  const karte = (m) => `<div class="card stack">
+    <div class="row between" style="align-items:flex-start"><div>${wer(m.user_id)}<br><span class="zb ${m.erledigt ? 'ok' : 'warn'}">${m.erledigt ? 'erledigt' : 'offen'}</span> <span class="zb">${esc(m.bereich || 'Sonstiges')}</span></div><span class="small muted">${datum(m.erstellt)}</span></div>
+    <blockquote class="small" style="margin:0;padding:.5rem .7rem;border-left:3px solid var(--violet);background:var(--card2);border-radius:6px;white-space:pre-wrap">${esc(m.text)}</blockquote>
+    ${m.kontakt ? `<p class="small" style="margin:0">Rückmeldung an: <a href="mailto:${esc(m.kontakt)}">${esc(m.kontakt)}</a></p>` : ''}
+    ${ktx(m.kontext)}
+    <div class="row"><button class="btn ${m.erledigt ? 'ghost' : 'primary'}" data-meld="${esc(m.id)}" data-erl="${m.erledigt ? '0' : '1'}">${m.erledigt ? '↩︎ Wieder öffnen' : '✓ Als erledigt markieren'}</button></div>
+  </div>`;
+  main.innerHTML = `<section class="stack"><h1 style="margin:0">Problem-Meldungen</h1><div id="msg"></div>
+    <p class="small muted" style="margin:0">Meldungen aus App und Arena (🐞 „Problem melden“). Jede Meldung wird hier gespeichert – unabhängig davon, ob der E-Mail-Versand eingerichtet ist.</p>
+    ${offen.length ? offen.map(karte).join('') : '<div class="card"><p class="muted" style="margin:0">Keine offenen Meldungen. 🎉</p></div>'}
+    ${erledigt.length ? `<details class="card"><summary><b>Erledigt (${erledigt.length})</b></summary><div class="stack" style="margin-top:.6rem">${erledigt.map(karte).join('')}</div></details>` : ''}
+  </section>`;
+  main.querySelectorAll('[data-meld]').forEach(b => b.onclick = () => tun(
+    () => api('meldung_erledigt', { meldung_id: b.dataset.meld, erledigt: b.dataset.erl === '1' }),
+    b.dataset.erl === '1' ? 'Als erledigt markiert.' : 'Wieder geöffnet.', meldungenSeite));
+  kopf(true);
+}
+
 async function codes() {
   const { codes: liste } = await laden();
   const offen = (c) => !c.widerrufen && (!c.gueltig_bis || new Date(c.gueltig_bis) > new Date()) && c.uses < c.max_uses;
@@ -401,7 +428,7 @@ async function codes() {
   main.querySelectorAll('[data-w]').forEach(b => b.onclick = () => confirm(`Code ${b.dataset.w} widerrufen? Wer ihn schon eingelöst hat, behält seinen Zugang.`) && tun(() => api('code_widerrufen', { code: b.dataset.w }), 'Code widerrufen.', codes));
 }
 
-const AKTION = { anfrage_genehmigt: '✅ Anfrage genehmigt', anfrage_abgelehnt: '❌ Anfrage abgelehnt', code_erstellt: '🎟️ Code erstellt', code_widerrufen: '🎟️ Code widerrufen', nutzer_geaendert: '✏️ Konto geändert', zugang_gegeben: '➕ Zugang gegeben', zugang_beendet: '➖ Zugang beendet', nutzer_geloescht: '🗑️ Konto gelöscht', passwort_mail: '🔑 Passwort-Mail', rolle_gesetzt: '🛠️ Rolle geändert', notiz_geaendert: '📝 Notiz', email_bestaetigt: '✓ E-Mail bestätigt', zwei_faktor_zurueckgesetzt: '🔐 Zwei-Faktor zurückgesetzt', bestaetigung_erneut: '✉️ Bestätigung erneut' };
+const AKTION = { anfrage_genehmigt: '✅ Anfrage genehmigt', anfrage_abgelehnt: '❌ Anfrage abgelehnt', code_erstellt: '🎟️ Code erstellt', code_widerrufen: '🎟️ Code widerrufen', nutzer_geaendert: '✏️ Konto geändert', zugang_gegeben: '➕ Zugang gegeben', zugang_beendet: '➖ Zugang beendet', nutzer_geloescht: '🗑️ Konto gelöscht', passwort_mail: '🔑 Passwort-Mail', rolle_gesetzt: '🛠️ Rolle geändert', notiz_geaendert: '📝 Notiz', email_bestaetigt: '✓ E-Mail bestätigt', zwei_faktor_zurueckgesetzt: '🔐 Zwei-Faktor zurückgesetzt', bestaetigung_erneut: '✉️ Bestätigung erneut', meldung_erledigt: '🐞 Meldung bearbeitet' };
 async function protokoll() {
   main.innerHTML = '<section class="stack"><h1 style="margin:0">Protokoll</h1><p class="muted">Lade …</p></section>';
   const [{ eintraege }, { nutzer }] = await Promise.all([api('protokoll'), laden()]);
@@ -479,6 +506,7 @@ async function route() {
     else if (teil === 'kunde' && arg) await kunde(arg);
     else if (teil === 'codes') await codes();
     else if (teil === 'anfragen') await anfragenSeite();
+    else if (teil === 'meldungen') await meldungenSeite();
     else if (teil === 'protokoll') await protokoll();
     else if (teil === 'system') await system();
     else if (teil === 'markt') await markt();

@@ -106,7 +106,8 @@ Deno.serve(async (req) => {
         });
         const { data: codes } = await db.from('invites').select('*').order('created_at', { ascending: false });
         const { count: offeneAnfragen } = await db.from('zugangsanfragen').select('id', { count: 'exact', head: true }).eq('status', 'offen');
-        return antwort(origin, 200, { nutzer, codes: codes || [], offeneAnfragen: offeneAnfragen || 0 });
+        const { count: offeneMeldungen } = await db.from('support_meldungen').select('id', { count: 'exact', head: true }).eq('erledigt', false);
+        return antwort(origin, 200, { nutzer, codes: codes || [], offeneAnfragen: offeneAnfragen || 0, offeneMeldungen: offeneMeldungen || 0 });
       }
       case 'code_erstellen': {
         const max = Math.min(1000, Math.max(1, Number(body.max_uses) || 1));
@@ -305,6 +306,22 @@ Deno.serve(async (req) => {
         const { error } = await db.from('zugangsanfragen').update({ status: ja ? 'genehmigt' : 'abgelehnt', antwort: text, entschieden_am: new Date().toISOString(), entschieden_von: u.user.id }).eq('id', aid).eq('status', 'offen');
         if (error) throw error;
         await protokoll(ja ? 'anfrage_genehmigt' : 'anfrage_abgelehnt', a.user_id, { produkt: a.produkt, bis });
+        return antwort(origin, 200, { ok: true });
+      }
+      case 'meldungen': {
+        const { data, error } = await db.from('support_meldungen')
+          .select('id, user_id, bereich, text, kontakt, kontext, erledigt, erstellt')
+          .order('erledigt', { ascending: true }).order('erstellt', { ascending: false }).limit(300);
+        if (error) throw error;
+        return antwort(origin, 200, { meldungen: data || [] });
+      }
+      case 'meldung_erledigt': {
+        const mid = String(body.meldung_id || '');
+        if (!UUID.test(mid)) return antwort(origin, 400, { fehler: 'Unbekannte Meldung' });
+        const erledigt = body.erledigt !== false; // Standard: als erledigt markieren
+        const { error } = await db.from('support_meldungen').update({ erledigt }).eq('id', mid);
+        if (error) throw error;
+        await protokoll('meldung_erledigt', null, { meldung_id: mid, erledigt });
         return antwort(origin, 200, { ok: true });
       }
       default:
