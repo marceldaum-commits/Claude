@@ -208,11 +208,44 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'Das ist Rechte-Ausweitung (Privilege Escalation): als normaler Benutzer rein → mit linPEAS die Fehlkonfiguration finden → mit dem GTFOBins-Trick zu root → Geheimnis lesen. Deshalb: SUID-Rechte so sparsam wie möglich, Konfigurationen regelmäßig prüfen – denn die Verteidiger nutzen linPEAS genauso.',
   },
+  {
+    id: 'container', icon: '🐳', titel: 'Container-Ausbruch in echt: vom Container zum Host', stufe: 'Könner', team: 'Rot',
+    einleitung: 'Container gelten als „sicher abgeschottet" – aber nur, wenn sie richtig konfiguriert sind. Der häufigste Fehler in echten Firmen: Ein Container darf den Docker-Socket des Hosts sehen. Wer im Container ist, ist damit faktisch root auf dem ganzen Server. Du spielst das auf deinem eigenen Rechner nach (dein Host, dein Container – alles deins, völlig legal).',
+    ziel: {
+      name: 'Dein eigener Docker-Host',
+      start: '# 1) Auf dem HOST eine Markierung ablegen (damit du den Ausbruch beweisen kannst):\necho \'AUSBRUCH-OK\' > /tmp/host-marker.txt\n# 2) Einen falsch konfigurierten Container starten (Docker-Socket eingehängt – der typische Fehler):\ndocker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock docker:cli sh',
+      hinweis: 'Du brichst aus deinem EIGENEN Container auf deinen EIGENEN Rechner aus – das ist sicher und legal. Mach das nie auf fremden Systemen.',
+      pruef: 'Im Container zeigt `docker ps` die Container des Hosts an – dann ist der Socket erreichbar.',
+    },
+    schritte: [
+      {
+        id: 'sock', werkzeug: 'Docker-Socket', frage_art: 'antwort',
+        aufgabe: 'Finde heraus, WAS dir hier die Kontrolle über den Host gibt. Schau, welche besondere Datei in den Container eingehängt wurde (sie verbindet dich mit dem Docker-Dienst des Hosts).',
+        befehl: 'ls -l /var/run/docker.sock\ndocker ps   # zeigt die Container des HOSTS',
+        erwartet: 'Die Socket-Datei ist da, und `docker ps` spricht mit dem Host-Docker.',
+        frage: 'Welche eingehängte Datei ist der gefährliche Zugang zum Host?', antwort: ['/var/run/docker.sock', 'var/run/docker.sock', 'docker.sock'], tipp: 'Endet auf „.sock" und liegt unter /var/run/.',
+      },
+      {
+        id: 'escape', werkzeug: 'Docker (im Container)', frage_art: 'antwort',
+        aufgabe: 'Brich aus: Starte über den Host-Docker einen neuen Container, der das GESAMTE Dateisystem des Hosts einhängt – und lies deine Markierung vom Host.',
+        befehl: 'docker run --rm -v /:/host alpine cat /host/tmp/host-marker.txt',
+        erwartet: 'Du liest eine Datei, die auf dem HOST liegt – obwohl du „nur" im Container bist.',
+        frage: 'Wie lautet der Inhalt von /tmp/host-marker.txt (vom Host)?', antwort: ['AUSBRUCH-OK', 'ausbruch-ok'], tipp: 'Genau der Text, den du in Schritt „Ziel starten" auf dem Host abgelegt hast.',
+      },
+      {
+        id: 'root', werkzeug: 'Host-Zugriff', frage_art: 'abhaken',
+        aufgabe: 'Mach dir klar, wie weit das reicht: Über denselben Weg könntest du jede Host-Datei lesen/ändern – z. B. einen Blick in /host/etc/shadow (die Passwort-Hashes des Hosts) werfen.',
+        befehl: 'docker run --rm -v /:/host alpine head -n 3 /host/etc/shadow',
+        erwartet: 'Du siehst Host-System-Dateien, die einem Container eigentlich verborgen sein müssten = volle Kontrolle.',
+        frage: 'Verstanden, dass der eingehängte Socket faktisch Host-Root bedeutet?', tipp: 'Darum hängt man den Docker-Socket NIE in nicht vertrauenswürdige Container.',
+      },
+    ],
+    abschluss: 'Ausbruch geschafft: Ein in den Container eingehängter Docker-Socket (oder --privileged) ist faktisch Root auf dem ganzen Host – ein sehr häufiger echter Fehler (CI-Runner, Monitoring-Agenten). Schutz: Socket niemals einhängen, rootless-Docker nutzen oder einen Socket-Proxy mit Positivliste davorschalten (genau das macht übrigens unser „Docker-Wächter" in der Arena).',
+  },
 ];
 
 // Noch geplante Module dieses Strangs (werden nach und nach gebaut).
 export const KALIPRAXIS_GEPLANT = [
-  { icon: '🪟', titel: 'Windows & Active Directory: Grundlagen angreifen' },
-  { icon: '📡', titel: 'WLAN & Netzwerk: mitlesen und knacken (aircrack-ng)' },
-  { icon: '🐳', titel: 'Container & Cloud: aus Docker ausbrechen' },
+  { icon: '📡', titel: 'WLAN in echt: WPA-Handshake offline knacken (aircrack-ng)' },
+  { icon: '🪟', titel: 'Windows & Active Directory (eigenes Mini-Labor)' },
 ];
