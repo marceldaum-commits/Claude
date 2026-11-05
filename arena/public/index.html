@@ -58,6 +58,10 @@
   </main>
   <section id="termbox" hidden>
     <div id="term" translate="no"></div>
+    <form id="cmdbar" translate="no" autocomplete="off">
+      <input id="cmd" type="text" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" inputmode="text" enterkeyhint="send" placeholder="Befehl eintippen und ↵ senden">
+      <button type="submit" class="btn" aria-label="Senden">↵</button>
+    </form>
     <nav id="keys" translate="no">
       <button data-k="tab">Tab</button><button data-k="ctrlc">Strg+C</button><button data-k="up">↑</button><button data-k="down">↓</button>
       <button data-k="left">←</button><button data-k="right">→</button><button data-s="|">|</button><button data-s="~">~</button>

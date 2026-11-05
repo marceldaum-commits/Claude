@@ -282,7 +282,7 @@
     // Zentrale Terminal-Härtung (gilt für ALLE Arena-Räume): Handy-Autokorrektur/Groß­schreibung/Vorschläge aus,
     // sonst wird aus „cat ~/auftrag.txt" schnell „cat ~/Auftrag.tut" und der Cursor springt.
     { const ta = term.textarea; if (ta) { ta.setAttribute('autocapitalize', 'none'); ta.setAttribute('autocorrect', 'off'); ta.setAttribute('autocomplete', 'off'); ta.setAttribute('spellcheck', 'false'); ta.setAttribute('inputmode', 'text'); ta.setAttribute('enterkeyhint', 'send'); ta.setAttribute('data-gramm', 'false'); } }
-    resize(); term.focus();
+    resize(); const cb = $('#cmd'); if (cb) cb.focus(); else term.focus();
     const proto = location.protocol === 'https:' ? 'wss' : 'ws';
     ws = new WebSocket(`${proto}://${location.host}${location.pathname.replace(/[^/]*$/, '')}api/term/${id}`);
     ws.onopen = resize;
@@ -295,5 +295,7 @@
 
   const KEYS = { tab: '\t', ctrlc: '\x03', up: '\x1b[A', down: '\x1b[B', left: '\x1b[D', right: '\x1b[C' };
   document.querySelectorAll('#keys button').forEach(b => b.onclick = () => { send(b.dataset.s ?? KEYS[b.dataset.k]); term.focus(); });
+  // Stabile Befehlszeile (Handy): ganze Zeile + Enter senden – umgeht die Autokorrektur/Komposition von xterm.
+  $('#cmdbar').onsubmit = (e) => { e.preventDefault(); const i = $('#cmd'); const v = i.value; i.value = ''; if (v !== '') send(v + '\r'); i.focus(); };
   $('#ende').onclick = async () => { if (id) await fetch(`api/session/${id}`, { method: 'DELETE' }).catch(() => {}); location.href = location.pathname; };
 })();

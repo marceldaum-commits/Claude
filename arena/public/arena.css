@@ -16,6 +16,9 @@ input { display: block; width: 100%; margin-top: .3rem; padding: .65rem .8rem; b
 .btn:disabled { opacity: .5; }
 #termbox { position: fixed; inset: 49px 0 0 0; display: flex; flex-direction: column; }
 #term { flex: 1; min-height: 0; padding: 4px; }
+#cmdbar { display: flex; gap: 6px; padding: 6px; border-top: 1px solid var(--line); background: var(--card); }
+#cmdbar input { flex: 1; min-width: 0; margin: 0; padding: .55rem .6rem; border-radius: 8px; border: 1px solid var(--line); background: #0d0d16; color: var(--text); font: 14px ui-monospace, monospace; }
+#cmdbar .btn { flex: 0 0 auto; padding: .55rem .9rem; }
 #keys { display: flex; gap: 4px; overflow-x: auto; padding: 6px; border-top: 1px solid var(--line); background: var(--card); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
 #keys button { flex: 0 0 auto; min-width: 44px; padding: .45rem .6rem; border-radius: 8px; border: 1px solid var(--line); background: #0d0d16; color: var(--text); font: 14px ui-monospace, monospace; }
 @media (min-width: 900px) { #keys { display: none; } }
