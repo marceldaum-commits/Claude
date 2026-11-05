@@ -986,6 +986,20 @@ views.werkzeuge = () => ({
     ${myToolbox().length ? `<p class="small muted">Diese Werkzeuge hast du schon wirklich benutzt, um Flags oder Antworten zu finden:</p><ul class="list">${myToolbox().map(([t, rs]) => `<li><span class="state done">✓</span><span class="grow"><span class="t"><code>${esc(t)}</code></span><span class="s">in ${rs.map(r => `<a href="#/raum/${r.id}">${esc(r.title)}</a>`).join(', ')}</span></span></li>`).join('')}</ul>` : '<p class="small">Noch leer – knack deinen ersten Raum, dann füllt sich der Kasten.</p>'}
     <p class="small muted">Tipp: Lege dir in Kali eine eigene Notizdatei an (<code>nano ~/notizen/werkzeuge.md</code>) und schreib zu jedem Werkzeug den Befehl auf, der bei dir funktioniert hat. Eigene Notizen merkt man sich viel besser.</p>
   </div>
+  <div class="card"><h3 style="margin-top:0">🧭 „Brauche ich das?" – Kurz-Checkliste</h3>
+    <p class="small"><b>Für die Arena & die App-Übungen: nichts installieren.</b> Alles läuft im Browser (den Linux-Server stellen wir). Werkzeuge brauchst du nur für die <b>optionalen „echten Kali-Aufträge"</b>.</p>
+    <p class="small"><b>✅ Standard-Kali bringt fast alles schon mit</b> – einfach benutzen, nichts tun:</p>
+    <ul class="list"><li><span class="state done">✓</span><span class="grow"><span class="t"><code translate="no">curl</code>, <code translate="no">grep</code>/<code translate="no">find</code>, <code translate="no">ps</code>, <code translate="no">nmap</code>, <code translate="no">wireshark</code></span><span class="s">Grundlagen, Scannen, Pakete ansehen (Level 1–9)</span></span></li>
+      <li><span class="state done">✓</span><span class="grow"><span class="t">Burp Suite, <code translate="no">gobuster</code>/<code translate="no">ffuf</code>, <code translate="no">whatweb</code>, <code translate="no">nikto</code></span><span class="s">Web-Hacking (Level 3) – im Standard-Kali enthalten</span></span></li>
+      <li><span class="state done">✓</span><span class="grow"><span class="t">Metasploit, John, Hashcat, SearchSploit</span><span class="s">Exploits & Passwort-Tests (Level 6–7) – ebenfalls dabei</span></span></li></ul>
+    <p class="small"><b>➕ Nur selten nachrüsten</b> (erst auf hohem Level, optional):</p>
+    <pre class="syntax" translate="no">sudo apt update && sudo apt install -y yara dnsutils
+pipx install sigma-cli   # optional, für Detection-Regeln</pre>
+    <p class="small muted">Prüfen, ob etwas fehlt: <code translate="no">command -v nmap gobuster burpsuite</code>. Fehlt mal ein Standard-Tool: <code translate="no">sudo apt install -y &lt;name&gt;</code>.</p>
+    <p class="small"><b>📱 Am Handy (Termux, kein Kali):</b> nur die Basics – der Rest läuft über die Arena im Browser:</p>
+    <pre class="syntax" translate="no">pkg install nmap curl dnsutils</pre>
+    <p class="small muted">Faustregel: Einsteiger brauchen <b>gar nichts</b> zu installieren. Fortgeschrittene auf echtem Kali meist auch nicht – Kali bringt den Werkzeugkasten schon mit. 🧰</p>
+  </div>
   <h2 style="margin-top:1rem">Alle Werkzeuge im Lernpfad</h2>
   <p class="muted small">Geordnet nach Level. Verfügbarkeit immer selbst prüfen: <code>command -v NAME</code>, <code>NAME --version</code>, <code>NAME --help</code>. Nichts unbedacht installieren.</p>
   <div class="stack">${TOOLS.map(t => `<div class="card">
