@@ -319,8 +319,9 @@ Deno.serve(async (req) => {
         const mid = String(body.meldung_id || '');
         if (!UUID.test(mid)) return antwort(origin, 400, { fehler: 'Unbekannte Meldung' });
         const erledigt = body.erledigt !== false; // Standard: als erledigt markieren
-        const { error } = await db.from('support_meldungen').update({ erledigt }).eq('id', mid);
+        const { data, error } = await db.from('support_meldungen').update({ erledigt }).eq('id', mid).select('id');
         if (error) throw error;
+        if (!data || !data.length) return antwort(origin, 404, { fehler: 'Meldung nicht gefunden' });
         await protokoll('meldung_erledigt', null, { meldung_id: mid, erledigt });
         return antwort(origin, 200, { ok: true });
       }

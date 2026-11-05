@@ -19,7 +19,7 @@ export const KALIPRAXIS = [
         aufgabe: 'Finde heraus, welche Ports/Dienste offen sind.',
         befehl: 'nmap -sV -p- 127.0.0.1',
         erwartet: 'Eine offene Zeile, z. B.: 3000/tcp open http Node.js Express framework',
-        frage: 'Auf welchem Port antwortet Juice Shop?', antwort: ['3000'], tipp: 'Steht in der nmap-Ausgabe (…/tcp open).',
+        frage: 'Auf welchem Port antwortet Juice Shop?', antwort: ['3000'], tipp: 'Steht in der nmap-Ausgabe (…/tcp open). „-p-" scannt alle 65535 Ports und kann ein paar Minuten dauern.',
       },
       {
         id: 'gobuster', werkzeug: 'gobuster', frage_art: 'antwort',
@@ -64,10 +64,10 @@ export const KALIPRAXIS = [
       },
       {
         id: 'idor', werkzeug: 'curl (API / IDOR)', frage_art: 'abhaken',
-        aufgabe: 'Zugriffsfehler ausnutzen (IDOR): Die API prüft nicht, OB dir ein Warenkorb gehört – sie gibt ihn nur nach Nummer heraus. Zähl die Nummer hoch und sieh einen fremden Korb.',
-        befehl: 'curl http://127.0.0.1:3000/rest/basket/2',
-        erwartet: 'Du bekommst JSON zu einem Warenkorb, der dir nicht gehört – obwohl du nur für deinen eigenen berechtigt wärst.',
-        frage: 'Fremden Warenkorb (andere Nummer) abgerufen?', tipp: 'Probier /rest/basket/1, /2, /3 … Jede Nummer ist ein anderer Nutzer.',
+        aufgabe: 'Zugriffsfehler ausnutzen (IDOR): Du bist aus dem vorigen Schritt eingeloggt. Hol dir dein Anmelde-Token (DevTools → Application → Local Storage → Schlüssel „token") und ruf damit einen Warenkorb mit einer FREMDEN Nummer ab. Die API prüft nämlich nicht, ob der Korb dir gehört.',
+        befehl: 'TOKEN=dein-token-aus-devtools\ncurl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:3000/rest/basket/2',
+        erwartet: 'Du bekommst den Warenkorb zu Nummer 2 – obwohl das nicht deiner ist (deiner ist Nummer 1).',
+        frage: 'Fremden Warenkorb (andere Nummer) abgerufen?', tipp: 'Das Token kommt aus dem Login davor (DevTools → Application → Local Storage → token). /rest/basket/1 ist deiner, /2 ein fremder.',
       },
     ],
     abschluss: 'Drei Welt-Klassiker erlebt: versteckten Bereich gefunden, Login per SQL-Injection umgangen, Zugriffskontrolle per IDOR ausgehebelt. Genau solche Fehler stehen oben in den OWASP Top 10 – und genau danach suchst du bei echten Web-Tests.',
@@ -146,7 +146,7 @@ export const KALIPRAXIS = [
     ziel: {
       name: 'Metasploitable 2 (Docker)',
       start: 'docker run --rm -it -p 21:21 -p 6200:6200 tleemcjr/metasploitable2',
-      hinweis: 'Metasploitable ist absichtlich voller Lücken – NIEMALS ins Internet hängen, nur lokal. Metasploit startest du in einem zweiten Terminal.',
+      hinweis: 'Metasploitable ist absichtlich voller Lücken – NIEMALS ins Internet hängen, nur lokal. Metasploit startest du in einem zweiten Terminal. Falls die Backdoor im Docker-Container nicht anspringt, nimm die Metasploitable-2-VM (gleiches Ziel) – der Exploit ist identisch.',
       pruef: 'nmap -sV -p21 127.0.0.1 zeigt 21/tcp open ftp vsftpd 2.3.4.',
     },
     schritte: [

@@ -297,7 +297,7 @@ async function createSession(lab, token, ip, userId = null, sprache = 'de') {
   await container.start();
   try { await waitReady(container, L.ready); }
   catch (e) { await container.remove({ force: true }).catch(() => {}); throw e; }
-  const s = { id, lab, containerId: container.id, ip, userId, created: Date.now(), lastSeen: Date.now(), token };
+  const s = { id, lab, containerId: container.id, ip, userId, created: Date.now(), lastSeen: Date.now(), token, sprache };
   sessions.set(id, s);
   log('start', lab, id.slice(0, 8), ip);
   return s;
@@ -375,12 +375,13 @@ async function meldungenMailen() {
     if (!r.ok) { log('mail', `laden ${r.status}`); return; }
     const liste = await r.json();
     if (!Array.isArray(liste) || !liste.length) return;
-    const tx = nodemailer.createTransport({ host: MAIL.host, port: MAIL.port, secure: MAIL.port === 465, auth: { user: MAIL.user, pass: MAIL.pass } });
+    const tx = nodemailer.createTransport({ host: MAIL.host, port: MAIL.port, secure: MAIL.port === 465, auth: { user: MAIL.user, pass: MAIL.pass }, connectionTimeout: 15000, greetingTimeout: 15000, socketTimeout: 20000 });
     for (const m of liste) {
       const k = m.kontext || {};
       const body = `Bereich: ${m.bereich}\nKontakt: ${m.kontakt || '(keiner)'}\nKonto: ${m.user_id || '(nicht angemeldet)'}\nZeit: ${m.erstellt}\n\n${m.text}\n\n-- technisch --\nVersion: ${k.version || '?'}\nLernort: ${k.lernort || '?'}\nSprache: ${k.sprache || '?'}\nGerät: ${k.geraet || '?'}`;
       try {
-        await tx.sendMail({ from: MAIL.user, to: MAIL.an, replyTo: m.kontakt || undefined, subject: `Nachtfalter: Problem – ${m.bereich}`.slice(0, 160), text: body });
+        const replyTo = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m.kontakt || '') ? m.kontakt : undefined;
+        await tx.sendMail({ from: MAIL.user, to: MAIL.an, replyTo, subject: `Nachtfalter: Problem – ${m.bereich}`.slice(0, 160), text: body });
       } catch (e) { log('mail', `senden ${m.id}: ${e.message}`); continue; } // nicht markieren → nächster Lauf erneut
       await fetch(`${MAIL.sbUrl}/rest/v1/support_meldungen?id=eq.${m.id}`,
         { method: 'PATCH', headers: { apikey: MAIL.sbKey, Authorization: `Bearer ${MAIL.sbKey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ gemeldet_am: new Date().toISOString() }) })

@@ -375,7 +375,7 @@ async function meldungenSeite() {
   const [{ meldungen }, { nutzer }] = await Promise.all([api('meldungen'), laden(true)]);
   const M = Object.fromEntries(nutzer.map(n => [n.id, n]));
   const offen = meldungen.filter(m => !m.erledigt), erledigt = meldungen.filter(m => m.erledigt);
-  const wer = (id) => M[id] ? `<a href="#/kunde/${id}"><b>${esc(M[id].name || M[id].email)}</b></a> <span class="small muted">${esc(M[id].email)}</span>` : '<span class="muted">gelöschtes Konto</span>';
+  const wer = (id) => !id ? '<span class="muted">anonym (nicht angemeldet)</span>' : M[id] ? `<a href="#/kunde/${id}"><b>${esc(M[id].name || M[id].email)}</b></a> <span class="small muted">${esc(M[id].email)}</span>` : '<span class="muted">gelöschtes Konto</span>';
   const ktx = (k) => { k = k || {}; const t = [k.version && `v${k.version}`, k.lernort, k.sprache, k.geraet].filter(Boolean).join(' · '); return t ? `<p class="small muted" style="margin:.2rem 0 0">🔧 ${esc(t)}</p>` : ''; };
   const karte = (m) => `<div class="card stack">
     <div class="row between" style="align-items:flex-start"><div>${wer(m.user_id)}<br><span class="zb ${m.erledigt ? 'ok' : 'warn'}">${m.erledigt ? 'erledigt' : 'offen'}</span> <span class="zb">${esc(m.bereich || 'Sonstiges')}</span></div><span class="small muted">${datum(m.erstellt)}</span></div>

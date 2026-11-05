@@ -27,8 +27,9 @@ open('/opt/firma/passwoerter.txt', 'w').write(
   '# Alte Passwortliste – sollte NICHT fuer alle lesbar sein!\n'
   'admin:fruehling2023\nbackup:Firma#2021\n'
   f'# Spiegel-Code-1 (Angriff geglueckt, du konntest die Datei lesen):\n{code(1)}\n')
-# Stufe 3: offener Status-Dienst, der den Rot-Code verrät
-open('/opt/spiegel/dienst.py', 'w').write(
+# Stufe 3: offener Status-Dienst, der den Rot-Code verrät (liegt in /opt/firma, damit 'admin' ihn
+# starten UND später per kill beenden kann – /opt/spiegel ist nur für 'pruef' betretbar)
+open('/opt/firma/dienst.py', 'w').write(
   'import socket\n'
   'MSG = "Offener Status-Dienst (niemand sollte mich erreichen).\\nSpiegel-Code-3: ' + code(3) + '\\n"\n'
   's = socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\n'
@@ -43,10 +44,10 @@ chown pruef:pruef /opt/spiegel/codes; chmod 600 /opt/spiegel/codes
 printf '%s\n' "$SP" > /opt/spiegel/sprache; chown pruef:pruef /opt/spiegel/sprache; chmod 644 /opt/spiegel/sprache
 cp /opt/lab/waechter.py /opt/spiegel/waechter.py; chown pruef:pruef /opt/spiegel/waechter.py; chmod 644 /opt/spiegel/waechter.py
 chown admin:admin /opt/firma/passwoerter.txt; chmod 644 /opt/firma/passwoerter.txt
-chown admin:admin /opt/spiegel/dienst.py; chmod 755 /opt/spiegel/dienst.py
+chown admin:admin /opt/firma/dienst.py; chmod 700 /opt/firma/dienst.py
 
 # Stufe 3/4: offenen Dienst als 'admin' starten (vom Spieler zu beenden)
-runuser -u admin -- bash -c 'setsid python3 /opt/spiegel/dienst.py >/dev/null 2>&1 &' || true
+runuser -u admin -- bash -c 'setsid python3 /opt/firma/dienst.py >/dev/null 2>&1 &' || true
 # Stufe 5: Hintertür-Autostart in ~/.bashrc
 printf '\n# kly-autostart: HINTERTUER – diese Zeilen gehoeren hier nicht hin, entferne sie!\n(command -v nc >/dev/null && nc -w1 10.0.0.9 4444 </dev/null >/dev/null 2>&1 &)  # kly-autostart\n' >> /home/admin/.bashrc
 chown admin:admin /home/admin/.bashrc
