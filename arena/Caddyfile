@@ -5,5 +5,10 @@
 		X-Robots-Tag "noindex, nofollow"
 		-Server
 	}
-	reverse_proxy arena:8090
+	reverse_proxy arena:8090 {
+		# Echte Client-IP verbindlich setzen (ueberschreibt evtl. vom Client gefaelschte Header),
+		# damit maxPerIp/pruefBremse nicht per X-Real-IP/X-Forwarded-For umgangen werden koennen.
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+	}
 }

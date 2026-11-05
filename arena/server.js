@@ -201,7 +201,9 @@ const sessions = new Map(); // id -> { id, lab, containerId, ip, created, lastSe
 const log = (...a) => console.log(new Date().toISOString(), ...a);
 
 function clientIp(req) {
-  // Hinter nginx: X-Real-IP bzw. der LETZTE Eintrag von X-Forwarded-For stammt von nginx selbst (der erste kann gefälscht sein)
+  // Hinter dem Reverse-Proxy: Der Proxy setzt X-Real-IP bzw. den LETZTEN XFF-Eintrag verbindlich auf die
+  // echte Client-IP (siehe Caddyfile header_up bzw. nginx proxy_set_header). Vom Client gesendete Werte
+  // werden dort ueberschrieben, sind hier also nicht faelschbar.
   if (CFG.trustProxy && req.headers['x-real-ip']) return String(req.headers['x-real-ip']).trim();
   if (CFG.trustProxy && req.headers['x-forwarded-for']) return String(req.headers['x-forwarded-for']).split(',').pop().trim();
   return req.socket.remoteAddress || '?';
@@ -420,6 +422,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/api/labs') return json(res, 200, { labs: labOeffentlich() });
     if (req.method === 'GET' && url.pathname === '/api/gesundheit') return json(res, 200, gesundheit);
     if (req.method === 'GET' && url.pathname === '/api/zugang') {
+      if (!pruefBremse(clientIp(req))) return json(res, 429, { fehler: 'Zu viele Versuche' });
       const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
       if (!bearer) return json(res, 401, { fehler: 'Bitte anmelden.' });
       let k; try { k = await kontoPruefen(bearer, url.searchParams.has('frisch')); } catch (e) { log('konto', e.message); return json(res, 502, { fehler: 'Konto gerade nicht erreichbar.' }); }
@@ -428,6 +431,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && url.pathname === '/api/session') {
       const ip = clientIp(req);
+      if (!pruefBremse(ip)) return json(res, 429, { fehler: 'Zu viele Versuche' });
       let body; try { body = JSON.parse(await readBody(req)); } catch { return json(res, 400, { fehler: 'Ungültige Anfrage' }); }
       let userId = null;
       const bearer = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
