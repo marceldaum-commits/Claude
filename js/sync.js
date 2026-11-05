@@ -88,18 +88,12 @@ export async function arenaFortschritt() {
 }
 export async function meldungSenden(payload) {
   const c = await getClient();
-  if (!c) throw new Error('nicht-angemeldet');
-  // Frisches Token sichern (sonst schickt invoke evtl. nur den anonymen Schlüssel → 401).
-  const { data: s } = await c.auth.getSession();
-  let token = s?.session?.access_token;
-  if (!token) throw new Error('nicht-angemeldet');
-  let res = await c.functions.invoke('melden', { body: payload, headers: { Authorization: `Bearer ${token}` } });
-  if (res.error) {
-    // Token evtl. abgelaufen → einmal auffrischen und erneut versuchen.
-    const { data: r } = await c.auth.refreshSession().catch(() => ({ data: null }));
-    token = r?.session?.access_token;
-    if (token) res = await c.functions.invoke('melden', { body: payload, headers: { Authorization: `Bearer ${token}` } });
-  }
+  if (!c) throw new Error('Senden nicht möglich – keine Verbindung.');
+  // Anmeldung ist freiwillig: Wer angemeldet ist, wird mitgeschickt (für Zuordnung); sonst anonym.
+  const { data: s } = await c.auth.getSession().catch(() => ({ data: null }));
+  const token = s?.session?.access_token;
+  const opts = token ? { body: payload, headers: { Authorization: `Bearer ${token}` } } : { body: payload };
+  const res = await c.functions.invoke('melden', opts);
   if (res.error) throw new Error(res.error.message || 'Senden fehlgeschlagen');
   return res.data;
 }

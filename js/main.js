@@ -1102,13 +1102,11 @@ views.melden = (vor = '') => {
         try {
           await meldungSenden({ bereich, text, kontakt: mail, kontext: kontext() });
           fb.className = 'small ok'; fb.textContent = '✓ Danke! Deine Meldung ist angekommen – wir kümmern uns.';
+          toast('✓ Meldung abgeschickt – danke!');
           $('#m-text', root).value = '';
         } catch (e) {
-          if (e.message === 'nicht-angemeldet') {
-            fb.className = 'small rot'; fb.textContent = 'Bitte melde dich zuerst an (Konto) – dann kommt deine Meldung direkt bei uns an. Oder nutz den E-Mail-Knopf.';
-          } else {
-            fb.className = 'small rot'; fb.textContent = 'Senden klappt gerade nicht. Nutz bitte den Knopf „Stattdessen per E-Mail“.';
-          }
+          fb.className = 'small rot'; fb.textContent = 'Senden klappt gerade nicht. Nutz bitte den Knopf „Stattdessen per E-Mail“.';
+          toast('Senden klappt gerade nicht – nimm den E-Mail-Knopf.');
           const mt = $('#m-mailto', root); mt.href = mailtoFallback(bereich, text); mt.hidden = false;
         }
         btn.disabled = false;
