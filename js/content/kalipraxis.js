@@ -358,10 +358,78 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'Jetzt hast du ein echtes AD-Labor: Kerberoasting, AS-REP-Roasting und Angriffspfade (BloodHound) kannst du gefahrlos üben. Die geknackten Kerberos-Tickets wandern zu hashcat (-m 13100) – die direkte Brücke zum Passwörter-Modul. Mehr AD-Praxis geht kaum sicherer.',
   },
+  {
+    id: 'android', icon: '📱', titel: 'Android-App auseinandernehmen (APK)', stufe: 'Aufbau', team: 'Rot',
+    einleitung: 'Eine Android-App (.apk) ist nichts weiter als ein ZIP-Archiv. Entwickler legen darin erschreckend oft Geheimnisse ab – API-Schlüssel, interne Adressen, Passwörter. Du baust hier eine typische „schlampige" App nach und holst das Geheimnis genau so heraus, wie es ein Analyst tut: auspacken und durchsuchen. Dieselben Handgriffe funktionieren an echten APKs.',
+    ziel: {
+      name: 'Beispiel-App (selbst gebaut)',
+      start: 'mkdir -p meineapp/assets meineapp/res/values\ncat > meineapp/assets/config.properties <<EOF\nAPI_KEY=SK-NACHTFALTER-7F3A91\nBACKEND=https://api.intern.firma.tld\nEOF\ncat > meineapp/res/values/strings.xml <<EOF\n<resources>\n  <string name="app_name">MeineBank</string>\n</resources>\nEOF\n(cd meineapp && zip -r ../meinebank.apk . >/dev/null)',
+      hinweis: 'Alles lokal. Eine echte APK aus dem Play Store ist auch nur so ein ZIP – dieselben Befehle greifen dort.',
+      pruef: 'Datei da: `ls -l meinebank.apk`.',
+    },
+    schritte: [
+      {
+        id: 'zip', werkzeug: 'unzip', frage_art: 'abhaken',
+        aufgabe: 'Zeig, dass eine APK ein ZIP ist: liste den Inhalt auf.',
+        befehl: 'unzip -l meinebank.apk',
+        erwartet: 'Du siehst u. a. assets/config.properties und res/values/strings.xml.',
+        frage: 'APK als ZIP ausgelesen (Dateien gesehen)?', tipp: 'Jede .apk lässt sich so öffnen.',
+      },
+      {
+        id: 'key', werkzeug: 'unzip + grep', frage_art: 'antwort',
+        aufgabe: 'Durchsuche die App nach hinterlegten Schlüsseln. „assets/" und Konfig-Dateien sind beliebte Fundgruben.',
+        befehl: 'unzip -p meinebank.apk assets/config.properties\n# oder alles entpacken und durchsuchen:\nunzip -o meinebank.apk -d entpackt >/dev/null && grep -rni "key\\|secret\\|token" entpackt/',
+        erwartet: 'In config.properties steht ein API-Schlüssel im Klartext.',
+        frage: 'Wie lautet der hinterlegte API_KEY?', antwort: ['SK-NACHTFALTER-7F3A91'], tipp: 'Steht hinter „API_KEY=".',
+      },
+      {
+        id: 'dex', werkzeug: 'jadx / strings', frage_art: 'abhaken',
+        aufgabe: 'Bei echten Apps steckt der Code in „classes.dex". Hol dir den lesbaren Quelltext mit jadx (in Kali dabei) und such nach Schlüsseln – oder schnell mit strings.',
+        befehl: 'jadx -d ausgabe echte_app.apk && grep -rni "api_key\\|password\\|secret" ausgabe/\n# schnell-check ohne jadx:\nstrings classes.dex | grep -i key',
+        erwartet: 'Auch fest einprogrammierte Strings (Schlüssel, URLs) werden sichtbar.',
+        frage: 'Verstanden, wie man im Code (classes.dex/jadx) nach Secrets sucht?', tipp: 'Lehre: Geheimnisse gehören NIE in die App, sondern auf den Server.',
+      },
+    ],
+    abschluss: 'Eine APK ist ein ZIP: Geheimnisse liegen oft im Klartext in assets/res (per unzip sichtbar) oder fest im Code (classes.dex → jadx). Genau danach suchen Angreifer zuerst. Lehre für Entwickler: keine Schlüssel/Passwörter in die App packen – die kann jeder auspacken.',
+  },
+  {
+    id: 'api', icon: '🔌', titel: 'APIs angreifen in echt: fremde Daten über die ID (BOLA)', stufe: 'Aufbau', team: 'Rot',
+    einleitung: 'Die häufigste API-Lücke der Welt (OWASP API Security Top 10, Platz 1) heißt BOLA: Die API gibt Daten nach einer Objekt-Nummer heraus, ohne zu prüfen, ob sie dir überhaupt gehören. Du startest eine kleine, absichtlich verwundbare API lokal und liest fremde Konten – nur durch Hochzählen der Nummer.',
+    ziel: {
+      name: 'Verwundbare Mini-API (lokal, Python)',
+      start: 'cat > api.py <<EOF\nfrom http.server import BaseHTTPRequestHandler, HTTPServer\nimport json\nKONTEN = {\n  1: {"user": "du", "geheim": "dein-eigenes-konto"},\n  2: {"user": "chef", "geheim": "BOLA{fremdes_konto_gelesen}"},\n  3: {"user": "buchhaltung", "geheim": "Gehaltsliste-2024"},\n}\nclass H(BaseHTTPRequestHandler):\n    def do_GET(self):\n        if self.path.startswith("/konto/"):\n            try: kid = int(self.path.split("/")[2])\n            except: kid = 0\n            k = KONTEN.get(kid)\n            self.send_response(200 if k else 404)\n            self.send_header("Content-Type", "application/json"); self.end_headers()\n            self.wfile.write(json.dumps(k or {"fehler": "nicht gefunden"}).encode())\n        else:\n            self.send_response(404); self.end_headers()\nprint("API laeuft auf http://127.0.0.1:8000  (Strg+C beendet)")\nHTTPServer(("127.0.0.1", 8000), H).serve_forever()\nEOF\npython3 api.py',
+      hinweis: 'Läuft lokal, Strg+C beendet. Lass dieses Fenster offen und greif in einem ZWEITEN Terminal an.',
+      pruef: 'curl http://127.0.0.1:8000/konto/1 liefert dein eigenes Konto zurück.',
+    },
+    schritte: [
+      {
+        id: 'eigen', werkzeug: 'curl', frage_art: 'abhaken',
+        aufgabe: 'Normalnutzung: Ruf dein eigenes Konto (Nummer 1) ab.',
+        befehl: 'curl http://127.0.0.1:8000/konto/1',
+        erwartet: 'Du bekommst dein eigenes Konto als JSON.',
+        frage: 'Eigenes Konto (1) abgerufen?', tipp: 'So würde die App es ganz normal tun.',
+      },
+      {
+        id: 'bola', werkzeug: 'curl', frage_art: 'antwort',
+        aufgabe: 'Der Angriff: Die API prüft nicht, WEM ein Konto gehört. Zähl die Nummer hoch und lies ein fremdes Konto.',
+        befehl: 'curl http://127.0.0.1:8000/konto/2',
+        erwartet: 'Du bekommst ein Konto, das dir nicht gehört.',
+        frage: 'Wie lautet das „geheim"-Feld von Konto 2?', antwort: ['BOLA{fremdes_konto_gelesen}', 'fremdes_konto_gelesen'], tipp: 'Steht im JSON unter „geheim".',
+      },
+      {
+        id: 'enum', werkzeug: 'curl (Schleife)', frage_art: 'abhaken',
+        aufgabe: 'Zeig die volle Tragweite: Mit einer Schleife liest du einfach ALLE Konten der Reihe nach aus.',
+        befehl: 'for i in 1 2 3 4 5; do curl -s http://127.0.0.1:8000/konto/$i; echo; done',
+        erwartet: 'Du siehst mehrere fremde Konten – nur durch Hochzählen.',
+        frage: 'Mehrere fremde Konten per Schleife gelesen?', tipp: 'Genau so ziehen Angreifer ganze Datenbanken ab.',
+      },
+    ],
+    abschluss: 'Das ist BOLA (Broken Object Level Authorization) – die Nummer 1 der API-Lücken: Daten werden nach ID herausgegeben, ohne die Besitzrechte zu prüfen. Schutz: Der Server muss bei JEDER Anfrage prüfen, ob der angemeldete Nutzer genau auf dieses Objekt zugreifen darf – niemals nur auf die ID vertrauen.',
+  },
 ];
 
 // Noch geplante Module dieses Strangs (werden nach und nach gebaut).
 export const KALIPRAXIS_GEPLANT = [
-  { icon: '📱', titel: 'Android-App in echt: APK auseinandernehmen' },
-  { icon: '🔌', titel: 'APIs angreifen: kaputte Authentifizierung & BOLA' },
+  { icon: '☁️', titel: 'Cloud (AWS/S3): offene Buckets & Fehlkonfigurationen' },
+  { icon: '🕵️', titel: 'OSINT: öffentliche Spuren über ein Ziel sammeln' },
 ];
