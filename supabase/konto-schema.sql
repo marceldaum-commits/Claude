@@ -1,5 +1,14 @@
 -- Nachtfalter-Konto (Supabase-Projekt „nachtfalter-konto“, Ref sxapebxzxmathkvtuuvn, Region eu-central-1/Frankfurt)
 -- Angewendet als Migration „konto_grundschema“ am 03.11.2026. Getrennt vom Lernstand-Sync (supabase/schema.sql).
+-- Diese Datei ist REFERENZ-Doku; maßgeblich ist die Live-DB. Stand 06.11.2026 mit Live abgeglichen
+-- (produkt kennt zusätzlich 'arena-profi', quelle zusätzlich 'anfrage' – siehe Checks unten).
+--
+-- Sicherheits-Audit RPC einloesen(p_code) am 06.11.2026 (Geld-/Zugang-Hebel): unauffällig. Prüft:
+--   security definer + search_path='' (alles public.* qualifiziert), uid aus auth.uid();
+--   Bremse: >=10 Fehlversuche/Stunde je Konto (invite_fails) -> zu_viele_versuche;
+--   Invite-Zeile per FOR UPDATE gesperrt -> race-sicher gegen max_uses; idempotent (schon-eingelöst erkannt,
+--   kein Doppel-Entitlement); gewährt genau inv.produkt für inv.tage (Default 30). EXECUTE nur
+--   authenticated/service_role (nicht anon). Keine Injection. Kein Handlungsbedarf.
 --
 -- profiles      : ein Profil pro Konto, wird bei Registrierung automatisch angelegt.
 --                 Nutzer dürfen nur display_name und lang ändern; Alter/Eltern-Einwilligung setzt der Dienst.
@@ -23,9 +32,9 @@ create policy "eigenes Profil ändern" on public.profiles for update to authenti
 create table public.entitlements (
   id bigint generated always as identity primary key,
   user_id uuid not null references auth.users(id) on delete cascade,
-  produkt text not null check (produkt in ('arena','ki','alles')),
+  produkt text not null check (produkt in ('arena','arena-profi','ki','alles')),
   gueltig_bis timestamptz not null,
-  quelle text not null check (quelle in ('beta','kauf','geschenk')),
+  quelle text not null check (quelle in ('beta','kauf','geschenk','anfrage')),
   ki_budget_usd numeric(8,2) check (ki_budget_usd is null or ki_budget_usd >= 0),
   notiz text,
   created_at timestamptz not null default now()
