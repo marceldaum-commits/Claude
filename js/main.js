@@ -627,7 +627,8 @@ function kiStufeTile(s, aktiv) {
   const sym = s.geloest ? '✓' : s.offen ? '🤖' : '🔒';
   return `<button type="button" class="ki-tile ${zustand}${s.level === aktiv ? ' aktiv' : ''}" data-lvl="${s.level}" ${s.offen ? '' : 'disabled'}>
     <span class="ki-top"><span class="ki-num">${s.level}</span><span class="ki-sym">${sym}</span></span>
-    <span class="ki-ttl">${esc(s.titel)}</span><span class="ki-thema">${esc(s.thema)}</span></button>`;
+    <span class="ki-ttl">${esc(s.titel)}</span><span class="ki-thema">${esc(s.thema)}</span>
+    ${s.stufe ? `<span class="ki-stufe st-${(s.stufe || '').replace(/\s+/g, '')}">${esc(s.stufe)}</span>` : ''}</button>`;
 }
 function kiMsg(von, text) {
   return `<div class="ki-msg ${von}">${von === 'du' ? '<b>Du:</b> ' + esc(text) : esc(text)}</div>`;
@@ -636,7 +637,7 @@ function kiChat(s, msgs) {
   if (!s) return '';
   if (!s.offen) return `<div class="card warn"><b>🔒 ${U('Noch gesperrt.')}</b> ${U('Knack erst die vorige Stufe.')}</div>`;
   return `<div class="card ki-chat" id="ki-panel">
-    <div class="row between"><b>🤖 ${esc(s.bot)} · ${Ut('Stufe {n}', { n: s.level })}</b><span class="badge ${s.geloest ? 'real' : 'sim'}">${s.geloest ? '✓ ' + U('geknackt') : esc(s.thema)}</span></div>
+    <div class="row between"><b>🤖 ${esc(s.bot)} · ${Ut('Stufe {n}', { n: s.level })}${s.stufe ? ` <span class="ki-stufe st-${(s.stufe || '').replace(/\s+/g, '')}">${esc(s.stufe)}</span>` : ''}</b><span class="badge ${s.geloest ? 'real' : 'sim'}">${s.geloest ? '✓ ' + U('geknackt') : esc(s.thema)}</span></div>
     <p class="small muted" style="margin:.2rem 0">🛡️ ${U('Abwehr')}: ${esc(s.verteidigung)}</p>
     <details class="small" style="margin-bottom:.4rem"><summary>💡 ${U('Tipp anzeigen')}</summary><p class="small" style="margin:.3rem 0 0">${esc(s.hinweis)}</p></details>
     <div class="ki-log" id="ki-log">${msgs.length ? msgs.map(x => kiMsg(x.von, x.text)).join('') : `<p class="small muted">${Ut('Schreib {bot} eine Nachricht und bring die KI dazu, ihr Geheimnis (Flag) zu verraten.', { bot: s.bot })}</p>`}</div>
@@ -728,7 +729,11 @@ views['ki-sicherheit'] = () => ({
     </div>
     <a class="card lime" href="#/kiarena" style="display:block;text-decoration:none;color:inherit">
       <div class="row between"><b>🤖 ${U('KI hacken – live')}</b><span class="badge real">${U('Weltneuheit')}</span></div>
-      <span class="small muted">${U('5 Stufen: bring eine lebende KI per Prompt Injection dazu, ihr Geheimnis zu verraten. Serverseitig, fair, pro Konto.')} →</span>
+      <span class="small muted">${U('10 Stufen von sehr leicht bis echt schwer: bring eine lebende KI per Prompt Injection dazu, ihr Geheimnis zu verraten. Serverseitig, fair, pro Konto.')} →</span>
+    </a>
+    <a class="card" href="#/deepfake" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
+      <div class="row between"><b>🕵️ ${U('Deepfakes & KI-Phishing erkennen')}</b><span class="badge plain">${U('defensiv')}</span></div>
+      <span class="small muted">${U('Trainiere, KI-Fälschungen (Stimme, Video, Phishing-Mails) zu entlarven.')} →</span>
     </a>
     <h2 style="margin:1.1rem 0 .4rem">📚 ${U('Theorie – kurz & klar')}</h2>
     <div class="stack">${KI_THEORIE.map(([t, txt]) => `<details class="card tight"><summary><b>${t}</b></summary><p class="small" style="margin:.4rem 0 0">${esc(txt)}</p></details>`).join('')}</div>
@@ -738,6 +743,51 @@ views['ki-sicherheit'] = () => ({
         <li><span class="state">🧑‍🏫</span><span class="grow"><span class="t">${U('KI-Mentor')}</span><span class="s">${U('Hilfe & Übungen auf deinem Niveau')}</span></span></li>
       </ul></div>
     <p class="honest">${U('Alle Angriffe nur an unseren Übungs-KIs. Was du hier lernst, dient dem Schutz – nie dem Missbrauch echter Systeme.')}</p>`,
+});
+
+// ---------------------------------------------------------------- Deepfake- & KI-Phishing-Erkennung (defensiv)
+const KI_FAKE = [
+  { frage: 'Dein „Chef" ruft an – die Stimme klingt täuschend echt – und verlangt SOFORT eine dringende Überweisung. Was tust du?',
+    optionen: ['Sofort überweisen, er klingt ja echt', 'Auflegen und ihn über seine BEKANNTE Nummer zurückrufen'], richtig: 1,
+    erklaerung: 'Stimm-Deepfake + Zeitdruck = klassische Betrugsmasche (CEO-Fraud). Nie unter Druck handeln – immer über einen zweiten, bekannten Kanal zurückrufen.' },
+  { frage: 'Woran erkennst du oft ein Deepfake-VIDEO?',
+    optionen: ['An perfekter Beleuchtung', 'An unnatürlichem Blinzeln, flackernden Rändern an Haaren/Gesicht, komischer Lippen-Synchro'], richtig: 1,
+    erklaerung: 'Achte auf Details: Augen/Blinzeln, Übergänge am Gesichtsrand, Zähne, Hände, Licht/Schatten – und auf asynchrone Lippenbewegungen.' },
+  { frage: 'Eine PERFEKT formulierte E-Mail deiner „Bank" (kein Rechtschreibfehler, KI-geschrieben) verlinkt auf „bank-sicherheit-login.com" und will dein Passwort. Was tust du?',
+    optionen: ['Draufklicken – sieht professionell aus', 'Nicht klicken; die Bank-App / offizielle Seite SELBST öffnen'], richtig: 1,
+    erklaerung: 'KI macht Phishing fehlerfrei – „keine Fehler" ist kein Echtheitsbeweis mehr. Prüfe Absender und Domain, und logge dich NIE über einen Mail-Link ein.' },
+  { frage: 'Neue Handynummer schreibt per WhatsApp: „Hallo Mama, mein Handy ist kaputt, kannst du schnell eine Rechnung zahlen?" Was tust du?',
+    optionen: ['Schnell zahlen, das Kind braucht Hilfe', 'Eine Kontrollfrage stellen, die nur dein echtes Kind weiß – oder es direkt anrufen'], richtig: 1,
+    erklaerung: 'Die „Hallo-Mama/Papa"-Masche nutzt Mitgefühl + Eile. Verifiziere über einen zweiten Kanal (Anruf) oder eine persönliche Kontrollfrage.' },
+  { frage: 'Was ist das beste allgemeine Gegenmittel gegen Deepfakes und KI-Phishing?',
+    optionen: ['Der Technik vertrauen – Fälschungen sieht man schon', 'Ruhe + ein zweiter Kanal: nie unter Zeitdruck handeln, Echtheit unabhängig prüfen'], richtig: 1,
+    erklaerung: 'Technik allein schützt nicht. Die stärkste Abwehr: Zeitdruck erkennen, innehalten und über einen unabhängigen, bekannten Weg verifizieren.' },
+];
+views.deepfake = () => ({
+  title: 'Deepfakes & KI-Phishing erkennen',
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a>
+    <div class="card adv-held"><div class="adv-held-kopf"><span class="adv-badge">🕵️ ${U('Deepfakes & KI-Phishing')}</span><span class="badge plain">${U('defensiv')}</span></div>
+      <h1 style="margin:.4rem 0 .2rem">${U('Fälschungen entlarven')}</h1>
+      <p class="small muted" style="margin:0">${U('KI macht Fälschungen billig: echte-klingende Stimmen, täuschende Videos, perfekte Phishing-Mails. Trainiere, sie zu erkennen – entscheide dich und lerne die Merkmale.')}</p>
+    </div>
+    <div id="dfwrap" class="stack">${KI_FAKE.map((q, i) => `
+      <div class="card" data-df="${i}">
+        <p style="margin:.1rem 0 .5rem"><b>${i + 1}.</b> ${esc(q.frage)}</p>
+        <div class="stack">${q.optionen.map((opt, j) => `<button class="btn small ghost df-opt" data-i="${i}" data-j="${j}" style="text-align:left">${esc(opt)}</button>`).join('')}</div>
+        <p class="small df-fb" data-fb="${i}" style="margin:.5rem 0 0"></p>
+      </div>`).join('')}</div>
+    <div class="card lime" style="margin-top:.4rem"><b>🛡️ ${U('Merksatz')}</b><br><span class="small">${U('„Keine Fehler" heißt nicht „echt". Bei Druck + Geld + Dringlichkeit: innehalten und über einen zweiten, bekannten Kanal prüfen.')}</span></div>
+    <p class="honest">${U('Defensives Wissen zum Selbstschutz – damit dich KI-Fälschungen nicht erwischen.')}</p>`,
+  mount(root) {
+    $$('.df-opt', root).forEach(btn => btn.onclick = () => {
+      const i = +btn.dataset.i, j = +btn.dataset.j, q = KI_FAKE[i];
+      const fb = root.querySelector(`[data-fb="${i}"]`);
+      $$(`.df-opt[data-i="${i}"]`, root).forEach(b => { b.disabled = true; b.classList.remove('primary'); });
+      const richtig = j === q.richtig;
+      btn.classList.add(richtig ? 'primary' : 'danger');
+      if (fb) fb.innerHTML = `<b style="color:${richtig ? '#9be28f' : 'var(--red)'}">${richtig ? '✓ ' + U('Richtig!') : '✗ ' + U('Nicht ideal.')}</b> ${esc(q.erklaerung)}`;
+    });
+  },
 });
 
 // ---------------------------------------------------------------- Lernpfad (geführte Lernstufen, Leiter)

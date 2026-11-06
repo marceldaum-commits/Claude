@@ -31,6 +31,8 @@ Lebendes Dokument. Entwickeln auf `ccr-63912bdd-xpv8bk`, live erst nach Marcels 
 ## Baulog (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
+| 06.11.2026 | KI-Arena auf 10 Stufen (sehr leicht → echt schwer: Ausgabefilter, Reizwort-Sperre, Verschleierung, Finale-Kombo) | **Live** |
+| 06.11.2026 | Deepfake-/KI-Phishing-Erkennung (interaktives „entlarve die Fälschung"-Modul, defensiv) | **Live** |
 | 06.11.2026 | SEO auf KI-Sicherheit: öffentliche Seite ki-sicherheit.html (DE/EN, Course/FAQ-JSON-LD), Startseiten-Feature, Sitemap | **Live** |
 | 06.11.2026 | ⭐ KI-Sicherheit Phase 1: Live-Angriffs-Labor (Edge `ki-sec`, 5 verwundbare Bot-Stufen, Flag pro Konto) + Hub mit Theorie | **Live** |
 | 06.11.2026 | SOC/Blue-Team-Detection-Modul (Brute-Force in Logs, Event-ID 4625, kodierte PowerShell, C2-Beaconing, DFIR-Zeitachse) | **Live** |
