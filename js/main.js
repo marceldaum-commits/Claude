@@ -182,6 +182,17 @@ function locationModal(force = false) {
 const views = {};
 let cleanup = null;
 
+// Einheitlicher Punktestand (XP) + Streak über ALLES – inkl. „CTF des Tages" (serverseitig).
+// ctfStand wird einmal pro Sitzung vom Server geholt; schlägt es fehl, zählt eben nur der lokale Stand.
+let ctfStand = null; // null = noch nicht geladen, {} = lädt, {punkte,streak} = da
+const gesamtPunkte = () => totalPoints() + ((ctfStand && ctfStand.punkte) || 0);
+const gesamtStreak = () => Math.max(streak(state), (ctfStand && ctfStand.streak) || 0);
+function ctfStandLaden() {
+  if (ctfStand !== null || !syncStatus().user) return;
+  ctfStand = {};
+  taeglich('info').then(d => { ctfStand = { punkte: d.punkte || 0, streak: d.streak || 0 }; render(); }).catch(() => {});
+}
+
 function render() {
   const hash = location.hash.replace(/^#\/?/, '') || 'heute';
   const [route, arg] = hash.split('/');
@@ -248,7 +259,7 @@ views.heute = () => {
         <div class="row between"><span class="badge real">${U('Ziel: eJPT')}</span><a class="btn small ghost" href="#/profil" style="min-height:36px">${U('{n} Abzeichen →', { n: earnedBadges().length })}</a></div>
         <h1 style="margin:.5rem 0 .3rem">${state.profile.name ? U('Hallo {name}!', { name: state.profile.name }) : U('Hallo!')}</h1>
         <div class="bar" aria-label="${esc(Ut('{done} von {all} geknackt', { done, all: ROOMS.length }))}"><i style="width:${Math.round(done / ROOMS.length * 100)}%"></i></div>
-        <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)}🔥</b><span>${U('Tage in Folge')}</span></div></div>
+        <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${gesamtPunkte()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${gesamtStreak()}🔥</b><span>${U('Tage in Folge')}</span></div></div>
       </div>
 
       ${!cont && (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0] ? (() => { const f = (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0]; return `<a class="card lime" href="#/raum/${f.id}" style="display:block;text-decoration:none;color:inherit">
@@ -274,6 +285,7 @@ views.heute = () => {
 
       <p class="small muted" style="margin-top:.8rem">${U('Später, als Ergänzung:')} <a href="#/extern">${U('externe Übungsplattformen')} →</a></p>
     </section>`,
+    mount() { ctfStandLaden(); },
   };
 };
 
@@ -1810,7 +1822,7 @@ views.profil = () => {
   const days = [...Array(28)].map((_, i) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - 27 + i); return today(d); });
   return {
     html: `<a class="back" href="#/mehr">← Mehr</a><h1>${state.profile.name ? esc(state.profile.name) + 's Profil' : 'Dein Profil'}</h1>
-    <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${totalPoints()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${streak(state)} 🔥</b><span>${U('Tage in Folge')}</span></div></div>
+    <div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><b>${gesamtPunkte()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${ROOMS.filter(r => roomDone(r.id)).length}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${gesamtStreak()} 🔥</b><span>${U('Tage in Folge')}</span></div></div>
     <div class="card" style="margin-top:.8rem"><h3>Letzte 4 Wochen</h3>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
     <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${UN(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
@@ -1818,6 +1830,7 @@ views.profil = () => {
     <div class="card"><h3>${U('Erfahrungsstufe')}</h3><p class="small muted" style="margin:0 0 .5rem">${U('Beeinflusst, wie ausführlich erklärt wird.')}</p><div class="stack">${nivButtons()}</div></div>
     <p class="honest">Punkte, Abzeichen und Serien sind Motivation – sie schalten keine Prüfung und kein Level frei.</p>`,
     mount(root) {
+      ctfStandLaden();
       $('#psave', root).onclick = () => { state.profile.name = $('#pname', root).value.trim().slice(0, 30); save(); render(); toast('Gespeichert.'); };
       $$('.niv-opt', root).forEach(btn => btn.onclick = () => { state.profile.level = btn.dataset.niv; save(); $$('.niv-opt', root).forEach(x => x.classList.toggle('on', x === btn)); toast(U('Erfahrungsstufe gespeichert.')); });
     },
