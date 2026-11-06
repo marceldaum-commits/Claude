@@ -119,6 +119,17 @@ export async function advent(aktion, payload = {}) {
   if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
   return res.data;
 }
+// Teilbares öffentliches Profil: teilen/status/aus (serverseitig, braucht Anmeldung).
+export async function profilAktion(aktion, payload = {}) {
+  const c = await getClient();
+  if (!c) throw new Error('Keine Verbindung.');
+  const { data: s } = await c.auth.getSession().catch(() => ({ data: null }));
+  const token = s?.session?.access_token;
+  if (!token) throw new Error('Bitte zuerst anmelden.');
+  const res = await c.functions.invoke('profil', { body: { aktion, ...payload }, headers: { Authorization: `Bearer ${token}` } });
+  if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
+  return res.data;
+}
 export async function meinStatus() {
   if (!user) return null;
   const c = await getClient();

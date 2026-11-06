@@ -531,5 +531,22 @@
   "Dieses Zertifikat bestätigt, dass": "This certificate confirms that",
   "alle 24 Türchen des Advent-Kalenders gelöst hat. 🏆": "has solved all 24 doors of the Advent calendar. 🏆",
   "Zertifikat-Nr.": "Certificate no.",
-  "Konnte nicht laden.": "Could not load."
+  "Konnte nicht laden.": "Could not load.",
+  "Öffentliches Profil teilen": "Share public profile",
+  "Zeig deinen Fortschritt (Punkte, Abzeichen, Serie) mit einem Link – z. B. in Social Media. Du bestimmst, ob er sichtbar ist.": "Show your progress (points, badges, streak) with a link – e.g. on social media. You decide whether it is visible.",
+  "Zum Teilen brauchst du ein Konto.": "You need an account to share.",
+  "Jetzt anmelden": "Sign in now",
+  "Kopieren": "Copy",
+  "Teilen": "Share",
+  "Werte aktualisieren": "Update values",
+  "Nicht mehr teilen": "Stop sharing",
+  "Der Link zeigt nur Name, Punkte, Abzeichen-Zahl, Serie und Meilenstein – keinen Lernstand.": "The link shows only name, points, badge count, streak and milestone – no learning data.",
+  "✓ Link kopiert.": "✓ Link copied.",
+  "Mein Lern-Profil im Nachtfalter Hacklab:": "My learning profile at the Nachtfalter Hacklab:",
+  "Aktualisiere …": "Updating …",
+  "✓ Aktualisiert.": "✓ Updated.",
+  "Öffentliches Profil wirklich abschalten? Der Link funktioniert dann nicht mehr.": "Really turn off the public profile? The link will stop working.",
+  "Profil-Link erstellen": "Create profile link",
+  "Erstelle …": "Creating …",
+  "Konnte nicht laden – bist du angemeldet?": "Could not load – are you signed in?"
 }

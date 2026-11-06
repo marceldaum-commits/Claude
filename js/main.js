@@ -14,7 +14,7 @@ import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { KALIPRAXIS, KALIPRAXIS_GEPLANT } from './content/kalipraxis.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -1956,6 +1956,49 @@ views.raum = (id) => {
   };
 };
 
+// Teilbares öffentliches Profil – UI im Profil
+function profilLink(share_id) { return `${location.origin}/p.html?id=${encodeURIComponent(share_id)}`; }
+function profilWerte() {
+  const hm = hoechsterMeilenstein();
+  return { name: (state.profile.name || '').trim().slice(0, 40), punkte: gesamtPunkte(), abzeichen: earnedBadges().length, meilenstein: hm ? hm.titel : '', streak: gesamtStreak() };
+}
+function profilTeilenMount(box) {
+  if (!box) return;
+  if (!syncConfigured() || !syncStatus().user) {
+    box.innerHTML = `<p class="small">🔐 ${U('Zum Teilen brauchst du ein Konto.')} <a href="konto.html">${U('Jetzt anmelden')} →</a></p>`;
+    return;
+  }
+  const zeigeAktiv = (share_id) => {
+    const link = profilLink(share_id);
+    box.innerHTML = `
+      <div class="row" style="gap:.4rem;align-items:center">
+        <input type="text" id="tl-link" readonly value="${esc(link)}" style="flex:1" onclick="this.select()">
+        <button class="btn small" id="tl-copy">${U('Kopieren')}</button>
+      </div>
+      <div class="row" style="gap:.4rem;margin-top:.5rem;flex-wrap:wrap">
+        ${navigator.share ? `<button class="btn small primary" id="tl-share">📤 ${U('Teilen')}</button>` : ''}
+        <button class="btn small ghost" id="tl-upd">↻ ${U('Werte aktualisieren')}</button>
+        <button class="btn small ghost" id="tl-off">${U('Nicht mehr teilen')}</button>
+      </div>
+      <p class="small muted" style="margin:.5rem 0 0">${U('Der Link zeigt nur Name, Punkte, Abzeichen-Zahl, Serie und Meilenstein – keinen Lernstand.')}</p>
+      <p class="small" id="tl-msg"></p>`;
+    const msg = $('#tl-msg', box);
+    $('#tl-copy', box).onclick = async () => { try { await navigator.clipboard.writeText(link); msg.textContent = U('✓ Link kopiert.'); } catch { $('#tl-link', box).select(); } };
+    const sh = $('#tl-share', box); if (sh) sh.onclick = () => navigator.share({ title: 'Nachtfalter Hacklab', text: U('Mein Lern-Profil im Nachtfalter Hacklab:'), url: link }).catch(() => {});
+    $('#tl-upd', box).onclick = async () => { msg.textContent = U('Aktualisiere …'); try { await profilAktion('teilen', profilWerte()); msg.textContent = U('✓ Aktualisiert.'); } catch (e) { msg.textContent = U('Fehler') + ': ' + (e.message || e); } };
+    $('#tl-off', box).onclick = async () => { if (!confirm(U('Öffentliches Profil wirklich abschalten? Der Link funktioniert dann nicht mehr.'))) return; try { await profilAktion('aus'); zeigeAus(); } catch (e) { msg.textContent = U('Fehler') + ': ' + (e.message || e); } };
+  };
+  const zeigeAus = () => {
+    box.innerHTML = `<button class="btn primary" id="tl-create">🔗 ${U('Profil-Link erstellen')}</button><p class="small" id="tl-msg2"></p>`;
+    $('#tl-create', box).onclick = async () => {
+      const m = $('#tl-msg2', box); m.textContent = U('Erstelle …');
+      try { const r = await profilAktion('teilen', profilWerte()); zeigeAktiv(r.share_id); } catch (e) { m.textContent = U('Fehler') + ': ' + (e.message || e); }
+    };
+  };
+  profilAktion('status').then(s => { if (s.aktiv && s.share_id) zeigeAktiv(s.share_id); else zeigeAus(); })
+    .catch(() => { box.innerHTML = `<p class="small muted">${U('Konnte nicht laden – bist du angemeldet?')}</p>`; });
+}
+
 views.profil = () => {
   const got = new Set(earnedBadges().map(b => b.id));
   const days = [...Array(28)].map((_, i) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - 27 + i); return today(d); });
@@ -1968,11 +2011,16 @@ views.profil = () => {
     <div class="card"><h3>Name</h3><div class="row" style="flex-wrap:nowrap"><input type="text" id="pname" maxlength="30" value="${esc(state.profile.name)}" placeholder="Name oder Spitzname"><button class="btn small primary" id="psave">Speichern</button></div></div>
     <div class="card"><h3>${U('Erfahrungsstufe')}</h3><p class="small muted" style="margin:0 0 .5rem">${U('Beeinflusst, wie ausführlich erklärt wird.')}</p><div class="stack">${nivButtons()}</div></div>
     <a class="card" href="#/zertifikat" style="display:block;text-decoration:none;color:inherit"><b>📜 ${U('Urkunde / Leistungsnachweis')}</b><br><span class="small muted">${U('Dein Fortschritt als PDF zum Speichern oder Drucken')} →</span></a>
+    <div class="card"><h3 style="margin-top:0">🔗 ${U('Öffentliches Profil teilen')}</h3>
+      <p class="small muted" style="margin:0 0 .5rem">${U('Zeig deinen Fortschritt (Punkte, Abzeichen, Serie) mit einem Link – z. B. in Social Media. Du bestimmst, ob er sichtbar ist.')}</p>
+      <div id="teilbox"><p class="small muted">${U('Lade …')}</p></div>
+    </div>
     <p class="honest">Punkte, Abzeichen und Serien sind Motivation – sie schalten keine Prüfung und kein Level frei.</p>`,
     mount(root) {
       ctfStandLaden();
       $('#psave', root).onclick = () => { state.profile.name = $('#pname', root).value.trim().slice(0, 30); save(); render(); toast('Gespeichert.'); };
       $$('.niv-opt', root).forEach(btn => btn.onclick = () => { state.profile.level = btn.dataset.niv; save(); $$('.niv-opt', root).forEach(x => x.classList.toggle('on', x === btn)); toast(U('Erfahrungsstufe gespeichert.')); });
+      profilTeilenMount($('#teilbox', root));
     },
   };
 };

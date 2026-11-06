@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nachtfalter-Profil</title>
+<meta name="description" content="Öffentliches Lern-Profil im Nachtfalter Hacklab – Punkte, Abzeichen und Serie.">
+<link rel="icon" href="icons/icon.svg">
+<style>
+  :root{--bg:#0b0b12;--card:#171724;--card2:#1e1e2e;--line:#2a2a3d;--text:#e8e8f0;--muted:#a3a3b8;--violet:#a78bfa;--lime:#a3e635;--gold:#c9a24a}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+  .wrap{max-width:460px;margin:0 auto;padding:24px 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 22px;text-align:center}
+  .brand{display:flex;align-items:center;justify-content:center;gap:.5rem;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;font-weight:700}
+  .brand img{width:22px;height:22px}
+  .ava{width:72px;height:72px;border-radius:50%;background:linear-gradient(160deg,#2a2350,#15122b);border:2px solid var(--violet);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:16px auto 8px}
+  h1{font-size:1.5rem;margin:.2rem 0 .1rem;word-break:break-word}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 4px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0 6px}
+  .kpi{background:var(--card2);border-radius:12px;padding:12px 6px}
+  .kpi b{display:block;font-size:1.3rem;color:var(--lime)}
+  .kpi span{font-size:.7rem;color:var(--muted)}
+  .ms{display:inline-block;margin:14px 0 0;padding:.35rem .7rem;border:1px solid var(--gold);color:#ffe9a8;border-radius:999px;font-size:.8rem}
+  .cta{display:block;margin:22px 0 0;background:var(--violet);color:#120f22;text-decoration:none;font-weight:800;padding:.8rem 1rem;border-radius:12px}
+  .cta.ghost{background:transparent;color:var(--violet);border:1px solid var(--violet);margin-top:10px;font-weight:700}
+  .muted{color:var(--muted)}
+  .foot{text-align:center;color:var(--muted);font-size:.75rem;margin-top:18px}
+  .foot a{color:var(--muted)}
+  .msg{padding:30px 10px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="inhalt" class="card"><div class="msg">Lade Profil …</div></div>
+  <p class="foot">Nachtfalter Hacklab · <a href="https://www.nachtfalter.tech">nachtfalter.tech</a></p>
+</div>
+<script src="config.js"></script>
+<script>
+(function () {
+  var el = document.getElementById('inhalt');
+  function esc(s){ var d=document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }
+  function fehler(t){ el.innerHTML = '<div class="msg">'+esc(t)+'<br><br><a class="cta" href="https://app.nachtfalter.tech">Zum Nachtfalter Hacklab →</a></div>'; }
+  var id = (new URLSearchParams(location.search).get('id') || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 40);
+  if (!id) { fehler('Kein Profil angegeben.'); return; }
+  var cfg = window.KLY_CONFIG || {};
+  if (!cfg.supabaseUrl) { fehler('Konfiguration fehlt.'); return; }
+  fetch(cfg.supabaseUrl + '/functions/v1/profil', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': cfg.supabaseAnonKey || '' },
+    body: JSON.stringify({ aktion: 'oeffentlich', id: id }),
+  }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+    .then(function (res) {
+      if (!res.ok || !res.j || !res.j.profil) { fehler((res.j && res.j.fehler) || 'Profil nicht gefunden.'); return; }
+      var p = res.j.profil;
+      var name = (p.name || '').trim() || 'Nachtfalter-Lernende(r)';
+      var initial = name.charAt(0).toUpperCase() || '🦉';
+      var html = ''
+        + '<div class="brand"><img src="icons/icon.svg" alt="">Nachtfalter Hacklab</div>'
+        + '<div class="ava">' + esc(initial) + '</div>'
+        + '<h1>' + esc(name) + '</h1>'
+        + '<p class="sub">Lern-Profil · Linux &amp; ethisches Hacken</p>'
+        + '<div class="kpis">'
+        +   '<div class="kpi"><b>' + esc(p.punkte || 0) + '</b><span>Punkte</span></div>'
+        +   '<div class="kpi"><b>' + esc(p.abzeichen || 0) + '</b><span>Abzeichen</span></div>'
+        +   '<div class="kpi"><b>' + esc(p.streak || 0) + '🔥</b><span>Serie</span></div>'
+        + '</div>'
+        + (p.meilenstein ? '<span class="ms">🏅 ' + esc(p.meilenstein) + '</span>' : '')
+        + '<a class="cta" href="https://app.nachtfalter.tech">Auch starten – kostenlos →</a>'
+        + '<a class="cta ghost" href="https://www.nachtfalter.tech">Was ist das Nachtfalter Hacklab?</a>';
+      el.innerHTML = html;
+    })
+    .catch(function () { fehler('Konnte das Profil gerade nicht laden.'); });
+})();
+</script>
+</body>
+</html>
