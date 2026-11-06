@@ -359,6 +359,7 @@ async function kunde(id) {
           ${n.zwei_faktor && !ich ? '<button class="btn small ghost" id="mfa">🔐 Zwei-Faktor zurücksetzen</button>' : ''}
           ${kind(n) ? `<button class="btn small ghost" id="eltern">${n.eltern ? 'Eltern-Zustimmung entfernen' : '👪 Eltern-Zustimmung vermerken'}</button>` : ''}
           <button class="btn small ghost" id="kitok">🎟️ KI-Tokens geben</button>
+          <button class="btn small ghost" id="kilimit">📊 KI-Tageslimit setzen</button>
           <button class="btn small ghost" id="kireset">🤖 KI-Fortschritt zurücksetzen</button>
           ${ich ? '' : `<button class="btn small ${n.gesperrt ? '' : 'ghost'}" id="sperre">${n.gesperrt ? '🔓 Entsperren' : '⛔ Sperren'}</button><button class="btn small rot" id="weg">🗑️ Konto löschen</button>`}
         </div></div></div>
@@ -399,6 +400,12 @@ async function kunde(id) {
     const tokens = voll ? undefined : Math.max(1, Math.min(200, parseInt(a, 10) || 0));
     if (!voll && !tokens) return;
     tun(() => api('ki_tokens', voll ? { user_id: id, voll: true } : { user_id: id, tokens }), voll ? 'KI-Tagesbudget wieder frei.' : `${tokens} KI-Nachrichten gutgeschrieben.`);
+  };
+  if ($('#kilimit')) $('#kilimit').onclick = () => {
+    const a = prompt(`Dauerhaftes KI-Tageslimit für ${n.email} (Nachrichten pro Tag).\nZahl eingeben, oder leer/0 für das Standardlimit:`, '');
+    if (a === null) return;
+    const lim = parseInt(a, 10);
+    tun(() => api('ki_limit', { user_id: id, tageslimit: (Number.isFinite(lim) && lim > 0) ? lim : 0 }), (Number.isFinite(lim) && lim > 0) ? `KI-Tageslimit: ${lim}/Tag.` : 'KI-Tageslimit auf Standard zurückgesetzt.');
   };
   if ($('#kireset')) $('#kireset').onclick = () => confirm(`KI-Sicherheit-Fortschritt von ${n.email} zurücksetzen? (Boss-Bots, Verteidigung, Arena – und das heutige KI-Budget)`) && tun(() => api('ki_reset', { user_id: id }), 'KI-Fortschritt zurückgesetzt.');
   main.querySelectorAll('[data-ende]').forEach(b => b.onclick = () => confirm('Zugang sofort beenden?') && tun(() => api('zugang_beenden', { zugang_id: Number(b.dataset.ende) }), 'Zugang beendet.', neu));

@@ -40,6 +40,7 @@ Reiner Test-Account ohne Sonderrechte, per SQL bestätigt angelegt. Bei Bedarf P
 ## Baulog (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
+| 06.11.2026 | KI-Ausbau (4er-Paket): **Bestenliste** der Boss-Bots (opt-in-Name), **Mentor-Tipp-Knopf** pro Boss, **2 neue Theorie-Einträge**, **dauerhaftes KI-Tageslimit pro Kunde** (Edge `admin` `ki_limit` + `ki-llm` liest `ki_llm_limit`) mit Zentrale-Knopf | **Live** |
 | 06.11.2026 | KI-Verteidigung: **KI-Coach** (echte KI prüft den selbst geschriebenen Schutz-Prompt, nennt ✅/⚠️ pro Angriff + Tipps) + Boss-Härtung (leichte Stufen „nie ablehnen" + stiller 1×-Nachfass) | **Live** |
 | 06.11.2026 | **Boss-Bots: 8-Stufen-Leiter (sehr einfach → extrem schwer), jede Stufe andere Technik** (direkt, Vorwand, Rollenspiel, Format, Override, indirekte Injektion, Kombi, 3-fach-Kombi) + **Lernmodus** (Technik erklärt + Beispiel-Angriff). Alle 8 end-to-end mit echtem Claude getestet. | **Live** |
 | 06.11.2026 | Fix (live): EN-Umschalter & öffentliches Profil – Inline-Scripts wegen CSP in externe .js ausgelagert (start.js/ki-sicherheit.js/p.js) | **Live** |

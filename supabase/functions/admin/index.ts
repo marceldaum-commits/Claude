@@ -285,6 +285,21 @@ Deno.serve(async (req) => {
         }
         return antwort(origin, 200, { ok: true });
       }
+      case 'ki_limit': {
+        // Dauerhaftes KI-Tageslimit eines Kunden setzen. 0/leer = Standardlimit wiederherstellen.
+        if (!UUID.test(id)) return antwort(origin, 400, { fehler: 'Unbekannter Nutzer' });
+        const roh = Number(body.tageslimit);
+        if (!Number.isFinite(roh) || roh <= 0) {
+          await db.from('ki_llm_limit').delete().eq('user_id', id);
+          await protokoll('ki_limit', id, { tageslimit: 'standard' });
+          return antwort(origin, 200, { ok: true, tageslimit: null });
+        }
+        const lim = Math.min(2000, Math.max(1, Math.round(roh)));
+        const { error } = await db.from('ki_llm_limit').upsert({ user_id: id, tageslimit: lim, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+        if (error) throw error;
+        await protokoll('ki_limit', id, { tageslimit: lim });
+        return antwort(origin, 200, { ok: true, tageslimit: lim });
+      }
       case 'protokoll': {
         const { data, error } = await db.from('admin_log').select('id, at, admin_id, aktion, ziel, details').order('at', { ascending: false }).limit(200);
         if (error) throw error;

@@ -135,10 +135,17 @@ async function claude(system: string, nachricht: string, maxTokens: number): Pro
 }
 
 const heute = () => new Date().toISOString().slice(0, 10);
-async function budget(uid: string): Promise<{ used: number; rest: number }> {
+// Pro-Konto-Tageslimit (von der Verwaltung setzbar); sonst Standard.
+async function limitFor(uid: string): Promise<number> {
+  const { data } = await db.from('ki_llm_limit').select('tageslimit').eq('user_id', uid).maybeSingle();
+  const v = data?.tageslimit;
+  return (typeof v === 'number' && v > 0) ? v : TAGESLIMIT;
+}
+async function budget(uid: string): Promise<{ used: number; rest: number; limit: number }> {
+  const lim = await limitFor(uid);
   const { data } = await db.from('ki_llm_nutzung').select('anzahl').eq('user_id', uid).eq('tag', heute()).maybeSingle();
   const used = data?.anzahl || 0;
-  return { used, rest: Math.max(0, TAGESLIMIT - used) };
+  return { used, rest: Math.max(0, lim - used), limit: lim };
 }
 async function verbrauche(uid: string, used: number) {
   await db.from('ki_llm_nutzung').upsert({ user_id: uid, tag: heute(), anzahl: used + 1 }, { onConflict: 'user_id,tag' });
@@ -169,8 +176,25 @@ Deno.serve(async (req) => {
     return antwort(o, 200, {
       konfiguriert: !!ANTHROPIC_API_KEY,
       bosse: BOSSE.map(x => ({ level: x.level, titel: x.titel, bot: x.bot, stufe: x.stufe, technik: x.technik, abwehr: x.abwehr, hinweis: x.hinweis, erklaerung: x.erklaerung, beispiel: x.beispiel, offen: offen(x.level, geloest), geloest: geloest.has(x.level) })),
-      anzahl: st.geloest.length, gesamt: BOSSE.length, punkte: st.punkte, rest: bud.rest, tageslimit: TAGESLIMIT,
+      anzahl: st.geloest.length, gesamt: BOSSE.length, punkte: st.punkte, rest: bud.rest, tageslimit: bud.limit,
     });
+  }
+
+  if (aktion === 'bestenliste') {
+    // Top-Angreifer nach Anzahl geknackter Bosse. Anzeigename nur bei aktivem öffentlichem Profil, sonst anonym.
+    const { data: fp } = await db.from('ki_llm_fortschritt').select('user_id');
+    const zahl: Record<string, number> = {};
+    for (const r of (fp || [])) zahl[(r as any).user_id] = (zahl[(r as any).user_id] || 0) + 1;
+    const top = Object.entries(zahl).sort((a, b) => b[1] - a[1]).slice(0, 20);
+    const ids = top.map(t => t[0]);
+    let namen = new Map<string, string>();
+    if (ids.length) {
+      // Ein Eintrag in public_profiles bedeutet: Profil wurde geteilt (opt-in) → Name darf gezeigt werden.
+      const { data: pp } = await db.from('public_profiles').select('user_id, name').in('user_id', ids);
+      namen = new Map((pp || []).filter((p: any) => p.name).map((p: any) => [p.user_id, String(p.name).slice(0, 40)]));
+    }
+    const liste = top.map(([uid2, n], i) => ({ platz: i + 1, name: namen.get(uid2) || ('Anonym'), anzahl: n, ich: uid2 === uid }));
+    return antwort(o, 200, { liste, gesamt: BOSSE.length });
   }
 
   if (aktion === 'chat' || aktion === 'mentor') {
