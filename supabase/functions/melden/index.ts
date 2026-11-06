@@ -42,6 +42,19 @@ Deno.serve(async (req) => {
   };
   if (text.length < 5) return antwort(o, 400, { fehler: 'Bitte beschreib kurz das Problem.' });
 
+  // Flut-Schutz (gegen Spam/DB-Bloat): pro Konto max. 5/Minute, insgesamt max. 60/Minute
+  // (fängt auch anonyme Massen-Fluten ab, ohne IP-Adressen zu speichern).
+  // Bei einem Zählfehler lieber durchlassen als eine echte Meldung zu verlieren.
+  try {
+    const seit = new Date(Date.now() - 60000).toISOString();
+    if (uid) {
+      const { count } = await db.from('support_meldungen').select('id', { count: 'exact', head: true }).eq('user_id', uid).gte('erstellt', seit);
+      if ((count ?? 0) >= 5) return antwort(o, 429, { fehler: 'Zu viele Meldungen in kurzer Zeit – bitte kurz warten.' });
+    }
+    const { count: gesamt } = await db.from('support_meldungen').select('id', { count: 'exact', head: true }).gte('erstellt', seit);
+    if ((gesamt ?? 0) >= 60) return antwort(o, 429, { fehler: 'Gerade sehr viele Meldungen – bitte in einer Minute noch einmal.' });
+  } catch { /* nicht blockieren */ }
+
   const { error } = await db.from('support_meldungen').insert({ user_id: uid, bereich, text, kontakt, kontext });
   if (error) { console.error('insert', error.message); return antwort(o, 500, { fehler: 'Konnte nicht gespeichert werden.' }); }
   // Gespeichert reicht: in der Zentrale sofort sichtbar, die E-Mail holt der Arena-Server im Hintergrund.

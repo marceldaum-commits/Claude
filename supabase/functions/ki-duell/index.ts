@@ -12,6 +12,7 @@ const KEY = Deno.env.get('KI_API_KEY') || '';                 // Anthropic-Schl�
 const KI_SECRET = Deno.env.get('KI_SECRET') || SERVICE;       // für die HMAC-Geheimnisse
 const MODELL = Deno.env.get('KI_MODEL') || 'claude-haiku-5-5';
 const MAX_VERLAUF = 20, MAX_NACHRICHT = 1000, STUFEN = 6;
+const TAGESLIMIT = Number(Deno.env.get('KI_TAGESLIMIT') || 300);   // Chat-Aufrufe pro Konto und Tag (Kostenbremse)
 const ORIGINS = new Set(['https://arena.nachtfalter.tech', 'https://app.nachtfalter.tech']);
 const db = createClient(URL_, SERVICE, { auth: { persistSession: false, autoRefreshToken: false } });
 
@@ -98,6 +99,13 @@ Deno.serve(async (req) => {
     verlauf = verlauf.slice(-MAX_VERLAUF).filter((m: any) => m && (m.rolle === 'user' || m.rolle === 'assistant') && typeof m.text === 'string');
     const nachricht = String(b?.nachricht || '').slice(0, MAX_NACHRICHT);
     if (!nachricht.trim()) return antwort(o, 400, { fehler: 'Leere Nachricht.' });
+    // Kostenbremse: Tages-Limit pro Konto. Zählt JEDEN Chat-Versuch. Fehlt die Tabelle noch
+    // (vor der Migration), lässt der catch-Zweig durch – kein harter Fehler für den Spieler.
+    try {
+      const { data: anzahl, error: le } = await db.rpc('ki_nutzung_inc', { p_user: uid });
+      if (!le && typeof anzahl === 'number' && anzahl > TAGESLIMIT)
+        return antwort(o, 429, { fehler: 'Tageslimit für den KI-Gegner erreicht – morgen geht es weiter.' });
+    } catch { /* Tabelle fehlt o. Ä. – nicht blockieren */ }
     const sprache = ['de', 'en'].includes(String(b?.sprache)) ? String(b.sprache) : 'de';
     const messages = [...verlauf.map((m: any) => ({ role: m.rolle, content: m.text.slice(0, MAX_NACHRICHT) })), { role: 'user', content: nachricht }];
     try {
