@@ -9,6 +9,8 @@ COPY nachtfalter-hilfe /usr/local/share/nachtfalter
 RUN install -m 755 /usr/local/share/nachtfalter/begriff /usr/local/share/nachtfalter/hilfe /usr/local/bin/ \
  && chmod 644 /usr/local/share/nachtfalter/*.txt
 COPY bau.py /opt/build/bau.py
-COPY setup.sh /opt/werkstatt/setup.sh
-RUN chmod 700 /opt/werkstatt/setup.sh
-ENTRYPOINT ["/opt/werkstatt/setup.sh"]
+# Startskript NICHT unter /opt/werkstatt ablegen: dort hängt zur Laufzeit ein tmpfs,
+# das die eingebackene Datei überdecken würde (Container könnte nicht starten).
+COPY setup.sh /usr/local/bin/werkstatt-setup.sh
+RUN chmod 755 /usr/local/bin/werkstatt-setup.sh
+ENTRYPOINT ["/usr/local/bin/werkstatt-setup.sh"]
