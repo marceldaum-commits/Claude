@@ -318,16 +318,26 @@ a.karte:hover { border-color: var(--violet); }
 .card.violet { border-color: var(--violet); }
 
 /* Advent-Kalender „Advent of Hacking" */
-.adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin: .2rem 0 .8rem; }
-@media (min-width: 540px) { .adv-grid { grid-template-columns: repeat(6, 1fr); } }
-.adv-tile { position: relative; aspect-ratio: 1 / 1; border-radius: 12px; border: 1px solid var(--line); background: var(--card2); color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .1rem; font: inherit; padding: 0; transition: transform .08s, border-color .15s; }
-.adv-tile:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--violet); }
-.adv-tile .adv-num { font-size: 1.2rem; font-weight: 800; }
-.adv-tile .adv-sym { font-size: 1rem; line-height: 1; }
-.adv-tile.offen { border-color: rgba(201, 162, 74, .6); background: linear-gradient(160deg, #1d2b47, #17233b); }
-.adv-tile.offen .adv-num { color: #ffe9a8; }
-.adv-tile.done { border-color: rgba(163, 230, 53, .5); background: var(--lime-bg); }
-.adv-tile.done .adv-num { color: var(--lime); }
-.adv-tile.zu { opacity: .5; cursor: not-allowed; }
-.adv-tile.aktiv { outline: 2px solid var(--violet); outline-offset: 1px; }
+.adv-held { position: relative; overflow: hidden; background: linear-gradient(165deg, #10131f, #171326 70%); border-color: rgba(167, 139, 250, .35); }
+.adv-held-kopf { display: flex; align-items: center; justify-content: space-between; }
+.adv-badge { display: inline-flex; align-items: center; gap: .35rem; font-size: .66rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--lime); border: 1px solid rgba(163, 230, 53, .4); border-radius: 999px; padding: .2rem .55rem; }
+.adv-moon-gross { width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f5ffd6, #cde86a 60%, #a3c23a); box-shadow: 0 0 22px 6px rgba(205, 232, 106, .45); }
+.adv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .55rem; margin: .4rem 0 .9rem; }
+@media (min-width: 480px) { .adv-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 720px) { .adv-grid { grid-template-columns: repeat(4, 1fr); } }
+.adv-tile { position: relative; overflow: hidden; min-height: 92px; border-radius: 14px; border: 1px solid var(--line); background: linear-gradient(165deg, #141624, #191528); color: var(--text); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; text-align: left; gap: .3rem; font: inherit; padding: .5rem .6rem; transition: transform .08s, border-color .15s, box-shadow .15s; }
+.adv-tile .adv-moon { position: absolute; top: 8px; right: 8px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f5ffd6, #cde86a 60%, #9fbf37); box-shadow: 0 0 10px 2px rgba(205, 232, 106, .4); opacity: .85; }
+.adv-tile .adv-top { display: flex; align-items: center; gap: .3rem; }
+.adv-tile .adv-num { font-size: 1.35rem; font-weight: 800; line-height: 1; }
+.adv-tile .adv-sym { font-size: .95rem; line-height: 1; }
+.adv-tile .adv-titel { font-size: .72rem; line-height: 1.2; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.adv-tile:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--violet); box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
+.adv-tile.offen { border-color: rgba(163, 230, 53, .5); }
+.adv-tile.offen .adv-num { color: var(--lime); }
+.adv-tile.done { border-color: rgba(163, 230, 53, .6); background: linear-gradient(165deg, #16241a, #15231a); }
+.adv-tile.done .adv-num, .adv-tile.done .adv-sym { color: var(--lime); }
+.adv-tile.zu { opacity: .55; cursor: not-allowed; }
+.adv-tile.zu .adv-moon { filter: grayscale(.6); opacity: .4; }
+.adv-tile.aktiv { outline: 2px solid var(--lime); outline-offset: 1px; }
 .adv-tile:disabled { cursor: default; }
+.adv-aufgabe .adv-kopf { display: flex; align-items: center; justify-content: space-between; }

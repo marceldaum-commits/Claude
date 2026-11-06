@@ -1,13 +1,14 @@
 // Nachtfalter – „Advent of Hacking" (Supabase Edge Function „advent").
-// 24 Türchen ab 1. Dezember. Jedes Türchen hat EIN Rätsel; die Flag + der Inhalt sind PRO KONTO aus einem
-// Geheimnis (HMAC) erzeugt – ein geteilter Lösungs-Code nützt niemand anderem. Prüfung serverseitig.
-// Ein Türchen öffnet frühestens an seinem Tag; verpasste Türchen bleiben offen (Nachholen möglich).
-// Punkte, Streak und eine Bestenliste inklusive. Wer alle 24 schafft, bekommt das Advent-Zertifikat.
+// 24 Türchen ab 1. Dezember, jedes mit eigenem Thema. Zwei Aufgaben-Arten:
+//   art 'flag'    – ein Knack-Rätsel; die Flag ist PRO KONTO per HMAC erzeugt (anti-cheat), serverseitig geprüft.
+//   art 'antwort' – eine Wissens-/Skill-Frage; akzeptierte Antworten liegen serverseitig (für alle gleich).
+// Ein Türchen öffnet frühestens an seinem Tag; verpasste bleiben offen (Nachholen). Punkte, Serie, Bestenliste,
+// und das Advent-Zertifikat bei allen 24. Titel/Themen stammen aus Marcels Entwurf.
 import { createClient } from 'npm:@supabase/supabase-js@2.57.4';
 
 const URL_ = Deno.env.get('SUPABASE_URL')!;
 const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const CTF_SECRET = Deno.env.get('CTF_SECRET') || SERVICE;        // gemeinsam mit „taeglich"
+const CTF_SECRET = Deno.env.get('CTF_SECRET') || SERVICE;
 const ADVENT_JAHR = parseInt(Deno.env.get('ADVENT_JAHR') || '2026', 10);
 const ADVENT_TEST = (Deno.env.get('ADVENT_TEST') || '') === '1'; // nur zum Testen: alle Türchen offen
 const PUNKTE_PRO = 20;
@@ -23,7 +24,7 @@ const cors = (o: string | null) => ({
 const antwort = (o: string | null, status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors(o), 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
-// ---- Krypto-Helfer
+// ---- Krypto
 async function hmacHex(msg: string): Promise<string> {
   const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(CTF_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const sig = await crypto.subtle.sign('HMAC', k, new TextEncoder().encode(msg));
@@ -32,115 +33,123 @@ async function hmacHex(msg: string): Promise<string> {
 const flagFor = async (uid: string, tuer: number) => 'KLY{' + (await hmacHex(`${uid}:adventflag:${ADVENT_JAHR}:${tuer}`)).slice(0, 16) + '}';
 const seedFor = (uid: string, tuer: number) => hmacHex(`${uid}:adventseed:${ADVENT_JAHR}:${tuer}`);
 
-// ---- Kodierer (arbeiten auf ASCII-Strings; die Flag ist reines ASCII)
+// ---- Kodierer (ASCII)
 const toHex = (s: string) => [...s].map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
 const rev = (s: string) => s.split('').reverse().join('');
-const xorStr = (s: string, k: number) => [...s].map(c => String.fromCharCode(c.charCodeAt(0) ^ k)).join('');
-const bin8 = (s: string) => [...s].map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
-const decAscii = (s: string) => [...s].map(c => c.charCodeAt(0)).join(' ');
-const urlenc = (s: string) => [...s].map(c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')).join('');
-function base32(s: string): string {
-  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; let bits = '', out = '';
-  for (let i = 0; i < s.length; i++) bits += s.charCodeAt(i).toString(2).padStart(8, '0');
-  for (let i = 0; i < bits.length; i += 5) { let ch = bits.slice(i, i + 5); if (ch.length < 5) ch = ch.padEnd(5, '0'); out += A[parseInt(ch, 2)]; }
-  while (out.length % 8) out += '=';
-  return out;
-}
 function caesar(s: string, k: number): string {
-  return [...s].map(c => {
-    const u = c.charCodeAt(0);
+  return [...s].map(c => { const u = c.charCodeAt(0);
     if (u >= 65 && u <= 90) return String.fromCharCode((u - 65 + k + 26 * 4) % 26 + 65);
     if (u >= 97 && u <= 122) return String.fromCharCode((u - 97 + k + 26 * 4) % 26 + 97);
-    return c;
-  }).join('');
-}
-const atbash = (s: string) => [...s].map(c => {
-  const u = c.charCodeAt(0);
-  if (u >= 65 && u <= 90) return String.fromCharCode(90 - (u - 65));
-  if (u >= 97 && u <= 122) return String.fromCharCode(122 - (u - 97));
-  return c;
-}).join('');
-const rot47 = (s: string) => [...s].map(c => {
-  const u = c.charCodeAt(0);
-  return (u >= 33 && u <= 126) ? String.fromCharCode(33 + ((u - 33 + 47) % 94)) : c;
-}).join('');
-function vigenere(s: string, key: string): string {
-  let ki = 0;
-  return [...s].map(c => {
-    const u = c.charCodeAt(0);
-    const sh = (key.charCodeAt(ki % key.length) | 32) - 97;
-    if (u >= 65 && u <= 90) { ki++; return String.fromCharCode((u - 65 + sh) % 26 + 65); }
-    if (u >= 97 && u <= 122) { ki++; return String.fromCharCode((u - 97 + sh) % 26 + 97); }
-    return c;
-  }).join('');
+    return c; }).join('');
 }
 
-type Puzzle = { titel: string; aufgabe: string; hinweis: string; kategorie: string };
+type Tuer = { nr: number; titel: string; art: 'flag' | 'antwort'; szenario?: string; hinweis?: string; loesungen?: string[] };
 
-// Baut das Rätsel für ein Türchen. Schwierigkeit steigt über den Monat.
-function baue(tuer: number, flag: string, seed: string): Puzzle {
+// Titel/Themen (Marcels Entwurf). Für 'antwort' stehen Frage (szenario), Hinweis und akzeptierte Antworten hier.
+const TUEREN: Tuer[] = [
+  { nr: 1, titel: 'Dein erster Befehl: whoami', art: 'antwort',
+    szenario: 'In jedem Terminal fängst du so an. Du willst wissen, als welcher Benutzer du gerade angemeldet bist – welcher Linux-Befehl zeigt dir das?',
+    hinweis: 'Ein einzelnes Wort, „wer bin ich" auf Englisch, zusammengeschrieben.', loesungen: ['whoami'] },
+  { nr: 2, titel: 'Finde die versteckte Datei', art: 'antwort',
+    szenario: 'Versteckte Dateien tauchen bei „ls" nicht auf. Mit welchem Schalter zeigt „ls" auch die versteckten Dateien an?',
+    hinweis: 'Ein Buchstabe mit Bindestrich – „a" wie all.', loesungen: ['-a', 'a', 'ls -a', 'ls-a'] },
+  { nr: 3, titel: 'Knacke das Passwort-Rätsel', art: 'antwort',
+    szenario: 'Angreifer probieren zuerst die häufigsten Passwörter. Welches Zahlen-Passwort steht in fast jeder Leak-Liste auf Platz 1?',
+    hinweis: 'Sechs Ziffern, der Reihe nach von der Tastatur.', loesungen: ['123456'] },
+  { nr: 4, titel: 'Die geheime Nachricht im Bild', art: 'antwort',
+    szenario: 'Man kann Daten unsichtbar in Bildern verstecken. Wie heißt diese Technik (Fachwort)?',
+    hinweis: 'Beginnt mit „Stegano…".', loesungen: ['steganographie', 'steganografie', 'steganography', 'stego'] },
+  { nr: 5, titel: 'Wie Geräte sich „pingen"', art: 'antwort',
+    szenario: 'Du willst prüfen, ob ein anderes Gerät im Netzwerk erreichbar ist. Welcher Befehl schickt ein kleines „Bist du da?"-Paket?',
+    hinweis: 'Vier Buchstaben, kommt vom Sonar.', loesungen: ['ping'] },
+  { nr: 6, titel: 'Nikolaus: die Caesar-Geheimschrift', art: 'flag',
+    szenario: 'Der Nikolaus nutzt eine uralte Verschiebe-Chiffre (Caesar). Entschlüssle die Nachricht zur Flag.' },
+  { nr: 7, titel: 'Geheimnisse im Quelltext', art: 'antwort',
+    szenario: 'Entwickler vergessen manchmal Hinweise im Seiten-Quelltext. Mit welcher Taste öffnest du die Entwickler-Werkzeuge im Browser?',
+    hinweis: 'Eine F-Taste ganz oben.', loesungen: ['f12'] },
+  { nr: 8, titel: 'Was ein Cookie verrät', art: 'antwort',
+    szenario: 'Ein Cookie kann vor Diebstahl per JavaScript geschützt werden. Welches Attribut sorgt dafür, dass JavaScript ein Cookie NICHT lesen kann?',
+    hinweis: 'Zwei Wörter zusammen: „Http…".', loesungen: ['httponly', 'http-only', 'http only'] },
+  { nr: 9, titel: 'Dreh den Hash zurück', art: 'flag',
+    szenario: 'Jemand hat die Flag einfach verdreht. Dreh sie zurück.' },
+  { nr: 10, titel: 'Wer darf was? Dateirechte', art: 'antwort',
+    szenario: 'Rechte schreibt man oft als drei Ziffern. Welche dreistellige Zahl gibt NUR dem Besitzer volle Rechte (lesen, schreiben, ausführen) und allen anderen nichts?',
+    hinweis: 'rwx = 7, für „Gruppe" und „andere" jeweils 0.', loesungen: ['700'] },
+  { nr: 11, titel: 'Welche Tür steht offen? Ports', art: 'antwort',
+    szenario: 'Dienste lauschen auf „Ports" (Türen). Auf welchem Standard-Port läuft verschlüsseltes Web (HTTPS)?',
+    hinweis: 'Drei Ziffern, direkt nach 442.', loesungen: ['443'] },
+  { nr: 12, titel: 'Spurensuche im Netz (OSINT)', art: 'antwort',
+    szenario: 'Das Sammeln von Infos aus frei zugänglichen Quellen hat eine bekannte Abkürzung (5 Buchstaben). Wie lautet sie?',
+    hinweis: 'Open Source … Intelligence.', loesungen: ['osint'] },
+  { nr: 13, titel: 'Halbzeit: die Bestenliste', art: 'flag',
+    szenario: 'Halbzeit – ein kleines Geschenk. Dekodiere den Hex-Code zu deiner Flag.' },
+  { nr: 14, titel: 'Entschlüssle den Base64-Code', art: 'flag',
+    szenario: 'Der Klassiker: ein Base64-Code. Dekodiere ihn zur Flag.' },
+  { nr: 15, titel: 'Trick die Datenbank aus (SQL)', art: 'antwort',
+    szenario: 'Bei SQL-Injection bricht man eine Datenbank-Abfrage mit EINEM Zeichen auf. Welches einzelne Zeichen ist der Klassiker?',
+    hinweis: 'Das Hochkomma / einfache Anführungszeichen.', loesungen: ["'", 'hochkomma', 'apostroph', 'single quote', "' or 1=1--", "' or 1=1"] },
+  { nr: 16, titel: 'Finde die verdächtige Log-Zeile', art: 'antwort',
+    szenario: 'Im Server-Log fallen fehlgeschlagene Logins auf, dann ein erfolgreicher. Welche IP ist der Angreifer?\n\n10.0.0.5  OK     (mara, 09:00)\n203.0.113.66  FAILED ×50 (09:12–09:18)\n203.0.113.66  OK     (backup, 09:19)',
+    hinweis: 'Die IP mit 50 Fehlversuchen direkt vor dem Erfolg.', loesungen: ['203.0.113.66'] },
+  { nr: 17, titel: 'Erkenne die Phishing-Falle', art: 'antwort',
+    szenario: 'Eine Mail zeigt zwei Links. Welche Domain ist die FÄLSCHUNG?\n\n(a) paypal.com\n(b) paypa1.com',
+    hinweis: 'Schau genau: eine „1" (Eins) statt einem „l" (kleines L).', loesungen: ['paypa1.com', 'b', 'paypa1', '(b)'] },
+  { nr: 18, titel: 'Trick die KI aus (Prompt Injection)', art: 'antwort',
+    szenario: 'Einer KI versteckte Anweisungen unterschieben, damit sie ihre Regeln bricht – wie heißt dieser Angriff (zwei Wörter, Fachbegriff)?',
+    hinweis: 'Prompt … (Einschleusen).', loesungen: ['prompt injection', 'promptinjection'] },
+  { nr: 19, titel: 'Wie sicher ist dein WLAN?', art: 'antwort',
+    szenario: 'Welcher WLAN-Verschlüsselungsstandard ist aktuell der sicherste (Nachfolger von WPA2)?',
+    hinweis: 'WPA… die nächste Zahl.', loesungen: ['wpa3', 'wpa 3'] },
+  { nr: 20, titel: 'Blick unter die Haube (Reverse)', art: 'antwort',
+    szenario: 'Ein Programm zerlegen, um zu verstehen, wie es innen arbeitet – wie heißt diese Disziplin (zwei Wörter, Englisch)?',
+    hinweis: 'Reverse … (die Technik „rückwärts").', loesungen: ['reverse engineering', 'reverseengineering'] },
+  { nr: 21, titel: 'Was Metadaten verraten', art: 'antwort',
+    szenario: 'Fotos speichern oft versteckt den Aufnahmeort. Welche drei Buchstaben stehen für diese Ortsdaten?',
+    hinweis: 'Satelliten-Navigation.', loesungen: ['gps'] },
+  { nr: 22, titel: 'Vom User zum Admin (PrivEsc)', art: 'antwort',
+    szenario: 'Das Ziel jeder Rechteausweitung unter Linux: wie heißt der allmächtige Administrator-Benutzer?',
+    hinweis: 'Vier Buchstaben, „Wurzel" auf Englisch.', loesungen: ['root'] },
+  { nr: 23, titel: 'Die große Challenge', art: 'flag',
+    szenario: 'Die große Challenge: zwei Schichten übereinander. Schäl dich durch.' },
+  { nr: 24, titel: 'Finale + dein Advent-Zertifikat', art: 'flag',
+    szenario: 'Großes Finale! Drei Schichten trennen dich von deinem Advent-Zertifikat. 🎄' },
+];
+const TMAP: Record<number, Tuer> = Object.fromEntries(TUEREN.map(t => [t.nr, t]));
+
+// Baut Aufgabe (kodierter String) + Hinweis für ein 'flag'-Türchen.
+function flagAufgabe(nr: number, flag: string, seed: string): { aufgabe: string; hinweis: string } {
   const b = (n: number) => parseInt(seed.slice(n, n + 2), 16);
-  switch (tuer) {
-    case 1: return { kategorie: 'base64', titel: '1 · Base64', aufgabe: btoa(flag), hinweis: 'Einmal Base64 dekodieren (z. B. `base64 -d`).' };
-    case 2: return { kategorie: 'hex', titel: '2 · Hex', aufgabe: toHex(flag), hinweis: 'Hex zurück in Text (`echo … | xxd -r -p`).' };
-    case 3: return { kategorie: 'rot13', titel: '3 · ROT13', aufgabe: caesar(flag, 13), hinweis: 'Buchstaben um 13 Stellen zurückdrehen (ROT13).' };
-    case 4: return { kategorie: 'base32', titel: '4 · Base32', aufgabe: base32(flag), hinweis: 'Base32 dekodieren (Alphabet A–Z und 2–7, nicht Base64).' };
-    case 5: return { kategorie: 'reverse', titel: '5 · Rückwärts', aufgabe: rev(flag), hinweis: 'Die Zeichenkette ist nur umgedreht – rückwärts lesen.' };
-    case 6: return { kategorie: 'binaer', titel: '6 · Binär', aufgabe: bin8(flag), hinweis: 'Je 8 Bit sind ein ASCII-Zeichen.' };
-    case 7: return { kategorie: 'dezimal', titel: '7 · Dezimal-ASCII', aufgabe: decAscii(flag), hinweis: 'Jede Zahl ist ein ASCII-Code (z. B. 75 = K).' };
-    case 8: return { kategorie: 'base64x2', titel: '8 · Doppeltes Base64', aufgabe: btoa(btoa(flag)), hinweis: 'Zweimal hintereinander Base64 dekodieren.' };
-    case 9: return { kategorie: 'rev64', titel: '9 · Base64, rückwärts', aufgabe: rev(btoa(flag)), hinweis: 'Zuerst die Zeichen umdrehen, dann Base64 dekodieren.' };
-    case 10: return { kategorie: 'url', titel: '10 · URL-Encoding', aufgabe: urlenc(flag), hinweis: 'Prozent-Kodierung (%XX) auflösen (URL-Decode).' };
-    case 11: { const k = (b(0) % 254) + 1; return { kategorie: 'xorhex', titel: '11 · XOR + Hex', aufgabe: toHex(xorStr(flag, k)), hinweis: `Erst Hex → Bytes, dann jedes Byte XOR 0x${k.toString(16).padStart(2, '0')}.` }; }
-    case 12: return { kategorie: 'rot47', titel: '12 · ROT47', aufgabe: rot47(flag), hinweis: 'ROT47 ist sein eigener Gegenspieler – einfach nochmal ROT47 anwenden.' };
-    case 13: { const k = (b(2) % 25) + 1; return { kategorie: 'caesar', titel: '13 · Caesar', aufgabe: caesar(flag, k), hinweis: `Caesar-Verschiebung: Buchstaben um ${k} Stellen zurückdrehen.` }; }
-    case 14: return { kategorie: 'atbash', titel: '14 · Atbash', aufgabe: atbash(flag), hinweis: 'Atbash: A↔Z, B↔Y … spiegeln (nochmal Atbash entschlüsselt es).' };
-    case 15: return { kategorie: 'hex64', titel: '15 · Hex über Base64', aufgabe: toHex(btoa(flag)), hinweis: 'Erst Hex → Text, dann das Ergebnis Base64 dekodieren.' };
-    case 16: return { kategorie: 'base64x3', titel: '16 · Base64 ×3', aufgabe: btoa(btoa(btoa(flag))), hinweis: 'Dreimal hintereinander Base64 dekodieren.' };
-    case 17: return { kategorie: 'rev32', titel: '17 · Base32, rückwärts', aufgabe: rev(base32(flag)), hinweis: 'Zuerst umdrehen, dann Base32 dekodieren.' };
-    case 18: return { kategorie: 'rot13_64', titel: '18 · Base64 + ROT13', aufgabe: btoa(caesar(flag, 13)), hinweis: 'Erst Base64 dekodieren, dann das Ergebnis mit ROT13 zurückdrehen.' };
-    case 19: { const keys = ['KATZE', 'NACHT', 'FALTER', 'KODE']; const key = keys[b(4) % keys.length]; return { kategorie: 'vigenere', titel: '19 · Vigenère', aufgabe: vigenere(flag, key), hinweis: `Vigenère mit Schlüssel „${key}" entschlüsseln (nur Buchstaben werden verschoben).` }; }
-    case 20: { const k = (b(6) % 254) + 1; return { kategorie: 'xor64', titel: '20 · XOR + Base64', aufgabe: btoa(xorStr(flag, k)), hinweis: `Erst Base64 dekodieren, dann jedes Byte XOR 0x${k.toString(16).padStart(2, '0')}.` }; }
-    case 21: return { kategorie: 'hexx2', titel: '21 · Hex ×2', aufgabe: toHex(toHex(flag)), hinweis: 'Zweimal hintereinander von Hex in Text wandeln.' };
-    case 22: return { kategorie: 'url64', titel: '22 · Base64 + URL', aufgabe: urlenc(btoa(flag)), hinweis: 'Erst URL-Decode (%XX), dann Base64 dekodieren.' };
-    case 23: { const keys = ['SPIEGEL', 'KELLER', 'FUNKTURM']; const key = keys[b(8) % keys.length]; return { kategorie: 'vig64', titel: '23 · Vigenère + Base64', aufgabe: btoa(vigenere(flag, key)), hinweis: `Erst Base64 dekodieren, dann Vigenère mit Schlüssel „${key}".` }; }
-    case 24: return { kategorie: 'finale', titel: '24 · Finale: 3 Schichten 🎄', aufgabe: toHex(btoa(caesar(flag, 13))), hinweis: 'Drei Schichten: erst Hex → Text, dann Base64, dann ROT13. Frohe Weihnachten!' };
-    default: return { kategorie: 'base64', titel: `${tuer} · Base64`, aufgabe: btoa(flag), hinweis: 'Einmal Base64 dekodieren.' };
+  switch (nr) {
+    case 6: { const k = (b(0) % 25) + 1; return { aufgabe: caesar(flag, k), hinweis: `Caesar: Buchstaben um ${k} Stellen zurückdrehen (Zahlen bleiben).` }; }
+    case 9: return { aufgabe: rev(flag), hinweis: 'Die Zeichenkette ist nur umgedreht – rückwärts lesen.' };
+    case 13: return { aufgabe: toHex(flag), hinweis: 'Hex zurück in Text (z. B. `echo … | xxd -r -p`).' };
+    case 14: return { aufgabe: btoa(flag), hinweis: 'Einmal Base64 dekodieren (z. B. `base64 -d`).' };
+    case 23: return { aufgabe: btoa(caesar(flag, 13)), hinweis: 'Erst Base64 dekodieren, dann das Ergebnis mit ROT13 zurückdrehen.' };
+    case 24: return { aufgabe: toHex(btoa(caesar(flag, 13))), hinweis: 'Drei Schichten: erst Hex → Text, dann Base64, dann ROT13.' };
+    default: return { aufgabe: btoa(flag), hinweis: 'Base64 dekodieren.' };
   }
 }
 
-// ---- Datums-Logik (UTC)
+const norm = (s: unknown) => String(s ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
+
+// ---- Datum (UTC)
 const heuteStr = () => new Date().toISOString().slice(0, 10);
-// Ein Türchen ist offen, wenn das heutige UTC-Datum >= 1. … 24. Dezember des Advent-Jahres ist.
 function tuerOffen(tuer: number): boolean {
   if (ADVENT_TEST) return true;
-  const jetzt = new Date();
   const start = new Date(Date.UTC(ADVENT_JAHR, 11, tuer, 0, 0, 0)); // Monat 11 = Dezember
-  return jetzt.getTime() >= start.getTime();
+  return Date.now() >= start.getTime();
 }
-
 function streakAus(tueren: number[]): number {
-  // „Serie" = längste lückenlose Kette gelöster Türchen vom 1. Türchen aufwärts bis zum höchsten offenen Türchen.
-  const set = new Set(tueren);
-  let s = 0;
+  const set = new Set(tueren); let s = 0;
   for (let d = 1; d <= 24; d++) { if (set.has(d)) s++; else break; }
   return s;
 }
-
 async function standFor(uid: string) {
   const { data } = await db.from('advent_fortschritt').select('tuer').eq('user_id', uid);
   const tueren = (data || []).map((r: any) => r.tuer);
-  const anzahl = tueren.length;
-  const komplett = anzahl >= 24;
-  return {
-    geloest: tueren.sort((a: number, b: number) => a - b),
-    anzahl,
-    komplett,
-    streak: streakAus(tueren),
-    punkte: anzahl * PUNKTE_PRO + (komplett ? BONUS_KOMPLETT : 0),
-  };
+  const anzahl = tueren.length, komplett = anzahl >= 24;
+  return { geloest: tueren.sort((a: number, b: number) => a - b), anzahl, komplett, streak: streakAus(tueren), punkte: anzahl * PUNKTE_PRO + (komplett ? BONUS_KOMPLETT : 0) };
 }
-
 async function bestenliste() {
   const { data } = await db.from('advent_fortschritt').select('user_id');
   const zahl: Record<string, number> = {};
@@ -172,32 +181,38 @@ Deno.serve(async (req) => {
     const geloest = new Set(st.geloest);
     const tueren = [];
     for (let t = 1; t <= 24; t++) {
-      const offen = tuerOffen(t);
-      const done = geloest.has(t);
-      const eintrag: any = { nr: t, offen, geloest: done };
-      // Inhalt nur für offene, noch nicht gelöste Türchen senden.
+      const def = TMAP[t];
+      const offen = tuerOffen(t), done = geloest.has(t);
+      const e: any = { nr: t, titel: def.titel, art: def.art, offen, geloest: done };
       if (offen && !done) {
-        const flag = await flagFor(uid, t);
-        const seed = await seedFor(uid, t);
-        const p = baue(t, flag, seed);
-        eintrag.titel = p.titel; eintrag.kategorie = p.kategorie; eintrag.aufgabe = p.aufgabe; eintrag.hinweis = p.hinweis;
+        e.szenario = def.szenario || '';
+        if (def.art === 'flag') {
+          const flag = await flagFor(uid, t);
+          const seed = await seedFor(uid, t);
+          const fa = flagAufgabe(t, flag, seed);
+          e.aufgabe = fa.aufgabe; e.hinweis = fa.hinweis;
+        } else {
+          e.hinweis = def.hinweis || '';
+        }
       }
-      tueren.push(eintrag);
+      tueren.push(e);
     }
-    return antwort(o, 200, {
-      jahr: ADVENT_JAHR, heute: heuteStr(), tueren,
-      anzahl: st.anzahl, komplett: st.komplett, punkte: st.punkte, streak: st.streak,
-      bestenliste: await bestenliste(),
-    });
+    return antwort(o, 200, { jahr: ADVENT_JAHR, heute: heuteStr(), tueren, anzahl: st.anzahl, komplett: st.komplett, punkte: st.punkte, streak: st.streak, bestenliste: await bestenliste() });
   }
 
   if (aktion === 'loesen') {
     const nr = parseInt(b?.nr, 10);
     if (!(nr >= 1 && nr <= 24)) return antwort(o, 400, { fehler: 'Ungültiges Türchen.' });
     if (!tuerOffen(nr)) return antwort(o, 403, { fehler: 'Dieses Türchen ist noch nicht offen.' });
-    const versuch = String(b?.versuch || '').trim().toLowerCase();
-    const flag = (await flagFor(uid, nr)).toLowerCase();
-    if (versuch !== flag) return antwort(o, 200, { ok: false });
+    const def = TMAP[nr];
+    let richtig = false;
+    if (def.art === 'flag') {
+      richtig = norm(b?.versuch) === (await flagFor(uid, nr)).toLowerCase();
+    } else {
+      const v = norm(b?.versuch);
+      richtig = (def.loesungen || []).some(l => norm(l) === v);
+    }
+    if (!richtig) return antwort(o, 200, { ok: false });
     await db.from('advent_fortschritt').upsert({ user_id: uid, tuer: nr }, { onConflict: 'user_id,tuer', ignoreDuplicates: true });
     const st = await standFor(uid);
     return antwort(o, 200, { ok: true, nr, punkte: st.punkte, streak: st.streak, anzahl: st.anzahl, komplett: st.komplett });

@@ -433,18 +433,24 @@ function adventTile(t, aktivNr) {
   const zustand = t.geloest ? 'done' : t.offen ? 'offen' : 'zu';
   const sym = t.geloest ? '✓' : t.offen ? '🎁' : '🔒';
   const klick = t.offen && !t.geloest;
-  return `<button type="button" class="adv-tile ${zustand}${t.nr === aktivNr ? ' aktiv' : ''}" data-nr="${t.nr}" ${klick ? '' : 'disabled'} aria-label="${esc(Ut('Türchen {n}', { n: t.nr }))}"><span class="adv-num">${t.nr}</span><span class="adv-sym">${sym}</span></button>`;
+  return `<button type="button" class="adv-tile ${zustand}${t.nr === aktivNr ? ' aktiv' : ''}" data-nr="${t.nr}" ${klick ? '' : 'disabled'} aria-label="${esc(Ut('Türchen {n}', { n: t.nr }))}: ${esc(t.titel || '')}">
+    <span class="adv-moon"></span>
+    <span class="adv-top"><span class="adv-num">${t.nr}</span><span class="adv-sym">${sym}</span></span>
+    <span class="adv-titel">${esc(t.titel || '')}</span></button>`;
 }
 function adventPanel(t) {
   if (!t) return '';
-  if (!t.offen) return `<div class="card warn"><b>🔒 ${U('Noch nicht offen.')}</b> ${Ut('Türchen {n} öffnet am {n}. Dezember.', { n: t.nr })}</div>`;
+  if (!t.offen) return `<div class="card warn"><b>🔒 ${U('Noch nicht offen.')}</b> ${Ut('Türchen {n} öffnet am {n}. Dezember.', { n: t.nr })}${t.titel ? ` · ${esc(t.titel)}` : ''}</div>`;
   if (t.geloest) return `<div class="card lime"><b>✓ ${Ut('Türchen {n} geschafft.', { n: t.nr })}</b> ${U('Wähle ein anderes Türchen.')}</div>`;
-  return `<div class="card" id="adv-panel">
-    <div class="row between"><b>🎁 ${esc(t.titel)}</b><span class="badge plain">${esc(t.kategorie)}</span></div>
-    <pre data-copy="${esc(t.aufgabe)}" style="white-space:pre-wrap;word-break:break-all">${esc(t.aufgabe)}</pre>
-    <p class="small muted">💡 ${esc(t.hinweis)}</p>
+  const istFlag = t.art === 'flag';
+  return `<div class="card adv-aufgabe" id="adv-panel">
+    <div class="adv-kopf"><span class="adv-badge">🌙 ${U('Advent of Hacking')}</span><span class="badge ${istFlag ? 'sim' : 'plain'}">${istFlag ? U('Rätsel') : U('Wissensfrage')}</span></div>
+    <h3 style="margin:.4rem 0 .5rem">🎁 ${Ut('Türchen {n}', { n: t.nr })} · ${esc(t.titel)}</h3>
+    ${t.szenario ? `<p class="small" style="white-space:pre-line;margin:0 0 .5rem">${esc(t.szenario)}</p>` : ''}
+    ${istFlag && t.aufgabe ? `<pre data-copy="${esc(t.aufgabe)}" style="white-space:pre-wrap;word-break:break-all">${esc(t.aufgabe)}</pre>` : ''}
+    ${t.hinweis ? `<p class="small muted">💡 ${esc(t.hinweis)}</p>` : ''}
     <div class="row" style="gap:.4rem;align-items:center">
-      <input type="text" id="adv-in" placeholder="KLY{…}" autocapitalize="off" autocorrect="off" spellcheck="false" style="flex:1">
+      <input type="text" id="adv-in" placeholder="${istFlag ? 'KLY{…}' : esc(U('Deine Antwort'))}" autocapitalize="off" autocorrect="off" spellcheck="false" style="flex:1">
       <button class="btn small" id="adv-go">${U('Prüfen')}</button>
     </div>
     <p class="small" id="adv-fb"></p>
@@ -452,13 +458,14 @@ function adventPanel(t) {
 }
 function adventHTML(d, aktivNr) {
   return `
-    <div class="card violet">
-      <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+    <div class="card adv-held">
+      <div class="adv-held-kopf"><span class="adv-badge">🌙 ${U('Advent of Hacking')}</span><span class="adv-moon-gross"></span></div>
+      <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.5rem">
         <div class="kpi"><b>${d.anzahl}/24</b><span>${U('Türchen')}</span></div>
         <div class="kpi"><b>${d.punkte}</b><span>${U('Punkte')}</span></div>
         <div class="kpi"><b>${d.streak}🔥</b><span>${U('Serie')}</span></div>
       </div>
-      <p class="small muted" style="margin:.5rem 0 0">${U('Jeden Tag im Dezember öffnet ein Türchen. Dekodiere die Zeichenkette zur Flag')} <code>KLY{…}</code> ${U('– verpasste Türchen kannst du nachholen.')}</p>
+      <p class="small muted" style="margin:.5rem 0 0">${U('Jeden Tag im Dezember öffnet ein neues Türchen – mal ein Knack-Rätsel, mal eine Wissensfrage. Verpasste Türchen kannst du jederzeit nachholen.')}</p>
     </div>
     ${d.komplett ? `<a class="card lime" href="#/adventurkunde" style="display:block;text-decoration:none;color:inherit"><b>🎄 ${U('Alle 24 geschafft!')}</b><br><span class="small muted">${U('Hol dir dein Advent-Zertifikat')} →</span></a>` : ''}
     <div class="adv-grid">${d.tueren.map(t => adventTile(t, aktivNr)).join('')}</div>
@@ -494,7 +501,7 @@ views.advent = () => ({
               const t = daten.tueren.find(x => x.nr === aktivNr); if (t) { t.geloest = true; delete t.aufgabe; delete t.hinweis; }
               daten.anzahl = r.anzahl; daten.punkte = r.punkte; daten.streak = r.streak; daten.komplett = r.komplett;
               aktivNr = standardAktiv(daten); zeichne();
-            } else { fb.textContent = U('✗ Noch nicht richtig – prüf deine Dekodierung.'); go.disabled = false; }
+            } else { fb.textContent = U('✗ Noch nicht richtig – versuch es nochmal.'); go.disabled = false; }
           } catch (e) { fb.textContent = U('Fehler') + ': ' + (e.message || e); go.disabled = false; }
         };
         go.onclick = pruef; inp.onkeydown = (e) => { if (e.key === 'Enter') pruef(); };
