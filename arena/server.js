@@ -324,15 +324,21 @@ async function pruefeImage(id, L) {
   if (vorhanden[id] === false) return { id, titel: L.title, ok: false, grund: 'Image nicht gebaut' };
   let c;
   try {
+    // Selbsttest-Container müssen EXAKT dieselbe Form haben wie echte Spiel-Container,
+    // sonst lehnt der Wächter (Docker-Socket-Proxy) sie ab: Name `kly-arena-…`, Label
+    // `kly.arena=1` sowie LogConfig/Ulimits/AutoRemove wie beim echten Start. Zusätzliches
+    // Label `kly.selbsttest=1`, damit der Orphan-Cleaner den laufenden Test nicht abräumt.
     c = await docker.createContainer({
-      Image: L.image, name: `kly-selbsttest-${id}-${randomBytes(4).toString('hex')}`,
-      Env: ['KLY_TOKEN=KLY-ABCDEF'], Hostname: 'test', Labels: { 'kly.selbsttest': '1' },
+      Image: L.image, name: `kly-arena-selbst-${randomBytes(4).toString('hex')}`,
+      Env: ['KLY_TOKEN=KLY-ABCDEF'], Hostname: 'test', Labels: { 'kly.arena': '1', 'kly.selbsttest': '1' },
       HostConfig: {
         NetworkMode: 'none', Memory: CFG.memMb * 1024 * 1024, MemorySwap: CFG.memMb * 1024 * 1024,
         NanoCpus: Math.round(CFG.cpus * 1e9), PidsLimit: CFG.pids, CapDrop: ['ALL'],
         CapAdd: ['CHOWN', 'DAC_OVERRIDE', 'FOWNER', 'SETUID', 'SETGID', 'KILL', 'AUDIT_WRITE', 'SYS_CHROOT', 'NET_BIND_SERVICE'],
-        SecurityOpt: ['no-new-privileges'], AutoRemove: false,
+        SecurityOpt: ['no-new-privileges'], AutoRemove: true,
         Tmpfs: { '/tmp': 'rw,noexec,nosuid,size=16m', '/var/tmp': 'rw,nosuid,size=16m', '/run/lock': 'rw,noexec,nosuid,size=1m', '/home': 'rw,exec,nosuid,size=48m,mode=755', ...(L.tmpfs || {}) },
+        LogConfig: { Type: 'json-file', Config: { 'max-size': '1m', 'max-file': '1' } },
+        Ulimits: [{ Name: 'fsize', Soft: 64 * 1024 * 1024, Hard: 64 * 1024 * 1024 }],
       },
     });
     await c.start();
@@ -405,7 +411,12 @@ async function reap() {
     else if (now - s.lastSeen > CFG.idleMin * 60000) await endSession(s.id, 'Leerlauf');
   }
   const list = await docker.listContainers({ all: true, filters: { label: ['kly.arena=1'] } }).catch(() => []);
-  for (const c of list) if (!sessions.has(c.Labels['kly.session'])) await docker.getContainer(c.Id).remove({ force: true }).catch(() => {});
+  for (const c of list) {
+    if (sessions.has(c.Labels['kly.session'])) continue;
+    // Laufenden Selbsttest (kurzlebig, räumt sich selbst ab) nicht killen; hängengebliebene nach 3 Min doch.
+    if (c.Labels['kly.selbsttest'] === '1' && (now / 1000 - c.Created) < 180) continue;
+    await docker.getContainer(c.Id).remove({ force: true }).catch(() => {});
+  }
 }
 setInterval(() => reap().catch(e => log('reap', e.message)), 60000).unref();
 
