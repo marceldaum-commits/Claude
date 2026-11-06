@@ -3,11 +3,12 @@
 Deutschsprachiges Lern-Projekt (Linux/Hacking) von Marcel. Antworten auf **Deutsch**, einfach,
 ein Schritt nach dem anderen (Marcel arbeitet viel am Handy, Anfänger).
 
-## Arbeitsraum – zu Beginn JEDER Sitzung lesen (Marcel, 06.11.2026)
-**Immer zuerst `docs/ARBEITSRAUM.md` und `docs/ROADMAP.md` lesen.** Das ist unser gemeinsamer Projektkopf
-(Entscheidungen, offene Fragen, Ideen, Baulog). Marcel will **kein Extra-Dokument öffnen** – die Zusammenarbeit
-läuft automatisch im Dialog über diese Repo-Dateien. Nach erledigten/neuen Dingen `docs/ARBEITSRAUM.md`
-fortschreiben (Baulog oben ergänzen, Entscheidungen/offene Fragen pflegen).
+## Rollen & Projekt-Kopf – zu Beginn JEDER Sitzung lesen (Marcel, 06.11.2026)
+**Rollen-Trennung:** „Arbeitsraum" = **Marketing** (Marcels eigener Raum), **Claude = Programmieren.**
+Marketing-/Reichweiten-Strategie gehört in den Marketing-Raum, nicht in den Code-Kontext.
+**Immer zuerst `docs/PROJEKT.md` und `docs/ROADMAP.md` lesen** (Spielregeln, offene Punkte, Feature-Backlog,
+Baulog). Marcel will **kein Extra-Dokument öffnen** – die Zusammenarbeit läuft automatisch im Dialog über diese
+Repo-Dateien. Nach erledigten/neuen Dingen `docs/PROJEKT.md` fortschreiben (Baulog oben ergänzen).
 
 ## Grundsatz: selbst-einrichtend bauen (Marcel, 05.11.2026)
 Funktionen/Automatiken **immer** so bauen, dass sie sich über den **Auto-Deploy von selbst
