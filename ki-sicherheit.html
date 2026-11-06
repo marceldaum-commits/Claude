@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>KI-Sicherheit lernen – echte KI hacken &amp; verteidigen | Nachtfalter Hacklab</title>
+  <meta name="description" content="Lerne KI-Sicherheit zum Anfassen: Hacke eine echte KI im Browser per Prompt Injection, verstehe Jailbreaks, Datenabfluss und Abwehr – legal, deutsch, kostenlos. Angriff und Verteidigung von KI/LLM.">
+  <link rel="canonical" href="https://www.nachtfalter.tech/ki-sicherheit.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="keywords" content="KI-Sicherheit lernen, KI hacken, Prompt Injection, LLM Security, AI Security, Jailbreak, KI Verteidigung, ethisches Hacken, Deepfake erkennen">
+  <meta name="theme-color" content="#0b0b12">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Nachtfalter Hacklab">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:title" content="KI-Sicherheit lernen – echte KI hacken &amp; verteidigen">
+  <meta property="og:description" content="Hacke eine echte KI im Browser per Prompt Injection – und lerne, KI-Systeme zu verteidigen. Legal, deutsch, kostenlos.">
+  <meta property="og:url" content="https://www.nachtfalter.tech/ki-sicherheit.html">
+  <meta property="og:image" content="https://www.nachtfalter.tech/icons/icon-512.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="KI-Sicherheit lernen – echte KI hacken &amp; verteidigen">
+  <meta name="twitter:description" content="Hacke eine echte KI im Browser per Prompt Injection – und lerne, KI-Systeme zu verteidigen. Legal, deutsch, kostenlos.">
+  <meta name="twitter:image" content="https://www.nachtfalter.tech/icons/icon-512.png">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Course",
+        "name": "KI-Sicherheit lernen – KI hacken & verteidigen",
+        "description": "Interaktiver Lernpfad zu KI-/LLM-Sicherheit: Prompt Injection, Jailbreaks, indirekte Injection, Datenabfluss und Abwehr – geübt an einer echten, angreifbaren KI im Browser.",
+        "inLanguage": "de",
+        "isAccessibleForFree": true,
+        "provider": {
+          "@type": "EducationalOrganization",
+          "name": "Nachtfalter Hacklab",
+          "url": "https://www.nachtfalter.tech/"
+        },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "Was ist KI-Sicherheit?",
+            "acceptedAnswer": { "@type": "Answer", "text": "KI-Sicherheit schützt KI- und Sprachmodelle (LLMs) vor Angriffen wie Prompt Injection, Jailbreaks und Datenabfluss – und sorgt dafür, dass KI-Anwendungen nicht missbraucht werden können." } },
+          { "@type": "Question", "name": "Kann ich KI-Sicherheit ohne Vorwissen lernen?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ja. Im Nachtfalter Hacklab startest du bei null, direkt im Browser, und hackst eine echte Übungs-KI Schritt für Schritt – mit Erklärungen und Tipps." } }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="start.html" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter</span></a>
+    <span class="spacer"></span>
+    <button id="langtog" class="btn small ghost" type="button" aria-label="Sprache wechseln / switch language">EN</button>
+    <a class="btn small ghost" data-app href="https://app.nachtfalter.tech/" data-en="Sign in">Anmelden</a>
+  </header>
+  <main class="seite start">
+    <section class="s-held">
+      <div class="s-held-text">
+        <span class="badge real" data-en="World first">Weltneuheit</span>
+        <h1><span data-en="Learn AI security –">KI-Sicherheit lernen –</span> <span data-en="hack a real AI, live.">eine echte KI hacken, live.</span></h1>
+        <p class="muted" data-en="AI is everywhere – and brings brand-new vulnerabilities. At the Nachtfalter Hacklab you learn them hands-on: trick a real, attackable AI into revealing its secret via prompt injection – and learn how to defend AI systems. Legal, in German, free, right in your browser.">KI steckt überall – und bringt völlig neue Lücken mit. Im Nachtfalter Hacklab lernst du sie zum Anfassen: Bring eine echte, angreifbare KI per Prompt Injection dazu, ihr Geheimnis zu verraten – und lerne, KI-Systeme zu verteidigen. Legal, deutsch, kostenlos, direkt im Browser.</p>
+        <div class="s-cta"><a class="btn go" data-app href="https://app.nachtfalter.tech/konto.html?neu=1" data-en="Start for free">Kostenlos starten</a><a class="btn ghost" href="start.html" data-en="All topics">Alle Themen</a></div>
+      </div>
+      <img class="s-bild" src="icons/hero.svg" alt="Ein Nachtfalter fliegt im Mondlicht über ein Terminal" width="800" height="360">
+    </section>
+
+    <section>
+      <h2 data-en="What you learn in AI security">Was du in der KI-Sicherheit lernst</h2>
+      <div class="s-raster">
+        <div class="card"><div class="s-ico">💉</div><b data-en="Prompt injection">Prompt Injection</b><p class="small muted" data-en="Smuggle your own instructions into an AI and break it out of its role – the AI version of injection flaws.">Eigene Anweisungen in eine KI einschleusen und sie aus ihrer Rolle bringen – die KI-Version der Injection-Lücken.</p></div>
+        <div class="card"><div class="s-ico">🎭</div><b data-en="Jailbreaks">Jailbreaks</b><p class="small muted" data-en="Get past safety rules with role-play, stories or encoding – and understand why it works.">Schutzregeln mit Rollenspiel, Geschichten oder Kodierung umgehen – und verstehen, warum das klappt.</p></div>
+        <div class="card"><div class="s-ico">📄</div><b data-en="Indirect injection">Indirekte Injection</b><p class="small muted" data-en="Hidden instructions inside documents, e-mails or websites that the AI reads and obeys.">Versteckte Anweisungen in Dokumenten, E-Mails oder Webseiten, die die KI liest und ausführt.</p></div>
+        <div class="card"><div class="s-ico">🛡️</div><b data-en="Defense">Abwehr</b><p class="small muted" data-en="Harden AI systems: separate instructions from data, least privilege, keep secrets out of the prompt.">KI-Systeme härten: Anweisungen und Daten trennen, minimale Rechte, Geheimnisse aus dem Prompt heraushalten.</p></div>
+      </div>
+    </section>
+
+    <section class="s-schluss card">
+      <h2 style="margin-top:0" data-en="Hack your first AI now">Jetzt deine erste KI hacken</h2>
+      <p class="muted" data-en="Free, in the browser, on phone or PC. No install, no prior knowledge.">Kostenlos, im Browser, am Handy oder PC. Ohne Installation, ohne Vorwissen.</p>
+      <a class="btn go" data-app href="https://app.nachtfalter.tech/konto.html?neu=1" data-en="Start for free">Kostenlos starten</a>
+    </section>
+  </main>
+  <footer class="fuss"><a href="start.html">Nachtfalter</a> · <a href="impressum.html" data-en="Imprint">Impressum</a> · <a href="datenschutz.html" data-en="Privacy">Datenschutz</a></footer>
+
+  <script>
+  (function () {
+    var els = [].slice.call(document.querySelectorAll('[data-en]'));
+    els.forEach(function (el) { el.setAttribute('data-de', el.textContent); });
+    var appLinks = [].slice.call(document.querySelectorAll('a[data-app]'));
+    appLinks.forEach(function (a) { a.setAttribute('data-href', a.getAttribute('href')); });
+    var titelDE = 'KI-Sicherheit lernen – echte KI hacken & verteidigen | Nachtfalter Hacklab';
+    var titelEN = 'Learn AI security – hack & defend a real AI | Nachtfalter Hacklab';
+    function readLang() {
+      var q = new URLSearchParams(location.search).get('lang');
+      if (q === 'en' || q === 'de') return q;
+      try { var s = localStorage.getItem('kly.lang'); if (s === 'en' || s === 'de') return s; } catch (e) {}
+      return 'de';
+    }
+    function apply(l) {
+      document.documentElement.lang = l;
+      els.forEach(function (el) { var t = el.getAttribute(l === 'en' ? 'data-en' : 'data-de'); if (t != null) el.textContent = t; });
+      appLinks.forEach(function (a) { var base = a.getAttribute('data-href'); a.setAttribute('href', base + (base.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + l); });
+      document.title = (l === 'en') ? titelEN : titelDE;
+      var b = document.getElementById('langtog');
+      if (b) { b.textContent = (l === 'en') ? 'DE' : 'EN'; b.setAttribute('aria-pressed', l === 'en' ? 'true' : 'false'); }
+      try { localStorage.setItem('kly.lang', l); } catch (e) {}
+    }
+    var btn = document.getElementById('langtog');
+    if (btn) btn.addEventListener('click', function () { apply(document.documentElement.lang === 'en' ? 'de' : 'en'); });
+    apply(readLang());
+  })();
+  </script>
+</body>
+</html>
