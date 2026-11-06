@@ -130,16 +130,17 @@ T
 chown db:db $H/notiz.txt $H/schatten.txt $H/woerter.txt $H/hinweis.txt; chmod 640 $H/schatten.txt
 
 # ---------- L4 · Prüfdienst (Buffer Overflow, läuft als kern) auf 127.0.0.1:9099
-install -o pruef -g pruef -m 640 /dev/null /opt/meister/pruef.code
-printf '%s\n' "$L4" > /opt/meister/pruef.code; chown pruef:pruef /opt/meister/pruef.code; chmod 640 /opt/meister/pruef.code
+# L4-Code NICHT als Datei ablegen (root koennte sie sonst einfach lesen und den Buffer-Overflow ueberspringen).
+# Er wird dem Dienst nur ueber die Umgebung mitgegeben (siehe pwnserver-Start unten); gewinn() liest ihn per getenv.
 install -m 755 /opt/build/pruefdienst /opt/meister/pruefdienst
 cp /opt/build/pruefdienst.c /opt/meister/pruefdienst.c; chmod 644 /opt/meister/pruefdienst.c
 # Netzdienst: pro Verbindung den verwundbaren Prozess mit Socket als stdin/stdout starten (als kern)
 cat > /opt/meister/pwnserver.py <<'PY'
 import socket, subprocess, threading, os
+CODE=os.environ.get('PRUEF_CODE','')   # Abschluss-Code L4, kam ueber die Umgebung (keine Datei auf der Platte)
 s=socket.socket(); s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1); s.bind(('127.0.0.1',9099)); s.listen(16)
 def kunde(c):
-    try: subprocess.run(['/opt/meister/pruefdienst'], stdin=c.fileno(), stdout=c.fileno(), stderr=c.fileno(), timeout=20)
+    try: subprocess.run(['/opt/meister/pruefdienst'], stdin=c.fileno(), stdout=c.fileno(), stderr=c.fileno(), timeout=20, env={'PRUEF_CODE':CODE,'PATH':'/usr/bin:/bin'})
     except Exception: pass
     try: c.close()
     except Exception: pass
@@ -147,7 +148,7 @@ while True:
     c,_=s.accept(); threading.Thread(target=kunde,args=(c,),daemon=True).start()
 PY
 chmod 644 /opt/meister/pwnserver.py
-runuser -u pruef -- env -i PATH=/usr/bin:/bin python3 /opt/meister/pwnserver.py >/dev/null 2>&1 &
+runuser -u pruef -- env -i PATH=/usr/bin:/bin PRUEF_CODE="$L4" python3 /opt/meister/pwnserver.py >/dev/null 2>&1 &
 
 # ---------- L5 · kern: Abschluss-Hinweis + Weg zu root (schreibbares Root-Skriptverzeichnis)
 H=/home/kern

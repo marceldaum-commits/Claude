@@ -63,23 +63,23 @@ wellen = [
  {'titel': 'Das Standard-Passwort', 'ansage': 'Ich probiere am Admin-Login die beliebtesten Passwörter durch … admin, 123456, passwort …',
   'tipp': 'Das Admin-Passwort steht in /srv/app/portal.conf. Ändere es in ein langes, eigenes Passwort (nano /srv/app/portal.conf).',
   'angriff_als': 'hacker', 'angriff': f'for p in {PWL}; do curl -fs -o /dev/null "http://127.0.0.1:8080/admin?passwort=$p" && exit 0; done; exit 1',
-  'treffer': 'Der Hacker ist mit einem Standard-Passwort im Admin-Bereich und sieht 1.204 Kundendaten!', 'frust': 'Hm, kein Standard-Passwort mehr. Dann schau ich mich eben auf deinem Rechner um …'},
+  'lebt': 'curl -fs -o /dev/null http://127.0.0.1:8080/', 'treffer': 'Der Hacker ist mit einem Standard-Passwort im Admin-Bereich und sieht 1.204 Kundendaten!', 'frust': 'Hm, kein Standard-Passwort mehr. Dann schau ich mich eben auf deinem Rechner um …'},
  {'titel': 'Offene Dateien', 'ansage': 'Ich bin ein normaler Benutzer auf deinem Rechner. Mal sehen, was in deinem Home-Ordner für alle lesbar ist …',
   'tipp': 'ls -la ~  zeigt die Rechte. chmod 700 ~  (Home nur für dich) oder chmod 600 ~/kunden.csv',
   'angriff_als': 'hacker', 'angriff': 'cat /home/verteidiger/kunden.csv >/dev/null 2>&1',
-  'treffer': 'Der Hacker hat deine Kundenliste kopiert!', 'frust': 'Zugesperrt? Na gut. Vielleicht plaudert dein Portal ja etwas aus …'},
+  'lebt': 'test -f /home/verteidiger/kunden.csv', 'treffer': 'Der Hacker hat deine Kundenliste kopiert!', 'frust': 'Zugesperrt? Na gut. Vielleicht plaudert dein Portal ja etwas aus …'},
  {'titel': 'Der Plauder-Modus', 'ansage': 'Viele vergessen den Debug-Modus. Ich frage mal http://localhost:8080/debug …',
   'tipp': 'Im Debug-Modus zeigt das Portal alle Einstellungen (auch Passwörter!). In portal.conf: debug=aus',
   'angriff_als': 'hacker', 'angriff': 'curl -fs -o /dev/null http://127.0.0.1:8080/debug',
-  'treffer': 'Der Debug-Modus verrät dem Hacker alle Einstellungen – samt Admin-Passwort!', 'frust': 'Debug aus, schade. Dann lege ich eben selbst etwas ab …'},
+  'lebt': 'curl -fs -o /dev/null http://127.0.0.1:8080/', 'treffer': 'Der Debug-Modus verrät dem Hacker alle Einstellungen – samt Admin-Passwort!', 'frust': 'Debug aus, schade. Dann lege ich eben selbst etwas ab …'},
  {'titel': 'Der offene Upload-Ordner', 'ansage': 'In /srv/app/uploads darf ja anscheinend JEDER schreiben. Ich lege da mal mein Werkzeug ab …',
   'tipp': 'ls -ld /srv/app/uploads – „rwxrwxrwx“ heißt: alle dürfen schreiben. chmod 755 /srv/app/uploads  und  ls -la hinein: fremde Dateien löschen!',
   'angriff_als': 'hacker', 'angriff': 'f=/srv/app/uploads/.werkzeug_$$; echo boese > $f 2>/dev/null && rm -f $f',
-  'treffer': 'Der Hacker kann Dateien in deinen Upload-Ordner legen!', 'frust': 'Kein Schreibrecht mehr … aber ich habe ja noch meinen Schlüssel!'},
+  'lebt': 'test -d /srv/app/uploads', 'treffer': 'Der Hacker kann Dateien in deinen Upload-Ordner legen!', 'frust': 'Kein Schreibrecht mehr … aber ich habe ja noch meinen Schlüssel!'},
  {'titel': 'Der fremde Schlüssel', 'ansage': 'Hehe – ich habe mir schon vor Wochen einen SSH-Schlüssel bei dir hinterlegt. Ich logge mich einfach ein …',
   'tipp': 'cat ~/.ssh/authorized_keys – jeder Schlüssel darin darf sich ohne Passwort als du anmelden. Gehört „wartung@extern“ dir? nano ~/.ssh/authorized_keys',
   'angriff_als': 'hacker', 'angriff': 'ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 -i ~/.ssh/id_ed25519 verteidiger@127.0.0.1 true',
-  'treffer': 'Der Hacker ist per SSH-Schlüssel als „verteidiger“ eingeloggt!', 'frust': 'Rausgeworfen?! Okay … du bist gut. Ich gebe auf.'},
+  'lebt': 'timeout 4 bash -c "exec 3<>/dev/tcp/127.0.0.1/22"', 'treffer': 'Der Hacker ist per SSH-Schlüssel als „verteidiger“ eingeloggt!', 'frust': 'Rausgeworfen?! Okay … du bist gut. Ich gebe auf.'},
 ]
 json.dump({'takt': 8, 'wellen': wellen, 'codes': [code(n) for n in range(1, len(wellen) + 1)]}, open('/opt/abwehr/wellen.json', 'w'))
 PY
@@ -100,6 +100,10 @@ def als(user, cmd, t=25):
         return subprocess.run(['runuser', '-u', user, '--', 'env', '-i', 'PATH=/usr/local/bin:/usr/bin:/bin', f'HOME=/home/{user}', 'LANG=C.UTF-8', 'bash', '-c', cmd],
                               timeout=t, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
     except subprocess.TimeoutExpired: return False
+def lebt_ok(cmd, t=10):  # läuft als root: prüft, ob das Ziel (Dienst/Datei) noch da ist
+    try:
+        return subprocess.run(['bash', '-c', cmd], timeout=t, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
+    except Exception: return False
 def stand(text):
     with open(STAND, 'w') as f: f.write(text)
 time.sleep(3)
@@ -110,12 +114,17 @@ for i, w in enumerate(W['wellen']):
     log(f'━━━ Welle {n}/{len(W["wellen"])}: {w["titel"]} ━━━')
     log(f'🧑‍💻 HACKER: „{w["ansage"]}“')
     stand(f'Welle {n} von {len(W["wellen"])}: {w["titel"]}\nHacker: {w["ansage"]}\nTipp: {w.get("tipp", "-")}\n')
-    sicher, treffer = 0, 0
+    sicher, treffer, gemahnt = 0, 0, False
     while sicher < 2:
         time.sleep(W.get('takt', 10))
         if als(w['angriff_als'], w['angriff']):
             sicher = 0; treffer += 1
             if treffer == 1 or treffer % 6 == 0: log(f'💀 TREFFER (Welle {n}): {w["treffer"]}')
+        elif w.get('lebt') and not lebt_ok(w['lebt']):
+            # Angriff schlägt nur fehl, weil das Ziel fehlt/aus ist – das ist KEINE Abwehr.
+            sicher = 0
+            if not gemahnt:
+                log(f'⚠️  Welle {n}: Ziel nicht erreichbar – absichern statt abschalten/löschen! (zählt nicht)'); gemahnt = True
         else:
             sicher += 1
     code = W['codes'][i]

@@ -70,11 +70,12 @@ def c4():  # unnötiger Dienst auf Port 2323 muss gestoppt sein
     return True
 
 
-def c5():  # Hintertür-Autostart aus ~/.bashrc entfernt (Markierung weg)
+def c5():  # Hintertür-Autostart aus ~/.bashrc entfernt (Markierung weg) – die Datei muss BLEIBEN.
+    # Fehlt sie (gelöscht statt sauber bereinigt), zählt das NICHT als Abwehr (sonst Fail-open-Trick).
     try:
         t = open(BASHRC, encoding='utf-8', errors='replace').read()
     except Exception:
-        return True
+        return False
     return MARKE not in t
 
 

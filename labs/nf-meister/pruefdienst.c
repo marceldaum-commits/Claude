@@ -8,10 +8,10 @@
 
 void gewinn() {
     // Wird normal NIE aufgerufen – nur per Overflow der Rücksprungadresse erreichbar.
-    char code[64];
-    FILE *f = fopen("/opt/meister/pruef.code", "r");
-    if (f) { if (fgets(code, sizeof(code), f)) printf("ZUGRIFF GEWAEHRT. %s", code); fclose(f); }
-    else printf("ZUGRIFF GEWAEHRT, aber Code-Datei fehlt.\n");
+    // Der Code kommt aus der Umgebung des Dienstes (kein Klartext auf der Platte, den root einfach „catten“ koennte).
+    char *code = getenv("PRUEF_CODE");
+    if (code && *code) printf("ZUGRIFF GEWAEHRT. %s\n", code);
+    else printf("ZUGRIFF GEWAEHRT, aber Code fehlt.\n");
     fflush(stdout);
 }
 

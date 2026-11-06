@@ -50,11 +50,12 @@ def c_port():   # Stufe 4: offener Dienst auf 2525 gestoppt
     return True
 
 
-def c_door():   # Stufe 5: Hintertür-Autostart aus ~/.bashrc entfernt
+def c_door():   # Stufe 5: Hintertür-Zeilen aus ~/.bashrc entfernt – die Datei muss BLEIBEN.
+    # Fehlt sie (jemand löscht sie, statt die Zeilen sauber zu entfernen), zählt das NICHT als Abwehr.
     try:
         return MARKE not in open(BASHRC, encoding='utf-8', errors='replace').read()
     except Exception:
-        return True
+        return False
 
 
 ROT = {
