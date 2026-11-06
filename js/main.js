@@ -1865,7 +1865,7 @@ views.zertifikat = (arg) => {
     const ueb = Object.entries(state.exercises || {}).filter(([id, e]) => e.passedAt && EX[id]).map(([id]) => String(EX[id].title || id));
     const badges = earnedBadges();
     const dstyle = `<style>
-.dz{max-width:720px;margin:0 auto;background:#fff;color:#1c1830;border:1px solid #d7d1ef;border-radius:12px;padding:30px 34px;font-family:system-ui,sans-serif}
+.dz{max-width:1040px;margin:0 auto;background:#fff;color:#1c1830;border:1px solid #d7d1ef;border-radius:12px;padding:30px 34px;font-family:system-ui,sans-serif}
 .dz-head{text-align:center;border-bottom:2px solid #2a2350;padding-bottom:14px;margin-bottom:16px}
 .dz-em{width:48px;height:48px;border-radius:50%;background:#15122b;display:flex;align-items:center;justify-content:center;margin:0 auto}.dz-em img{width:30px;height:30px}
 .dz-mk{letter-spacing:.24em;font-size:.68rem;color:#5b5280;text-transform:uppercase;margin:.4rem 0 0}
@@ -1877,10 +1877,12 @@ views.zertifikat = (arg) => {
 .dz h3{color:#241d4a;font-size:1rem;margin:1.1rem 0 .4rem;border-bottom:1px solid #eee;padding-bottom:.2rem}
 .dz ul{margin:.2rem 0;padding-left:1.1rem}.dz li{margin:.18rem 0;font-size:.9rem;color:#2c2648}
 .dz .leer{color:#8a82ad;font-size:.85rem}
-.dz-cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 28px}
-.dz-sec{break-inside:avoid}.dz-sec h3{margin-top:.8rem}
-@media (max-width:640px){.dz-cols{grid-template-columns:1fr}}
-@media print{@page{size:A4 portrait;margin:14mm}body{background:#fff !important}.top,.nav,.meldfab,#lang-banner,.zert-noprint{display:none !important}#main{margin:0 !important;padding:0 !important;max-width:none !important}.dz{border:none;max-width:none;padding:0}}
+.dz-cols{column-count:4;column-gap:24px}
+.dz-sec{break-inside:avoid;-webkit-column-break-inside:avoid;margin-bottom:.5rem}.dz-sec h3{margin-top:.2rem}
+@media (max-width:980px){.dz-cols{column-count:3}}
+@media (max-width:680px){.dz-cols{column-count:2}}
+@media (max-width:440px){.dz-cols{column-count:1}}
+@media print{@page{size:A4 landscape;margin:12mm}body{background:#fff !important}.top,.nav,.meldfab,#lang-banner,.zert-noprint{display:none !important}#main{margin:0 !important;padding:0 !important;max-width:none !important}.dz{border:none;max-width:none;padding:0}.dz-cols{column-count:4}}
 </style>`;
     const liste = (arr, leer) => arr.length ? `<ul>${arr.map(x => `<li>${x}</li>`).join('')}</ul>` : `<p class="leer">${leer}</p>`;
     return {
