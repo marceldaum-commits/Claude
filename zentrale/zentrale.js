@@ -250,6 +250,42 @@ function csv(nutzer) {
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 
+// Zertifikat/Urkunde für einen Nutzer druckfertig in neuem Fenster öffnen (gleiches Design wie in der App).
+function zertDrucken(n) {
+  const name = (n.name || '').trim() || n.email || 'Nachtfalter-Lernende(r)';
+  const raeume = n.fortschritt?.geloest || 0, lekt = n.fortschritt?.lektionen || 0, pruef = n.fortschritt?.pruefungen || 0;
+  const dat = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+  const h = Math.abs([...(name + ':' + raeume)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)).toString(36).toUpperCase().padStart(5, '0').slice(0, 5);
+  const nr = 'NF-' + new Date().getFullYear() + '-' + h;
+  const e = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Zertifikat – ${e(name)}</title><style>
+@page{size:A4 landscape;margin:10mm}*{box-sizing:border-box}
+body{margin:0;background:#fff;font-family:Georgia,'Times New Roman',serif;color:#1c1830;padding:16px}
+.b{position:relative;margin:0 auto;max-width:1000px;background:#fbfaff;border:2px solid #2a2350;border-radius:14px;padding:40px 46px;aspect-ratio:1.414/1;overflow:hidden}
+.b:before{content:"";position:absolute;inset:10px;border:1px solid #7c6fd6;border-radius:8px}
+.em{width:56px;height:56px;border-radius:50%;background:#15122b;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:28px}
+.mk{text-align:center;letter-spacing:.28em;font-size:.72rem;color:#5b5280;margin:.5rem 0 0;font-family:system-ui,sans-serif;text-transform:uppercase}
+h1{text-align:center;font-size:2.1rem;margin:.6rem 0 .1rem;color:#241d4a}.sub{text-align:center;color:#6a6192;font-size:.9rem;margin:0}
+.nm{text-align:center;margin:1.1rem 0 .2rem}.nm span{display:inline-block;font-size:2rem;color:#0e0b1e;border-bottom:1px solid #d7d1ef;padding:0 1.2rem .25rem}
+.tx{text-align:center;max-width:650px;margin:.5rem auto 0;color:#2c2648;font-size:1rem;line-height:1.5}
+.st{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1.4rem auto 0;max-width:560px}
+.st div{text-align:center;background:#f1eefb;border:1px solid #e0dbf4;border-radius:8px;padding:.6rem .2rem;font-family:system-ui,sans-serif}
+.st b{display:block;font-size:1.4rem;color:#3a2f8f}.st span{font-size:.72rem;color:#6a6192}
+.ft{display:flex;justify-content:space-between;align-items:flex-end;margin-top:1.7rem;font-family:system-ui,sans-serif;font-size:.78rem;color:#5b5280}
+.sg{text-align:center}.sg .l{border-top:1px solid #b9b2db;width:170px;margin:0 auto .2rem}.sg b{color:#241d4a}
+</style></head><body onload="setTimeout(function(){window.print()},300)">
+<div class="b"><div class="em">🦋</div><p class="mk">Nachtfalter Hacklab</p>
+<h1>Leistungsnachweis</h1><p class="sub">für ethisches Hacken &amp; IT-Sicherheit</p>
+<div class="nm"><span>${e(name)}</span></div>
+<p class="tx">hat sich im Nachtfalter Hacklab eigenständig und praxisnah in Linux, Netzwerken und ethischem Hacken weitergebildet und dabei folgende Leistung erbracht:</p>
+<div class="st"><div><b>${raeume}</b><span>Räume geknackt</span></div><div><b>${lekt}</b><span>Lektionen</span></div><div><b>${pruef}</b><span>Prüfungen bestanden</span></div></div>
+<div class="ft"><div><div>${e(dat)}</div><div style="color:#8a82ad">Nachweis-Nr. ${nr}</div></div><div class="sg"><div class="l"></div><b>Nachtfalter Hacklab</b><div>nachtfalter.tech</div></div></div>
+</div></body></html>`;
+  const w = window.open('', '_blank');
+  if (!w) { alert('Bitte Pop-ups erlauben, um das Zertifikat zu öffnen/drucken.'); return; }
+  w.document.write(html); w.document.close();
+}
+
 async function kunde(id) {
   const { nutzer } = await laden();
   const n = nutzer.find(x => x.id === id);
@@ -275,6 +311,7 @@ async function kunde(id) {
         <div class="zaktionen">
           <a class="btn small ghost" href="mailto:${esc(n.email)}?subject=${encodeURIComponent('Dein Nachtfalter-Konto')}">✉️ E-Mail schreiben</a>
           <button class="btn small" id="pw">🔑 Passwort-Mail senden</button>
+          <button class="btn small" id="zert">📜 Zertifikat drucken</button>
           ${n.bestaetigt ? '' : '<button class="btn small" id="best">✉️ Bestätigung erneut senden</button><button class="btn small ghost" id="bestH">✓ E-Mail manuell bestätigen</button>'}
           ${n.zwei_faktor && !ich ? '<button class="btn small ghost" id="mfa">🔐 Zwei-Faktor zurücksetzen</button>' : ''}
           ${kind(n) ? `<button class="btn small ghost" id="eltern">${n.eltern ? 'Eltern-Zustimmung entfernen' : '👪 Eltern-Zustimmung vermerken'}</button>` : ''}
@@ -299,6 +336,7 @@ async function kunde(id) {
     tun(() => api('rolle_setzen', { user_id: id, rolle: r }), 'Rolle geändert.', neu);
   });
   $('#pw').onclick = () => confirm(`Eine Mail zum Zurücksetzen des Passworts an ${n.email} senden?`) && tun(() => api('passwort_mail', { user_id: id }), 'Passwort-Mail ist unterwegs.');
+  if ($('#zert')) $('#zert').onclick = () => zertDrucken(n);
   if ($('#best')) $('#best').onclick = () => tun(() => api('bestaetigung_erneut', { user_id: id }), 'Bestätigungs-Mail erneut gesendet.');
   if ($('#bestH')) $('#bestH').onclick = () => confirm('E-Mail-Adresse ohne Klick des Kunden als bestätigt markieren?') && tun(() => api('email_bestaetigen', { user_id: id }), 'E-Mail als bestätigt markiert.', neu);
   if ($('#mfa')) $('#mfa').onclick = () => confirm(`Zwei-Faktor-Anmeldung von ${n.email} entfernen? (z. B. Handy verloren) Bei Verwaltungs-Konten wird sie bei der nächsten Anmeldung in der Zentrale neu eingerichtet.`) && tun(() => api('zwei_faktor_zuruecksetzen', { user_id: id }), 'Zwei-Faktor-Anmeldung zurückgesetzt.', neu);
