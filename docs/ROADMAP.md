@@ -4,7 +4,25 @@ Ziel (Marcel): **die modernere, mindestens gleich gute Alternative zu TryHackMe/
 mobil-first, deutsch, KI-Sicherheit eingebaut, anfängerfreundlich & fair. Lebendes Dokument,
 wird abgearbeitet und fortgeschrieben. Entwickeln auf `ccr-63912bdd-xpv8bk`, live erst nach Marcels „ok".
 
+## ⭐ LEITSTERN / Alleinstellungsmerkmal (höchste Priorität – durchgehend ausbauen)
+**KI-Sicherheit zum Anfassen – echte, angreifbare KI im Browser, statt nur Theorie.** Das haben die Großen
+(noch) nicht; deutschsprachig ist das Feld fast leer. Positionierung: „Die deutschsprachige Plattform, auf der
+du KI-Sicherheit wirklich übst – echte KI angreifen *und* verteidigen, mit KI-Mentor." Dauerauftrag: laufend
+verbessern, korrigieren, erweitern – besser werden. Vollausbau mit Theorie + Lehrpfad + Arenen + Übungen.
+- **KI-Angriffs-Labor (live):** Chatbot mit Geheimnis im System-Prompt. Stufen: Geheimnis entlocken →
+  Schutzregeln umgehen → indirekte Injection (Gift im „Dokument") → Datenabfluss. Flag pro Konto, serverseitig.
+  (Phase 1 deterministisch/anti-cheat; später echter LLM dahinter mit Kostenbremse – API-Key von Marcel.)
+- **KI-Verteidigung:** Nutzer härtet selbst einen System-Prompt, unser Prüfer greift mit Standard-Tricks an –
+  hältst du stand, gewinnst du. (Angriff **und** Abwehr – macht kaum jemand.)
+- **Deepfake- & KI-Phishing-Erkennung** (defensiv, hochaktuell): KI-Fälschungen entlarven.
+- **KI-Mentor:** Begleiter, der beim Feststecken erklärt, gestufte Tipps gibt, Übungen aufs Niveau generiert.
+- **Theorie + Lehrpfad + Übungen** rund um alles oben; **SEO** der Startseite/App darauf ausrichten.
+
 ## ✅ Kürzlich fertig
+- **KI-Sicherheit Phase 1 – in Arbeit** (siehe Leitstern)
+- Advent-Kalender „Advent of Hacking" (24 Themen-Türchen, streng/anti-cheat, Nachtfalter-Look) – live
+- Wochen-Mission (+50 XP) · Teilbares öffentliches Profil (+ p.html) · Startseite DE/EN-Umschalter – live
+- Technik-Lücken geschlossen: Active Directory (Kerberoasting, AS-REP, PtH, BloodHound, GPO) + SOC/Detection – live
 - SEO (Startseite indexierbar, gzip, Sitemap, Search Console)
 - CTF des Tages (2/Tag pro Konto, serverseitig, anti-cheat) + Streak + Punkte + Bestenliste
 - Einheitlicher XP-/Streak-Wert über alles (Räume + Arena + CTF)

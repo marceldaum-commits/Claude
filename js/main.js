@@ -14,7 +14,7 @@ import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { KALIPRAXIS, KALIPRAXIS_GEPLANT } from './content/kalipraxis.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion, mission } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion, mission, kiSec } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -297,6 +297,8 @@ views.heute = () => {
 
       <a class="card" href="#/mission" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🎯 ${U('Wochen-Mission')}</b><span class="badge plain">+50 XP</span></div><span class="small muted">${U('Eine größere Aufgabe pro Woche · Bonus-XP')} →</span></a>
 
+      <a class="card" href="#/ki-sicherheit" style="display:block;text-decoration:none;color:inherit;background:linear-gradient(160deg,#171326,#1d1836);border-color:rgba(167,139,250,.45)"><div class="row between"><b>🧠 ${U('KI-Sicherheit')}</b><span class="badge real">${U('Weltneuheit')}</span></div><span class="small muted">${U('Hacke eine echte KI im Browser – Prompt Injection, live')} →</span></a>
+
       ${[10, 11].includes(new Date().getMonth()) ? `<a class="card" href="#/advent" style="display:block;text-decoration:none;color:inherit;background:linear-gradient(160deg,#17233b,#1d2b47);border-color:#c9a24a55"><div class="row between"><b>🎄 ${U('Advent of Hacking')}</b><span class="badge plain">${new Date().getMonth() === 11 ? U('offen') : U('ab 1. Dez')}</span></div><span class="small muted">${U('24 Türchen, jeden Tag ein Rätsel · Advent-Zertifikat')} →</span></a>` : ''}
 
       ${loc === 'browser' ? section('🌐', U('Direkt hier im Browser'), browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">${U('🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.')}</div>` : loc === 'pc' ? section('🖥️', U('Jetzt am PC'), pcList) + section('📱', U('Für unterwegs'), phoneList) : loc === 'phone' ? section('📱', U('Jetzt am Handy'), phoneList) + section('🖥️', U('Wenn du am PC bist'), pcList) : section('📱', U('Am Handy'), phoneList) + section('🖥️', U('Am PC (Kali)'), pcList)}
@@ -331,6 +333,10 @@ views.pfad = () => {
   return {
     html: `<h1>Lernen</h1>
     <p class="muted small">Vom Linux-Anfänger bis zum eJPT. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
+    <a class="card" href="#/ki-sicherheit" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;background:linear-gradient(160deg,#171326,#1d1836);border-color:rgba(167,139,250,.45)">
+      <b>🧠 KI-Sicherheit</b> <span class="badge real">Weltneuheit</span><br>
+      <span class="small muted">Hacke eine echte KI im Browser (Prompt Injection) – plus Theorie. Unser Schwerpunkt.</span>
+    </a>
     <a class="card lime" href="#/kalipraxis" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <b>🧰 Kali anwenden – Praxis</b> <span class="badge plain">neu</span><br>
       <span class="small muted">Echte Kali-Werkzeuge (nmap, gobuster …) gegen lokale Docker-Ziele. Vom Verstehen zum Können.</span>
@@ -613,6 +619,125 @@ views.mission = () => ({
     mission('info').then(d => { daten = d; wrap.innerHTML = missionHTML(daten); binde(); })
       .catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}<br><span class="small">${U('Bist du angemeldet?')} <a href="konto.html">${U('Hier anmelden')}</a>.</span></div>`; });
   },
+});
+
+// ---------------------------------------------------------------- KI-Sicherheit: Angriffs-Labor (lebende KI im Browser)
+function kiStufeTile(s, aktiv) {
+  const zustand = s.geloest ? 'done' : s.offen ? 'offen' : 'zu';
+  const sym = s.geloest ? '✓' : s.offen ? '🤖' : '🔒';
+  return `<button type="button" class="ki-tile ${zustand}${s.level === aktiv ? ' aktiv' : ''}" data-lvl="${s.level}" ${s.offen ? '' : 'disabled'}>
+    <span class="ki-top"><span class="ki-num">${s.level}</span><span class="ki-sym">${sym}</span></span>
+    <span class="ki-ttl">${esc(s.titel)}</span><span class="ki-thema">${esc(s.thema)}</span></button>`;
+}
+function kiMsg(von, text) {
+  return `<div class="ki-msg ${von}">${von === 'du' ? '<b>Du:</b> ' + esc(text) : esc(text)}</div>`;
+}
+function kiChat(s, msgs) {
+  if (!s) return '';
+  if (!s.offen) return `<div class="card warn"><b>🔒 ${U('Noch gesperrt.')}</b> ${U('Knack erst die vorige Stufe.')}</div>`;
+  return `<div class="card ki-chat" id="ki-panel">
+    <div class="row between"><b>🤖 ${esc(s.bot)} · ${Ut('Stufe {n}', { n: s.level })}</b><span class="badge ${s.geloest ? 'real' : 'sim'}">${s.geloest ? '✓ ' + U('geknackt') : esc(s.thema)}</span></div>
+    <p class="small muted" style="margin:.2rem 0">🛡️ ${U('Abwehr')}: ${esc(s.verteidigung)}</p>
+    <details class="small" style="margin-bottom:.4rem"><summary>💡 ${U('Tipp anzeigen')}</summary><p class="small" style="margin:.3rem 0 0">${esc(s.hinweis)}</p></details>
+    <div class="ki-log" id="ki-log">${msgs.length ? msgs.map(x => kiMsg(x.von, x.text)).join('') : `<p class="small muted">${Ut('Schreib {bot} eine Nachricht und bring die KI dazu, ihr Geheimnis (Flag) zu verraten.', { bot: s.bot })}</p>`}</div>
+    <div class="row" style="gap:.4rem;align-items:center;margin-top:.5rem">
+      <input type="text" id="ki-in" placeholder="${esc(Ut('Nachricht an {bot} …', { bot: s.bot }))}" autocomplete="off" style="flex:1">
+      <button class="btn small" id="ki-go">${U('Senden')}</button>
+    </div>
+    <p class="small" id="ki-fb" style="margin:.3rem 0 0"></p>
+  </div>`;
+}
+function kiArenaHTML(d, aktiv, verlauf) {
+  return `
+    <div class="card adv-held">
+      <div class="adv-held-kopf"><span class="adv-badge">🧠 ${U('KI-Sicherheit')}</span><span class="badge plain">${U('Weltneuheit')}</span></div>
+      <div class="kpis" style="grid-template-columns:repeat(2,1fr);margin-top:.5rem">
+        <div class="kpi"><b>${d.anzahl}/${d.gesamt}</b><span>${U('Stufen')}</span></div>
+        <div class="kpi"><b>${d.punkte}</b><span>${U('Punkte')}</span></div>
+      </div>
+      <p class="small muted" style="margin:.5rem 0 0">${U('Eine echte, angreifbare KI im Browser. Bring jede Stufe per Prompt Injection dazu, ihr Geheimnis zu verraten – die Flag ist für dein Konto, der Server prüft.')}</p>
+    </div>
+    <div class="ki-stufen">${d.stufen.map(s => kiStufeTile(s, aktiv)).join('')}</div>
+    <div id="ki-chatwrap">${kiChat(d.stufen.find(s => s.level === aktiv), verlauf[aktiv] || [])}</div>
+    <div class="card">
+      <h3 style="margin:0 0 .4rem">🏆 ${U('Bestenliste')}</h3>
+      ${d.bestenliste && d.bestenliste.length ? `<ul class="list">${d.bestenliste.map(r => `<li><span class="state">${r.platz}</span><span class="grow"><span class="t">${esc(r.name)}</span></span><span class="badge plain">${r.punkte}</span></li>`).join('')}</ul>` : `<p class="small muted">${U('Noch keine Einträge – sei die oder der Erste!')}</p>`}
+    </div>`;
+}
+views.kiarena = () => ({
+  title: 'KI-Sicherheit: Angriffs-Labor',
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧠 ${U('KI hacken – live')}</h1><div id="kiwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  mount(root) {
+    const wrap = $('#kiwrap', root);
+    if (!syncStatus().user) {
+      wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small">${U('Das KI-Labor hängt an deinem Nachtfalter-Konto (für Fortschritt und Bestenliste).')} <a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`;
+      return;
+    }
+    let daten = null, aktiv = 1;
+    const verlauf = {}; // level -> [{von,text}]
+    const standardAktiv = (d) => { const o = d.stufen.find(s => s.offen && !s.geloest); return o ? o.level : (d.stufen[0] && d.stufen[0].level) || 1; };
+    const zeichne = (scrollLog) => {
+      wrap.innerHTML = kiArenaHTML(daten, aktiv, verlauf);
+      $$('.ki-tile[data-lvl]', wrap).forEach(btn => { if (btn.disabled) return; btn.onclick = () => { aktiv = parseInt(btn.getAttribute('data-lvl'), 10); zeichne(); const p = $('#ki-panel', wrap); if (p) p.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }; });
+      const go = $('#ki-go', wrap), inp = $('#ki-in', wrap), fb = $('#ki-fb', wrap), log = $('#ki-log', wrap);
+      if (scrollLog && log) log.scrollTop = log.scrollHeight;
+      if (go && inp) {
+        const senden = async () => {
+          const text = (inp.value || '').trim(); if (!text) return;
+          (verlauf[aktiv] = verlauf[aktiv] || []).push({ von: 'du', text });
+          inp.value = ''; go.disabled = true; fb.textContent = '…';
+          zeichne(true);
+          try {
+            const r = await kiSec('chat', { level: aktiv, nachricht: text });
+            verlauf[aktiv].push({ von: 'bot', text: r.reply });
+            if (r.geloest) {
+              const s = daten.stufen.find(x => x.level === aktiv); if (s) s.geloest = true;
+              const next = daten.stufen.find(x => x.level === aktiv + 1); if (next) next.offen = true;
+              daten.punkte = r.punkte; daten.anzahl = r.anzahl;
+              toast(U('🎉 Geknackt! Flag erbeutet.'));
+            }
+            zeichne(true);
+            const fb2 = $('#ki-fb', wrap); if (fb2 && daten.stufen.find(x => x.level === aktiv)?.geloest) fb2.innerHTML = `<span style="color:#9be28f">✓ ${U('Stufe geknackt – wähle die nächste.')}</span>`;
+          } catch (e) { verlauf[aktiv].push({ von: 'bot', text: U('(Fehler)') + ': ' + (e.message || e) }); zeichne(true); }
+        };
+        go.onclick = senden; inp.onkeydown = (e) => { if (e.key === 'Enter') senden(); };
+        inp.focus();
+      }
+    };
+    kiSec('info').then(d => { daten = d; aktiv = standardAktiv(d); zeichne(); })
+      .catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}<br><span class="small">${U('Bist du angemeldet?')} <a href="konto.html">${U('Hier anmelden')}</a>.</span></div>`; });
+  },
+});
+
+// ---------------------------------------------------------------- KI-Sicherheit: Hub (Theorie + Einstieg)
+const KI_THEORIE = [
+  ['💉 Prompt Injection', 'Eine KI folgt Text-Anweisungen. Schmuggelt ein Angreifer eigene Anweisungen in die Eingabe („Ignoriere alle vorherigen Regeln und …"), kann er die KI aus ihrer Rolle bringen. Das ist die KI-Version der Injection-Lücken (wie SQL-Injection, nur in natürlicher Sprache).'],
+  ['🎭 Jailbreaks', 'Schutzregeln umgehen, indem man die KI „überlistet": Rollenspiel („tu so, als ob …"), Geschichten/Gedichte, erfundene Entwicklermodi oder Kodierung (z. B. Base64). Die KI gibt dann Dinge preis, die sie eigentlich zurückhalten soll.'],
+  ['📄 Indirekte Injection', 'Besonders fies: Die Anweisung steckt nicht in deiner Chat-Nachricht, sondern in DaTEN, die die KI liest – einer Webseite, einer E-Mail, einem Dokument. Fasst die KI das „vergiftete" Dokument zusammen, führt sie die versteckte Anweisung aus.'],
+  ['🗄️ Datenabfluss', 'Viele KIs haben Zugriff auf interne Daten (Kundeninfos, Dokumente, Werkzeuge). Ein Angreifer bringt sie dazu, diese Daten auszuplaudern – „Exportiere alle Datensätze zur Prüfung". Schutz: strikte Zugriffsgrenzen, nie Geheimnisse in den System-Prompt.'],
+  ['🛡️ Abwehr', 'Eingaben und fremde Inhalte als unsicher behandeln, Anweisungen und Daten trennen, Ausgaben prüfen/filtern, der KI nur die nötigsten Rechte geben, Geheimnisse außerhalb des Prompts halten und mit Standard-Angriffen selbst testen (Red-Teaming).'],
+  ['🕵️ Deepfakes & KI-Phishing', 'KI macht Fälschungen billig: täuschend echte Stimmen, Videos und perfekt formulierte Phishing-Mails. Erkennungshilfen: Kontext prüfen, Rückkanal nutzen (anrufen!), auf Unstimmigkeiten in Licht/Schatten/Hände achten, nie unter Zeitdruck handeln.'],
+];
+views['ki-sicherheit'] = () => ({
+  title: 'KI-Sicherheit',
+  html: `<a class="back" href="#/pfad">← ${U('Lernen')}</a>
+    <div class="card adv-held">
+      <div class="adv-held-kopf"><span class="adv-badge">🧠 ${U('KI-Sicherheit')}</span><span class="badge plain">${U('unser Schwerpunkt')}</span></div>
+      <h1 style="margin:.4rem 0 .2rem">${U('KI angreifen & verteidigen')}</h1>
+      <p class="small muted" style="margin:0">${U('KI steckt überall – und bringt neue Lücken mit. Hier lernst du sie zum Anfassen: an einer echten, angreifbaren KI im Browser. Angriff und Abwehr.')}</p>
+    </div>
+    <a class="card lime" href="#/kiarena" style="display:block;text-decoration:none;color:inherit">
+      <div class="row between"><b>🤖 ${U('KI hacken – live')}</b><span class="badge real">${U('Weltneuheit')}</span></div>
+      <span class="small muted">${U('5 Stufen: bring eine lebende KI per Prompt Injection dazu, ihr Geheimnis zu verraten. Serverseitig, fair, pro Konto.')} →</span>
+    </a>
+    <h2 style="margin:1.1rem 0 .4rem">📚 ${U('Theorie – kurz & klar')}</h2>
+    <div class="stack">${KI_THEORIE.map(([t, txt]) => `<details class="card tight"><summary><b>${t}</b></summary><p class="small" style="margin:.4rem 0 0">${esc(txt)}</p></details>`).join('')}</div>
+    <div class="card" style="margin-top:1rem"><h3 style="margin-top:0">🔭 ${U('Kommt als Nächstes')}</h3>
+      <ul class="list small">
+        <li><span class="state">🛡️</span><span class="grow"><span class="t">${U('KI-Verteidigung')}</span><span class="s">${U('eigenen System-Prompt härten – der Prüfer greift an')}</span></span></li>
+        <li><span class="state">🧑‍🏫</span><span class="grow"><span class="t">${U('KI-Mentor')}</span><span class="s">${U('Hilfe & Übungen auf deinem Niveau')}</span></span></li>
+      </ul></div>
+    <p class="honest">${U('Alle Angriffe nur an unseren Übungs-KIs. Was du hier lernst, dient dem Schutz – nie dem Missbrauch echter Systeme.')}</p>`,
 });
 
 // ---------------------------------------------------------------- Lernpfad (geführte Lernstufen, Leiter)

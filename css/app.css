@@ -341,3 +341,25 @@ a.karte:hover { border-color: var(--violet); }
 .adv-tile.aktiv { outline: 2px solid var(--lime); outline-offset: 1px; }
 .adv-tile:disabled { cursor: default; }
 .adv-aufgabe .adv-kopf { display: flex; align-items: center; justify-content: space-between; }
+
+/* KI-Sicherheit: Angriffs-Labor */
+.ki-stufen { display: grid; grid-template-columns: repeat(2, 1fr); gap: .55rem; margin: .4rem 0 .9rem; }
+@media (min-width: 560px) { .ki-stufen { grid-template-columns: repeat(3, 1fr); } }
+.ki-tile { position: relative; min-height: 96px; border-radius: 14px; border: 1px solid var(--line); background: linear-gradient(165deg, #141624, #191528); color: var(--text); cursor: pointer; display: flex; flex-direction: column; justify-content: flex-start; gap: .25rem; text-align: left; font: inherit; padding: .55rem .6rem; transition: transform .08s, border-color .15s; }
+.ki-tile:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--violet); }
+.ki-tile .ki-top { display: flex; align-items: center; gap: .35rem; }
+.ki-tile .ki-num { font-size: 1.2rem; font-weight: 800; line-height: 1; }
+.ki-tile .ki-sym { font-size: 1rem; }
+.ki-tile .ki-ttl { font-size: .82rem; font-weight: 700; line-height: 1.15; }
+.ki-tile .ki-thema { font-size: .68rem; color: var(--muted); line-height: 1.2; }
+.ki-tile.offen { border-color: rgba(167, 139, 250, .5); }
+.ki-tile.offen .ki-num { color: var(--violet); }
+.ki-tile.done { border-color: rgba(163, 230, 53, .55); background: linear-gradient(165deg, #16241a, #15231a); }
+.ki-tile.done .ki-num, .ki-tile.done .ki-sym { color: var(--lime); }
+.ki-tile.zu { opacity: .5; cursor: not-allowed; }
+.ki-tile.aktiv { outline: 2px solid var(--violet); outline-offset: 1px; }
+.ki-tile:disabled { cursor: default; }
+.ki-log { display: flex; flex-direction: column; gap: .4rem; max-height: 300px; overflow-y: auto; padding: .5rem; background: var(--term); border: 1px solid var(--line); border-radius: 10px; }
+.ki-msg { font-size: .9rem; line-height: 1.35; padding: .4rem .55rem; border-radius: 10px; max-width: 92%; word-break: break-word; }
+.ki-msg.du { align-self: flex-end; background: var(--violet-bg); border: 1px solid rgba(167, 139, 250, .35); }
+.ki-msg.bot { align-self: flex-start; background: var(--card2); border: 1px solid var(--line); }
