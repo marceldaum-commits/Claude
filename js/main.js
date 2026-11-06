@@ -1877,6 +1877,9 @@ views.zertifikat = (arg) => {
 .dz h3{color:#241d4a;font-size:1rem;margin:1.1rem 0 .4rem;border-bottom:1px solid #eee;padding-bottom:.2rem}
 .dz ul{margin:.2rem 0;padding-left:1.1rem}.dz li{margin:.18rem 0;font-size:.9rem;color:#2c2648}
 .dz .leer{color:#8a82ad;font-size:.85rem}
+.dz-cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 28px}
+.dz-sec{break-inside:avoid}.dz-sec h3{margin-top:.8rem}
+@media (max-width:640px){.dz-cols{grid-template-columns:1fr}}
 @media print{@page{size:A4 portrait;margin:14mm}body{background:#fff !important}.top,.nav,.meldfab,#lang-banner,.zert-noprint{display:none !important}#main{margin:0 !important;padding:0 !important;max-width:none !important}.dz{border:none;max-width:none;padding:0}}
 </style>`;
     const liste = (arr, leer) => arr.length ? `<ul>${arr.map(x => `<li>${x}</li>`).join('')}</ul>` : `<p class="leer">${leer}</p>`;
@@ -1888,11 +1891,13 @@ views.zertifikat = (arg) => {
       <div class="dz">
         <div class="dz-head"><div class="dz-em"><img src="icons/icon.svg" alt=""></div><p class="dz-mk">Nachtfalter Hacklab</p><h2>${U('Ausführlicher Leistungsnachweis')}</h2><div class="dz-meta">${esc(name)} · ${esc(datum)} · ${U('Nachweis-Nr.')} ${code}</div></div>
         <div class="dz-kpi"><div><b>${punkte}</b><span>${U('Punkte')}</span></div><div><b>${geknackt}/${ROOMS.length}</b><span>${U('Räume')}</span></div><div><b>${abz}</b><span>${U('Abzeichen')}</span></div><div><b>${serie}🔥</b><span>${U('Serie')}</span></div></div>
-        <h3>🧩 ${U('Gelöste Räume')}</h3>${liste(raeumeDone.map(r => `${esc(roomText(r, 'title'))} <span class="leer">· ${roomPoints(r.id)} P.</span>`), U('Noch keine Räume vollständig gelöst.'))}
-        <h3>📒 ${U('Bestandene Übungen')}</h3>${liste(ueb.map(t => esc(t)), U('Noch keine Übungen bestanden.'))}
-        <h3>🏅 ${U('Abzeichen')}</h3>${liste(badges.map(b => `${b.icon || '🏅'} ${esc(UN(b.title))}`), U('Noch keine Abzeichen.'))}
-        <h3>🎯 ${U('Arena-Labs')}</h3><div id="arenabox"><p class="leer">${U('Lade …')}</p></div>
-        <h3>🏁 ${U('CTF des Tages')}</h3><p style="font-size:.9rem;color:#2c2648">${U('Punkte')}: ${(ctfStand && ctfStand.punkte) || 0} · ${U('Serie')}: ${(ctfStand && ctfStand.streak) || 0}🔥</p>
+        <div class="dz-cols">
+          <section class="dz-sec"><h3>🧩 ${U('Gelöste Räume')}</h3>${liste(raeumeDone.map(r => `${esc(roomText(r, 'title'))} <span class="leer">· ${roomPoints(r.id)} P.</span>`), U('Noch keine Räume vollständig gelöst.'))}</section>
+          <section class="dz-sec"><h3>📒 ${U('Bestandene Übungen')}</h3>${liste(ueb.map(t => esc(t)), U('Noch keine Übungen bestanden.'))}</section>
+          <section class="dz-sec"><h3>🏅 ${U('Abzeichen')}</h3>${liste(badges.map(b => `${b.icon || '🏅'} ${esc(UN(b.title))}`), U('Noch keine Abzeichen.'))}</section>
+          <section class="dz-sec"><h3>🎯 ${U('Arena-Labs')}</h3><div id="arenabox"><p class="leer">${U('Lade …')}</p></div></section>
+          <section class="dz-sec"><h3>🏁 ${U('CTF des Tages')}</h3><p style="font-size:.9rem;color:#2c2648">${U('Punkte')}: ${(ctfStand && ctfStand.punkte) || 0} · ${U('Serie')}: ${(ctfStand && ctfStand.streak) || 0}🔥</p></section>
+        </div>
         <p class="leer" style="margin-top:1rem">${U('Persönlicher Nachweis über den Fortschritt in dieser App – kein externes Zertifikat.')}</p>
       </div>`,
       mount(root) {
