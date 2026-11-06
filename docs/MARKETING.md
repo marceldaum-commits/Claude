@@ -80,6 +80,10 @@ Dort ist die Konkurrenz auf Deutsch dünn – das ist unser stärkster Hebel.
 
 > **Hinweis:** Themen an die echten Türchen-Inhalte der App anpassen (Programmier-Raum kennt die genauen Aufgaben). Oben = Vorschlag/Gerüst.
 
+**Fertige Kacheln:** alle 24 als PNG (1080×1080) in `docs/marketing-assets/advent/` (`advent-01.png` … `advent-24.png`),
+Übersicht: `_uebersicht.png`, Design-Vorlage: `_vorlage-v4.svg` (Falter freigestellt + Mond).
+Erzeugt aus freigestelltem Logo; bei sauberer Original-Logo-Datei neu rendern für mehr Schärfe.
+
 ## To-dos (Marketing)
 - [x] Advent-Kampagne planen (24-Tage-Post-Plan + Hashtags + CTA) – Entwurf steht
 - [ ] Türchen-Themen mit den echten App-Aufgaben abgleichen (Rückfrage an Programmier-Raum)
@@ -91,5 +95,6 @@ Dort ist die Konkurrenz auf Deutsch dünn – das ist unser stärkster Hebel.
 ## Log (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
-| 06.11.2026 | Markenfarben + Logo-Dateien festgehalten, 24-Tage-Advent-Plan geschrieben, Kachel-Vorlage (v3: Falter freigestellt + Mond) gebaut | Entwürfe stehen |
+| 06.11.2026 | Alle 24 Advent-Kacheln (1080×1080) erstellt + im marketing-Branch gesichert | Fertig zum Posten |
+| 06.11.2026 | Markenfarben + Logo-Dateien festgehalten, 24-Tage-Advent-Plan geschrieben, Kachel-Vorlage (v4: Falter freigestellt + Mond) gebaut | Entwürfe stehen |
 | 06.11.2026 | Marketing-Raum eingerichtet | Start |
