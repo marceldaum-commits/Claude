@@ -211,6 +211,14 @@ nginx_conf() { # $1 = _headers-Datei, $2 = Web-Ordner, $3 = Seite → Konfigurat
   echo "# Automatisch erzeugt von nachtfalter-deploy ($seite) – nicht von Hand ändern."
   echo "root $root;"
   echo "index index.html;"
+  # Komprimierung (spart ~70 % bei HTML/CSS/JS/SVG). text/html wird von nginx bei aktivem gzip
+  # automatisch komprimiert und darf nicht in gzip_types stehen. nginx -t prüft die Syntax weiter unten.
+  echo "gzip on;"
+  echo "gzip_comp_level 5;"
+  echo "gzip_min_length 256;"
+  echo "gzip_vary on;"
+  echo "gzip_proxied any;"
+  echo "gzip_types text/plain text/css text/xml application/javascript application/json application/manifest+json image/svg+xml application/xml;"
   if [ "$seite" = vorschau ] && [ -s "$WEBCONF/vorschau.htpasswd" ]; then
     echo 'auth_basic "Nachtfalter Vorschau";'
     echo "auth_basic_user_file $WEBCONF/vorschau.htpasswd;"
