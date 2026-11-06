@@ -358,6 +358,8 @@ async function kunde(id) {
           ${n.bestaetigt ? '' : '<button class="btn small" id="best">✉️ Bestätigung erneut senden</button><button class="btn small ghost" id="bestH">✓ E-Mail manuell bestätigen</button>'}
           ${n.zwei_faktor && !ich ? '<button class="btn small ghost" id="mfa">🔐 Zwei-Faktor zurücksetzen</button>' : ''}
           ${kind(n) ? `<button class="btn small ghost" id="eltern">${n.eltern ? 'Eltern-Zustimmung entfernen' : '👪 Eltern-Zustimmung vermerken'}</button>` : ''}
+          <button class="btn small ghost" id="kitok">🎟️ KI-Tokens geben</button>
+          <button class="btn small ghost" id="kireset">🤖 KI-Fortschritt zurücksetzen</button>
           ${ich ? '' : `<button class="btn small ${n.gesperrt ? '' : 'ghost'}" id="sperre">${n.gesperrt ? '🔓 Entsperren' : '⛔ Sperren'}</button><button class="btn small rot" id="weg">🗑️ Konto löschen</button>`}
         </div></div></div>
     </div>
@@ -390,6 +392,15 @@ async function kunde(id) {
     const b = prompt(`Konto ${n.email} endgültig löschen – mit Fortschritt und Zugängen?\nZum Bestätigen LÖSCHEN eintippen:`);
     if (b === 'LÖSCHEN') tun(() => api('nutzer_loeschen', { user_id: id, bestaetigung: b }), 'Konto gelöscht.', () => { location.hash = '#/kunden'; });
   };
+  if ($('#kitok')) $('#kitok').onclick = () => {
+    const a = prompt(`KI-Nachrichten für ${n.email} HEUTE freigeben.\nZahl eingeben (zusätzliche Nachrichten) oder "voll" für das komplette Tagesbudget:`, 'voll');
+    if (a === null) return;
+    const voll = String(a).trim().toLowerCase() === 'voll';
+    const tokens = voll ? undefined : Math.max(1, Math.min(200, parseInt(a, 10) || 0));
+    if (!voll && !tokens) return;
+    tun(() => api('ki_tokens', voll ? { user_id: id, voll: true } : { user_id: id, tokens }), voll ? 'KI-Tagesbudget wieder frei.' : `${tokens} KI-Nachrichten gutgeschrieben.`);
+  };
+  if ($('#kireset')) $('#kireset').onclick = () => confirm(`KI-Sicherheit-Fortschritt von ${n.email} zurücksetzen? (Boss-Bots, Verteidigung, Arena – und das heutige KI-Budget)`) && tun(() => api('ki_reset', { user_id: id }), 'KI-Fortschritt zurückgesetzt.');
   main.querySelectorAll('[data-ende]').forEach(b => b.onclick = () => confirm('Zugang sofort beenden?') && tun(() => api('zugang_beenden', { zugang_id: Number(b.dataset.ende) }), 'Zugang beendet.', neu));
   $('#zf').onsubmit = (e) => { e.preventDefault(); const f = e.target; tun(() => api('zugang_geben', { user_id: id, produkt: f.produkt.value, tage: f.tage.value === 'unbefristet' ? 'unbefristet' : Number(f.tage.value) }), 'Zugang vergeben.', neu); };
   $('#nzs').onclick = () => tun(() => api('notiz_setzen', { user_id: id, notiz: $('#nz').value }), 'Notiz gespeichert.');
