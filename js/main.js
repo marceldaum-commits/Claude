@@ -147,6 +147,7 @@ const NIVEAUS = {
   anfaenger: { icon: '🌱', label: 'Anfänger', desc: 'Ganz neu – erklär mir alles in Ruhe.' },
   etwas: { icon: '⚡', label: 'Etwas Erfahrung', desc: 'Grundlagen sitzen, ich will tiefer rein.' },
   profi: { icon: '🎯', label: 'Profi', desc: 'Fordere mich – weniger an die Hand nehmen.' },
+  experte: { icon: '🔥', label: 'Experte', desc: 'Ganz ohne Tipps – nur für Harte. Dafür immer volle Punkte.' },
 };
 const niveau = () => state.profile.level || 'anfaenger';
 function nivButtons() {
@@ -221,7 +222,12 @@ const needsKali = (r) => r.machine.kind !== 'sandbox' && !(r.machine.kind === 's
 const visible = (r) => !(browserOnly() && needsKali(r));
 // Einstiegsreihenfolge für Neue ohne Kali: erst die Story, dann aufbauend
 const BROWSER_ORDER = ['w1', 'r0', 'w4', 'h1', 'n1', 'w6', 'w3', 'w5', 'w7', 'b1', 'p5', 'w8', 'p6', 'w9', 'p7', 'p8', 'p10'];
-const browserPicks = () => ROOMS.filter(r => !needsKali(r) && !roomDone(r.id)).sort((a, b) => (BROWSER_ORDER.indexOf(a.id) + 1 || 99) - (BROWSER_ORDER.indexOf(b.id) + 1 || 99));
+// Räume passend zur Erfahrungsstufe: Anfänger → leichtere zuerst, Profi/Experte → fordernde zuerst.
+const DIFFRANK = { leicht: 1, einfach: 1, mittel: 2, schwer: 3, schwierig: 3, extrem: 4 };
+const nivPref = () => ({ anfaenger: 1, etwas: 2, profi: 3, experte: 3 }[niveau()] || 1);
+const diffGap = (r) => Math.abs((DIFFRANK[(r.difficulty || '').toLowerCase()] || 2) - nivPref());
+const ordBrowser = (r) => (BROWSER_ORDER.indexOf(r.id) + 1 || 99);
+const browserPicks = () => { const adv = niveau() === 'profi' || niveau() === 'experte'; return ROOMS.filter(r => !needsKali(r) && !roomDone(r.id)).sort((a, b) => adv ? ((diffGap(a) - diffGap(b)) || (ordBrowser(a) - ordBrowser(b))) : ((ordBrowser(a) - ordBrowser(b)) || (diffGap(a) - diffGap(b)))); };
 // Wo spielbar? sandbox = überall (Browser), target = PC (Docker) oder Handy (Termux), ssh/ext = nur PC
 const onPhone = (r) => r.machine.kind === 'sandbox' || r.machine.kind === 'target';
 const onPC = (r) => r.machine.kind !== 'sandbox';
@@ -247,7 +253,7 @@ views.heute = () => {
   const done = ROOMS.filter(r => roomDone(r.id)).length;
   const rank = { sandbox: 0, ssh: 1, ext: 1, target: 2 }; // zuerst, was ohne Zusatz-Installation läuft
   const pick = (pred, phone) => ROOMS.filter(r => pred(r) && !roomDone(r.id) && r !== cont)
-    .sort((x, y) => (phone ? rank[x.machine.kind] - rank[y.machine.kind] : (x.machine.kind === 'target') - (y.machine.kind === 'target')))
+    .sort((x, y) => (phone ? rank[x.machine.kind] - rank[y.machine.kind] : (x.machine.kind === 'target') - (y.machine.kind === 'target')) || (diffGap(x) - diffGap(y)))
     .slice(0, 3);
   const phoneList = pick(onPhone, true), pcList = pick(onPC, false);
   const section = (icon, title, list) => list.length ? `<div class="card"><h3 style="margin:0 0 .3rem">${icon} ${title}</h3><ul class="list">${list.map(r => miniRoom(r, icon === '📱')).join('')}</ul></div>` : '';
@@ -604,8 +610,8 @@ views.uebung = (id) => {
   if (!state.archive[id]) { state.archive[id] = Date.now(); save(); }
   const repeat = !!st.passedAt;
   const run = { taskOk: false, knobelOk: false, fails: 0 };
-  const tips = uebungsTipps(e, LESSON[e.lesson]);
-  const tipCost = e.xp / tips.length;
+  const tips = niveau() === 'experte' ? [] : uebungsTipps(e, LESSON[e.lesson]);
+  const tipCost = tips.length ? e.xp / tips.length : 0;
   const isReal = e.kind === 'real';
   return {
     html: `<a class="back" href="#/lektion/${e.lesson}">${U('← Spickzettel: {title}', { title: L1.t(LESSON[e.lesson].title) })}</a>
@@ -632,10 +638,10 @@ views.uebung = (id) => {
       <div id="termwrap"></div>
       <div class="row"><button class="btn go" id="check">${U('Ergebnis prüfen')}</button><button class="btn ghost" id="reset">${U('Übung neu starten')}</button></div>
       <div id="fb"></div>`}
-      <div class="card" id="hintcard">
+      ${tips.length ? `<div class="card" id="hintcard">
         <div class="row between"><b>${U('💡 Tipps')}</b><span class="small muted" id="hintstate"></span></div>
         <div class="tips" id="hinttext"></div>
-      </div>
+      </div>` : `<div class="card tight small muted">🔥 ${U('Experten-Modus: ohne Tipps – dafür die vollen Punkte. Du kannst die Stufe im Profil ändern.')}</div>`}
       <div id="knobel"></div>
       <div id="debrief"></div>
     </div>`,
@@ -660,7 +666,7 @@ views.uebung = (id) => {
           updateHint();
         };
       };
-      updateHint();
+      if (tips.length) updateHint();
 
       const start = () => {
         $('#termwrap', root).innerHTML = '';
@@ -1499,7 +1505,8 @@ const qOk = (rid, key) => !!state.rooms[rid]?.answers?.[key]?.ok;
 function roomDone(id) { return allQs(ROOM[id]).every(x => qOk(id, x.key)); }
 function roomPct(id) { const qs = allQs(ROOM[id]); return Math.round(qs.filter(x => qOk(id, x.key)).length / qs.length * 100); }
 // Tipp-Leiter: Jeder Tipp ist sofort abrufbar und kostet einen gleichen Anteil der Punkte (mind. 1 Punkt bleibt).
-const hintsOf = (q) => q.hints || (q.hint ? [q.hint] : []);
+// Experten-Modus: gar keine Tipps (→ keine Tipp-Knöpfe, keine Punktabzüge, also immer volle Punkte).
+const hintsOf = (q) => niveau() === 'experte' ? [] : (q.hints || (q.hint ? [q.hint] : []));
 const hintsUsed = (rid, key) => { const h = state.rooms[rid]?.hints?.[key]; return h === true ? 1 : (+h || 0); };
 const hintCost = (q) => { const n = hintsOf(q).length; return n ? q.points / n : 0; };
 function earned(rid, x) {
@@ -1839,7 +1846,8 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Urkunde / Leistungsnachweis (PDF über Drucken)
-views.zertifikat = () => {
+views.zertifikat = (arg) => {
+  const voll = arg === 'voll';
   const geknackt = ROOMS.filter(r => roomDone(r.id)).length;
   const punkte = gesamtPunkte();
   if (punkte < 1 && geknackt < 1) {
@@ -1851,6 +1859,54 @@ views.zertifikat = () => {
   const datum = new Date().toLocaleDateString(currentLang() === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
   const h = Math.abs([...(name + ':' + punkte + ':' + geknackt)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)).toString(36).toUpperCase().padStart(5, '0').slice(0, 5);
   const code = 'NF-' + new Date().getFullYear() + '-' + h;
+
+  if (voll) {
+    const raeumeDone = ROOMS.filter(r => roomDone(r.id));
+    const ueb = Object.entries(state.exercises || {}).filter(([id, e]) => e.passedAt && EX[id]).map(([id]) => String(EX[id].title || id));
+    const badges = earnedBadges();
+    const dstyle = `<style>
+.dz{max-width:720px;margin:0 auto;background:#fff;color:#1c1830;border:1px solid #d7d1ef;border-radius:12px;padding:30px 34px;font-family:system-ui,sans-serif}
+.dz-head{text-align:center;border-bottom:2px solid #2a2350;padding-bottom:14px;margin-bottom:16px}
+.dz-em{width:48px;height:48px;border-radius:50%;background:#15122b;display:flex;align-items:center;justify-content:center;margin:0 auto}.dz-em img{width:30px;height:30px}
+.dz-mk{letter-spacing:.24em;font-size:.68rem;color:#5b5280;text-transform:uppercase;margin:.4rem 0 0}
+.dz-head h2{font-family:Georgia,'Times New Roman',serif;color:#241d4a;margin:.3rem 0 .1rem;font-size:1.5rem}
+.dz-meta{color:#6a6192;font-size:.85rem}
+.dz-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 16px}
+.dz-kpi div{text-align:center;background:#f1eefb;border:1px solid #e0dbf4;border-radius:8px;padding:.5rem .2rem}
+.dz-kpi b{display:block;font-size:1.2rem;color:#3a2f8f}.dz-kpi span{font-size:.68rem;color:#6a6192}
+.dz h3{color:#241d4a;font-size:1rem;margin:1.1rem 0 .4rem;border-bottom:1px solid #eee;padding-bottom:.2rem}
+.dz ul{margin:.2rem 0;padding-left:1.1rem}.dz li{margin:.18rem 0;font-size:.9rem;color:#2c2648}
+.dz .leer{color:#8a82ad;font-size:.85rem}
+@media print{@page{size:A4 portrait;margin:14mm}body{background:#fff !important}.top,.nav,.meldfab,#lang-banner,.zert-noprint{display:none !important}#main{margin:0 !important;padding:0 !important;max-width:none !important}.dz{border:none;max-width:none;padding:0}}
+</style>`;
+    const liste = (arr, leer) => arr.length ? `<ul>${arr.map(x => `<li>${x}</li>`).join('')}</ul>` : `<p class="leer">${leer}</p>`;
+    return {
+      title: 'Ausführlicher Nachweis', wide: true,
+      html: `${dstyle}
+      <div class="zert-noprint" style="margin-bottom:.8rem"><a class="back" href="#/zertifikat">← ${U('Kompakte Urkunde')}</a>
+        <div class="row between" style="align-items:center;margin-top:.3rem"><h1 style="margin:0">📋 ${U('Ausführlicher Nachweis')}</h1><button class="btn primary" id="zertdruck">🖨️ ${U('Als PDF speichern')}</button></div></div>
+      <div class="dz">
+        <div class="dz-head"><div class="dz-em"><img src="icons/icon.svg" alt=""></div><p class="dz-mk">Nachtfalter Hacklab</p><h2>${U('Ausführlicher Leistungsnachweis')}</h2><div class="dz-meta">${esc(name)} · ${esc(datum)} · ${U('Nachweis-Nr.')} ${code}</div></div>
+        <div class="dz-kpi"><div><b>${punkte}</b><span>${U('Punkte')}</span></div><div><b>${geknackt}/${ROOMS.length}</b><span>${U('Räume')}</span></div><div><b>${abz}</b><span>${U('Abzeichen')}</span></div><div><b>${serie}🔥</b><span>${U('Serie')}</span></div></div>
+        <h3>🧩 ${U('Gelöste Räume')}</h3>${liste(raeumeDone.map(r => `${esc(roomText(r, 'title'))} <span class="leer">· ${roomPoints(r.id)} P.</span>`), U('Noch keine Räume vollständig gelöst.'))}
+        <h3>📒 ${U('Bestandene Übungen')}</h3>${liste(ueb.map(t => esc(t)), U('Noch keine Übungen bestanden.'))}
+        <h3>🏅 ${U('Abzeichen')}</h3>${liste(badges.map(b => `${b.icon || '🏅'} ${esc(UN(b.title))}`), U('Noch keine Abzeichen.'))}
+        <h3>🎯 ${U('Arena-Labs')}</h3><div id="arenabox"><p class="leer">${U('Lade …')}</p></div>
+        <h3>🏁 ${U('CTF des Tages')}</h3><p style="font-size:.9rem;color:#2c2648">${U('Punkte')}: ${(ctfStand && ctfStand.punkte) || 0} · ${U('Serie')}: ${(ctfStand && ctfStand.streak) || 0}🔥</p>
+        <p class="leer" style="margin-top:1rem">${U('Persönlicher Nachweis über den Fortschritt in dieser App – kein externes Zertifikat.')}</p>
+      </div>`,
+      mount(root) {
+        const db = $('#zertdruck', root); if (db) db.onclick = () => window.print();
+        ctfStandLaden();
+        arenaFortschritt().then(m => {
+          const box = $('#arenabox', root); if (!box) return;
+          const e2 = Object.entries(m || {});
+          box.innerHTML = e2.length ? `<ul>${e2.map(([lab, n]) => `<li>${esc(lab)} <span class="leer">· ${n} ${U('Level')}</span></li>`).join('')}</ul>` : `<p class="leer">${U('Noch keine Arena-Labs gelöst.')}</p>`;
+        }).catch(() => { const box = $('#arenabox', root); if (box) box.innerHTML = `<p class="leer">${U('Arena-Stand nicht geladen.')}</p>`; });
+      },
+    };
+  }
+
   const style = `<style>
 .zert-wrap{max-width:900px;margin:0 auto}
 .zert-blatt{position:relative;background:#fbfaff;color:#1c1830;border-radius:14px;padding:38px 40px;aspect-ratio:1.414/1;border:2px solid #2a2350;box-shadow:0 10px 40px rgba(0,0,0,.25);overflow:hidden;font-family:Georgia,'Times New Roman',serif}
@@ -1879,7 +1935,7 @@ views.zertifikat = () => {
     wide: true,
     html: `${style}
     <div class="zert-noprint" style="margin-bottom:.8rem"><a class="back" href="#/profil">← ${U('Profil')}</a>
-      <div class="row between" style="align-items:center;margin-top:.3rem"><h1 style="margin:0">📜 ${U('Urkunde')}</h1><button class="btn primary" id="zertdruck">🖨️ ${U('Als PDF speichern')}</button></div>
+      <div class="row between" style="align-items:center;margin-top:.3rem;gap:.4rem"><h1 style="margin:0">📜 ${U('Urkunde')}</h1><div class="row" style="gap:.4rem"><a class="btn small ghost" href="#/zertifikat/voll">📋 ${U('Ausführlich')}</a><button class="btn primary" id="zertdruck">🖨️ ${U('Als PDF speichern')}</button></div></div>
       <p class="small muted" style="margin:.3rem 0 0">${U('Persönlicher Leistungsnachweis über deinen Lernfortschritt. „Als PDF speichern" → im Druckdialog „Als PDF sichern" wählen (Querformat).')}</p>
     </div>
     <div class="zert-wrap"><div class="zert-blatt" id="zertblatt">
