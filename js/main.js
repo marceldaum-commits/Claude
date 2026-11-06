@@ -194,6 +194,16 @@ function ctfStandLaden() {
   taeglich('info').then(d => { ctfStand = { punkte: d.punkte || 0, streak: d.streak || 0 }; render(); }).catch(() => {});
 }
 
+// Meilensteine (für die Urkunde): klare, „verdiente" Stufen. Höchster erreichter wird oben auf der Urkunde gezeigt.
+const MEILENSTEINE = [
+  { id: 'start', icon: '🌱', titel: 'Erste Schritte', test: () => ROOMS.filter(r => roomDone(r.id)).length >= 1 },
+  { id: 'grundlagen', icon: '📗', titel: 'Grundlagen abgeschlossen', test: () => ROOMS.filter(r => roomDone(r.id)).length >= 5 },
+  { id: 'fortgeschritten', icon: '⚙️', titel: 'Fortgeschritten', test: () => ROOMS.filter(r => roomDone(r.id)).length >= 10 },
+  { id: 'meister', icon: '🏆', titel: 'Alle Räume gemeistert', test: () => ROOMS.length > 0 && ROOMS.every(r => roomDone(r.id)) },
+];
+const erreichteMeilensteine = () => MEILENSTEINE.filter(m => { try { return m.test(); } catch { return false; } });
+const hoechsterMeilenstein = () => { const e = erreichteMeilensteine(); return e[e.length - 1] || null; };
+
 function render() {
   const hash = location.hash.replace(/^#\/?/, '') || 'heute';
   const [route, arg] = hash.split('/');
@@ -1859,6 +1869,8 @@ views.zertifikat = (arg) => {
   const datum = new Date().toLocaleDateString(currentLang() === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
   const h = Math.abs([...(name + ':' + punkte + ':' + geknackt)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)).toString(36).toUpperCase().padStart(5, '0').slice(0, 5);
   const code = 'NF-' + new Date().getFullYear() + '-' + h;
+  const ms = erreichteMeilensteine();
+  const hm = ms[ms.length - 1] || null;
 
   if (voll) {
     const raeumeDone = ROOMS.filter(r => roomDone(r.id));
@@ -1894,6 +1906,7 @@ views.zertifikat = (arg) => {
         <div class="dz-head"><div class="dz-em"><img src="icons/icon.svg" alt=""></div><p class="dz-mk">Nachtfalter Hacklab</p><h2>${U('Ausführlicher Leistungsnachweis')}</h2><div class="dz-meta">${esc(name)} · ${esc(datum)} · ${U('Nachweis-Nr.')} ${code}</div></div>
         <div class="dz-kpi"><div><b>${punkte}</b><span>${U('Punkte')}</span></div><div><b>${geknackt}/${ROOMS.length}</b><span>${U('Räume')}</span></div><div><b>${abz}</b><span>${U('Abzeichen')}</span></div><div><b>${serie}🔥</b><span>${U('Serie')}</span></div></div>
         <div class="dz-cols">
+          <section class="dz-sec"><h3>🏅 ${U('Meilensteine')}</h3>${liste(ms.map(m => `${m.icon} ${esc(m.titel)}`), U('Noch keine Meilensteine.'))}</section>
           <section class="dz-sec"><h3>🧩 ${U('Gelöste Räume')}</h3>${liste(raeumeDone.map(r => `${esc(roomText(r, 'title'))} <span class="leer">· ${roomPoints(r.id)} P.</span>`), U('Noch keine Räume vollständig gelöst.'))}</section>
           <section class="dz-sec"><h3>📒 ${U('Bestandene Übungen')}</h3>${liste(ueb.map(t => esc(t)), U('Noch keine Übungen bestanden.'))}</section>
           <section class="dz-sec"><h3>🏅 ${U('Abzeichen')}</h3>${liste(badges.map(b => `${b.icon || '🏅'} ${esc(UN(b.title))}`), U('Noch keine Abzeichen.'))}</section>
@@ -1923,7 +1936,8 @@ views.zertifikat = (arg) => {
 .zert-marke{text-align:center;letter-spacing:.28em;font-size:.72rem;color:#5b5280;margin:.5rem 0 0;font-family:system-ui,sans-serif;text-transform:uppercase}
 .zert-titel{text-align:center;font-size:2.1rem;margin:.6rem 0 .1rem;color:#241d4a}
 .zert-sub{text-align:center;color:#6a6192;font-size:.9rem;margin:0}
-.zert-namewrap{text-align:center;margin:1.1rem 0 .2rem}
+.zert-ms{text-align:center;color:#3a2f8f;font-weight:600;font-size:.95rem;margin:.4rem 0 0;font-family:system-ui,sans-serif}
+.zert-namewrap{text-align:center;margin:.9rem 0 .2rem}
 .zert-name{display:inline-block;font-size:2rem;color:#0e0b1e;border-bottom:1px solid #d7d1ef;padding:0 1.2rem .25rem}
 .zert-text{text-align:center;max-width:640px;margin:.5rem auto 0;color:#2c2648;font-size:1rem;line-height:1.5}
 .zert-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1.4rem auto 0;max-width:660px}
@@ -1950,6 +1964,7 @@ views.zertifikat = (arg) => {
       <p class="zert-marke">Nachtfalter Hacklab</p>
       <h2 class="zert-titel">${U('Leistungsnachweis')}</h2>
       <p class="zert-sub">${U('für ethisches Hacken & IT-Sicherheit')}</p>
+      ${hm ? `<p class="zert-ms">${hm.icon} ${esc(hm.titel)}</p>` : ''}
       <div class="zert-namewrap"><span class="zert-name">${esc(name)}</span></div>
       <p class="zert-text">${U('hat sich im Nachtfalter Hacklab eigenständig und praxisnah in Linux, Netzwerken und ethischem Hacken weitergebildet und dabei folgende Leistung erbracht:')}</p>
       <div class="zert-stats">

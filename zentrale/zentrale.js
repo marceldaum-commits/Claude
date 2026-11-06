@@ -286,6 +286,48 @@ h1{text-align:center;font-size:2.1rem;margin:.6rem 0 .1rem;color:#241d4a}.sub{te
   w.document.write(html); w.document.close();
 }
 
+// Ausführlicher Nachweis (alle Details) für einen Nutzer – holt nutzer_detail und druckt.
+async function zertDetailDrucken(n) {
+  const w = window.open('', '_blank');
+  if (!w) { alert('Bitte Pop-ups erlauben, um den Nachweis zu öffnen/drucken.'); return; }
+  w.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:system-ui;padding:24px;color:#333">Lade Nachweis …</body>');
+  let d; try { d = await api('nutzer_detail', { user_id: n.id }); } catch (err) { try { w.document.body.textContent = 'Konnte nicht laden: ' + (err.message || err); } catch (e2) { /* */ } return; }
+  const e = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const name = (n.name || '').trim() || n.email || 'Nachtfalter-Lernende(r)';
+  const dat = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+  const raeume = (d.raeume || []).filter((r) => r.geloest);
+  const pruef = (d.pruefungen || []).filter((p) => p.bestanden);
+  const arenaMap = {}; for (const a of (d.arena || [])) arenaMap[a.lab] = (arenaMap[a.lab] || 0) + 1;
+  const liste = (arr, leer) => arr.length ? `<ul>${arr.map((x) => `<li>${x}</li>`).join('')}</ul>` : `<p class="leer">${leer}</p>`;
+  const h = Math.abs([...(name + ':' + raeume.length)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)).toString(36).toUpperCase().padStart(5, '0').slice(0, 5);
+  const nr = 'NF-' + new Date().getFullYear() + '-' + h;
+  const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Ausführlicher Nachweis – ${e(name)}</title><style>
+@page{size:A4 landscape;margin:12mm}body{margin:0;background:#fff;color:#1c1830;font-family:system-ui,sans-serif;padding:16px}
+.dz{max-width:1040px;margin:0 auto;border:1px solid #d7d1ef;border-radius:12px;padding:28px 32px}
+.hd{text-align:center;border-bottom:2px solid #2a2350;padding-bottom:12px;margin-bottom:14px}
+.em{width:48px;height:48px;border-radius:50%;background:#15122b;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:26px}
+.mk{letter-spacing:.24em;font-size:.68rem;color:#5b5280;text-transform:uppercase;margin:.4rem 0 0}
+h2{font-family:Georgia,'Times New Roman',serif;color:#241d4a;margin:.3rem 0 .1rem;font-size:1.5rem}.meta{color:#6a6192;font-size:.85rem}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 14px}.kpi div{text-align:center;background:#f1eefb;border:1px solid #e0dbf4;border-radius:8px;padding:.5rem .2rem}
+.kpi b{display:block;font-size:1.2rem;color:#3a2f8f}.kpi span{font-size:.68rem;color:#6a6192}
+.cols{column-count:4;column-gap:24px}.sec{break-inside:avoid;margin-bottom:.5rem}
+h3{color:#241d4a;font-size:1rem;margin:.2rem 0 .4rem;border-bottom:1px solid #eee;padding-bottom:.2rem}
+ul{margin:.2rem 0;padding-left:1.1rem}li{margin:.18rem 0;font-size:.9rem;color:#2c2648}.leer{color:#8a82ad;font-size:.85rem}
+@media print{.dz{border:none;max-width:none;padding:0}}
+</style></head><body onload="setTimeout(function(){window.print()},300)"><div class="dz">
+<div class="hd"><div class="em">🦋</div><p class="mk">Nachtfalter Hacklab</p><h2>Ausführlicher Leistungsnachweis</h2><div class="meta">${e(name)} · ${e(dat)} · Nachweis-Nr. ${nr}</div></div>
+<div class="kpi"><div><b>${raeume.length}</b><span>Räume geknackt</span></div><div><b>${d.lektionen || 0}</b><span>Lektionen</span></div><div><b>${pruef.length}</b><span>Prüfungen</span></div><div><b>${(d.arena || []).length}</b><span>Arena-Level</span></div></div>
+<div class="cols">
+  <section class="sec"><h3>🧩 Gelöste Räume</h3>${liste(raeume.map((r) => e(r.id)), '—')}</section>
+  <section class="sec"><h3>🎓 Bestandene Prüfungen</h3>${liste(pruef.map((p) => e(p.level)), '—')}</section>
+  <section class="sec"><h3>🎯 Arena-Labs</h3>${liste(Object.entries(arenaMap).map(([l, c]) => `${e(l)} <span class="leer">· ${c}</span>`), '—')}</section>
+  <section class="sec"><h3>📒 Übungen</h3><p style="font-size:.9rem">${d.uebungen || 0} bearbeitet</p></section>
+</div>
+<p class="leer" style="margin-top:1rem">Persönlicher Nachweis über den Fortschritt in dieser App – kein externes Zertifikat.</p>
+</div></body></html>`;
+  w.document.open(); w.document.write(html); w.document.close();
+}
+
 async function kunde(id) {
   const { nutzer } = await laden();
   const n = nutzer.find(x => x.id === id);
@@ -312,6 +354,7 @@ async function kunde(id) {
           <a class="btn small ghost" href="mailto:${esc(n.email)}?subject=${encodeURIComponent('Dein Nachtfalter-Konto')}">✉️ E-Mail schreiben</a>
           <button class="btn small" id="pw">🔑 Passwort-Mail senden</button>
           <button class="btn small" id="zert">📜 Zertifikat drucken</button>
+          <button class="btn small ghost" id="zertv">📋 Ausführlicher Nachweis</button>
           ${n.bestaetigt ? '' : '<button class="btn small" id="best">✉️ Bestätigung erneut senden</button><button class="btn small ghost" id="bestH">✓ E-Mail manuell bestätigen</button>'}
           ${n.zwei_faktor && !ich ? '<button class="btn small ghost" id="mfa">🔐 Zwei-Faktor zurücksetzen</button>' : ''}
           ${kind(n) ? `<button class="btn small ghost" id="eltern">${n.eltern ? 'Eltern-Zustimmung entfernen' : '👪 Eltern-Zustimmung vermerken'}</button>` : ''}
@@ -337,6 +380,7 @@ async function kunde(id) {
   });
   $('#pw').onclick = () => confirm(`Eine Mail zum Zurücksetzen des Passworts an ${n.email} senden?`) && tun(() => api('passwort_mail', { user_id: id }), 'Passwort-Mail ist unterwegs.');
   if ($('#zert')) $('#zert').onclick = () => zertDrucken(n);
+  if ($('#zertv')) $('#zertv').onclick = () => zertDetailDrucken(n);
   if ($('#best')) $('#best').onclick = () => tun(() => api('bestaetigung_erneut', { user_id: id }), 'Bestätigungs-Mail erneut gesendet.');
   if ($('#bestH')) $('#bestH').onclick = () => confirm('E-Mail-Adresse ohne Klick des Kunden als bestätigt markieren?') && tun(() => api('email_bestaetigen', { user_id: id }), 'E-Mail als bestätigt markiert.', neu);
   if ($('#mfa')) $('#mfa').onclick = () => confirm(`Zwei-Faktor-Anmeldung von ${n.email} entfernen? (z. B. Handy verloren) Bei Verwaltungs-Konten wird sie bei der nächsten Anmeldung in der Zentrale neu eingerichtet.`) && tun(() => api('zwei_faktor_zuruecksetzen', { user_id: id }), 'Zwei-Faktor-Anmeldung zurückgesetzt.', neu);
