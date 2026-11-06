@@ -831,6 +831,13 @@ views.kiverteidigung = () => ({
       <button class="btn primary" id="kiv-run" style="margin-top:.7rem">▶ ${U('Prüfer starten')}</button>
     </div>
     <div id="kiv-erg"></div>
+    <div class="card" style="margin-top:.7rem;border-color:rgba(167,139,250,.4)">
+      <h3 style="margin-top:0">🤖 ${U('Von der echten KI prüfen lassen')}</h3>
+      <p class="small muted" style="margin:.2rem 0 .5rem">${U('Schreib deinen eigenen Schutz-Prompt. Die echte KI prüft ihn gegen die Standard-Angriffe und zeigt dir die Lücken. (Verbraucht 1 KI-Nachricht.)')}</p>
+      <textarea id="kic-in" rows="4" style="width:100%;box-sizing:border-box" placeholder="${esc(U('Deine Schutzregeln für den KI-Bot …'))}"></textarea>
+      <button class="btn primary" id="kic-run" style="margin-top:.5rem">🤖 ${U('Abwehr prüfen')}</button>
+      <div id="kic-erg" class="small" style="margin-top:.5rem;white-space:pre-wrap"></div>
+    </div>
     <p class="honest">${U('Dieselben Angriffe fährt echtes Red-Teaming gegen KI-Systeme. Wer sie kennt, baut die bessere Abwehr.')}</p>`,
   mount(root) {
     const gewaehlt = new Set();
@@ -839,6 +846,16 @@ views.kiverteidigung = () => ({
       if (gewaehlt.has(id)) { gewaehlt.delete(id); btn.classList.remove('primary'); btn.classList.add('ghost'); }
       else { gewaehlt.add(id); btn.classList.add('primary'); btn.classList.remove('ghost'); }
     });
+    const kicRun = $('#kic-run', root), kicErg = $('#kic-erg', root);
+    if (kicRun) kicRun.onclick = async () => {
+      if (!syncStatus().user) { kicErg.textContent = U('Dafür musst du angemeldet sein.'); return; }
+      const txt = ($('#kic-in', root).value || '').trim();
+      if (!txt) { kicErg.textContent = U('Schreib zuerst deine Schutzregeln.'); return; }
+      kicRun.disabled = true; kicErg.textContent = U('KI prüft …');
+      try { const r = await kiLlm('coach', { systemprompt: txt }); kicErg.textContent = r.reply || r.fehler || ''; }
+      catch (e) { kicErg.textContent = U('(Fehler)') + ': ' + (e.message || e); }
+      kicRun.disabled = false;
+    };
     $('#kiv-run', root).onclick = () => {
       const erg = KIV_ANGRIFFE.map(a => ({ a, ab: a.durch.some(d => gewaehlt.has(d)) }));
       const offen = erg.filter(e => !e.ab).length;

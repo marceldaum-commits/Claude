@@ -26,7 +26,7 @@ Reiner Test-Account ohne Sonderrechte, per SQL bestätigt angelegt. Bei Bedarf P
 ## Offene technische Punkte
 - [ ] **Verwaltung/Zentrale – Konto-Steuerung pro Kunde (Marcel-Wunsch 06.11.2026):**
       Backend in Edge `admin` **codiert** (Aktionen `ki_reset` = KI-Fortschritt+Budget zurücksetzen, `ki_tokens` = Tokens heute gutschreiben/voll). **Noch zu tun:** admin-Function deployen + Knöpfe in der Zentrale (Kunden-Detail). Durable „Tokens pro TAG erhöhen" (Pro-Konto-Limit-Override, das `ki-llm` liest) steht noch aus.
-- [ ] **KI-Verteidigung „echter Angreifer" geparkt:** Idee war, die echte KI gegen den selbst­geschriebenen Schutz-Prompt antreten zu lassen. Erkenntnis beim Test: Haiku verweigert praktisch IMMER die Code-Preisgabe (auch wenn der System-Prompt zum Lecken auffordert) → jede Abwehr „gewinnt", lehrt nichts. Edge-Aktion `verteidigung` ist deployt, aber NICHT in die App verdrahtet. Besserer Weg: echte KI als „Coach", der den Schutz-Prompt analysiert und Lücken benennt (zuverlässig).
+- [x] **KI-Verteidigung „echter Angreifer" → stattdessen KI-Coach (erledigt):** Der echte-Angreifer-Modus funktioniert nicht (Haiku verweigert die Code-Preisgabe fast immer → jede Abwehr „gewinnt"). Edge-Aktion `verteidigung` bleibt deployt, aber ungenutzt. Stattdessen **KI-Coach** gebaut & live: echte KI analysiert den selbst geschriebenen Schutz-Prompt und benennt pro Standard-Angriff ✅/⚠️ + Tipps (Edge-Aktion `coach`, in der Verteidigungs-Ansicht verdrahtet).
 - [ ] **Hinweis MCP/SQL:** Destruktives SQL (DELETE/DROP/TRUNCATE) über die Supabase-MCP braucht eine interaktive Bestätigung → läuft aus dieser Cloud-Sitzung in 230s-Timeout. Workarounds: statt DELETE ein `UPDATE … SET anzahl=0` (nicht-destruktiv, kein Confirm), oder über die Admin-Edge-Function (Service-Rolle), oder Bestätigung im Supabase-Dashboard. Budget setzt sich ohnehin täglich (UTC) zurück.
 - [ ] Backups prüfen: Plesk → Google Drive läuft? (mit Marcel) + Geheimnisse in Bitwarden
 - [ ] Nächster großer Block: Technik-Module (Active Directory tief, SOC/Blue-Team-Detection, Malware-Analyse)
@@ -41,6 +41,7 @@ Reiner Test-Account ohne Sonderrechte, per SQL bestätigt angelegt. Bei Bedarf P
 ## Baulog (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
+| 06.11.2026 | KI-Verteidigung: **KI-Coach** (echte KI prüft den selbst geschriebenen Schutz-Prompt, nennt ✅/⚠️ pro Angriff + Tipps) + Boss-Härtung (leichte Stufen „nie ablehnen" + stiller 1×-Nachfass) | **Live** |
 | 06.11.2026 | **Boss-Bots: 8-Stufen-Leiter (sehr einfach → extrem schwer), jede Stufe andere Technik** (direkt, Vorwand, Rollenspiel, Format, Override, indirekte Injektion, Kombi, 3-fach-Kombi) + **Lernmodus** (Technik erklärt + Beispiel-Angriff). Alle 8 end-to-end mit echtem Claude getestet. | **Live** |
 | 06.11.2026 | Fix (live): EN-Umschalter & öffentliches Profil – Inline-Scripts wegen CSP in externe .js ausgelagert (start.js/ki-sicherheit.js/p.js) | **Live** |
 | 06.11.2026 | 🔴 **Arena-Selbsttest repariert** (meldete 22/22 „defekt"): Selbsttest-Container war nicht Wächter-konform (Name/Label/LogConfig/Ulimits/AutoRemove). Echtes Spielen war nie betroffen. Fix live gepusht; nachtfalter-deploy baut Arena-Container neu (~10 Min). | **Live** |

@@ -655,5 +655,12 @@
   "Modus": "Mode",
   "Technik": "Technique",
   "Lernmodus: Technik erklärt + Beispiel zum Ausprobieren. Ideal zum Üben.": "Learning mode: technique explained + an example to try. Great for practising.",
-  "Challenge: keine Lösungshilfe – knack die KI selbst.": "Challenge: no solution hints – crack the AI yourself."
+  "Challenge: keine Lösungshilfe – knack die KI selbst.": "Challenge: no solution hints – crack the AI yourself.",
+  "Von der echten KI prüfen lassen": "Have the real AI check it",
+  "Schreib deinen eigenen Schutz-Prompt. Die echte KI prüft ihn gegen die Standard-Angriffe und zeigt dir die Lücken. (Verbraucht 1 KI-Nachricht.)": "Write your own protection prompt. The real AI tests it against the standard attacks and shows you the gaps. (Uses 1 AI message.)",
+  "Deine Schutzregeln für den KI-Bot …": "Your protection rules for the AI bot …",
+  "Abwehr prüfen": "Check defense",
+  "Dafür musst du angemeldet sein.": "You need to be signed in for that.",
+  "Schreib zuerst deine Schutzregeln.": "Write your protection rules first.",
+  "KI prüft …": "AI is checking …"
 }
