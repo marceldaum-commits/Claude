@@ -142,22 +142,36 @@ function renderNav(route) {
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
 }
 
+// Erfahrungsstufe (beim Erststart gefragt, im Profil änderbar). Anfänger ist die Voreinstellung.
+const NIVEAUS = {
+  anfaenger: { icon: '🌱', label: 'Anfänger', desc: 'Ganz neu – erklär mir alles in Ruhe.' },
+  etwas: { icon: '⚡', label: 'Etwas Erfahrung', desc: 'Grundlagen sitzen, ich will tiefer rein.' },
+  profi: { icon: '🎯', label: 'Profi', desc: 'Fordere mich – weniger an die Hand nehmen.' },
+};
+const niveau = () => state.profile.level || 'anfaenger';
+function nivButtons() {
+  return Object.entries(NIVEAUS).map(([k, n]) => `<button class="loc-opt niv-opt ${niveau() === k ? 'on' : ''}" data-niv="${k}"><span class="ic">${n.icon}</span><span><b>${U(n.label)}</b><br><span class="small muted">${U(n.desc)}</span></span></button>`).join('');
+}
+
 function locationModal(force = false) {
   if (!force && state.location && state.locationDay === today()) return;
   const m = document.createElement('div');
   m.className = 'modal';
   m.innerHTML = `<div class="box" role="dialog" aria-label="${Ut('Lernort wählen')}">
     ${state.location ? '' : langPickerHTML()}
-    ${state.location ? `<h2>${U('Wo lernst du heute?')}</h2>` : `<h2>${U('Willkommen! 👋')}</h2><p>${U('Hier lernst du Linux und Hacking Schritt für Schritt – mit Rätseln, Geschichten und Tipps, wenn du festhängst.')}</p><p class="small"><b>${U('Neu hier?')}</b> ${U('Nimm „Nur im Browser“ – du brauchst nichts zu installieren.')}</p><label class="small">${U('Wie sollen wir dich nennen? (freiwillig)')}</label><input type="text" id="wname" maxlength="30" placeholder="${esc(Ut('Name oder Spitzname'))}" style="margin-bottom:.6rem">`}
+    ${state.location ? `<h2>${U('Wo lernst du heute?')}</h2>` : `<h2>${U('Willkommen! 👋')}</h2><p>${U('Hier lernst du Linux und Hacking Schritt für Schritt – mit Rätseln, Geschichten und Tipps, wenn du festhängst.')}</p><p class="small"><b>${U('Neu hier?')}</b> ${U('Nimm „Nur im Browser“ – du brauchst nichts zu installieren.')}</p><label class="small">${U('Wie sollen wir dich nennen? (freiwillig)')}</label><input type="text" id="wname" maxlength="30" placeholder="${esc(Ut('Name oder Spitzname'))}" style="margin-bottom:.6rem"><label class="small" style="display:block;margin:.2rem 0 .3rem"><b>${U('Wie viel Erfahrung hast du?')}</b></label>${nivButtons()}<p class="muted small" style="margin:.3rem 0 .2rem">${U('Du kannst das später im Profil ändern.')}</p>`}
     <p class="muted small">${U('Anleitungen, Befehle und Grenzen werden an deinen Lernort angepasst. Du kannst ihn oben jederzeit ändern.')}</p>
     ${Object.entries(LOCATIONS).map(([k, l]) => `<button class="loc-opt ${state.location === k ? 'on' : ''}" data-k="${k}"><span class="ic">${l.icon}</span><span><b>${U(l.label)}</b><br><span class="small muted">${U(l.desc)}</span></span></button>`).join('')}
   </div>`;
   document.body.appendChild(m);
   bindLangPicker(m);
   m.addEventListener('click', (e) => {
+    const nb = e.target.closest('.niv-opt');
+    if (nb) { state.profile.level = nb.dataset.niv; m.querySelectorAll('.niv-opt').forEach(x => x.classList.toggle('on', x === nb)); save(); return; }
     const b = e.target.closest('.loc-opt');
     if (b) {
       state.location = b.dataset.k; state.locationDay = today(); state.locationAt = Date.now();
+      if (!state.profile.level) state.profile.level = 'anfaenger';
       const wn = m.querySelector('#wname'); if (wn && wn.value.trim()) state.profile.name = wn.value.trim().slice(0, 30);
       save(); m.remove(); render();
     } else if (e.target === m && state.location) { state.locationDay = today(); save(); m.remove(); }
@@ -1801,8 +1815,12 @@ views.profil = () => {
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${days.map(d => `<span title="${d}" style="aspect-ratio:1;border-radius:4px;background:${state.activity[d] ? (state.activity[d] > 4 ? 'var(--lime)' : 'var(--lime-d)') : 'var(--card2)'}"></span>`).join('')}</div></div>
     <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${UN(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
     <div class="card"><h3>Name</h3><div class="row" style="flex-wrap:nowrap"><input type="text" id="pname" maxlength="30" value="${esc(state.profile.name)}" placeholder="Name oder Spitzname"><button class="btn small primary" id="psave">Speichern</button></div></div>
+    <div class="card"><h3>${U('Erfahrungsstufe')}</h3><p class="small muted" style="margin:0 0 .5rem">${U('Beeinflusst, wie ausführlich erklärt wird.')}</p><div class="stack">${nivButtons()}</div></div>
     <p class="honest">Punkte, Abzeichen und Serien sind Motivation – sie schalten keine Prüfung und kein Level frei.</p>`,
-    mount(root) { $('#psave', root).onclick = () => { state.profile.name = $('#pname', root).value.trim().slice(0, 30); save(); render(); toast('Gespeichert.'); }; },
+    mount(root) {
+      $('#psave', root).onclick = () => { state.profile.name = $('#pname', root).value.trim().slice(0, 30); save(); render(); toast('Gespeichert.'); };
+      $$('.niv-opt', root).forEach(btn => btn.onclick = () => { state.profile.level = btn.dataset.niv; save(); $$('.niv-opt', root).forEach(x => x.classList.toggle('on', x === btn)); toast(U('Erfahrungsstufe gespeichert.')); });
+    },
   };
 };
 
