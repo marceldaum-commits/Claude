@@ -14,7 +14,7 @@ import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { KALIPRAXIS, KALIPRAXIS_GEPLANT } from './content/kalipraxis.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion, mission, kiSec } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion, mission, kiSec, kiLlm } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -732,6 +732,14 @@ views['ki-sicherheit'] = () => ({
       <div class="row between"><b>🤖 ${U('KI hacken – live')}</b><span class="badge real">${U('Weltneuheit')}</span></div>
       <span class="small muted">${U('10 Stufen von sehr leicht bis echt schwer: bring eine lebende KI per Prompt Injection dazu, ihr Geheimnis zu verraten. Serverseitig, fair, pro Konto.')} →</span>
     </a>
+    <a class="card" href="#/kibosse" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;border-color:rgba(163,230,53,.5)">
+      <div class="row between"><b>👾 ${U('Boss-Bots: echte KI')}</b><span class="badge real">${U('LLM live')}</span></div>
+      <span class="small muted">${U('Kein Skript – ein echter Claude mit Geheimnis. Überrede ihn per Prompt Injection. Die Königsklasse.')} →</span>
+    </a>
+    <a class="card" href="#/kimentor" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
+      <div class="row between"><b>🧑‍🏫 ${U('KI-Mentor')}</b><span class="badge plain">${U('KI-Hilfe')}</span></div>
+      <span class="small muted">${U('Dein Lern-Begleiter: erklärt einfach, gibt Tipps auf deinem Niveau.')} →</span>
+    </a>
     <a class="card" href="#/deepfake" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <div class="row between"><b>🕵️ ${U('Deepfakes & KI-Phishing erkennen')}</b><span class="badge plain">${U('defensiv')}</span></div>
       <span class="small muted">${U('Trainiere, KI-Fälschungen (Stimme, Video, Phishing-Mails) zu entlarven.')} →</span>
@@ -742,11 +750,7 @@ views['ki-sicherheit'] = () => ({
     </a>
     <h2 style="margin:1.1rem 0 .4rem">📚 ${U('Theorie – kurz & klar')}</h2>
     <div class="stack">${KI_THEORIE.map(([t, txt]) => `<details class="card tight"><summary><b>${t}</b></summary><p class="small" style="margin:.4rem 0 0">${esc(txt)}</p></details>`).join('')}</div>
-    <div class="card" style="margin-top:1rem"><h3 style="margin-top:0">🔭 ${U('Kommt als Nächstes')}</h3>
-      <ul class="list small">
-        <li><span class="state">🧑‍🏫</span><span class="grow"><span class="t">${U('KI-Mentor')}</span><span class="s">${U('Hilfe & Übungen auf deinem Niveau')}</span></span></li>
-        <li><span class="state">🤖</span><span class="grow"><span class="t">${U('Echter LLM hinter der Arena')}</span><span class="s">${U('mit Kostenbremse')}</span></span></li>
-      </ul></div>
+    <p class="small muted" style="margin-top:1rem">🔭 ${U('Wir bauen den Schwerpunkt laufend weiter aus – mehr Bosse, mehr Theorie, mehr Übungen.')}</p>
     <p class="honest">${U('Alle Angriffe nur an unseren Übungs-KIs. Was du hier lernst, dient dem Schutz – nie dem Missbrauch echter Systeme.')}</p>`,
 });
 
@@ -846,6 +850,98 @@ views.kiverteidigung = () => ({
       </div>`;
       box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
+  },
+});
+
+// ---------------------------------------------------------------- KI Boss-Bots (echter LLM) + KI-Mentor
+function bossTile(s, aktiv) {
+  const zustand = s.geloest ? 'done' : s.offen ? 'offen' : 'zu';
+  const sym = s.geloest ? '✓' : s.offen ? '🤖' : '🔒';
+  return `<button type="button" class="ki-tile ${zustand}${s.level === aktiv ? ' aktiv' : ''}" data-lvl="${s.level}" ${s.offen ? '' : 'disabled'}>
+    <span class="ki-top"><span class="ki-num">${s.level}</span><span class="ki-sym">${sym}</span></span>
+    <span class="ki-ttl">${esc(s.titel)}</span><span class="ki-thema">${esc(s.abwehr)}</span>
+    <span class="ki-stufe st-${(s.stufe || '').replace(/\s+/g, '')}">${esc(s.stufe)}</span></button>`;
+}
+function bosseHTML(d, aktiv, verlauf) {
+  const s = d.bosse.find(x => x.level === aktiv);
+  return `
+    <div class="card adv-held">
+      <div class="adv-held-kopf"><span class="adv-badge">🤖 ${U('Echte KI')}</span><span class="badge real">${U('LLM live')}</span></div>
+      <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.5rem">
+        <div class="kpi"><b>${d.anzahl}/${d.gesamt}</b><span>${U('Bosse')}</span></div>
+        <div class="kpi"><b>${d.punkte}</b><span>${U('Punkte')}</span></div>
+        <div class="kpi"><b>${d.rest}</b><span>${U('KI-Nachrichten heute')}</span></div>
+      </div>
+      <p class="small muted" style="margin:.5rem 0 0">${U('Das ist ein echter Claude mit einem Geheimnis im System-Prompt. Bring ihn per Prompt Injection dazu, es zu verraten. (Tageslimit schützt vor Kosten.)')}</p>
+    </div>
+    <div class="ki-stufen">${d.bosse.map(x => bossTile(x, aktiv)).join('')}</div>
+    ${s ? (s.offen ? `<div class="card ki-chat" id="ki-panel">
+      <div class="row between"><b>🤖 ${esc(s.bot)}</b><span class="badge ${s.geloest ? 'real' : 'sim'}">${s.geloest ? '✓ ' + U('geknackt') : esc(s.stufe)}</span></div>
+      <p class="small muted" style="margin:.2rem 0">🛡️ ${U('Abwehr')}: ${esc(s.abwehr)}</p>
+      <details class="small" style="margin-bottom:.4rem"><summary>💡 ${U('Tipp anzeigen')}</summary><p class="small" style="margin:.3rem 0 0">${esc(s.hinweis)}</p></details>
+      <div class="ki-log" id="ki-log">${(verlauf[aktiv] || []).length ? verlauf[aktiv].map(x => kiMsg(x.von, x.text)).join('') : `<p class="small muted">${Ut('Schreib {bot} eine Nachricht …', { bot: s.bot })}</p>`}</div>
+      <div class="row" style="gap:.4rem;align-items:center;margin-top:.5rem"><input type="text" id="ki-in" placeholder="${esc(Ut('Nachricht an {bot} …', { bot: s.bot }))}" autocomplete="off" style="flex:1"><button class="btn small" id="ki-go">${U('Senden')}</button></div>
+      <p class="small" id="ki-fb" style="margin:.3rem 0 0"></p>
+    </div>` : `<div class="card warn"><b>🔒 ${U('Noch gesperrt.')}</b> ${U('Knack erst den vorigen Boss.')}</div>`) : ''}`;
+}
+views.kibosse = () => ({
+  title: 'KI Boss-Bots',
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🤖 ${U('Boss-Bots: echte KI hacken')}</h1><div id="bwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  mount(root) {
+    const wrap = $('#bwrap', root);
+    if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }
+    let daten = null, aktiv = 1; const verlauf = {};
+    const start = (d) => { const o = d.bosse.find(x => x.offen && !x.geloest); return o ? o.level : (d.bosse[0] && d.bosse[0].level) || 1; };
+    const zeichne = (scroll) => {
+      wrap.innerHTML = bosseHTML(daten, aktiv, verlauf);
+      $$('.ki-tile[data-lvl]', wrap).forEach(btn => { if (btn.disabled) return; btn.onclick = () => { aktiv = parseInt(btn.getAttribute('data-lvl'), 10); zeichne(); const p = $('#ki-panel', wrap); if (p) p.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }; });
+      const go = $('#ki-go', wrap), inp = $('#ki-in', wrap), fb = $('#ki-fb', wrap), log = $('#ki-log', wrap);
+      if (scroll && log) log.scrollTop = log.scrollHeight;
+      if (go && inp) {
+        const senden = async () => {
+          const text = (inp.value || '').trim(); if (!text) return;
+          (verlauf[aktiv] = verlauf[aktiv] || []).push({ von: 'du', text });
+          inp.value = ''; go.disabled = true; zeichne(true);
+          try {
+            const r = await kiLlm('chat', { level: aktiv, nachricht: text });
+            verlauf[aktiv].push({ von: 'bot', text: r.reply });
+            if (typeof r.rest === 'number') daten.rest = r.rest;
+            if (r.geloest) { const x = daten.bosse.find(y => y.level === aktiv); if (x) x.geloest = true; const n = daten.bosse.find(y => y.level === aktiv + 1); if (n) n.offen = true; daten.punkte = r.punkte; daten.anzahl = r.anzahl; aktiv = start(daten); toast(U('🎉 Geknackt!')); }
+            zeichne(true);
+          } catch (e) { verlauf[aktiv].push({ von: 'bot', text: U('(Fehler)') + ': ' + (e.message || e) }); zeichne(true); }
+        };
+        go.onclick = senden; inp.onkeydown = (e) => { if (e.key === 'Enter') senden(); };
+        inp.focus();
+      }
+    };
+    kiLlm('info').then(d => { daten = d; if (!d.konfiguriert) { wrap.innerHTML = `<div class="card warn"><b>🔧 ${U('KI wird gerade eingerichtet.')}</b><br><span class="small">${U('Die Boss-Bots sind gleich da – schau später nochmal rein.')}</span></div>`; return; } aktiv = start(d); zeichne(); })
+      .catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}</div>`; });
+  },
+});
+views.kimentor = () => ({
+  title: 'KI-Mentor',
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧑‍🏫 ${U('KI-Mentor')}</h1><div id="mwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  mount(root) {
+    const wrap = $('#mwrap', root);
+    if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }
+    const verlauf = [];
+    const zeichne = (scroll) => {
+      wrap.innerHTML = `
+        <div class="card" style="margin-bottom:.6rem"><p class="small muted" style="margin:0">${U('Dein geduldiger Lern-Begleiter für IT- & KI-Sicherheit. Frag ihn alles – er erklärt einfach und gibt Tipps (nie direkt die Lösung).')}</p></div>
+        <div class="card ki-chat"><div class="ki-log" id="m-log">${verlauf.length ? verlauf.map(x => kiMsg(x.von, x.text)).join('') : `<p class="small muted">${U('Stell dem Mentor eine Frage, z. B. „Was ist Prompt Injection?"')}</p>`}</div>
+        <div class="row" style="gap:.4rem;align-items:center;margin-top:.5rem"><input type="text" id="m-in" placeholder="${esc(U('Deine Frage …'))}" autocomplete="off" style="flex:1"><button class="btn small" id="m-go">${U('Fragen')}</button></div></div>`;
+      const go = $('#m-go', wrap), inp = $('#m-in', wrap), log = $('#m-log', wrap);
+      if (scroll && log) log.scrollTop = log.scrollHeight;
+      const senden = async () => {
+        const text = (inp.value || '').trim(); if (!text) return;
+        verlauf.push({ von: 'du', text }); inp.value = ''; go.disabled = true; zeichne(true);
+        try { const r = await kiLlm('mentor', { nachricht: text }); verlauf.push({ von: 'bot', text: '🧑‍🏫 ' + r.reply }); }
+        catch (e) { verlauf.push({ von: 'bot', text: U('(Fehler)') + ': ' + (e.message || e) }); }
+        zeichne(true);
+      };
+      go.onclick = senden; inp.onkeydown = (e) => { if (e.key === 'Enter') senden(); }; inp.focus();
+    };
+    zeichne();
   },
 });
 

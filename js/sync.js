@@ -108,6 +108,17 @@ export async function taeglich(aktion, payload = {}) {
   if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
   return res.data;
 }
+// KI-Sicherheit – echter LLM (Boss-Bots + Mentor, serverseitig, braucht Anmeldung).
+export async function kiLlm(aktion, payload = {}) {
+  const c = await getClient();
+  if (!c) throw new Error('Keine Verbindung.');
+  const { data: s } = await c.auth.getSession().catch(() => ({ data: null }));
+  const token = s?.session?.access_token;
+  if (!token) throw new Error('Bitte zuerst anmelden.');
+  const res = await c.functions.invoke('ki-llm', { body: { aktion, ...payload }, headers: { Authorization: `Bearer ${token}` } });
+  if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
+  return res.data;
+}
 // KI-Sicherheit – Angriffs-Labor (lebende KI im Browser, serverseitig, braucht Anmeldung).
 export async function kiSec(aktion, payload = {}) {
   const c = await getClient();
