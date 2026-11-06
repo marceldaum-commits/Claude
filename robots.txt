@@ -1,0 +1,7 @@
+# Nachtfalter Hacklab – https://www.nachtfalter.tech
+# Die öffentliche Startseite darf indexiert werden; die App-Seiten selbst
+# tragen ihr eigenes noindex-Meta und werden dadurch nicht aufgenommen.
+User-agent: *
+Allow: /
+
+Sitemap: https://www.nachtfalter.tech/sitemap.xml

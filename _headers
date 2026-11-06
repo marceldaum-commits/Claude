@@ -1,6 +1,8 @@
-# Cloudflare Pages: Sicherheits-Header für alle Seiten
+# Cloudflare Pages: Sicherheits-Header für alle Seiten.
+# Hinweis: KEIN globales X-Robots-Tag noindex – die öffentliche Startseite (start.html → www.nachtfalter.tech)
+# soll von Suchmaschinen gefunden werden. Alle privaten Seiten (index/konto/admin/impressum/datenschutz)
+# tragen ihr eigenes <meta name="robots" content="noindex,nofollow">; Arena und Zentrale haben eigene Header.
 /*
-  X-Robots-Tag: noindex, nofollow
   X-Content-Type-Options: nosniff
   Strict-Transport-Security: max-age=31536000
   X-Frame-Options: DENY
