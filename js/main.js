@@ -14,7 +14,7 @@ import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { KALIPRAXIS, KALIPRAXIS_GEPLANT } from './content/kalipraxis.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -295,6 +295,8 @@ views.heute = () => {
 
       <a class="card" href="#/ctf" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🏁 ${U('CTF des Tages')}</b><span class="badge plain">${U('neu')}</span></div><span class="small muted">${U('Jeden Tag 2 frische Rätsel · Streak &amp; Bestenliste')} →</span></a>
 
+      ${[10, 11].includes(new Date().getMonth()) ? `<a class="card" href="#/advent" style="display:block;text-decoration:none;color:inherit;background:linear-gradient(160deg,#17233b,#1d2b47);border-color:#c9a24a55"><div class="row between"><b>🎄 ${U('Advent of Hacking')}</b><span class="badge plain">${new Date().getMonth() === 11 ? U('offen') : U('ab 1. Dez')}</span></div><span class="small muted">${U('24 Türchen, jeden Tag ein Rätsel · Advent-Zertifikat')} →</span></a>` : ''}
+
       ${loc === 'browser' ? section('🌐', U('Direkt hier im Browser'), browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">${U('🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.')}</div>` : loc === 'pc' ? section('🖥️', U('Jetzt am PC'), pcList) + section('📱', U('Für unterwegs'), phoneList) : loc === 'phone' ? section('📱', U('Jetzt am Handy'), phoneList) + section('🖥️', U('Wenn du am PC bist'), pcList) : section('📱', U('Am Handy'), phoneList) + section('🖥️', U('Am PC (Kali)'), pcList)}
 
       <a class="card" href="#/pfad" style="display:block;text-decoration:none;color:inherit"><b>${U('Alles ansehen →')}</b><br><span class="small muted">${U('Alle Wargames, Räume und Level bis zum eJPT')}</span></a>
@@ -423,6 +425,126 @@ views.ctf = () => ({
       .catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}<br><span class="small">${U('Bist du angemeldet?')} <a href="konto.html">${U('Hier anmelden')}</a>.</span></div>`; });
   },
 });
+
+// ---------------------------------------------------------------- Advent-Kalender „Advent of Hacking" (24 Türchen ab 1. Dez)
+function adventTile(t, aktivNr) {
+  const zustand = t.geloest ? 'done' : t.offen ? 'offen' : 'zu';
+  const sym = t.geloest ? '✓' : t.offen ? '🎁' : '🔒';
+  const klick = t.offen && !t.geloest;
+  return `<button type="button" class="adv-tile ${zustand}${t.nr === aktivNr ? ' aktiv' : ''}" data-nr="${t.nr}" ${klick ? '' : 'disabled'} aria-label="${esc(Ut('Türchen {n}', { n: t.nr }))}"><span class="adv-num">${t.nr}</span><span class="adv-sym">${sym}</span></button>`;
+}
+function adventPanel(t) {
+  if (!t) return '';
+  if (!t.offen) return `<div class="card warn"><b>🔒 ${U('Noch nicht offen.')}</b> ${Ut('Türchen {n} öffnet am {n}. Dezember.', { n: t.nr })}</div>`;
+  if (t.geloest) return `<div class="card lime"><b>✓ ${Ut('Türchen {n} geschafft.', { n: t.nr })}</b> ${U('Wähle ein anderes Türchen.')}</div>`;
+  return `<div class="card" id="adv-panel">
+    <div class="row between"><b>🎁 ${esc(t.titel)}</b><span class="badge plain">${esc(t.kategorie)}</span></div>
+    <pre data-copy="${esc(t.aufgabe)}" style="white-space:pre-wrap;word-break:break-all">${esc(t.aufgabe)}</pre>
+    <p class="small muted">💡 ${esc(t.hinweis)}</p>
+    <div class="row" style="gap:.4rem;align-items:center">
+      <input type="text" id="adv-in" placeholder="KLY{…}" autocapitalize="off" autocorrect="off" spellcheck="false" style="flex:1">
+      <button class="btn small" id="adv-go">${U('Prüfen')}</button>
+    </div>
+    <p class="small" id="adv-fb"></p>
+  </div>`;
+}
+function adventHTML(d, aktivNr) {
+  return `
+    <div class="card violet">
+      <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+        <div class="kpi"><b>${d.anzahl}/24</b><span>${U('Türchen')}</span></div>
+        <div class="kpi"><b>${d.punkte}</b><span>${U('Punkte')}</span></div>
+        <div class="kpi"><b>${d.streak}🔥</b><span>${U('Serie')}</span></div>
+      </div>
+      <p class="small muted" style="margin:.5rem 0 0">${U('Jeden Tag im Dezember öffnet ein Türchen. Dekodiere die Zeichenkette zur Flag')} <code>KLY{…}</code> ${U('– verpasste Türchen kannst du nachholen.')}</p>
+    </div>
+    ${d.komplett ? `<a class="card lime" href="#/adventurkunde" style="display:block;text-decoration:none;color:inherit"><b>🎄 ${U('Alle 24 geschafft!')}</b><br><span class="small muted">${U('Hol dir dein Advent-Zertifikat')} →</span></a>` : ''}
+    <div class="adv-grid">${d.tueren.map(t => adventTile(t, aktivNr)).join('')}</div>
+    <div id="adv-panelwrap">${adventPanel(d.tueren.find(x => x.nr === aktivNr))}</div>
+    <div class="card">
+      <h3 style="margin:0 0 .4rem">🏆 ${U('Bestenliste')}</h3>
+      ${d.bestenliste && d.bestenliste.length ? `<ul class="list">${d.bestenliste.map(r => `<li><span class="state">${r.platz}</span><span class="grow"><span class="t">${esc(r.name)}</span></span><span class="badge plain">${r.punkte}</span></li>`).join('')}</ul>` : `<p class="small muted">${U('Noch keine Einträge – sei die oder der Erste!')}</p>`}
+    </div>`;
+}
+views.advent = () => ({
+  title: 'Advent of Hacking',
+  html: `<a class="back" href="#/heute">← ${U('Start')}</a><h1 style="margin:.3rem 0 .6rem">🎄 ${U('Advent of Hacking')}</h1><div id="advwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  mount(root) {
+    const wrap = $('#advwrap', root);
+    if (!syncStatus().user) {
+      wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small">${U('Der Advent-Kalender hängt an deinem Nachtfalter-Konto (für Fortschritt und Bestenliste).')} <a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`;
+      return;
+    }
+    let daten = null, aktivNr = 0;
+    const standardAktiv = (d) => { const o = d.tueren.find(t => t.offen && !t.geloest); return o ? o.nr : 0; };
+    const bindCopy = () => $$('[data-copy]', wrap).forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(b.getAttribute('data-copy')); } catch { /* */ } });
+    const binde = () => {
+      bindCopy();
+      $$('.adv-tile[data-nr]', wrap).forEach(btn => { if (btn.disabled) return; btn.onclick = () => { aktivNr = parseInt(btn.getAttribute('data-nr'), 10); zeichne(); const p = $('#adv-panel', wrap); if (p) p.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }; });
+      const go = $('#adv-go', wrap), inp = $('#adv-in', wrap), fb = $('#adv-fb', wrap);
+      if (go && inp) {
+        const pruef = async () => {
+          const versuch = (inp.value || '').trim(); if (!versuch) return;
+          go.disabled = true; fb.textContent = U('Prüfe …');
+          try {
+            const r = await advent('loesen', { nr: aktivNr, versuch });
+            if (r.ok) {
+              const t = daten.tueren.find(x => x.nr === aktivNr); if (t) { t.geloest = true; delete t.aufgabe; delete t.hinweis; }
+              daten.anzahl = r.anzahl; daten.punkte = r.punkte; daten.streak = r.streak; daten.komplett = r.komplett;
+              aktivNr = standardAktiv(daten); zeichne();
+            } else { fb.textContent = U('✗ Noch nicht richtig – prüf deine Dekodierung.'); go.disabled = false; }
+          } catch (e) { fb.textContent = U('Fehler') + ': ' + (e.message || e); go.disabled = false; }
+        };
+        go.onclick = pruef; inp.onkeydown = (e) => { if (e.key === 'Enter') pruef(); };
+      }
+    };
+    const zeichne = () => { wrap.innerHTML = adventHTML(daten, aktivNr); binde(); };
+    advent('info').then(d => { daten = d; aktivNr = standardAktiv(d); zeichne(); })
+      .catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}<br><span class="small">${U('Bist du angemeldet?')} <a href="konto.html">${U('Hier anmelden')}</a>.</span></div>`; });
+  },
+});
+views.adventurkunde = () => {
+  const name = (state.profile.name || '').trim() || 'Nachtfalter-Lernende(r)';
+  const jahr = new Date().getFullYear();
+  const datum = new Date().toLocaleDateString(currentLang() === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+  const h = Math.abs([...(name + ':advent:' + jahr)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)).toString(36).toUpperCase().padStart(5, '0').slice(0, 5);
+  const code = 'NF-ADV-' + jahr + '-' + h;
+  const style = `<style>
+.adz{max-width:820px;margin:0 auto;position:relative;background:linear-gradient(160deg,#0f1b2d,#17233b);color:#f3f6ff;border:2px solid #c9a24a;border-radius:16px;padding:40px 44px;text-align:center;font-family:Georgia,'Times New Roman',serif;overflow:hidden}
+.adz:before{content:"";position:absolute;inset:10px;border:1px solid #c9a24a66;border-radius:10px;pointer-events:none}
+.adz-mk{letter-spacing:.3em;font-size:.72rem;color:#c9a24a;text-transform:uppercase;font-family:system-ui,sans-serif}
+.adz-tree{font-size:2.6rem}
+.adz h2{font-size:2rem;margin:.3rem 0 .1rem;color:#fff}
+.adz .name{font-size:1.5rem;color:#ffe9a8;margin:.6rem 0}
+.adz .sub{color:#c7d2e8;font-size:.95rem}
+.adz .meta{color:#9fb0cf;font-size:.8rem;margin-top:1rem;font-family:system-ui,sans-serif}
+@media print{@page{size:A4 landscape;margin:14mm}body{background:#fff !important}.top,.nav,.meldfab,#lang-banner,.zert-noprint{display:none !important}#main{margin:0 !important;padding:0 !important;max-width:none !important}}
+</style>`;
+  return {
+    title: 'Advent-Zertifikat', wide: true,
+    html: `${style}
+    <div class="zert-noprint" style="margin-bottom:.8rem"><a class="back" href="#/advent">← ${U('Advent-Kalender')}</a>
+      <div class="row between" style="align-items:center;margin-top:.3rem"><h1 style="margin:0">🎄 ${U('Advent-Zertifikat')}</h1><button class="btn primary" id="advdruck" disabled>🖨️ ${U('Als PDF speichern')}</button></div></div>
+    <div id="advzert"><p class="muted">${U('Lade …')}</p></div>`,
+    mount(root) {
+      const box = $('#advzert', root), db = $('#advdruck', root);
+      if (!syncStatus().user) { box.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b></div>`; return; }
+      advent('info').then(d => {
+        if (!d.komplett) { box.innerHTML = `<div class="card warn"><b>🎁 ${Ut('Erst {n}/24 Türchen.', { n: d.anzahl })}</b><br><span class="small">${U('Das Zertifikat gibt es, wenn du alle 24 geschafft hast.')} <a href="#/advent">${U('Weiter zum Kalender')} →</a></span></div>`; return; }
+        box.innerHTML = `<div class="adz">
+          <div class="adz-tree">🎄</div>
+          <p class="adz-mk">Nachtfalter Hacklab</p>
+          <h2>${U('Advent of Hacking')} ${jahr}</h2>
+          <p class="sub">${U('Dieses Zertifikat bestätigt, dass')}</p>
+          <p class="name">${esc(name)}</p>
+          <p class="sub">${U('alle 24 Türchen des Advent-Kalenders gelöst hat. 🏆')}</p>
+          <p class="meta">${esc(datum)} · ${U('Zertifikat-Nr.')} ${code}</p>
+        </div>`;
+        if (db) { db.disabled = false; db.onclick = () => window.print(); }
+      }).catch(() => { box.innerHTML = `<div class="card warn">${U('Konnte nicht laden.')}</div>`; });
+    },
+  };
+};
 
 // ---------------------------------------------------------------- Lernpfad (geführte Lernstufen, Leiter)
 let arenaProg = {}; let arenaProgGeladen = false;

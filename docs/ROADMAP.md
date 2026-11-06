@@ -19,7 +19,9 @@ wird abgearbeitet und fortgeschrieben. Entwickeln auf `ccr-63912bdd-xpv8bk`, liv
 2. **Meilenstein-Zertifikate** („Grundlagen abgeschlossen", „Lernpfad gemeistert", „10 Räume")
 3. **Streak-Erinnerung** (Mail/Push „deine Serie läuft ab")
 4. **Wochen-Mission** (eine größere Aufgabe pro Woche, Bonus-XP) – wie THM „Pulse"
-5. **Advent-Kalender „Advent of Hacking"** (24 Türchen ab 1. Dez) – zeitlich dringend, großer Reichweiten-Hebel
+5. **[gebaut, Vorschau] Advent-Kalender „Advent of Hacking"** (24 Türchen ab 1. Dez) – Edge Function `advent`
+   (serverseitige HMAC-Flags + Prüfung, Datums-Gating) + Tabelle `advent_fortschritt` live; App-UI (`views.advent`,
+   Kalender-Grid, Advent-Zertifikat) auf Branch, wartet auf „ok live". Großer Reichweiten-Hebel, zeitlich dringend.
 6. **Teilbares öffentliches Profil** (Abzeichen/Score zeigen)
 7. **Werkstatt / Baukasten: Kunden bauen eigene Räume** (user-created content) – großer Brocken,
    braucht Editor + Moderation + strenge Sicherheit (Sandbox/Isolation). NOCH NICHT vorhanden.

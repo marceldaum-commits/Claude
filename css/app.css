@@ -316,3 +316,18 @@ a.karte:hover { border-color: var(--violet); }
 .pfad-selbst { margin: .3rem 0 0; padding-left: 1.2rem; }
 .pfad-selbst li { margin: .3rem 0; }
 .card.violet { border-color: var(--violet); }
+
+/* Advent-Kalender „Advent of Hacking" */
+.adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin: .2rem 0 .8rem; }
+@media (min-width: 540px) { .adv-grid { grid-template-columns: repeat(6, 1fr); } }
+.adv-tile { position: relative; aspect-ratio: 1 / 1; border-radius: 12px; border: 1px solid var(--line); background: var(--card2); color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .1rem; font: inherit; padding: 0; transition: transform .08s, border-color .15s; }
+.adv-tile:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--violet); }
+.adv-tile .adv-num { font-size: 1.2rem; font-weight: 800; }
+.adv-tile .adv-sym { font-size: 1rem; line-height: 1; }
+.adv-tile.offen { border-color: rgba(201, 162, 74, .6); background: linear-gradient(160deg, #1d2b47, #17233b); }
+.adv-tile.offen .adv-num { color: #ffe9a8; }
+.adv-tile.done { border-color: rgba(163, 230, 53, .5); background: var(--lime-bg); }
+.adv-tile.done .adv-num { color: var(--lime); }
+.adv-tile.zu { opacity: .5; cursor: not-allowed; }
+.adv-tile.aktiv { outline: 2px solid var(--violet); outline-offset: 1px; }
+.adv-tile:disabled { cursor: default; }
