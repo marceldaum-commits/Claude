@@ -39,7 +39,9 @@ Reiner Test-Account ohne Sonderrechte, per SQL bestätigt angelegt. Bei Bedarf P
 ## Baulog (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
-| 06.11.2026 | 🔴 **Arena-Selbsttest repariert** (meldete 22/22 „defekt"): Selbsttest-Container war nicht Wächter-konform (Name/Label/LogConfig/Ulimits/AutoRemove). Echtes Spielen war nie betroffen. Fix auf Branch – **Arena-Live braucht Marcels ok + Arena-Deploy** | Branch |
+| 06.11.2026 | **Boss-Bots: 8-Stufen-Leiter (sehr einfach → extrem schwer), jede Stufe andere Technik** (direkt, Vorwand, Rollenspiel, Format, Override, indirekte Injektion, Kombi, 3-fach-Kombi) + **Lernmodus** (Technik erklärt + Beispiel-Angriff). Alle 8 end-to-end mit echtem Claude getestet. | **Live** |
+| 06.11.2026 | Fix (live): EN-Umschalter & öffentliches Profil – Inline-Scripts wegen CSP in externe .js ausgelagert (start.js/ki-sicherheit.js/p.js) | **Live** |
+| 06.11.2026 | 🔴 **Arena-Selbsttest repariert** (meldete 22/22 „defekt"): Selbsttest-Container war nicht Wächter-konform (Name/Label/LogConfig/Ulimits/AutoRemove). Echtes Spielen war nie betroffen. Fix live gepusht; nachtfalter-deploy baut Arena-Container neu (~10 Min). | **Live** |
 | 06.11.2026 | KI-Sicherheit Phase 2: echter LLM – Boss-Bots (Nova/Wächter/Nyx, steigende Abwehr) + KI-Mentor (Claude Haiku 5.5, Tageslimit 40/Konto, Edge `ki-llm`) | **Live** |
 | 06.11.2026 | KI-Lehrpfad geführt (Grundlagen → Angriff → Abwehr → Fälschungen, mit Übungen, verbindet alles) | **Live** |
 | 06.11.2026 | KI-Verteidigung: Schutzmaßnahmen wählen, Prüfer fährt alle Angriffe dagegen (Angriff UND Abwehr) | **Live** |

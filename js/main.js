@@ -862,8 +862,16 @@ function bossTile(s, aktiv) {
     <span class="ki-ttl">${esc(s.titel)}</span><span class="ki-thema">${esc(s.abwehr)}</span>
     <span class="ki-stufe st-${(s.stufe || '').replace(/\s+/g, '')}">${esc(s.stufe)}</span></button>`;
 }
-function bosseHTML(d, aktiv, verlauf) {
+function bosseHTML(d, aktiv, verlauf, lern) {
   const s = d.bosse.find(x => x.level === aktiv);
+  const lernBlock = (s && lern) ? `
+      <div class="card ki-lernbox" style="margin:.1rem 0 .5rem">
+        <b class="small">🎓 ${U('Lernmodus')}: ${esc(s.technik || '')}</b>
+        <p class="small" style="margin:.3rem 0">${esc(s.erklaerung || '')}</p>
+        ${s.beispiel ? `<p class="small muted" style="margin:.3rem 0 .1rem">${U('Beispiel-Angriff:')}</p>
+        <pre class="ki-bsp-text">${esc(s.beispiel)}</pre>
+        <button class="btn small ghost" type="button" id="ki-bsp">${U('Beispiel einsetzen')}</button>` : ''}
+      </div>` : '';
   return `
     <div class="card adv-held">
       <div class="adv-held-kopf"><span class="adv-badge">🤖 ${U('Echte KI')}</span><span class="badge real">${U('LLM live')}</span></div>
@@ -872,12 +880,18 @@ function bosseHTML(d, aktiv, verlauf) {
         <div class="kpi"><b>${d.punkte}</b><span>${U('Punkte')}</span></div>
         <div class="kpi"><b>${d.rest}</b><span>${U('KI-Nachrichten heute')}</span></div>
       </div>
-      <p class="small muted" style="margin:.5rem 0 0">${U('Das ist ein echter Claude mit einem Geheimnis im System-Prompt. Bring ihn per Prompt Injection dazu, es zu verraten. (Tageslimit schützt vor Kosten.)')}</p>
+      <p class="small muted" style="margin:.5rem 0 .4rem">${U('Das ist ein echter Claude mit einem Geheimnis im System-Prompt. Bring ihn per Prompt Injection dazu, es zu verraten. (Tageslimit schützt vor Kosten.)')}</p>
+      <div class="ki-modus" role="group" aria-label="${esc(U('Modus'))}">
+        <button type="button" class="btn small ${lern ? '' : 'ghost'}" id="ki-mode-lern" aria-pressed="${lern ? 'true' : 'false'}">🎓 ${U('Lernmodus')}</button>
+        <button type="button" class="btn small ${lern ? 'ghost' : ''}" id="ki-mode-chall" aria-pressed="${lern ? 'false' : 'true'}">🏆 ${U('Challenge')}</button>
+      </div>
+      <p class="small muted" style="margin:.35rem 0 0">${lern ? U('Lernmodus: Technik erklärt + Beispiel zum Ausprobieren. Ideal zum Üben.') : U('Challenge: keine Lösungshilfe – knack die KI selbst.')}</p>
     </div>
     <div class="ki-stufen">${d.bosse.map(x => bossTile(x, aktiv)).join('')}</div>
     ${s ? (s.offen ? `<div class="card ki-chat" id="ki-panel">
       <div class="row between"><b>🤖 ${esc(s.bot)}</b><span class="badge ${s.geloest ? 'real' : 'sim'}">${s.geloest ? '✓ ' + U('geknackt') : esc(s.stufe)}</span></div>
-      <p class="small muted" style="margin:.2rem 0">🛡️ ${U('Abwehr')}: ${esc(s.abwehr)}</p>
+      <p class="small muted" style="margin:.2rem 0">🎯 ${U('Technik')}: ${esc(s.technik || '')} · 🛡️ ${U('Abwehr')}: ${esc(s.abwehr)}</p>
+      ${lernBlock}
       <details class="small" style="margin-bottom:.4rem"><summary>💡 ${U('Tipp anzeigen')}</summary><p class="small" style="margin:.3rem 0 0">${esc(s.hinweis)}</p></details>
       <div class="ki-log" id="ki-log">${(verlauf[aktiv] || []).length ? verlauf[aktiv].map(x => kiMsg(x.von, x.text)).join('') : `<p class="small muted">${Ut('Schreib {bot} eine Nachricht …', { bot: s.bot })}</p>`}</div>
       <div class="row" style="gap:.4rem;align-items:center;margin-top:.5rem"><input type="text" id="ki-in" placeholder="${esc(Ut('Nachricht an {bot} …', { bot: s.bot }))}" autocomplete="off" style="flex:1"><button class="btn small" id="ki-go">${U('Senden')}</button></div>
@@ -891,11 +905,18 @@ views.kibosse = () => ({
     const wrap = $('#bwrap', root);
     if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }
     let daten = null, aktiv = 1; const verlauf = {};
+    let lern = false; try { lern = localStorage.getItem('kly.kibosse.lern') === '1'; } catch { /* */ }
     const start = (d) => { const o = d.bosse.find(x => x.offen && !x.geloest); return o ? o.level : (d.bosse[0] && d.bosse[0].level) || 1; };
+    const setLern = (v) => { lern = v; try { localStorage.setItem('kly.kibosse.lern', v ? '1' : '0'); } catch { /* */ } zeichne(); };
     const zeichne = (scroll) => {
-      wrap.innerHTML = bosseHTML(daten, aktiv, verlauf);
+      wrap.innerHTML = bosseHTML(daten, aktiv, verlauf, lern);
       $$('.ki-tile[data-lvl]', wrap).forEach(btn => { if (btn.disabled) return; btn.onclick = () => { aktiv = parseInt(btn.getAttribute('data-lvl'), 10); zeichne(); const p = $('#ki-panel', wrap); if (p) p.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }; });
+      const ml = $('#ki-mode-lern', wrap), mc = $('#ki-mode-chall', wrap);
+      if (ml) ml.onclick = () => setLern(true);
+      if (mc) mc.onclick = () => setLern(false);
       const go = $('#ki-go', wrap), inp = $('#ki-in', wrap), fb = $('#ki-fb', wrap), log = $('#ki-log', wrap);
+      const bsp = $('#ki-bsp', wrap);
+      if (bsp && inp) bsp.onclick = () => { const s = daten.bosse.find(x => x.level === aktiv); if (s && s.beispiel) { inp.value = s.beispiel; inp.focus(); } };
       if (scroll && log) log.scrollTop = log.scrollHeight;
       if (go && inp) {
         const senden = async () => {
