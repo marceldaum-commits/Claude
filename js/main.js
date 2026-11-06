@@ -14,7 +14,7 @@ import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { KALIPRAXIS, KALIPRAXIS_GEPLANT } from './content/kalipraxis.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion, mission } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -295,6 +295,8 @@ views.heute = () => {
 
       <a class="card" href="#/ctf" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🏁 ${U('CTF des Tages')}</b><span class="badge plain">${U('neu')}</span></div><span class="small muted">${U('Jeden Tag 2 frische Rätsel · Streak &amp; Bestenliste')} →</span></a>
 
+      <a class="card" href="#/mission" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🎯 ${U('Wochen-Mission')}</b><span class="badge plain">+50 XP</span></div><span class="small muted">${U('Eine größere Aufgabe pro Woche · Bonus-XP')} →</span></a>
+
       ${[10, 11].includes(new Date().getMonth()) ? `<a class="card" href="#/advent" style="display:block;text-decoration:none;color:inherit;background:linear-gradient(160deg,#17233b,#1d2b47);border-color:#c9a24a55"><div class="row between"><b>🎄 ${U('Advent of Hacking')}</b><span class="badge plain">${new Date().getMonth() === 11 ? U('offen') : U('ab 1. Dez')}</span></div><span class="small muted">${U('24 Türchen, jeden Tag ein Rätsel · Advent-Zertifikat')} →</span></a>` : ''}
 
       ${loc === 'browser' ? section('🌐', U('Direkt hier im Browser'), browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">${U('🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.')}</div>` : loc === 'pc' ? section('🖥️', U('Jetzt am PC'), pcList) + section('📱', U('Für unterwegs'), phoneList) : loc === 'phone' ? section('📱', U('Jetzt am Handy'), phoneList) + section('🖥️', U('Wenn du am PC bist'), pcList) : section('📱', U('Am Handy'), phoneList) + section('🖥️', U('Am PC (Kali)'), pcList)}
@@ -545,6 +547,66 @@ views.adventurkunde = () => {
     },
   };
 };
+
+// ---------------------------------------------------------------- Wochen-Mission (eine größere Aufgabe pro Woche, Bonus-XP)
+function missionHTML(d) {
+  return `
+    <div class="card violet">
+      <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+        <div class="kpi"><b>${d.anzahl}</b><span>${U('Missionen')}</span></div>
+        <div class="kpi"><b>${d.punkte}</b><span>${U('Punkte')}</span></div>
+        <div class="kpi"><b>+${d.punkte_pro}</b><span>${U('diese Woche')}</span></div>
+      </div>
+      <p class="small muted" style="margin:.5rem 0 0">${U('Kalenderwoche')} ${esc(d.woche)} · ${U('eine größere Aufgabe pro Woche')}</p>
+    </div>
+    <div class="card ${d.geloest ? 'lime' : ''}">
+      <div class="row between"><b>🎯 ${esc(d.titel)}</b><span class="badge ${d.geloest ? 'real' : 'plain'}">${d.geloest ? U('✓ geschafft') : '+' + d.punkte_pro + ' XP'}</span></div>
+      <p class="small" style="margin:.3rem 0 .5rem">${esc(d.szenario)}</p>
+      <pre data-copy="${esc(d.aufgabe)}" style="white-space:pre-wrap;word-break:break-all">${esc(d.aufgabe)}</pre>
+      <p class="small muted" style="margin:0 0 .2rem">${U('Weg zur Flag')} <code>KLY{…}</code>:</p>
+      <ol class="small muted" style="margin:.1rem 0 .6rem;padding-left:1.2rem">${d.hinweise.map(h => `<li>${esc(h)}</li>`).join('')}</ol>
+      ${d.geloest ? `<p class="small" style="color:#9be28f">✓ ${U('Diese Woche erledigt – super!')}</p>` : `
+        <div class="row" style="gap:.4rem;align-items:center">
+          <input type="text" id="mi-in" placeholder="KLY{…}" autocapitalize="off" autocorrect="off" spellcheck="false" style="flex:1">
+          <button class="btn small" id="mi-go">${U('Prüfen')}</button>
+        </div>
+        <p class="small" id="mi-fb"></p>`}
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 .4rem">🏆 ${U('Bestenliste')}</h3>
+      ${d.bestenliste && d.bestenliste.length ? `<ul class="list">${d.bestenliste.map(r => `<li><span class="state">${r.platz}</span><span class="grow"><span class="t">${esc(r.name)}</span></span><span class="badge plain">${r.punkte}</span></li>`).join('')}</ul>` : `<p class="small muted">${U('Noch keine Einträge – sei die oder der Erste!')}</p>`}
+    </div>`;
+}
+views.mission = () => ({
+  title: 'Wochen-Mission',
+  html: `<a class="back" href="#/heute">← ${U('Start')}</a><h1 style="margin:.3rem 0 .6rem">🎯 ${U('Wochen-Mission')}</h1><div id="miwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  mount(root) {
+    const wrap = $('#miwrap', root);
+    if (!syncStatus().user) {
+      wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small">${U('Die Wochen-Mission hängt an deinem Nachtfalter-Konto (für Punkte und Bestenliste).')} <a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`;
+      return;
+    }
+    let daten = null;
+    const bindCopy = () => $$('[data-copy]', wrap).forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(b.getAttribute('data-copy')); } catch { /* */ } });
+    const binde = () => {
+      bindCopy();
+      const go = $('#mi-go', wrap), inp = $('#mi-in', wrap), fb = $('#mi-fb', wrap);
+      if (!go || !inp) return;
+      const pruef = async () => {
+        const versuch = (inp.value || '').trim(); if (!versuch) return;
+        go.disabled = true; fb.textContent = U('Prüfe …');
+        try {
+          const r = await mission('loesen', { versuch });
+          if (r.ok) { daten.geloest = true; daten.punkte = r.punkte; daten.anzahl = r.anzahl; wrap.innerHTML = missionHTML(daten); binde(); }
+          else { fb.textContent = U('✗ Noch nicht richtig – prüf deine Dekodierung.'); go.disabled = false; }
+        } catch (e) { fb.textContent = U('Fehler') + ': ' + (e.message || e); go.disabled = false; }
+      };
+      go.onclick = pruef; inp.onkeydown = (e) => { if (e.key === 'Enter') pruef(); };
+    };
+    mission('info').then(d => { daten = d; wrap.innerHTML = missionHTML(daten); binde(); })
+      .catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}<br><span class="small">${U('Bist du angemeldet?')} <a href="konto.html">${U('Hier anmelden')}</a>.</span></div>`; });
+  },
+});
 
 // ---------------------------------------------------------------- Lernpfad (geführte Lernstufen, Leiter)
 let arenaProg = {}; let arenaProgGeladen = false;

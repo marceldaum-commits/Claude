@@ -31,6 +31,7 @@ Lebendes Dokument. Entwickeln auf `ccr-63912bdd-xpv8bk`, live erst nach Marcels 
 ## Baulog (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
+| 06.11.2026 | Wochen-Mission (Edge `mission` + Tabelle wochen_mission live, App-View + Startkarte, +50 XP) | Vorschau (Branch) |
 | 06.11.2026 | Teilbares öffentliches Profil (Edge `profil` + Tabelle public_profiles live, App-Teilen-UI + p.html) | Vorschau (Branch) |
 | 06.11.2026 | Advent-Kalender „Advent of Hacking" (24 Türchen, Edge Function + Tabelle + App-UI + Zertifikat) | **Live** |
 | 06.11.2026 | Ausführliches Zertifikat (4 Spalten) + Zentrale-Druck, Meilenstein-Zertifikate, Roadmap | Live |

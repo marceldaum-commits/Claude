@@ -108,6 +108,17 @@ export async function taeglich(aktion, payload = {}) {
   if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
   return res.data;
 }
+// Wochen-Mission: Aufgabe holen / Lösung prüfen (serverseitig, braucht Anmeldung).
+export async function mission(aktion, payload = {}) {
+  const c = await getClient();
+  if (!c) throw new Error('Keine Verbindung.');
+  const { data: s } = await c.auth.getSession().catch(() => ({ data: null }));
+  const token = s?.session?.access_token;
+  if (!token) throw new Error('Bitte zuerst anmelden.');
+  const res = await c.functions.invoke('mission', { body: { aktion, ...payload }, headers: { Authorization: `Bearer ${token}` } });
+  if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
+  return res.data;
+}
 // Advent-Kalender „Advent of Hacking": Türchen holen / Lösung prüfen (serverseitig, braucht Anmeldung).
 export async function advent(aktion, payload = {}) {
   const c = await getClient();

@@ -548,5 +548,15 @@
   "Öffentliches Profil wirklich abschalten? Der Link funktioniert dann nicht mehr.": "Really turn off the public profile? The link will stop working.",
   "Profil-Link erstellen": "Create profile link",
   "Erstelle …": "Creating …",
-  "Konnte nicht laden – bist du angemeldet?": "Could not load – are you signed in?"
+  "Konnte nicht laden – bist du angemeldet?": "Could not load – are you signed in?",
+  "Wochen-Mission": "Weekly mission",
+  "Missionen": "Missions",
+  "diese Woche": "this week",
+  "Kalenderwoche": "Calendar week",
+  "eine größere Aufgabe pro Woche": "one bigger challenge per week",
+  "✓ geschafft": "✓ done",
+  "Weg zur Flag": "Path to the flag",
+  "Diese Woche erledigt – super!": "Done for this week – great!",
+  "Die Wochen-Mission hängt an deinem Nachtfalter-Konto (für Punkte und Bestenliste).": "The weekly mission is tied to your Nachtfalter account (for points and leaderboard).",
+  "Eine größere Aufgabe pro Woche · Bonus-XP": "One bigger challenge per week · bonus XP"
 }
