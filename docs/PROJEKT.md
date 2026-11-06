@@ -25,7 +25,9 @@ Reiner Test-Account ohne Sonderrechte, per SQL bestätigt angelegt. Bei Bedarf P
 
 ## Offene technische Punkte
 - [ ] **Verwaltung/Zentrale – Konto-Steuerung pro Kunde (Marcel-Wunsch 06.11.2026):**
-      KI-Tokens pro Tag vergeben/erweitern (Tageslimit `ki_llm_nutzung`/Override), Account/Fortschritt zurücksetzen.
+      Backend in Edge `admin` **codiert** (Aktionen `ki_reset` = KI-Fortschritt+Budget zurücksetzen, `ki_tokens` = Tokens heute gutschreiben/voll). **Noch zu tun:** admin-Function deployen + Knöpfe in der Zentrale (Kunden-Detail). Durable „Tokens pro TAG erhöhen" (Pro-Konto-Limit-Override, das `ki-llm` liest) steht noch aus.
+- [ ] **KI-Verteidigung „echter Angreifer" geparkt:** Idee war, die echte KI gegen den selbst­geschriebenen Schutz-Prompt antreten zu lassen. Erkenntnis beim Test: Haiku verweigert praktisch IMMER die Code-Preisgabe (auch wenn der System-Prompt zum Lecken auffordert) → jede Abwehr „gewinnt", lehrt nichts. Edge-Aktion `verteidigung` ist deployt, aber NICHT in die App verdrahtet. Besserer Weg: echte KI als „Coach", der den Schutz-Prompt analysiert und Lücken benennt (zuverlässig).
+- [ ] **Hinweis MCP/SQL:** Destruktives SQL (DELETE/DROP/TRUNCATE) über die Supabase-MCP braucht eine interaktive Bestätigung → läuft aus dieser Cloud-Sitzung in 230s-Timeout. Workarounds: statt DELETE ein `UPDATE … SET anzahl=0` (nicht-destruktiv, kein Confirm), oder über die Admin-Edge-Function (Service-Rolle), oder Bestätigung im Supabase-Dashboard. Budget setzt sich ohnehin täglich (UTC) zurück.
 - [ ] Backups prüfen: Plesk → Google Drive läuft? (mit Marcel) + Geheimnisse in Bitwarden
 - [ ] Nächster großer Block: Technik-Module (Active Directory tief, SOC/Blue-Team-Detection, Malware-Analyse)
       vs. Produkt-Features – Priorität mit Marcel klären.

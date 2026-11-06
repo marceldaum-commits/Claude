@@ -258,6 +258,33 @@ Deno.serve(async (req) => {
         await protokoll('zwei_faktor_zurueckgesetzt', id, { anzahl: n });
         return antwort(origin, 200, { ok: true, anzahl: n });
       }
+      case 'ki_reset': {
+        // KI-Sicherheit-Fortschritt eines Kunden zurücksetzen (Boss-Bots, Verteidigung, Arena) + heutiges KI-Budget.
+        if (!UUID.test(id)) return antwort(origin, 400, { fehler: 'Unbekannter Nutzer' });
+        await db.from('ki_llm_fortschritt').delete().eq('user_id', id);
+        await db.from('ki_llm_verteidigung').delete().eq('user_id', id);
+        await db.from('ki_llm_nutzung').delete().eq('user_id', id);
+        await db.from('ki_sec_fortschritt').delete().eq('user_id', id);
+        await protokoll('ki_zurueckgesetzt', id);
+        return antwort(origin, 200, { ok: true });
+      }
+      case 'ki_tokens': {
+        // Dem Kunden KI-Nachrichten für HEUTE gutschreiben. voll=true: volles Tagesbudget wieder frei;
+        // sonst tokens=N: N zusätzliche Nachrichten heute (senkt den verbrauchten Zähler).
+        if (!UUID.test(id)) return antwort(origin, 400, { fehler: 'Unbekannter Nutzer' });
+        const tag = new Date().toISOString().slice(0, 10);
+        if (body.voll === true) {
+          await db.from('ki_llm_nutzung').delete().eq('user_id', id).eq('tag', tag);
+          await protokoll('ki_tokens', id, { voll: true });
+        } else {
+          const n = Math.max(1, Math.min(200, parseInt(String(body.tokens ?? '10'), 10) || 10));
+          const { data: cur } = await db.from('ki_llm_nutzung').select('anzahl').eq('user_id', id).eq('tag', tag).maybeSingle();
+          const neu = Math.max(0, ((cur?.anzahl as number) || 0) - n);
+          await db.from('ki_llm_nutzung').upsert({ user_id: id, tag, anzahl: neu }, { onConflict: 'user_id,tag' });
+          await protokoll('ki_tokens', id, { tokens: n });
+        }
+        return antwort(origin, 200, { ok: true });
+      }
       case 'protokoll': {
         const { data, error } = await db.from('admin_log').select('id, at, admin_id, aktion, ziel, details').order('at', { ascending: false }).limit(200);
         if (error) throw error;
