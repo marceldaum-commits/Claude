@@ -1828,12 +1828,80 @@ views.profil = () => {
     <div class="card"><h3>Abzeichen</h3><div class="grid two">${BADGES.map(b => `<div class="row" style="opacity:${got.has(b.id) ? 1 : .4}"><span style="font-size:1.6rem;width:2.2rem;text-align:center">${b.icon}</span><span><b>${UN(b.title)}</b>${got.has(b.id) ? ' ✓' : ''}<br><span class="small muted">${esc(b.desc)}</span></span></div>`).join('')}</div></div>
     <div class="card"><h3>Name</h3><div class="row" style="flex-wrap:nowrap"><input type="text" id="pname" maxlength="30" value="${esc(state.profile.name)}" placeholder="Name oder Spitzname"><button class="btn small primary" id="psave">Speichern</button></div></div>
     <div class="card"><h3>${U('Erfahrungsstufe')}</h3><p class="small muted" style="margin:0 0 .5rem">${U('Beeinflusst, wie ausführlich erklärt wird.')}</p><div class="stack">${nivButtons()}</div></div>
+    <a class="card" href="#/zertifikat" style="display:block;text-decoration:none;color:inherit"><b>📜 ${U('Urkunde / Leistungsnachweis')}</b><br><span class="small muted">${U('Dein Fortschritt als PDF zum Speichern oder Drucken')} →</span></a>
     <p class="honest">Punkte, Abzeichen und Serien sind Motivation – sie schalten keine Prüfung und kein Level frei.</p>`,
     mount(root) {
       ctfStandLaden();
       $('#psave', root).onclick = () => { state.profile.name = $('#pname', root).value.trim().slice(0, 30); save(); render(); toast('Gespeichert.'); };
       $$('.niv-opt', root).forEach(btn => btn.onclick = () => { state.profile.level = btn.dataset.niv; save(); $$('.niv-opt', root).forEach(x => x.classList.toggle('on', x === btn)); toast(U('Erfahrungsstufe gespeichert.')); });
     },
+  };
+};
+
+// ---------------------------------------------------------------- Urkunde / Leistungsnachweis (PDF über Drucken)
+views.zertifikat = () => {
+  const geknackt = ROOMS.filter(r => roomDone(r.id)).length;
+  const punkte = gesamtPunkte();
+  if (punkte < 1 && geknackt < 1) {
+    return { title: 'Urkunde', html: `<a class="back" href="#/profil">← ${U('Profil')}</a><div class="card warn"><b>📜 ${U('Noch keine Urkunde.')}</b><br><span class="small">${U('Löse zuerst ein paar Aufgaben oder einen Raum – dann gibt es hier deinen Leistungsnachweis.')}</span></div>` };
+  }
+  const name = (state.profile.name || '').trim() || 'Nachtfalter-Lernende(r)';
+  const abz = earnedBadges().length;
+  const serie = gesamtStreak();
+  const datum = new Date().toLocaleDateString(currentLang() === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+  const h = Math.abs([...(name + ':' + punkte + ':' + geknackt)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)).toString(36).toUpperCase().padStart(5, '0').slice(0, 5);
+  const code = 'NF-' + new Date().getFullYear() + '-' + h;
+  const style = `<style>
+.zert-wrap{max-width:900px;margin:0 auto}
+.zert-blatt{position:relative;background:#fbfaff;color:#1c1830;border-radius:14px;padding:38px 40px;aspect-ratio:1.414/1;border:2px solid #2a2350;box-shadow:0 10px 40px rgba(0,0,0,.25);overflow:hidden;font-family:Georgia,'Times New Roman',serif}
+.zert-blatt:before{content:"";position:absolute;inset:10px;border:1px solid #7c6fd6;border-radius:8px;pointer-events:none}
+.zert-emblem{width:54px;height:54px;border-radius:50%;background:#15122b;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.zert-emblem img{width:34px;height:34px}
+.zert-marke{text-align:center;letter-spacing:.28em;font-size:.72rem;color:#5b5280;margin:.5rem 0 0;font-family:system-ui,sans-serif;text-transform:uppercase}
+.zert-titel{text-align:center;font-size:2.1rem;margin:.6rem 0 .1rem;color:#241d4a}
+.zert-sub{text-align:center;color:#6a6192;font-size:.9rem;margin:0}
+.zert-namewrap{text-align:center;margin:1.1rem 0 .2rem}
+.zert-name{display:inline-block;font-size:2rem;color:#0e0b1e;border-bottom:1px solid #d7d1ef;padding:0 1.2rem .25rem}
+.zert-text{text-align:center;max-width:640px;margin:.5rem auto 0;color:#2c2648;font-size:1rem;line-height:1.5}
+.zert-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1.4rem auto 0;max-width:660px}
+.zert-stat{text-align:center;background:#f1eefb;border:1px solid #e0dbf4;border-radius:8px;padding:.6rem .2rem}
+.zert-stat b{display:block;font-size:1.4rem;color:#3a2f8f;font-family:system-ui,sans-serif}
+.zert-stat span{font-size:.72rem;color:#6a6192;font-family:system-ui,sans-serif}
+.zert-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:1.6rem;font-family:system-ui,sans-serif;font-size:.78rem;color:#5b5280;gap:1rem}
+.zert-sig{text-align:center;flex:0 0 auto}
+.zert-line{border-top:1px solid #b9b2db;width:170px;margin:0 auto .2rem}
+.zert-sig b{color:#241d4a;font-size:.9rem}
+@media (max-width:640px){.zert-blatt{aspect-ratio:auto;padding:24px 18px}.zert-titel{font-size:1.5rem}.zert-name{font-size:1.4rem}.zert-stats{grid-template-columns:repeat(2,1fr)}.zert-foot{flex-direction:column;align-items:center;gap:.6rem;text-align:center}}
+@media print{@page{size:A4 landscape;margin:10mm}body{background:#fff !important}.top,.nav,.meldfab,#lang-banner,.zert-noprint{display:none !important}#main{margin:0 !important;padding:0 !important;max-width:none !important}.zert-blatt{box-shadow:none !important;border-radius:0}}
+</style>`;
+  return {
+    title: 'Urkunde',
+    wide: true,
+    html: `${style}
+    <div class="zert-noprint" style="margin-bottom:.8rem"><a class="back" href="#/profil">← ${U('Profil')}</a>
+      <div class="row between" style="align-items:center;margin-top:.3rem"><h1 style="margin:0">📜 ${U('Urkunde')}</h1><button class="btn primary" id="zertdruck">🖨️ ${U('Als PDF speichern')}</button></div>
+      <p class="small muted" style="margin:.3rem 0 0">${U('Persönlicher Leistungsnachweis über deinen Lernfortschritt. „Als PDF speichern" → im Druckdialog „Als PDF sichern" wählen (Querformat).')}</p>
+    </div>
+    <div class="zert-wrap"><div class="zert-blatt" id="zertblatt">
+      <div class="zert-emblem"><img src="icons/icon.svg" alt=""></div>
+      <p class="zert-marke">Nachtfalter Hacklab</p>
+      <h2 class="zert-titel">${U('Leistungsnachweis')}</h2>
+      <p class="zert-sub">${U('für ethisches Hacken & IT-Sicherheit')}</p>
+      <div class="zert-namewrap"><span class="zert-name">${esc(name)}</span></div>
+      <p class="zert-text">${U('hat sich im Nachtfalter Hacklab eigenständig und praxisnah in Linux, Netzwerken und ethischem Hacken weitergebildet und dabei folgende Leistung erbracht:')}</p>
+      <div class="zert-stats">
+        <div class="zert-stat"><b>${punkte}</b><span>${U('Punkte')}</span></div>
+        <div class="zert-stat"><b>${geknackt}/${ROOMS.length}</b><span>${U('Räume geknackt')}</span></div>
+        <div class="zert-stat"><b>${abz}</b><span>${U('Abzeichen')}</span></div>
+        <div class="zert-stat"><b>${serie}🔥</b><span>${U('Tage in Folge')}</span></div>
+      </div>
+      <div class="zert-foot">
+        <div><div>${esc(datum)}</div><div style="color:#8a82ad">${U('Nachweis-Nr.')} ${code}</div></div>
+        <div class="zert-sig"><div class="zert-line"></div><b>Nachtfalter Hacklab</b><div>nachtfalter.tech</div></div>
+      </div>
+    </div></div>
+    <p class="honest zert-noprint" style="margin-top:1rem">${U('Hinweis: Dies ist eine persönliche Urkunde über deinen Fortschritt in dieser App – kein staatlich oder extern anerkanntes Zertifikat.')}</p>`,
+    mount(root) { const b = $('#zertdruck', root); if (b) b.onclick = () => window.print(); },
   };
 };
 
