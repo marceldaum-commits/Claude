@@ -19,7 +19,9 @@ verbessern, korrigieren, erweitern – besser werden. Vollausbau mit Theorie + L
 - **Theorie + Lehrpfad + Übungen** rund um alles oben; **SEO** der Startseite/App darauf ausrichten.
 
 ## ✅ Kürzlich fertig
-- **KI-Sicherheit Phase 1 – in Arbeit** (siehe Leitstern)
+- **KI-Sicherheit Phase 2 – echter LLM (live):** Boss-Bots (Nova leicht → Wächter mittel → Nyx schwer) mit
+  echtem Claude (Haiku 5.5) + per-Konto-Flag; KI-Mentor. Tageslimit/Konto, Edge `ki-llm`. End-to-end getestet.
+- **KI-Sicherheit Phase 1 (live):** deterministische 10-Stufen-Arena, Theorie, Lehrpfad, Deepfake, Verteidigung
 - Advent-Kalender „Advent of Hacking" (24 Themen-Türchen, streng/anti-cheat, Nachtfalter-Look) – live
 - Wochen-Mission (+50 XP) · Teilbares öffentliches Profil (+ p.html) · Startseite DE/EN-Umschalter – live
 - Technik-Lücken geschlossen: Active Directory (Kerberoasting, AS-REP, PtH, BloodHound, GPO) + SOC/Detection – live
@@ -33,6 +35,8 @@ verbessern, korrigieren, erweitern – besser werden. Vollausbau mit Theorie + L
 - Sicherheits-Härtung #29–#33, Umzug-Runbook, Geheimnis-Checkliste
 
 ## 🔜 Als Nächstes (Produkt/Engagement) – Reihenfolge
+1. **Verwaltung/Zentrale – Konto-Steuerung pro Kunde** (Marcel-Wunsch): KI-Tokens/Tag vergeben & erweitern
+   (Tageslimit-Override auf `ki_llm_nutzung`), Account/Fortschritt zurücksetzen. Admin-only via Edge Function.
 1. **[in Arbeit] Nachweis-Design in Spalten** (sieht aufgeräumter aus)
 2. **Meilenstein-Zertifikate** („Grundlagen abgeschlossen", „Lernpfad gemeistert", „10 Räume")
 3. **Streak-Erinnerung** (Mail/Push „deine Serie läuft ab")

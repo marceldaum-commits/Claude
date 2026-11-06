@@ -17,7 +17,15 @@ Lebendes Dokument. Entwickeln auf `ccr-63912bdd-xpv8bk`, live erst nach Marcels 
 - **Umzugssicher** (siehe `docs/UMZUG.md`) und **selbst-einrichtend** (Auto-Deploy, kein manuelles SSH).
 - **`ki-lernen/` nicht anfassen** – andere Claude-Sitzung.
 
+## Test-Zugang (intern, von Marcel freigegeben 06.11.2026)
+Damit Claude die komplette App end-to-end prüfen kann (eingeloggte Views + Edge Functions).
+Reiner Test-Account ohne Sonderrechte, per SQL bestätigt angelegt. Bei Bedarf Passwort rotieren.
+- E-Mail: `klytest@nachtfalter.tech`  ·  Passwort: `KlyTest!2026`  ·  user_id: `4e4de3ed-1998-40f2-9e7d-4b7f6fea0db2`
+- Login-Token holen: POST `…/auth/v1/token?grant_type=password` mit `apikey:<anon>` + JSON `{email,password}` → `access_token`.
+
 ## Offene technische Punkte
+- [ ] **Verwaltung/Zentrale – Konto-Steuerung pro Kunde (Marcel-Wunsch 06.11.2026):**
+      KI-Tokens pro Tag vergeben/erweitern (Tageslimit `ki_llm_nutzung`/Override), Account/Fortschritt zurücksetzen.
 - [ ] Backups prüfen: Plesk → Google Drive läuft? (mit Marcel) + Geheimnisse in Bitwarden
 - [ ] Nächster großer Block: Technik-Module (Active Directory tief, SOC/Blue-Team-Detection, Malware-Analyse)
       vs. Produkt-Features – Priorität mit Marcel klären.
