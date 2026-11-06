@@ -31,6 +31,7 @@ Lebendes Dokument. Entwickeln auf `ccr-63912bdd-xpv8bk`, live erst nach Marcels 
 ## Baulog (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
+| 06.11.2026 | KI-Verteidigung: Schutzmaßnahmen wählen, Prüfer fährt alle Angriffe dagegen (Angriff UND Abwehr) | **Live** |
 | 06.11.2026 | KI-Arena auf 10 Stufen (sehr leicht → echt schwer: Ausgabefilter, Reizwort-Sperre, Verschleierung, Finale-Kombo) | **Live** |
 | 06.11.2026 | Deepfake-/KI-Phishing-Erkennung (interaktives „entlarve die Fälschung"-Modul, defensiv) | **Live** |
 | 06.11.2026 | SEO auf KI-Sicherheit: öffentliche Seite ki-sicherheit.html (DE/EN, Course/FAQ-JSON-LD), Startseiten-Feature, Sitemap | **Live** |
