@@ -508,6 +508,54 @@ export const KALIPRAXIS = [
     ],
     abschluss: 'OSINT ist der erste Schritt echter Angriffe – und dein bester Schutz ist zu wissen, was über dich auffindbar ist. Lehre: Fotos/Dokumente vor dem Teilen von Metadaten befreien (exiftool -all=), sparsam posten und ab und zu den eigenen Namen/E-Mail selbst suchen. Üben nur bei dir selbst oder mit Erlaubnis.',
   },
+  {
+    id: 'soc', icon: '🛡️', titel: 'Blue Team: Angriffe in Logs erkennen (SOC)', stufe: 'Aufbau', team: 'Blau',
+    einleitung: 'Die andere Seite: Im Security Operations Center (SOC) findest du Angriffe in Logs, bevor Schaden entsteht. Du liest echte-artige Log-Zeilen, erkennst das Muster, schreibst eine Erkennungsregel und baust eine kleine Zeitachse (DFIR). Kein Server nötig – alles mit Bordmitteln (grep, awk, jq).',
+    ziel: {
+      name: 'Beispiel-Logs (lokal, keine Zielmaschine)',
+      start: '# Nichts anzugreifen – die Logzeilen stehen direkt in den Schritten.\n# Wer mag, legt sie als Datei an und übt mit grep/awk:\nmkdir -p ~/soc && cd ~/soc',
+      hinweis: 'Reines Mitlesen reicht. Wer mag, kopiert die Logzeilen in eine Datei und filtert selbst – ganz ohne fremde Systeme.',
+      pruef: 'Bereit, sobald du ein Terminal offen hast (oder einfach mitliest und antwortest).',
+    },
+    schritte: [
+      {
+        id: 'bruteforce', werkzeug: 'grep/awk – Brute Force', frage_art: 'antwort',
+        aufgabe: 'Finde den Angreifer: Im SSH-Log häufen sich fehlgeschlagene Logins – von einer IP, gefolgt von einem Erfolg. Das ist ein Brute-Force-Treffer.',
+        befehl: 'Nov  6 02:11:04 srv sshd: Failed password for admin from 198.51.100.7 port 51002\nNov  6 02:11:05 srv sshd: Failed password for root  from 203.0.113.66 port 44210\nNov  6 02:11:06 srv sshd: Failed password for root  from 203.0.113.66 port 44212\nNov  6 02:11:07 srv sshd: Failed password for backup from 203.0.113.66 port 44215\n… (48 weitere „Failed password" von 203.0.113.66) …\nNov  6 02:13:51 srv sshd: Accepted password for backup from 203.0.113.66 port 44980\n\n# So würdest du es filtern:\ngrep "Failed password" auth.log | awk \'{print $NF}\' | sort | uniq -c | sort -rn',
+        erwartet: 'Eine IP sticht mit ~50 Fehlversuchen heraus – und meldet sich dann erfolgreich an.',
+        frage: 'Welche IP ist der Angreifer?', antwort: ['203.0.113.66'], tipp: 'Die IP mit den vielen „Failed password" direkt vor dem „Accepted password".',
+      },
+      {
+        id: 'eventid', werkzeug: 'Sigma / Windows-Events', frage_art: 'antwort',
+        aufgabe: 'Erkennungsregel verstehen: Detection-Regeln (z. B. im Sigma-Format) reagieren auf bestimmte Windows-Event-IDs. Für „fehlgeschlagene Anmeldung" ist das eine feste Nummer.',
+        befehl: 'title: Viele fehlgeschlagene Anmeldungen\nlogsource: { product: windows, service: security }\ndetection:\n  selection:\n    EventID: ____        # <– welche Nummer?\n  condition: selection | count() by IpAddress > 20\n# Merke: 4624 = Login OK, 4625 = Login fehlgeschlagen',
+        erwartet: 'Die Regel feuert bei >20 fehlgeschlagenen Anmeldungen pro Quell-IP.',
+        frage: 'Welche Windows-Event-ID steht für einen fehlgeschlagenen Login?', antwort: ['4625'], tipp: 'Steht als Kommentar in der Regel: 4624 = OK, 4625 = fehlgeschlagen.',
+      },
+      {
+        id: 'prozess', werkzeug: 'jq – verdächtiger Prozess', frage_art: 'antwort',
+        aufgabe: 'Böswillige Ausführung erkennen: In Prozess-Logs (z. B. Sysmon als JSON) verrät sich Schadcode oft durch einen kodierten Befehl. Welches Programm wird hier verdächtig gestartet?',
+        befehl: '{"EventID":1,"ParentImage":"C:\\\\…\\\\winword.exe",\n "Image":"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",\n "CommandLine":"powershell -nop -w hidden -enc SQBFAFgAKA..."}\n\n# Filtern mit jq:\njq \'select(.CommandLine | test("-enc|-EncodedCommand")) | .Image\' sysmon.json',
+        erwartet: 'Ein Office-Programm (winword) startet eine versteckte, base64-kodierte Shell – ein klassisches Angriffsmuster.',
+        frage: 'Welches Programm wird hier verdächtig gestartet (Name)?', antwort: ['powershell', 'powershell.exe'], tipp: '„-enc" = base64-kodierter Befehl, „-w hidden" = unsichtbar. Office, das so etwas startet, ist hochverdächtig.',
+      },
+      {
+        id: 'beacon', werkzeug: 'Threat Hunting – Beaconing', frage_art: 'antwort',
+        aufgabe: 'Command-and-Control finden: Infizierte Rechner „funken nach Hause" – in sehr regelmäßigen Abständen zur selben Adresse (Beaconing). Finde das Ziel im Proxy-Log.',
+        befehl: '12:00:03  10.0.0.23 -> update.microsoft.com     (312 KB)\n12:00:31  10.0.0.23 -> evil-c2.example   (2 KB)\n12:01:31  10.0.0.23 -> evil-c2.example   (2 KB)\n12:02:31  10.0.0.23 -> evil-c2.example   (2 KB)\n12:03:31  10.0.0.23 -> evil-c2.example   (2 KB)\n# immer ~60 s Abstand, immer ~2 KB – viel zu regelmäßig für echten Verkehr',
+        erwartet: 'Eine Domain wird exakt alle 60 Sekunden mit winziger, gleicher Datenmenge kontaktiert – typisches C2-Beaconing.',
+        frage: 'Welche Domain ruft das Gerät auffällig regelmäßig an (Beaconing)?', antwort: ['evil-c2.example', 'evil-c2'], tipp: 'Nicht die legitime Microsoft-Adresse – die mit dem starren 60-Sekunden-Takt.',
+      },
+      {
+        id: 'dfir', werkzeug: 'DFIR – Zeitachse', frage_art: 'abhaken',
+        aufgabe: 'Vorfall rekonstruieren (DFIR): Ordne die Funde zu einer Zeitachse – (1) Brute-Force-Erfolg 02:13 → (2) kodierte PowerShell → (3) C2-Beaconing. So entsteht die Geschichte des Angriffs für den Bericht.',
+        befehl: '# Eine Zeitachse ist nur eine sortierte Liste „Zeit – was passierte – Quelle":\n02:13  Login per Brute Force (SSH, 203.0.113.66)   auth.log\n12:00  winword startet versteckte PowerShell       sysmon.json\n12:00+ regelmäßiges Beaconing zu evil-c2.example    proxy.log',
+        erwartet: 'Du hast eine klare Reihenfolge: Einbruch → Ausführung → Fernsteuerung – und weißt, wo du den Angriff stoppst.',
+        frage: 'Zeitachse gebaut und den ersten Zugriff (02:13) erkannt?', tipp: 'Gegenmaßnahmen: Konto sperren/Passwort neu, Rechner isolieren, evil-c2.example blocken, Office-Makros einschränken.',
+      },
+    ],
+    abschluss: 'Das ist der Kern der SOC-Arbeit: Brute Force im Log erkennen (grep/awk), die richtigen Windows-Event-IDs kennen (4625), böse Ausführung finden (kodierte PowerShell), Command-and-Control jagen (Beaconing) und alles zu einer DFIR-Zeitachse ordnen. Verteidigung nutzt genau die Spuren, die Angreifer hinterlassen – schreib dir aus jedem Fund eine Erkennungsregel.',
+  },
 ];
 
 // Der Strang ist aktuell vollständig ausgebaut. Neue Ideen kommen hier rein.

@@ -31,8 +31,10 @@ Lebendes Dokument. Entwickeln auf `ccr-63912bdd-xpv8bk`, live erst nach Marcels 
 ## Baulog (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
-| 06.11.2026 | Wochen-Mission (Edge `mission` + Tabelle wochen_mission live, App-View + Startkarte, +50 XP) | Vorschau (Branch) |
-| 06.11.2026 | Teilbares öffentliches Profil (Edge `profil` + Tabelle public_profiles live, App-Teilen-UI + p.html) | Vorschau (Branch) |
+| 06.11.2026 | SOC/Blue-Team-Detection-Modul (Brute-Force in Logs, Event-ID 4625, kodierte PowerShell, C2-Beaconing, DFIR-Zeitachse) | **Live** |
+| 06.11.2026 | Active Directory abgerundet: AS-REP-Roasting (-m 18200) + GPO-Abuse im GOAD-Modul | **Live** |
+| 06.11.2026 | Wochen-Mission (Edge `mission` + Tabelle wochen_mission, App-View + Startkarte, +50 XP) | **Live** |
+| 06.11.2026 | Teilbares öffentliches Profil (Edge `profil` + Tabelle public_profiles, App-Teilen-UI + p.html) | **Live** |
 | 06.11.2026 | Advent streng: alle 24 Türchen = Konto-eigene Flag-Rätsel (anti-cheat, nicht teilbar), Thema je im Titel/Einleitung | **Live** |
 | 06.11.2026 | Startseite (start.html): DE/EN-Umschalter, Wahl gemerkt + an App weitergereicht | **Live** |
 | 06.11.2026 | Advent-Kalender neu gestaltet: 24 Themen-Türchen (Marcels Titel), Nachtfalter-Look (Mond/Lime) | **Live** |
