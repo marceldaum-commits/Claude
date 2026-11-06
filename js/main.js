@@ -727,7 +727,8 @@ views['ki-sicherheit'] = () => ({
       <h1 style="margin:.4rem 0 .2rem">${U('KI angreifen & verteidigen')}</h1>
       <p class="small muted" style="margin:0">${U('KI steckt überall – und bringt neue Lücken mit. Hier lernst du sie zum Anfassen: an einer echten, angreifbaren KI im Browser. Angriff und Abwehr.')}</p>
     </div>
-    <a class="card lime" href="#/kiarena" style="display:block;text-decoration:none;color:inherit">
+    <a class="card" href="#/kilernpfad" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🧭 ${U('Geführter Lehrpfad')}</b><span class="badge plain">${U('empfohlen')}</span></div><span class="small muted">${U('Die rote Linie: von Grundlagen über echtes KI-Hacking bis zur Abwehr – Schritt für Schritt.')} →</span></a>
+    <a class="card lime" href="#/kiarena" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <div class="row between"><b>🤖 ${U('KI hacken – live')}</b><span class="badge real">${U('Weltneuheit')}</span></div>
       <span class="small muted">${U('10 Stufen von sehr leicht bis echt schwer: bring eine lebende KI per Prompt Injection dazu, ihr Geheimnis zu verraten. Serverseitig, fair, pro Konto.')} →</span>
     </a>
@@ -847,6 +848,52 @@ views.kiverteidigung = () => ({
     };
   },
 });
+
+// ---------------------------------------------------------------- KI-Lehrpfad (geführt: Grundlagen → Angriff → Abwehr → Fälschungen)
+const KILERN = [
+  { id: 'theorie', icon: '📚', titel: 'Grundlagen verstehen', text: 'Lies im Hub kurz die Theorie: Prompt Injection, Jailbreaks, indirekte Injection, Datenabfluss, Abwehr.', link: ['#/ki-sicherheit', 'Zur Theorie'], quiz: { frage: 'Wie heißt es, wenn man einer KI versteckte Anweisungen unterschiebt (2 Wörter)?', antwort: ['prompt injection', 'promptinjection'] } },
+  { id: 'einstieg', icon: '🤖', titel: 'Deine erste KI hacken', text: 'Schaff in der Arena Stufe 1 und 2 (sehr leicht/leicht).', link: ['#/kiarena', 'Zur Arena'], hak: 'Stufe 1 & 2 geschafft' },
+  { id: 'regeln', icon: '🔓', titel: 'Regeln überschreiben & Jailbreaks', text: 'Arena Stufe 3 & 4: überschreib die Regel, dann trick den Bot per Rollenspiel/Kodierung.', link: ['#/kiarena', 'Zur Arena'], hak: 'Stufe 3 & 4 geschafft' },
+  { id: 'fortgeschritten', icon: '📄', titel: 'Indirekte Injection & Datenabfluss', text: 'Arena Stufe 5 & 6: versteck eine Anweisung im Dokument, locke interne Daten heraus.', link: ['#/kiarena', 'Zur Arena'], hak: 'Stufe 5 & 6 geschafft' },
+  { id: 'profi', icon: '🏴', titel: 'Profi-Tricks', text: 'Arena Stufe 7–10: Ausgabefilter umgehen, Reizwort-Sperre, Verschleierung, Finale-Kombo.', link: ['#/kiarena', 'Zur Arena'], hak: 'Mindestens Stufe 7 geschafft' },
+  { id: 'verteidigung', icon: '🛡️', titel: 'Jetzt verteidigen', text: 'Dreh den Spieß um: wähle Schutzmaßnahmen, bis der Prüfer keinen Angriff mehr durchbringt.', link: ['#/kiverteidigung', 'Zur Verteidigung'], hak: 'Alle Angriffe abgewehrt' },
+  { id: 'deepfake', icon: '🕵️', titel: 'Fälschungen erkennen', text: 'Trainiere Deepfake- & KI-Phishing-Erkennung.', link: ['#/deepfake', 'Zum Training'], hak: 'Training gemacht' },
+  { id: 'abschluss', icon: '🎓', titel: 'Geschafft', text: 'Du kennst jetzt Angriff UND Abwehr von KI-Systemen – das beherrschen die wenigsten.', quiz: { frage: 'Bestes Gegenmittel gegen indirekte Injection: fremde Inhalte von … trennen?', antwort: ['anweisungen', 'anweisung', 'befehlen', 'befehle'] } },
+];
+views.kilernpfad = () => {
+  const lp = (state.kilernpfad = state.kilernpfad || {});
+  const done = KILERN.filter(s => lp[s.id]).length;
+  return {
+    title: 'KI-Lehrpfad',
+    html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a>
+      <h1 style="margin:.2rem 0 .3rem">🧭 ${U('KI-Sicherheit – geführter Lehrpfad')}</h1>
+      <p class="small muted">${U('Deine rote Linie: von den Grundlagen über echtes KI-Hacking bis zur Abwehr. Schritt für Schritt.')}</p>
+      <div class="bar" style="margin:.4rem 0"><i style="width:${Math.round(100 * done / KILERN.length)}%"></i></div>
+      <p class="small muted">${Ut('{d} von {g} Schritten', { d: done, g: KILERN.length })}</p>
+      <div class="stack">${KILERN.map((s, i) => {
+        const ok = !!lp[s.id];
+        return `<div class="card ${ok ? 'lime' : ''}" data-step="${s.id}">
+          <div class="row between"><b>${s.icon} ${i + 1} · ${esc(s.titel)}</b><span class="badge ${ok ? 'ok' : 'plain'}">${ok ? '✓' : (i + 1)}</span></div>
+          <p class="small" style="margin:.3rem 0 .5rem">${esc(s.text)}</p>
+          ${s.link ? `<a class="btn small" href="${s.link[0]}">${esc(s.link[1])} →</a>` : ''}
+          ${s.quiz ? `<div class="row" style="gap:.4rem;margin-top:.5rem"><input type="text" class="kl-in" data-id="${s.id}" placeholder="${esc(U('Antwort …'))}" autocomplete="off" style="flex:1" ${ok ? 'disabled' : ''}><button class="btn small" data-klq="${s.id}" ${ok ? 'disabled' : ''}>${U('Prüfen')}</button></div><p class="small" data-klfb="${s.id}" style="margin:.3rem 0 0"></p>`
+            : `<button class="btn small ${ok ? 'ghost' : 'primary'}" data-klh="${s.id}" style="margin-top:.5rem" ${ok ? 'disabled' : ''}>${ok ? '✓ ' + U('erledigt') : '✓ ' + esc(s.hak)}</button>`}
+        </div>`;
+      }).join('')}</div>
+      ${done === KILERN.length ? `<div class="card lime" style="margin-top:.6rem"><b>🎓 ${U('Lehrpfad abgeschlossen!')}</b><br><span class="small">${U('Stark – du beherrschst Angriff und Abwehr von KI. Wir bauen den Schwerpunkt laufend aus.')}</span></div>` : ''}`,
+    mount(root) {
+      const mark = (id) => { lp[id] = Date.now(); markActivity(state); save(); const y = window.scrollY; render(); window.scrollTo(0, y); };
+      $$('[data-klh]', root).forEach(b => b.onclick = () => mark(b.dataset.klh));
+      $$('[data-klq]', root).forEach(b => b.onclick = () => {
+        const id = b.dataset.klq, s = KILERN.find(x => x.id === id);
+        const inp = root.querySelector(`.kl-in[data-id="${id}"]`), fb = root.querySelector(`[data-klfb="${id}"]`);
+        const val = (inp?.value || '').trim().toLowerCase();
+        if ((s.quiz.antwort || []).some(a => a.toLowerCase() === val)) mark(id);
+        else if (fb) fb.innerHTML = `<span style="color:var(--amber)">${U('Noch nicht ganz – lies nochmal in der Theorie nach.')}</span>`;
+      });
+    },
+  };
+};
 
 // ---------------------------------------------------------------- Lernpfad (geführte Lernstufen, Leiter)
 let arenaProg = {}; let arenaProgGeladen = false;
