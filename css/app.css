@@ -247,6 +247,8 @@ a.karte:hover { border-color: var(--violet); }
 .karte.aus { opacity: .6; }
 .fuss { text-align: center; padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom)); font-size: .86rem; color: var(--muted); }
 .fuss a { color: var(--muted); }
+.fuss-mehr { margin-top: .4rem; font-size: .8rem; opacity: .8; }
+.fuss-mehr a { text-decoration: none; border-bottom: 1px solid rgba(167,139,250,.4); }
 
 /* Kopfzeile auf schmalen Handys: nur Symbole, Marke nicht umbrechen */
 .brand span { white-space: nowrap; }
