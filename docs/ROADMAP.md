@@ -25,7 +25,7 @@ nicht kitschig:** die Bots antworten wie echte, eingesetzte Assistenten (seriös
 so überträgt sich das Gelernte auf echte Systeme. **Ethik:** nur unsere Übungs-Bots, Spiel-Codes – Mechanik + Abwehr
 lehren, kein Jailbreak-Kochbuch (hält uns auch bei den App-Stores sauber). **Lernkreis:** entlocken → verstehen → verteidigen.
 
-- **[gebaut, Vorschau – wartet auf „ok live"] Freies Spiel (Endlos-Modus):** echter Claude als Spielleiter, adaptive
+- **[gebaut · „ok live" erteilt (Marcel 07.11) · Rollout Di 11.11 im Paket] Freies Spiel (Endlos-Modus):** echter Claude als Spielleiter, adaptive
   Leiter von sehr einfach (Runde 1 rückt sofort raus) bis extrem. Pro Runde frische Flag, „Beste"-Rekord pro Konto.
   Edge `ki-llm` v11 Aktion `frei` (Band-Schwierigkeit + Anti-Refusal-Nachfass), App-View `kifrei` + Hub-Karte +
   Lehrpfad-Schritt. End-to-end getestet (Backend + UI, Playwright). Liegt auf `ccr-63912bdd-xpv8bk` / vorschau.nachtfalter.tech.
@@ -43,8 +43,8 @@ lehren, kein Jailbreak-Kochbuch (hält uns auch bei den App-Stores sauber). **Le
   Unbekannte). Fallback, falls wackelig: zweiter KI-Aufruf als Schiedsrichter (urteilt nur, muss selbst nichts „verraten").
   Aufwand: mittel + Validierungsschritt.
 - **Phase D – Politur/später:** Bestenliste über alle Modi, Meilenstein-Zertifikat „KI-Red-Teamer", Schwierigkeits-Feinschliff.
-- **Reihenfolge-Empfehlung:** Freies Spiel live (nach Marcels Blick) → Phase A + B als nächster Sprint (Hauptnutzen) →
-  Phase C nach dem Prüf-Test → Phase D später. **Entscheidung offen:** wie weit in einem Rutsch (nur A/B, oder gleich A–C)?
+- **Entschieden (Marcel 07.11.2026):** voller Umfang **A–D**, **alles am Dienstag 11.11.** in einem Rutsch
+  (inkl. Freies-Spiel-Rollout nach `live`). Reihenfolge am Di: Freies Spiel live → Phase A → B → Prüf-Test → C → D.
 
 ## ✅ Kürzlich fertig
 - **KI-Sicherheit Phase 2 – echter LLM (live):** Boss-Bots (Nova leicht → Wächter mittel → Nyx schwer) mit
