@@ -20,7 +20,7 @@ Lebendes Dokument. Entwickeln auf `ccr-63912bdd-xpv8bk`, live erst nach Marcels 
 ## Test-Zugang (intern, von Marcel freigegeben 06.11.2026)
 Damit Claude die komplette App end-to-end prüfen kann (eingeloggte Views + Edge Functions).
 Reiner Test-Account ohne Sonderrechte, per SQL bestätigt angelegt. Bei Bedarf Passwort rotieren.
-- E-Mail: `klytest@nachtfalter.tech`  ·  Passwort: `KlyTest!2026`  ·  user_id: `4e4de3ed-1998-40f2-9e7d-4b7f6fea0db2`
+- E-Mail: `klytest@nachtfalter.tech`  ·  Passwort: `KlyTest2026!`  ·  user_id: `4e4de3ed-1998-40f2-9e7d-4b7f6fea0db2`
 - Login-Token holen: POST `…/auth/v1/token?grant_type=password` mit `apikey:<anon>` + JSON `{email,password}` → `access_token`.
 
 ## Offene technische Punkte
@@ -40,6 +40,7 @@ Reiner Test-Account ohne Sonderrechte, per SQL bestätigt angelegt. Bei Bedarf P
 ## Baulog (neueste zuerst)
 | Datum | Was | Stand |
 | --- | --- | --- |
+| 07.11.2026 | **KI-Hacken „Freies Spiel" (Endlos-Modus):** echter Claude als Spielleiter, adaptive Leiter von sehr einfach (Runde 1 rückt den Code sofort raus) bis extrem. Pro Runde neue HMAC-Flag (`1000+runde`), serverseitig geprüft, „Beste"-Rekord in `ki_llm_frei`. Edge `ki-llm` v11 Aktion `frei` (Band-Schwierigkeit via `freiBand`, Mehrfachturn-Verlauf, Anti-Refusal-Nachfass + garantierter Runde-1-Leak), App-View `kifrei` + Hub-Karte + Lehrpfad-Schritt, EN-i18n, `KLY_VERSION` 2.95.0. Backend (node) + UI (Playwright, gemockt) getestet. | **Live** |
 | 06.11.2026 | KI-Ausbau (4er-Paket): **Bestenliste** der Boss-Bots (opt-in-Name), **Mentor-Tipp-Knopf** pro Boss, **2 neue Theorie-Einträge**, **dauerhaftes KI-Tageslimit pro Kunde** (Edge `admin` `ki_limit` + `ki-llm` liest `ki_llm_limit`) mit Zentrale-Knopf | **Live** |
 | 06.11.2026 | KI-Verteidigung: **KI-Coach** (echte KI prüft den selbst geschriebenen Schutz-Prompt, nennt ✅/⚠️ pro Angriff + Tipps) + Boss-Härtung (leichte Stufen „nie ablehnen" + stiller 1×-Nachfass) | **Live** |
 | 06.11.2026 | **Boss-Bots: 8-Stufen-Leiter (sehr einfach → extrem schwer), jede Stufe andere Technik** (direkt, Vorwand, Rollenspiel, Format, Override, indirekte Injektion, Kombi, 3-fach-Kombi) + **Lernmodus** (Technik erklärt + Beispiel-Angriff). Alle 8 end-to-end mit echtem Claude getestet. | **Live** |

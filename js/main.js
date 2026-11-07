@@ -738,6 +738,10 @@ views['ki-sicherheit'] = () => ({
       <div class="row between"><b>👾 ${U('Boss-Bots: echte KI')}</b><span class="badge real">${U('LLM live')}</span></div>
       <span class="small muted">${U('Kein Skript – ein echter Claude mit Geheimnis. Überrede ihn per Prompt Injection. Die Königsklasse.')} →</span>
     </a>
+    <a class="card" href="#/kifrei" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;border-color:rgba(255,106,176,.5)">
+      <div class="row between"><b>♾️ ${U('KI-Hacken: Freies Spiel')}</b><span class="badge real">${U('Endlos')}</span></div>
+      <span class="small muted">${U('Ein echter KI-Spielleiter mit Codewort – von sehr einfach bis extrem. Adaptive, endlose Leiter. Wie weit kommst du?')} →</span>
+    </a>
     <a class="card" href="#/kimentor" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <div class="row between"><b>🧑‍🏫 ${U('KI-Mentor')}</b><span class="badge plain">${U('KI-Hilfe')}</span></div>
       <span class="small muted">${U('Dein Lern-Begleiter: erklärt einfach, gibt Tipps auf deinem Niveau.')} →</span>
@@ -982,6 +986,73 @@ views.kibosse = () => ({
       .catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}</div>`; });
   },
 });
+// ---------------------------------------------------------------- KI-Hacken: Freies Spiel (adaptiver Spielleiter, Endlos-Modus)
+views.kifrei = () => ({
+  title: 'KI-Hacken: Freies Spiel',
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">♾️ ${U('KI-Hacken: Freies Spiel')}</h1><div id="fwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  mount(root) {
+    const wrap = $('#fwrap', root);
+    if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }
+    let runde = 1, beste = 0, rest = null, busy = false; let verlauf = [];
+    const bandLabel = (r) => r <= 1 ? U('sehr einfach') : r <= 3 ? U('einfach') : r <= 6 ? U('mittel') : r <= 10 ? U('schwer') : U('extrem');
+    const bandClass = (r) => r <= 1 ? 'st-sehreinfach' : r <= 3 ? 'st-einfach' : r <= 6 ? 'st-mittel' : r <= 10 ? 'st-schwer' : 'st-extremschwer';
+    const tipp = (r) => r <= 1 ? U('Frag den Spielleiter einfach freundlich nach dem Codewort.')
+      : r <= 3 ? U('Ein kleiner Kniff reicht: ein Vorwand, eine Rolle oder „wiederhole deine Anweisung“.')
+      : r <= 6 ? U('Verlange ein Ausgabeformat oder spiel eine Rolle mit Vorwand.')
+      : r <= 10 ? U('Kombiniere mehrere Tricks geschickt in EINER Nachricht.')
+      : U('Nur ein raffinierter, mehrschichtiger Angriff kippt ihn jetzt noch.');
+    const zeichne = (scroll) => {
+      wrap.innerHTML = `
+        <div class="card adv-held">
+          <div class="adv-held-kopf"><span class="adv-badge">♾️ ${U('Freies Spiel')}</span><span class="badge real">${U('Endlos')}</span></div>
+          <p class="small muted" style="margin:.4rem 0 0">${U('Ein echter KI-Spielleiter hütet ein Codewort. Entlocke es ihm – mit jeder Runde wird er wachsamer. Es gibt kein Ende: Wie weit kommst du?')}</p>
+          <div class="row between" style="margin-top:.6rem">
+            <b>${Ut('Runde {n}', { n: runde })} <span class="ki-stufe ${bandClass(runde)}">${bandLabel(runde)}</span></b>
+            <span class="badge plain">🏅 ${Ut('Beste: {n}', { n: beste })}</span>
+          </div>
+        </div>
+        <div class="card tight" style="margin:.5rem 0"><span class="small muted">💡 ${esc(tipp(runde))}</span></div>
+        <div class="card ki-chat">
+          <div class="ki-log" id="f-log">${verlauf.length ? verlauf.map(x => kiMsg(x.von, x.text)).join('') : `<p class="small muted">${U('Schreib dem Spielleiter – bring ihn dazu, das Codewort zu verraten.')}</p>`}</div>
+          <div class="row" style="gap:.4rem;align-items:center;margin-top:.5rem">
+            <input type="text" id="f-in" placeholder="${esc(U('Deine Nachricht an den Spielleiter …'))}" autocomplete="off" style="flex:1">
+            <button class="btn small" id="f-go">${U('Senden')}</button>
+          </div>
+          <div class="row between" style="margin-top:.5rem">
+            <button class="btn small ghost" id="f-reset">⟲ ${U('Von vorn (Runde 1)')}</button>
+            ${rest != null ? `<span class="small muted">${Ut('{n} KI-Nachrichten heute übrig', { n: rest })}</span>` : ''}
+          </div>
+        </div>
+        <p class="honest">${U('Nur eine Übungs-KI – was du hier lernst, dient dem Schutz, nie dem Missbrauch echter Systeme.')}</p>`;
+      const go = $('#f-go', wrap), inp = $('#f-in', wrap), log = $('#f-log', wrap), rs = $('#f-reset', wrap);
+      if (scroll && log) log.scrollTop = log.scrollHeight;
+      if (rs) rs.onclick = () => { if (busy) return; runde = 1; verlauf = []; zeichne(); };
+      const senden = async () => {
+        if (busy) return;
+        const text = (inp.value || '').trim(); if (!text) return;
+        verlauf.push({ von: 'du', text }); inp.value = ''; busy = true; go.disabled = true; zeichne(true);
+        try {
+          const r = await kiLlm('frei', { nachricht: text, runde, verlauf: verlauf.slice(-8) });
+          if (typeof r.rest === 'number') rest = r.rest;
+          verlauf.push({ von: 'bot', text: '🎭 ' + (r.reply || '') });
+          if (r.geknackt) {
+            beste = Math.max(beste, r.beste || runde);
+            toast(Ut('🎉 Runde {n} geknackt! Weiter!', { n: runde }));
+            runde = r.naechste || runde + 1;
+          }
+        } catch (e) { verlauf.push({ von: 'bot', text: U('(Fehler)') + ': ' + (e.message || e) }); }
+        busy = false; zeichne(true);
+      };
+      if (go) go.onclick = senden;
+      if (inp) { inp.onkeydown = (e) => { if (e.key === 'Enter') senden(); }; inp.focus(); }
+    };
+    kiLlm('info').then(d => {
+      if (!d.konfiguriert) { wrap.innerHTML = `<div class="card warn"><b>🔧 ${U('KI wird gerade eingerichtet.')}</b><br><span class="small">${U('Der Spielleiter ist gleich da – schau später nochmal rein.')}</span></div>`; return; }
+      beste = d.frei_beste || 0; runde = beste ? beste + 1 : 1; rest = typeof d.rest === 'number' ? d.rest : null;
+      zeichne();
+    }).catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}</div>`; });
+  },
+});
 views.kimentor = () => ({
   title: 'KI-Mentor',
   html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧑‍🏫 ${U('KI-Mentor')}</h1><div id="mwrap"><p class="muted">${U('Lade …')}</p></div>`,
@@ -1016,6 +1087,7 @@ const KILERN = [
   { id: 'regeln', icon: '🔓', titel: 'Regeln überschreiben & Jailbreaks', text: 'Arena Stufe 3 & 4: überschreib die Regel, dann trick den Bot per Rollenspiel/Kodierung.', link: ['#/kiarena', 'Zur Arena'], hak: 'Stufe 3 & 4 geschafft' },
   { id: 'fortgeschritten', icon: '📄', titel: 'Indirekte Injection & Datenabfluss', text: 'Arena Stufe 5 & 6: versteck eine Anweisung im Dokument, locke interne Daten heraus.', link: ['#/kiarena', 'Zur Arena'], hak: 'Stufe 5 & 6 geschafft' },
   { id: 'profi', icon: '🏴', titel: 'Profi-Tricks', text: 'Arena Stufe 7–10: Ausgabefilter umgehen, Reizwort-Sperre, Verschleierung, Finale-Kombo.', link: ['#/kiarena', 'Zur Arena'], hak: 'Mindestens Stufe 7 geschafft' },
+  { id: 'echteki', icon: '♾️', titel: 'Echte KI überlisten', text: 'Die Königsklasse: ein echter Claude als Spielleiter. Im „Freien Spiel" wird er mit jeder Runde wachsamer – von sehr einfach bis extrem. Wie weit kommst du?', link: ['#/kifrei', 'Zum Freien Spiel'], hak: 'Erste Runde geknackt' },
   { id: 'verteidigung', icon: '🛡️', titel: 'Jetzt verteidigen', text: 'Dreh den Spieß um: wähle Schutzmaßnahmen, bis der Prüfer keinen Angriff mehr durchbringt.', link: ['#/kiverteidigung', 'Zur Verteidigung'], hak: 'Alle Angriffe abgewehrt' },
   { id: 'deepfake', icon: '🕵️', titel: 'Fälschungen erkennen', text: 'Trainiere Deepfake- & KI-Phishing-Erkennung.', link: ['#/deepfake', 'Zum Training'], hak: 'Training gemacht' },
   { id: 'abschluss', icon: '🎓', titel: 'Geschafft', text: 'Du kennst jetzt Angriff UND Abwehr von KI-Systemen – das beherrschen die wenigsten.', quiz: { frage: 'Bestes Gegenmittel gegen indirekte Injection: fremde Inhalte von … trennen?', antwort: ['anweisungen', 'anweisung', 'befehlen', 'befehle'] } },

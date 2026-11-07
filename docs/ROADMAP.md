@@ -19,6 +19,10 @@ verbessern, korrigieren, erweitern – besser werden. Vollausbau mit Theorie + L
 - **Theorie + Lehrpfad + Übungen** rund um alles oben; **SEO** der Startseite/App darauf ausrichten.
 
 ## ✅ Kürzlich fertig
+- **KI-Hacken „Freies Spiel" (Endlos-Modus, live):** ein echter Claude als Spielleiter, der eine endlose Leiter
+  führt – Runde 1 sehr einfach (rückt den Code sofort raus) bis extrem (nur mehrschichtige Angriffe). Pro Runde
+  neue Flag, serverseitig geprüft, „Beste"-Rekord pro Konto. Edge `ki-llm` Aktion `frei` (Band-Schwierigkeit +
+  Anti-Refusal-Nachfass), App-View `kifrei` + Hub-Karte + Lehrpfad-Schritt. End-to-end getestet (Backend + UI).
 - **KI-Sicherheit Phase 2 – echter LLM (live):** Boss-Bots (Nova leicht → Wächter mittel → Nyx schwer) mit
   echtem Claude (Haiku 5.5) + per-Konto-Flag; KI-Mentor. Tageslimit/Konto, Edge `ki-llm`. End-to-end getestet.
 - **KI-Sicherheit Phase 1 (live):** deterministische 10-Stufen-Arena, Theorie, Lehrpfad, Deepfake, Verteidigung
