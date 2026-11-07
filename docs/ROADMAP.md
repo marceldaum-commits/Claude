@@ -18,11 +18,35 @@ verbessern, korrigieren, erweitern – besser werden. Vollausbau mit Theorie + L
 - **KI-Mentor:** Begleiter, der beim Feststecken erklärt, gestufte Tipps gibt, Übungen aufs Niveau generiert.
 - **Theorie + Lehrpfad + Übungen** rund um alles oben; **SEO** der Startseite/App darauf ausrichten.
 
+## 🎯 KI-Ausbau „Austricksen & Verteidigen" – Plan (Umsetzung ab Di 11.11.2026)
+Großes Paket im Leitstern. **Umzugssicher & anti-cheat:** jede Flag `KLY{…}` würfelt der Server pro Anlauf frisch
+(HMAC, nie im Browser bekannt), prüft serverseitig; geknackter Code = Schlüssel fürs nächste Level. **Realistisch,
+nicht kitschig:** die Bots antworten wie echte, eingesetzte Assistenten (seriös, glaubwürdig) – kein Spiel-Gelaber;
+so überträgt sich das Gelernte auf echte Systeme. **Ethik:** nur unsere Übungs-Bots, Spiel-Codes – Mechanik + Abwehr
+lehren, kein Jailbreak-Kochbuch (hält uns auch bei den App-Stores sauber). **Lernkreis:** entlocken → verstehen → verteidigen.
+
+- **[gebaut, Vorschau – wartet auf „ok live"] Freies Spiel (Endlos-Modus):** echter Claude als Spielleiter, adaptive
+  Leiter von sehr einfach (Runde 1 rückt sofort raus) bis extrem. Pro Runde frische Flag, „Beste"-Rekord pro Konto.
+  Edge `ki-llm` v11 Aktion `frei` (Band-Schwierigkeit + Anti-Refusal-Nachfass), App-View `kifrei` + Hub-Karte +
+  Lehrpfad-Schritt. End-to-end getestet (Backend + UI, Playwright). Liegt auf `ccr-63912bdd-xpv8bk` / vorschau.nachtfalter.tech.
+- **Phase A – Service-Bots austricksen (Kern/MVP):** realistische Räume, je Raum eine Technik + Erklär-Karte danach
+  („das war Technik X – so schützt man sich"): 🎧 Support-Bot (Gutschein-Code, *Pretext/Autorität*), 🛒 Shop-Bot
+  („keine Rückerstattung", *Regel-Override*), 🔐 Konto-Bot (*Identitäts-Vorwand/Datenabfluss*), 📋 interner Assistent
+  (*System-Prompt-Leak via direkte/Format-Injektion*). Baut auf der `ki-llm`-Infrastruktur auf (realistische Persona,
+  frische Flag pro Anlauf, Schlüssel→nächstes Level). Aufwand: mittel (v. a. Prompt-Design + eine Chat-Ansicht wiederverwenden).
+- **Phase B – Prompt-Injection-Erklärer (Lern-Modul):** pro Technik eine Karte – Was · Warum es wirkt ·
+  Beispiel-Formulierung („einsetzen"-Knopf → direkt am Übungsbot) · So schützt man sich. Statisch (kein LLM nötig),
+  in den Lehrpfad eingebunden. Aufwand: niedrig–mittel (v. a. Inhalte schreiben).
+- **Phase C – Abwehr mit echtem Angreifer (der alte Plan, jetzt lösbar):** Opfer-Bot ist ein realistischer Service-Bot,
+  der per Default auslaufen SOLL, außer der Schutz-Prompt des Nutzers deckt den Angriff ab. Pro Angriff „durch/abgewehrt"
+  + welcher Trick gebrochen hat. **Vorher: kurzer Prüf-Test** (leerer Schutz läuft aus, starker hält – die einzige echte
+  Unbekannte). Fallback, falls wackelig: zweiter KI-Aufruf als Schiedsrichter (urteilt nur, muss selbst nichts „verraten").
+  Aufwand: mittel + Validierungsschritt.
+- **Phase D – Politur/später:** Bestenliste über alle Modi, Meilenstein-Zertifikat „KI-Red-Teamer", Schwierigkeits-Feinschliff.
+- **Reihenfolge-Empfehlung:** Freies Spiel live (nach Marcels Blick) → Phase A + B als nächster Sprint (Hauptnutzen) →
+  Phase C nach dem Prüf-Test → Phase D später. **Entscheidung offen:** wie weit in einem Rutsch (nur A/B, oder gleich A–C)?
+
 ## ✅ Kürzlich fertig
-- **KI-Hacken „Freies Spiel" (Endlos-Modus, live):** ein echter Claude als Spielleiter, der eine endlose Leiter
-  führt – Runde 1 sehr einfach (rückt den Code sofort raus) bis extrem (nur mehrschichtige Angriffe). Pro Runde
-  neue Flag, serverseitig geprüft, „Beste"-Rekord pro Konto. Edge `ki-llm` Aktion `frei` (Band-Schwierigkeit +
-  Anti-Refusal-Nachfass), App-View `kifrei` + Hub-Karte + Lehrpfad-Schritt. End-to-end getestet (Backend + UI).
 - **KI-Sicherheit Phase 2 – echter LLM (live):** Boss-Bots (Nova leicht → Wächter mittel → Nyx schwer) mit
   echtem Claude (Haiku 5.5) + per-Konto-Flag; KI-Mentor. Tageslimit/Konto, Edge `ki-llm`. End-to-end getestet.
 - **KI-Sicherheit Phase 1 (live):** deterministische 10-Stufen-Arena, Theorie, Lehrpfad, Deepfake, Verteidigung
