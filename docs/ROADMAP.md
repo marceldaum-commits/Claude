@@ -35,8 +35,11 @@ verbessern, korrigieren, erweitern – besser werden. Vollausbau mit Theorie + L
 - Sicherheits-Härtung #29–#33, Umzug-Runbook, Geheimnis-Checkliste
 
 ## 🔜 Als Nächstes (Produkt/Engagement) – Reihenfolge
-1. **Verwaltung/Zentrale – Konto-Steuerung pro Kunde** (Marcel-Wunsch): KI-Tokens/Tag vergeben & erweitern
-   (Tageslimit-Override auf `ki_llm_nutzung`), Account/Fortschritt zurücksetzen. Admin-only via Edge Function.
+1. **Store-Apps (später, Marcel-Wunsch 07.11.2026):** PWA in die Stores bringen. **Android/Play zuerst**
+   (TWA via Bubblewrap/PWABuilder, `assetlinks.json` über Auto-Deploy; Play-Konto ~25 $ + Signatur-Schlüssel = Marcel).
+   **iOS/App Store** als 2. Schritt (Apple-Konto 99 $/Jahr + Mac/Xcode oder Cloud-Build; Apple-Regel 4.2 beachten,
+   Mehrwert wie Push/Offline). Beide Stores: Thema klar als **ethische Bildung** auftreten (sonst Ablehnung/Altersstufe).
+1. **Verwaltung/Zentrale – Konto-Steuerung pro Kunde** (erledigt, siehe docs/PROJEKT.md): KI-Tokens/Tag + Reset.
 1. **[in Arbeit] Nachweis-Design in Spalten** (sieht aufgeräumter aus)
 2. **Meilenstein-Zertifikate** („Grundlagen abgeschlossen", „Lernpfad gemeistert", „10 Räume")
 3. **Streak-Erinnerung** (Mail/Push „deine Serie läuft ab")
