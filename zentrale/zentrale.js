@@ -125,6 +125,30 @@ function kopf(an) {
   const zm = $('#meldZahl'); if (zm) { zm.textContent = D?.offeneMeldungen || ''; zm.hidden = !D?.offeneMeldungen; }
   $('#wer').textContent = an && ses?.user?.email ? ses.user.email : '';
 }
+// Augen-Symbol: zeigt/versteckt die Passwort-Eingabe (Inline-Styles, unabhängig vom App-CSS).
+function augenAn(root) {
+  root.querySelectorAll('input[type="password"]').forEach((inp) => {
+    if (inp.dataset.auge) return; inp.dataset.auge = '1';
+    inp.style.paddingRight = '2.6rem';
+    const wrap = document.createElement('span');
+    wrap.style.position = 'relative'; wrap.style.display = 'block';
+    inp.parentNode.insertBefore(wrap, inp); wrap.appendChild(inp);
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.textContent = '👁';
+    btn.setAttribute('aria-label', 'Passwort anzeigen'); btn.setAttribute('aria-pressed', 'false');
+    btn.style.cssText = 'position:absolute;right:.4rem;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;font-size:1.1rem;line-height:1;padding:.25rem;color:inherit';
+    btn.onclick = () => {
+      const z = inp.type === 'password';
+      inp.type = z ? 'text' : 'password';
+      btn.textContent = z ? '🙈' : '👁';
+      btn.setAttribute('aria-pressed', z ? 'true' : 'false');
+      btn.setAttribute('aria-label', z ? 'Passwort verbergen' : 'Passwort anzeigen');
+      inp.focus();
+    };
+    wrap.appendChild(btn);
+  });
+}
+
 function anmelden(hinweis = '') {
   kopf(false);
   main.innerHTML = `<section class="stack" style="max-width:420px;margin:2rem auto">
@@ -140,6 +164,7 @@ function anmelden(hinweis = '') {
     <p class="small muted" style="text-align:center"><a href="${APP}/konto.html">Passwort vergessen?</a></p>
   </section>`;
   const f = $('#lf');
+  augenAn(f);
   f.onsubmit = async (e) => {
     e.preventDefault(); f.querySelector('button').disabled = true;
     try { speichern(await token('password', { email: f.email.value.trim(), password: f.pw.value })); zweiterFaktor(); }
