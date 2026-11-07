@@ -91,7 +91,32 @@ function rahmen(inner, { held = false } = {}) {
     <p class="small muted"><a href="./">← Zurück zum Hacklab</a></p>
   </section>`;
   bindLangPicker(main);
+  augenAn(main);
   hinweis = ''; fehlerHinweis = '';
+}
+
+// Augen-Symbol: zeigt/versteckt die Passwort-Eingabe. Wirkt auf alle Passwortfelder.
+function augenAn(root) {
+  root.querySelectorAll('input[type="password"]').forEach((inp) => {
+    if (inp.dataset.auge) return; inp.dataset.auge = '1';
+    const wrap = document.createElement('span');
+    wrap.className = 'pw-wrap';
+    inp.parentNode.insertBefore(wrap, inp);
+    wrap.appendChild(inp);
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'pw-auge';
+    btn.setAttribute('aria-label', 'Passwort anzeigen'); btn.setAttribute('aria-pressed', 'false');
+    btn.textContent = '👁';
+    btn.onclick = () => {
+      const zeigen = inp.type === 'password';
+      inp.type = zeigen ? 'text' : 'password';
+      btn.textContent = zeigen ? '🙈' : '👁';
+      btn.setAttribute('aria-pressed', zeigen ? 'true' : 'false');
+      btn.setAttribute('aria-label', zeigen ? 'Passwort verbergen' : 'Passwort anzeigen');
+      inp.focus();
+    };
+    wrap.appendChild(btn);
+  });
 }
 
 function abgemeldet(tab = 'login') {
