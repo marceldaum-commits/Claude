@@ -116,9 +116,18 @@ Technische Bausteine (grobe Reihenfolge, Aufwand je ~Tage, nicht Wochen – Infr
    App-Views auf Server umgestellt, `uebung()`-Caller in `sync.js`. Backend 16/16 + UI (gemockt) getestet. KLY_VERSION 3.5.0.
 2. **✅ Globale Bestenliste (live):** „Übungs-Bestenliste" (`uebung` Aktion `bestenliste`) auf allen drei Lab-Seiten,
    Name nur bei opt-in-Profil, eigener Eintrag mit ★. *Als Nächstes: evtl. in ein gemeinsames „Bestenlisten"-Zentrum bündeln.*
-3. **🔜 OFFEN – Bezahlung & Abo-Gating** (nächster großer Brocken; **wartet auf das Preis-/Geschäftsmodell aus dem
-   Marketing-Raum**: was ist frei, was „Pro", welcher Preis?). Technisch: Zahlungsanbieter (z. B. Stripe) anbinden,
-   Plan/Abo pro Konto speichern (Tabelle + Webhook), Inhalte „frei vs. Pro" serverseitig freischalten, Konto-/Rechnungs-UI.
+3. **🔜 OFFEN – Bezahlung & Abo-Gating** (nächster großer Brocken). **Modell festgelegt (Marcel 08.11.2026):**
+   - **Ein Preis für alle** Zahlarten (kein Aufschlag); Banküberweisung bleibt die kostenlose Zahlart (rechtlich sauber:
+     Aufschlag wäre nur mit kostenloser Alternative zulässig – daher einfach ein Preis).
+   - **Preise:** Pro **€8,99/Mo** oder **€79/Jahr**, **Schüler €4,99/Mo**. Gratis-Stufe bleibt.
+   - **Kostendeckung über KI-Tageslimit (Fair-Use):** Gratis ~**10** KI-Nachrichten/Tag, Pro ~**60**/Tag (echte KI = Haiku-API,
+     ~0,3–0,5 Ct/Nachricht → Limit schützt die Marge; Gratis-Nutzer kosten auch API, daher klein gedeckelt).
+     *Wichtig: Gratis-Limit erst MIT dem Pro-Launch senken, nicht vorher (sonst Downgrade für heutige Nutzer).*
+   - **Technik:** Stripe als Zentrale (Karte + SEPA, Webhook → sofort auto-freischalten), optional PayPal (auch Webhook),
+     Banküberweisung = kostenlos aber verzögert/manuell. Plan-Status pro Konto in Supabase (Tabelle `abo` + Webhook-Edge-
+     Function), „frei vs. Pro" serverseitig gaten (`plan` steuert KI-Limit via `ki_llm_limit`/neuer Plan-Logik + Lab-Zugang),
+     Konto-/Rechnungs-UI. Jahresabo nach vorn stellen (1× Gebühr statt 12×). **Startet, sobald Marcel ein Stripe-Konto +
+     API-Schlüssel bereitstellt** (der eine Geheimnis-Schritt, den nur er machen kann).
 4. **🔜 OFFEN – Fairness/Anti-Cheat-Review** vor dem Scharfschalten des wertbaren Teils: keine client-seitigen Lücken,
    Rate-Limits auf `uebung`/Edge-Functions, Bestenlisten gegen Manipulation prüfen, Missbrauchs-Schutz.
 
