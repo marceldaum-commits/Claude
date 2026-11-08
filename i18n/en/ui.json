@@ -787,5 +787,16 @@
   "Suchen": "Search",
   "Suchbegriff": "Search term",
   "Produktsuche": "Product search",
-  "So baut der Server die Abfrage:": "How the server builds the query:"
+  "So baut der Server die Abfrage:": "How the server builds the query:",
+  "Forensik-Lab": "Forensics lab",
+  "Einen Vorfall untersuchen": "Investigate an incident",
+  "Ermittlungs-Fortschritt": "Investigation progress",
+  "Fall gelöst!": "Case solved!",
+  "Fall gelöst – sauber ermittelt!": "Case solved – clean work!",
+  "Beweismittel: Zugriffs-Log": "Evidence: access log",
+  "Deine Ermittlung": "Your investigation",
+  "Base64-Dekoder": "Base64 decoder",
+  "Dekodieren": "Decode",
+  "Kein gültiges Base64.": "Not valid Base64.",
+  "Noch nicht – schau genauer ins Log.": "Not yet – look closer at the log."
 }

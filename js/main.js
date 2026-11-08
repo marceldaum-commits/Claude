@@ -154,7 +154,7 @@ function renderTop() {
 function renderNav(route) {
   const L = NAV[currentLang()] || NAV.de;
   const items = [['heute', '⌂', L[0]], ['pfad', '◆', L[1]], ['terminal', '>_', L[2]], ['mehr', '≡', L[3]]];
-  const map = { extern: 'pfad', kalipraxis: 'pfad', weblab: 'pfad', melden: 'mehr', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
+  const map = { extern: 'pfad', kalipraxis: 'pfad', weblab: 'pfad', forensik: 'pfad', melden: 'mehr', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
   const on = map[route] || route;
   $('#nav').setAttribute('translate', 'no');
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
@@ -362,6 +362,10 @@ views.pfad = () => {
     <a class="card" href="#/weblab" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;border-color:rgba(167,139,250,.45)">
       <b>🕸️ Web-Hacking-Lab</b> <span class="badge real">im Browser</span><br>
       <span class="small muted">Verwundbare Web-App zum Anfassen – SQL-Injection &amp; XSS, komplett im Browser simuliert. Kein Kali nötig, ideal zum Starten.</span>
+    </a>
+    <a class="card" href="#/forensik" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;border-color:rgba(167,139,250,.45)">
+      <b>🔍 Forensik-Lab</b> <span class="badge real">im Browser</span><br>
+      <span class="small muted">Einen Vorfall untersuchen: Zugriffs-Log lesen, den Angreifer finden, die Exfiltration dekodieren. Blue-Team zum Anfassen.</span>
     </a>
     <h2 style="margin-top:1rem">🎮 Leitern</h2>
     <p class="small muted">Rätsel-Ketten mit Story: Jede Lösung öffnet die nächste Stufe. Fang oben an und arbeite dich hoch.</p>
@@ -1483,6 +1487,82 @@ views.weblab = () => ({
     }
     const zeichne = () => { renderFort(); ({ login: stationLogin, daten: stationDaten, xss: stationXss }[aktiv] || stationLogin)(); };
     zeichne();
+  },
+});
+// ---------------------------------------------------------------- Forensik-Lab (browser-nativ): einen Vorfall untersuchen
+const FORENSIK_KEY = 'kly.forensik';
+const FOR_LOG = [
+  '10.0.0.5    [10/Nov/2026:09:01:12] "POST /login" 200',
+  '203.0.113.66 [10/Nov/2026:09:03:01] "POST /login" 401',
+  '203.0.113.66 [10/Nov/2026:09:03:03] "POST /login" 401',
+  '203.0.113.66 [10/Nov/2026:09:03:05] "POST /login" 401',
+  '203.0.113.66 [10/Nov/2026:09:03:07] "POST /login" 401',
+  '10.0.0.5    [10/Nov/2026:09:04:00] "GET /start" 200',
+  '203.0.113.66 [10/Nov/2026:09:03:09] "POST /login" 401',
+  '203.0.113.66 [10/Nov/2026:09:03:11] "POST /login" 401',
+  '203.0.113.66 [10/Nov/2026:09:05:22] "POST /login" 200   <== erfolgreich',
+  '203.0.113.66 [10/Nov/2026:09:06:10] "GET /admin/export?file=kunden.csv" 200',
+  '203.0.113.66 [10/Nov/2026:09:06:11] "GET /admin/note?token=S0xZe2ZvcjVuc2ljX3dpbn0=" 200',
+  '10.0.0.7    [10/Nov/2026:09:10:00] "GET /" 200',
+];
+views.forensik = () => ({
+  title: 'Forensik-Lab',
+  html: `<a class="back" href="#/pfad">← ${U('Lernen')}</a>
+    <div class="card adv-held"><div class="adv-held-kopf"><span class="adv-badge">🔍 ${U('Forensik-Lab')}</span><span class="badge real">${U('im Browser')}</span></div>
+      <h1 style="margin:.4rem 0 .2rem">${U('Einen Vorfall untersuchen')}</h1>
+      <p class="small muted" style="margin:0">${U('Ein Server wurde angegriffen. Lies das Zugriffs-Log wie ein Ermittler: Wer war es, was wurde gestohlen, und was steckt im mitgeschnittenen Token? Alles im Browser – kein Kali nötig.')}</p>
+      <div id="fo-fort" style="margin-top:.6rem"></div>
+    </div>
+    <div class="card"><h3 style="margin-top:0">📜 ${U('Beweismittel: Zugriffs-Log')}</h3>
+      <pre class="pfad-code" translate="no" style="max-height:240px;overflow:auto;white-space:pre">${esc(FOR_LOG.join('\n'))}</pre>
+      <p class="small muted" style="margin:.3rem 0 0">${U('Tipp: Achte auf die Status-Codes. 401 = Anmeldung fehlgeschlagen, 200 = erfolgreich.')}</p>
+    </div>
+    <div class="card"><h3 style="margin-top:0">🔎 ${U('Deine Ermittlung')}</h3>
+      <div class="stack">
+        <div><label>${U('1. Welche IP ist der Angreifer? (viele Fehlversuche, dann Erfolg)')}</label>
+          <div class="row" style="gap:.4rem"><input id="fo-q1" autocomplete="off" placeholder="z. B. 10.0.0.5" translate="no" style="flex:1"><button class="btn small" data-q="1">${U('Prüfen')}</button></div>
+          <p class="small" id="fo-fb1" style="margin:.3rem 0 0"></p></div>
+        <div><label>${U('2. Welche Datei hat der Angreifer gestohlen (exfiltriert)?')}</label>
+          <div class="row" style="gap:.4rem"><input id="fo-q2" autocomplete="off" placeholder="z. B. datei.txt" translate="no" style="flex:1"><button class="btn small" data-q="2">${U('Prüfen')}</button></div>
+          <p class="small" id="fo-fb2" style="margin:.3rem 0 0"></p></div>
+        <div><label>${U('3. Im Log steht ein token=… in Base64. Dekodiere es – was ist die versteckte Flag?')}</label>
+          <div class="card tight" style="margin:.2rem 0"><span class="small muted">🧰 ${U('Base64-Dekoder')}</span>
+            <div class="row" style="gap:.4rem;margin-top:.3rem"><input id="fo-b64" autocomplete="off" translate="no" value="S0xZe2ZvcjVuc2ljX3dpbn0=" style="flex:1"><button class="btn small ghost" id="fo-dec">${U('Dekodieren')}</button></div>
+            <div class="syntax" id="fo-b64out" translate="no" style="margin:.4rem 0 0;display:none"></div></div>
+          <div class="row" style="gap:.4rem"><input id="fo-q3" autocomplete="off" placeholder="KLY{…}" translate="no" style="flex:1"><button class="btn small" data-q="3">${U('Prüfen')}</button></div>
+          <p class="small" id="fo-fb3" style="margin:.3rem 0 0"></p></div>
+      </div>
+      <div id="fo-win" style="margin-top:.6rem"></div>
+    </div>
+    <p class="honest">${U('So arbeitet Blue-Team-Forensik: Spuren lesen, Zeitachse bauen, belegen. Nur an Übungsdaten – echte Logs gehören Betroffenen.')}</p>`,
+  mount(root) {
+    const fortBox = $('#fo-fort', root);
+    const done = new Set();
+    const AKZEPT = { 1: /^203\.0\.113\.66$/, 2: /^kunden\.csv$/i, 3: /KLY\{for5nsic_win\}/i };
+    const renderFort = () => {
+      fortBox.innerHTML = `<div class="row between" style="align-items:center"><b>${done.size >= 3 ? '🏆 ' + U('Fall gelöst!') : '🔍 ' + U('Ermittlungs-Fortschritt')}</b><span class="badge ${done.size >= 3 ? 'real' : 'plain'}">${done.size}/3</span></div><div class="bar" style="margin:.35rem 0 0"><i style="width:${Math.round(100 * done.size / 3)}%"></i></div>`;
+    };
+    renderFort();
+    const pruef = (n) => {
+      const inp = $('#fo-q' + n, root), fb = $('#fo-fb' + n, root);
+      const val = (inp.value || '').trim();
+      if (AKZEPT[n].test(val)) {
+        done.add(n); renderFort();
+        fb.innerHTML = `<span style="color:var(--lime)">✓ ${U('Richtig!')}</span>`;
+        inp.disabled = true;
+        if (done.size === 3) {
+          try { localStorage.setItem(FORENSIK_KEY, '1'); } catch { /* */ }
+          feier(true);
+          $('#fo-win', root).innerHTML = `<div class="card lime"><b>🎉 ${U('Fall gelöst – sauber ermittelt!')}</b><br><span class="small">${U('Angreifer 203.0.113.66 hat per Brute-Force (viele 401) das Login geknackt, kunden.csv exfiltriert und einen Base64-Token hinterlassen.')}</span><br><span class="small" style="color:var(--lime)">🛡️ ${U('So schützt man sich')}: ${U('Login-Rate-Limit & Konto-Sperre nach wenigen Fehlversuchen, Alarm bei vielen 401, Zugriff auf Export-Funktionen streng begrenzen und protokollieren.')}</span></div>`;
+        }
+      } else {
+        fb.innerHTML = `<span style="color:var(--red)">✗ ${U('Noch nicht – schau genauer ins Log.')}</span>`;
+      }
+    };
+    $$('[data-q]', root).forEach(b => b.onclick = () => pruef(+b.dataset.q));
+    $$('input[id^="fo-q"]', root).forEach(i => i.onkeydown = (e) => { if (e.key === 'Enter') pruef(+i.id.replace('fo-q', '')); });
+    const dec = $('#fo-dec', root), out = $('#fo-b64out', root);
+    if (dec) dec.onclick = () => { try { const s = atob(($('#fo-b64', root).value || '').trim()); out.style.display = ''; out.textContent = s || '(leer)'; } catch { out.style.display = ''; out.textContent = U('Kein gültiges Base64.'); } };
   },
 });
 // ---------------------------------------------------------------- Prompt-Injection-Erklärer (Lern-Modul, statisch)
