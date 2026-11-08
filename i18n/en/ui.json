@@ -798,5 +798,15 @@
   "Base64-Dekoder": "Base64 decoder",
   "Dekodieren": "Decode",
   "Kein gültiges Base64.": "Not valid Base64.",
-  "Noch nicht – schau genauer ins Log.": "Not yet – look closer at the log."
+  "Noch nicht – schau genauer ins Log.": "Not yet – look closer at the log.",
+  "Challenge des Monats": "Challenge of the month",
+  "Krypto": "Crypto",
+  "Das Rätsel des Monats": "The puzzle of the month",
+  "Verschlüsselte Nachricht": "Encoded message",
+  "Dekoder-Werkzeugkasten": "Decoder toolbox",
+  "Zeichenfolge hier einfügen …": "Paste the string here …",
+  "Ergebnis übernehmen": "Use result",
+  "Deine Lösung": "Your solution",
+  "Geknackt!": "Cracked!",
+  "Du hast das Monats-Rätsel gelöst.": "You solved the monthly puzzle."
 }
