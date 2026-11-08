@@ -106,6 +106,18 @@ Forensik/pcap, KI-Sicherheit, Blue-Team-Wellen, Pivoting). Es fehlen v. a.:
 - **Kubernetes-/Container-Orchestrierung-Sicherheit** (über Container-Escape hinaus)
 - **KI-Phishing / Deepfake-Erkennung** (defensiv, sehr aktuell)
 
+## 💰 Meilenstein: Wettbewerbsfähig & monetarisierbar (Marcel 08.11.2026, Ziel ~1–2 Monate)
+Entscheidung getroffen: In 1–2 Monaten soll die Plattform wettbewerbsfähig sein und **Geld verdienen**.
+**Rollen-Trennung:** Preis-/Geschäftsmodell & Positionierung = **Marketing-Raum**; hier die **technischen Bausteine**.
+Technische Bausteine (grobe Reihenfolge, Aufwand je ~Tage, nicht Wochen – Infrastruktur steht großteils):
+1. **Server-seitiges Scoring der Browser-Labs** (Voraussetzung für faire Wertung): Prüfung von Web-/Forensik-/Monats-Lab
+   in eine Edge-Function verschieben (per-Konto-Flag, HMAC, serverseitig – wie KI-Bots & CTF). Web-Lab = mittel (Erkennung
+   serverseitig), Forensik/Monat = leicht (Antwort vergleichen). *Modell-unabhängig → kann sofort starten.*
+2. **Globale Bestenlisten / Ranglisten** über alle wertbaren Modi (fair, nur serverseitig geprüfte Punkte zählen).
+3. **Bezahlung & Abo-Gating** (sobald das Modell aus dem Marketing-Raum steht): Zahlungsanbieter (z. B. Stripe) anbinden,
+   Plan/Abo pro Konto speichern, Inhalte „frei vs. Pro" serverseitig freischalten. *Hängt am Modell → danach.*
+4. **Fairness/Anti-Cheat-Review** des wertbaren Teils (keine client-seitigen Lücken, Rate-Limits).
+
 ## 📌 Später / Backlog (mit Marcel terminiert, 08.11.2026)
 - **Zweisprachigkeit (DE/EN) einheitlich nachziehen:** Die neuen Module (KI-Labs, Deepfake-Szenarien, Web-/Forensik-/Monats-Lab, Wall) sind bisher **deutsch-primär**; lange Texte fallen für EN auf Deutsch zurück. Später **einheitlich** komplett übersetzen (eigener Durchlauf: alle neuen `U()`-Strings + die als JS-Literale hinterlegten Inhalte nach `i18n/en/` ziehen). Marcel: „machen wir später einheitlich".
 - **Serverprüfung der Browser-Labs (optional, nur falls wertbar):** Web-Hacking-/Forensik-/Monats-Lab prüfen die Flags aktuell **client-seitig** (super zum Lernen, aber schummelbar → bewusst **keine** Bestenliste/Punkte). Wenn sie mal zählen sollen: Prüfung in eine Edge-Function verschieben (per-Konto-Flag, HMAC, serverseitig – wie bei den KI-Bots & CTF des Tages).
