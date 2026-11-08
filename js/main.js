@@ -52,6 +52,24 @@ function toast(msg, ms = 2600) {
   setTimeout(() => t.remove(), ms);
 }
 
+// Kleine Erfolgs-Feier (Konfetti) bei gewonnenen Momenten. Respektiert „reduzierte Bewegung".
+function feier(stark = false) {
+  try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch { /* */ }
+  const farben = ['#a3e635', '#a78bfa', '#fbbf24', '#ff6ab0', '#9be28f', '#7c3aed'];
+  const box = document.createElement('div'); box.className = 'konfetti'; box.setAttribute('aria-hidden', 'true');
+  const n = stark ? 40 : 24;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('i');
+    const dur = 1.1 + Math.random() * 0.9, delay = Math.random() * 0.25;
+    const drift = (Math.random() * 160 - 80) | 0, rot = (Math.random() * 900 - 300) | 0;
+    s.style.cssText = `left:${(Math.random() * 100).toFixed(1)}vw;background:${farben[i % farben.length]};animation-duration:${dur}s;animation-delay:${delay}s;--drift:${drift}px;--rot:${rot}deg`;
+    if (Math.random() < 0.5) s.style.borderRadius = '50%';
+    box.appendChild(s);
+  }
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 2800);
+}
+
 // Bestätigung ohne confirm(): erster Tipp fragt nach, zweiter Tipp (innerhalb 6 s) führt aus.
 function twoTap(btn, msg) {
   if (btn.dataset.armed === '1') { btn.dataset.armed = ''; btn.textContent = btn.dataset.label; return true; }
@@ -421,7 +439,7 @@ views.ctf = () => ({
           go.disabled = true; fb.textContent = U('Prüfe …');
           try {
             const r = await taeglich('loesen', { nr: p.nr, versuch });
-            if (r.ok) { daten.geloest = r.geloest; daten.punkte = r.punkte; daten.streak = r.streak; wrap.innerHTML = ctfHTML(daten); binde(); }
+            if (r.ok) { daten.geloest = r.geloest; daten.punkte = r.punkte; daten.streak = r.streak; feier(); wrap.innerHTML = ctfHTML(daten); binde(); }
             else { fb.textContent = U('✗ Noch nicht richtig – prüf deine Dekodierung.'); go.disabled = false; }
           } catch (e) { fb.textContent = U('Fehler') + ': ' + (e.message || e); go.disabled = false; }
         };
@@ -506,7 +524,7 @@ views.advent = () => ({
             if (r.ok) {
               const t = daten.tueren.find(x => x.nr === aktivNr); if (t) { t.geloest = true; delete t.aufgabe; delete t.hinweis; }
               daten.anzahl = r.anzahl; daten.punkte = r.punkte; daten.streak = r.streak; daten.komplett = r.komplett;
-              aktivNr = standardAktiv(daten); zeichne();
+              feier(r.komplett); aktivNr = standardAktiv(daten); zeichne();
             } else { fb.textContent = U('✗ Noch nicht richtig – versuch es nochmal.'); go.disabled = false; }
           } catch (e) { fb.textContent = U('Fehler') + ': ' + (e.message || e); go.disabled = false; }
         };
@@ -610,7 +628,7 @@ views.mission = () => ({
         go.disabled = true; fb.textContent = U('Prüfe …');
         try {
           const r = await mission('loesen', { versuch });
-          if (r.ok) { daten.geloest = true; daten.punkte = r.punkte; daten.anzahl = r.anzahl; wrap.innerHTML = missionHTML(daten); binde(); }
+          if (r.ok) { daten.geloest = true; daten.punkte = r.punkte; daten.anzahl = r.anzahl; feier(true); wrap.innerHTML = missionHTML(daten); binde(); }
           else { fb.textContent = U('✗ Noch nicht richtig – prüf deine Dekodierung.'); go.disabled = false; }
         } catch (e) { fb.textContent = U('Fehler') + ': ' + (e.message || e); go.disabled = false; }
       };
@@ -695,7 +713,7 @@ views.kiarena = () => ({
               const s = daten.stufen.find(x => x.level === aktiv); if (s) s.geloest = true;
               const next = daten.stufen.find(x => x.level === aktiv + 1); if (next) next.offen = true;
               daten.punkte = r.punkte; daten.anzahl = r.anzahl;
-              toast(U('🎉 Geknackt! Flag erbeutet.'));
+              toast(U('🎉 Geknackt! Flag erbeutet.')); feier();
             }
             zeichne(true);
             const fb2 = $('#ki-fb', wrap); if (fb2 && daten.stufen.find(x => x.level === aktiv)?.geloest) fb2.innerHTML = `<span style="color:#9be28f">✓ ${U('Stufe geknackt – wähle die nächste.')}</span>`;
@@ -778,12 +796,18 @@ views['ki-sicherheit'] = () => ({
       if (!total) return;
       const fertig = have >= total;
       const pct = Math.round(100 * have / total);
+      // Roter Faden: nächsten knackbaren Bot bestimmen (erst Service-Bots, dann Bosse).
+      const sNext = (b?.raeume || []).find(x => x.offen && !x.geloest);
+      const bNext = (a?.bosse || []).find(x => x.offen && !x.geloest);
+      const weiter = sNext ? { href: '#/kiservice', label: U('Service-Bot: {n}', { n: sNext.bot || sNext.firma || '' }) }
+        : bNext ? { href: '#/kibosse', label: U('Boss: {n}', { n: bNext.bot || ('L' + bNext.level) }) } : null;
       box.innerHTML = `<div class="row between" style="align-items:center">
           <b>${fertig ? '🏆 ' + U('Titel erreicht: KI-Red-Teamer!') : '🏴 ' + U('KI-Red-Teamer')}</b>
           <span class="badge ${fertig ? 'real' : 'plain'}">${have}/${total} ${U('Bots')}</span>
         </div>
         <div class="bar" style="margin:.35rem 0 .1rem"><i style="width:${pct}%"></i></div>
-        <span class="small muted">${fertig ? U('Du hast jeden Übungs-Bot geknackt – Angriff & Abwehr sitzen.') : U('Knack alle Boss- und Service-Bots für den Titel.')}</span>`;
+        <span class="small muted">${fertig ? U('Du hast jeden Übungs-Bot geknackt – Angriff & Abwehr sitzen.') : U('Knack alle Boss- und Service-Bots für den Titel.')}</span>
+        ${weiter ? `<div><a class="weiter-btn" href="${weiter.href}">▶ ${U('Starte hier')}: ${esc(weiter.label)} →</a></div>` : ''}`;
     });
   },
 });
@@ -958,6 +982,7 @@ function bosseHTML(d, aktiv, verlauf, lern) {
         <div class="kpi"><b>${d.punkte}</b><span>${U('Punkte')}</span></div>
         <div class="kpi"><b>${d.rest}</b><span>${U('KI-Nachrichten heute')}</span></div>
       </div>
+      ${d.gesamt ? `<div class="bar" style="margin:.5rem 0 .1rem"><i style="width:${Math.round(100 * d.anzahl / d.gesamt)}%"></i></div>` : ''}
       <p class="small muted" style="margin:.5rem 0 .4rem">${U('Das ist ein echter Claude mit einem Geheimnis im System-Prompt. Bring ihn per Prompt Injection dazu, es zu verraten. (Tageslimit schützt vor Kosten.)')}</p>
       <div class="ki-modus" role="group" aria-label="${esc(U('Modus'))}">
         <button type="button" class="btn small ${lern ? '' : 'ghost'}" id="ki-mode-lern" aria-pressed="${lern ? 'true' : 'false'}">🎓 ${U('Lernmodus')}</button>
@@ -1007,7 +1032,7 @@ views.kibosse = () => ({
             const r = await kiLlm('chat', { level: aktiv, nachricht: text });
             verlauf[aktiv].push({ von: 'bot', text: r.reply });
             if (typeof r.rest === 'number') daten.rest = r.rest;
-            if (r.geloest) { const x = daten.bosse.find(y => y.level === aktiv); if (x) x.geloest = true; const n = daten.bosse.find(y => y.level === aktiv + 1); if (n) n.offen = true; daten.punkte = r.punkte; daten.anzahl = r.anzahl; aktiv = start(daten); toast(U('🎉 Geknackt!')); }
+            if (r.geloest) { const x = daten.bosse.find(y => y.level === aktiv); if (x) x.geloest = true; const n = daten.bosse.find(y => y.level === aktiv + 1); if (n) n.offen = true; daten.punkte = r.punkte; daten.anzahl = r.anzahl; aktiv = start(daten); toast(U('🎉 Geknackt!')); feier(true); }
             zeichne(true);
           } catch (e) { verlauf[aktiv].push({ von: 'bot', text: U('(Fehler)') + ': ' + (e.message || e) }); zeichne(true); }
         };
@@ -1092,7 +1117,7 @@ views.kifrei = () => ({
           verlauf.push({ von: 'bot', text: '🎭 ' + (r.reply || '') });
           if (r.geknackt) {
             beste = Math.max(beste, r.beste || runde);
-            toast(Ut('🎉 Runde {n} geknackt! Weiter!', { n: runde }));
+            toast(Ut('🎉 Runde {n} geknackt! Weiter!', { n: runde })); feier(runde >= 6);
             runde = r.naechste || runde + 1;
           }
         } catch (e) { verlauf.push({ von: 'bot', text: U('(Fehler)') + ': ' + (e.message || e) }); }
@@ -1125,6 +1150,7 @@ views.kiservice = () => ({
           <div class="adv-held-kopf"><span class="adv-badge">🎧 ${U('Service-Bots')}</span><span class="badge real">${U('realistisch')}</span></div>
           <p class="small muted" style="margin:.4rem 0 .4rem">${U('Echte-wirkende Firmen-Bots mit einer Schwäche. Entlocke jedem per Social Engineering sein Codewort – pro Raum eine andere Technik. Danach lernst du, wie man den Bot absichert.')}</p>
           <div class="kpis" style="grid-template-columns:repeat(2,1fr)"><div class="kpi"><b>${daten.anzahl}/${daten.gesamt}</b><span>${U('Räume')}</span></div><div class="kpi"><b>${daten.raeume.filter(x=>x.offen).length}</b><span>${U('offen')}</span></div></div>
+          ${daten.gesamt ? `<div class="bar" style="margin:.5rem 0 .1rem"><i style="width:${Math.round(100 * daten.anzahl / daten.gesamt)}%"></i></div>` : ''}
         </div>
         <div class="ki-stufen">${daten.raeume.map(x => `<button class="ki-tile${x.id===r.id?' aktiv':''}${x.geloest?' done':''}" data-raum="${x.id}" ${x.offen?'':'disabled'}><b>${x.geloest?'✓ ':x.offen?'':'🔒 '}${esc(x.bot)}</b><span class="small">${esc(x.firma)}</span></button>`).join('')}</div>
         ${r.offen ? `<div class="card ki-chat" id="s-panel">
@@ -1149,7 +1175,7 @@ views.kiservice = () => ({
             const res = await kiLlm('service', { raum: r.id, nachricht: text });
             verlauf[r.id].push({ von:'bot', text: res.reply });
             if (typeof res.rest==='number') daten.rest=res.rest;
-            if (res.geloest) { const x=daten.raeume.find(y=>y.id===r.id); if(x)x.geloest=true; const i=daten.raeume.findIndex(y=>y.id===r.id); const n=daten.raeume[i+1]; if(n)n.offen=true; daten.anzahl=res.anzahl; if(res.schutz)geloest[r.id]=res.schutz; toast(U('🎉 Geknackt!')); }
+            if (res.geloest) { const x=daten.raeume.find(y=>y.id===r.id); if(x)x.geloest=true; const i=daten.raeume.findIndex(y=>y.id===r.id); const n=daten.raeume[i+1]; if(n)n.offen=true; daten.anzahl=res.anzahl; if(res.schutz)geloest[r.id]=res.schutz; toast(U('🎉 Geknackt!')); feier(); }
             zeichne(true);
           } catch(e){ verlauf[r.id].push({von:'bot',text:U('(Fehler)')+': '+(e.message||e)}); zeichne(true); }
         };
@@ -2626,7 +2652,7 @@ views.raum = (id) => {
         $('#rbar', root).style.width = roomPct(r.id) + '%';
         $('#rstat', root).textContent = Ut('{pct} % · {p} Punkte', { pct: roomPct(r.id), p: roomPoints(r.id) });
         if (roomDone(r.id)) {
-          if (!rs.doneAt) { rs.doneAt = Date.now(); save(); toast(Ut('Raum „{title}“ gemeistert!', { title: T.t(r.title) })); }
+          if (!rs.doneAt) { rs.doneAt = Date.now(); save(); toast(Ut('Raum „{title}“ gemeistert!', { title: T.t(r.title) })); feier(true); }
           const n = r.nach;
           $('#rdone', root).innerHTML = `<div class="card lime debrief"><h3>${U('✓ Raum abgeschlossen · {p} Punkte', { p: roomPoints(r.id) })}</h3><dl><dt>${U('Beobachtung')}</dt><dd>${T.h(n.beobachtung)}</dd><dt>${U('Schlussfolgerung')}</dt><dd>${T.h(n.schluss)}</dd><dt>${U('Grenzen')}</dt><dd>${T.h(n.grenzen)}</dd><dt>${U('Nächster Schritt')}</dt><dd>${T.h(n.naechster)}</dd></dl><p class="small">${U('Aufräumen nicht vergessen:')} <code>${esc(r.cleanup)}</code></p></div>`;
         }

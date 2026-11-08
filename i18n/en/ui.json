@@ -732,5 +732,8 @@
   "KI-Red-Teamer": "AI red-teamer",
   "Bots": "bots",
   "Du hast jeden Übungs-Bot geknackt – Angriff & Abwehr sitzen.": "You cracked every practice bot – attack & defense both nailed.",
-  "Knack alle Boss- und Service-Bots für den Titel.": "Crack every boss and service bot for the title."
+  "Knack alle Boss- und Service-Bots für den Titel.": "Crack every boss and service bot for the title.",
+  "Starte hier": "Start here",
+  "Service-Bot: {n}": "Service bot: {n}",
+  "Boss: {n}": "Boss: {n}"
 }

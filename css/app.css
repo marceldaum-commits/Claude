@@ -389,3 +389,13 @@ ol.bl li.ich { border-color: var(--lime); color: var(--lime); }
 .pw-auge:hover { opacity: .8; }
 .btn.danger { color: var(--red); border-color: var(--red); background: var(--red-bg); }
 .df-opt.primary { color: var(--lime); border-color: var(--lime); background: var(--lime-bg); }
+
+/* ---------- Erfolgs-Feier (Konfetti) ---------- */
+.konfetti { position: fixed; inset: 0; pointer-events: none; z-index: 70; overflow: hidden; }
+.konfetti i { position: absolute; top: -14px; width: 9px; height: 14px; opacity: 0; will-change: transform, opacity; animation-name: kfall; animation-timing-function: cubic-bezier(.25, .6, .4, 1); animation-fill-mode: forwards; }
+@keyframes kfall { 0% { transform: translate(0, -14px) rotate(0); opacity: 0; } 8% { opacity: 1; } 100% { transform: translate(var(--drift, 0), 106vh) rotate(var(--rot, 360deg)); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .konfetti { display: none; } }
+
+/* Nächster-Schritt-Knopf (roter Faden) */
+.weiter-btn { display: inline-flex; align-items: center; gap: .4rem; margin-top: .55rem; padding: .5rem .9rem; border-radius: 10px; background: var(--lime); border: 1px solid var(--lime); color: #111; font-weight: 700; text-decoration: none; min-height: 40px; }
+.weiter-btn:hover { background: #b6ef5a; }
