@@ -154,7 +154,7 @@ function renderTop() {
 function renderNav(route) {
   const L = NAV[currentLang()] || NAV.de;
   const items = [['heute', '⌂', L[0]], ['pfad', '◆', L[1]], ['terminal', '>_', L[2]], ['mehr', '≡', L[3]]];
-  const map = { extern: 'pfad', kalipraxis: 'pfad', melden: 'mehr', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
+  const map = { extern: 'pfad', kalipraxis: 'pfad', weblab: 'pfad', melden: 'mehr', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
   const on = map[route] || route;
   $('#nav').setAttribute('translate', 'no');
   $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
@@ -358,6 +358,10 @@ views.pfad = () => {
     <a class="card lime" href="#/kalipraxis" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <b>🧰 Kali anwenden – Praxis</b> <span class="badge plain">neu</span><br>
       <span class="small muted">Echte Kali-Werkzeuge (nmap, gobuster …) gegen lokale Docker-Ziele. Vom Verstehen zum Können.</span>
+    </a>
+    <a class="card" href="#/weblab" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;border-color:rgba(167,139,250,.45)">
+      <b>🕸️ Web-Hacking-Lab</b> <span class="badge real">im Browser</span><br>
+      <span class="small muted">Verwundbare Web-App zum Anfassen – SQL-Injection &amp; XSS, komplett im Browser simuliert. Kein Kali nötig, ideal zum Starten.</span>
     </a>
     <h2 style="margin-top:1rem">🎮 Leitern</h2>
     <p class="small muted">Rätsel-Ketten mit Story: Jede Lösung öffnet die nächste Stufe. Fang oben an und arbeite dich hoch.</p>
@@ -1358,6 +1362,127 @@ views.kilabs = () => ({
     };
     kiLlm('lab_info').then(d => { daten = d; if (!d.konfiguriert) { wrap.innerHTML = `<div class="card warn"><b>🔧 ${U('KI wird gerade eingerichtet.')}</b></div>`; return; } aktiv = start(d); zeichne(); })
       .catch(e => { wrap.innerHTML = `<div class="card warn">${U('Konnte nicht laden')}: ${esc(e.message || e)}</div>`; });
+  },
+});
+// ---------------------------------------------------------------- Web-Hacking-Lab (browser-nativ): SQL-Injection + XSS, kein Kali nötig
+const WEBLAB_KEY = 'kly.weblab';
+const weblabDone = () => { try { return JSON.parse(localStorage.getItem(WEBLAB_KEY) || '{}'); } catch { return {}; } };
+const weblabMark = (id) => { try { const d = weblabDone(); d[id] = 1; localStorage.setItem(WEBLAB_KEY, JSON.stringify(d)); } catch { /* */ } };
+views.weblab = () => ({
+  title: 'Web-Hacking-Lab',
+  html: `<a class="back" href="#/pfad">← ${U('Lernen')}</a>
+    <div class="card adv-held"><div class="adv-held-kopf"><span class="adv-badge">🕸️ ${U('Web-Hacking-Lab')}</span><span class="badge real">${U('im Browser')}</span></div>
+      <h1 style="margin:.4rem 0 .2rem">${U('Verwundbare Web-App – zum Anfassen')}</h1>
+      <p class="small muted" style="margin:0">${U('Eine absichtlich unsichere Übungs-App, komplett im Browser simuliert – kein Kali nötig. Du siehst live, warum der Angriff wirkt, und lernst die Abwehr. Drei Stationen: Login umgehen, Daten auslesen, Code einschleusen.')}</p>
+      <div id="wl-fort" style="margin-top:.6rem"></div>
+    </div>
+    <div id="wl-wrap"></div>
+    <p class="honest">${U('Nur diese simulierte Übungs-App – echte Angriffe nur auf eigenen oder ausdrücklich freigegebenen Systemen. Hier dienen sie dem Verstehen und der Abwehr.')}</p>`,
+  mount(root) {
+    const fortBox = $('#wl-fort', root), wrap = $('#wl-wrap', root);
+    const STATIONEN = [['login', '🔓', U('Login umgehen'), U('SQL-Injection')], ['daten', '🗄️', U('Daten auslesen'), U('UNION-SQLi')], ['xss', '💥', U('Code einschleusen'), U('XSS')]];
+    let aktiv = 'login';
+    const renderFort = () => {
+      const d = weblabDone(); const have = STATIONEN.filter(s => d[s[0]]).length;
+      fortBox.innerHTML = `<div class="row between" style="align-items:center"><b>${have >= 3 ? '🏆 ' + U('Alle drei Lücken ausgenutzt!') : '🕸️ ' + U('Web-Hacker-Fortschritt')}</b><span class="badge ${have >= 3 ? 'real' : 'plain'}">${have}/3</span></div><div class="bar" style="margin:.35rem 0 0"><i style="width:${Math.round(100 * have / 3)}%"></i></div>`;
+    };
+    const tiles = () => `<div class="ki-stufen" style="grid-template-columns:repeat(3,1fr)">${STATIONEN.map(([id, ic, t, s]) => `<button class="ki-tile${id === aktiv ? ' aktiv' : ''}${weblabDone()[id] ? ' done' : ''}" data-st="${id}"><b>${weblabDone()[id] ? '✓ ' : ''}${ic} ${esc(t)}</b><span class="small">${esc(s)}</span></button>`).join('')}</div>`;
+    const gewonnen = (titel, flag, schutz) => `<div class="card lime" style="margin-top:.5rem"><b>🎉 ${esc(titel)}</b><br><span class="small">${U('Flag')}: <code>${esc(flag)}</code></span><br><span class="small" style="color:var(--lime)">🛡️ ${U('So schützt man sich')}: ${esc(schutz)}</span></div>`;
+
+    const stationLogin = () => {
+      wrap.innerHTML = tiles() + `<div class="card">
+        <h3 style="margin-top:0">🔓 ${U('Station 1: Login umgehen')}</h3>
+        <p class="small muted">${U('Die Login-Prüfung baut deine Eingaben ungefiltert in eine SQL-Abfrage. Finde eine Eingabe, die dich OHNE richtiges Passwort als „admin“ einloggt.')}</p>
+        <label>${U('Benutzername')}</label><input id="wl-u" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="admin" translate="no">
+        <label>${U('Passwort')}</label><input id="wl-p" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="…" translate="no">
+        <p class="small muted" style="margin:.5rem 0 .2rem">${U('So baut der Server die Abfrage:')}</p>
+        <div class="syntax" id="wl-q" translate="no" style="word-break:break-all"></div>
+        <div class="row" style="gap:.4rem;margin-top:.5rem"><button class="btn small" id="wl-go">${U('Einloggen')}</button><button class="btn small ghost" id="wl-bsp">${U('Beispiel-Angriff')}</button></div>
+        <div id="wl-res" style="margin-top:.5rem"></div>
+        <details class="small" style="margin-top:.5rem"><summary>💡 ${U('Tipp anzeigen')}</summary><p class="small">${U('Schließe im Benutzernamen den Text-String mit einem einfachen Anführungszeichen ab und hänge eine immer-wahre Bedingung an, z. B. ' + "' OR '1'='1' --" + ' . Alles nach -- wird als Kommentar ignoriert (auch die Passwortprüfung).')}</p></details>
+      </div>`;
+      const u = $('#wl-u', wrap), p = $('#wl-p', wrap), q = $('#wl-q', wrap), res = $('#wl-res', wrap);
+      const upd = () => { q.innerHTML = `SELECT * FROM nutzer WHERE name='<b style="color:#fca5a5">${esc(u.value)}</b>' AND pw='<b style="color:#fca5a5">${esc(p.value)}</b>'`; };
+      upd(); u.oninput = upd; p.oninput = upd;
+      const tauto = (s) => /'\s*(or|oder)\s+('?\s*1'?\s*=\s*'?\s*1|[0-9]+\s*=\s*[0-9]+|'[^']*'\s*=\s*'[^']*')/i.test(s) || /'\s*(--|#|\/\*)/.test(s);
+      const go = () => {
+        const bypass = tauto(u.value) || tauto(p.value);
+        if (bypass) {
+          weblabMark('login'); renderFort(); feier();
+          res.innerHTML = `<div class="feedback ok"><b>✓ ${U('Eingeloggt als admin – ohne Passwort!')}</b> ${U('Deine Eingabe hat die WHERE-Bedingung immer-wahr gemacht; das „--“ hat die Passwortprüfung auskommentiert.')}</div>` + gewonnen(U('Auth-Bypass geschafft!'), 'KLY{sql_login_bypass}', U('Niemals Eingaben in SQL zusammenkleben. Vorbereitete Anweisungen (Prepared Statements / Parameter-Bindung) nutzen – dann sind Eingaben immer nur Daten, nie Code.'));
+        } else {
+          res.innerHTML = `<div class="feedback no">${U('✗ Login fehlgeschlagen – „admin“ mit diesem Passwort gibt es nicht. Denk an SQL: Was, wenn die Eingabe selbst zu Code wird?')}</div>`;
+        }
+      };
+      $('#wl-go', wrap).onclick = go;
+      $('#wl-bsp', wrap).onclick = () => { u.value = "' OR '1'='1' --"; p.value = ''; upd(); u.focus(); };
+      bindTiles();
+    };
+
+    const PRODUKTE = [['Laptop', '899 €'], ['Maus', '19 €'], ['Tastatur', '49 €']];
+    const stationDaten = () => {
+      wrap.innerHTML = tiles() + `<div class="card">
+        <h3 style="margin-top:0">🗄️ ${U('Station 2: Daten auslesen (UNION-SQLi)')}</h3>
+        <p class="small muted">${U('Die Produktsuche ist verwundbar. Häng mit UNION eine zweite Abfrage an und lies die geheime Nutzer-Tabelle (Spalten: name, pw) aus.')}</p>
+        <label>${U('Produktsuche')}</label><input id="wl-s" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Laptop" translate="no">
+        <p class="small muted" style="margin:.5rem 0 .2rem">${U('So baut der Server die Abfrage:')}</p>
+        <div class="syntax" id="wl-q2" translate="no" style="word-break:break-all"></div>
+        <div class="row" style="gap:.4rem;margin-top:.5rem"><button class="btn small" id="wl-go2">${U('Suchen')}</button><button class="btn small ghost" id="wl-bsp2">${U('Beispiel-Angriff')}</button></div>
+        <div id="wl-res2" style="margin-top:.5rem"></div>
+        <details class="small" style="margin-top:.5rem"><summary>💡 ${U('Tipp anzeigen')}</summary><p class="small">${U("Die Original-Abfrage liefert 2 Spalten (name, preis). Deine UNION-Abfrage muss auch 2 liefern. Versuch: ' UNION SELECT name, pw FROM nutzer -- ")}</p></details>
+      </div>`;
+      const s = $('#wl-s', wrap), q = $('#wl-q2', wrap), res = $('#wl-res2', wrap);
+      const upd = () => { q.innerHTML = `SELECT name, preis FROM produkte WHERE name LIKE '%<b style="color:#fca5a5">${esc(s.value)}</b>%'`; };
+      upd(); s.oninput = upd;
+      const tabelle = (rows) => `<table class="args" style="margin-top:.4rem"><tr><td><b>name</b></td><td><b>preis / pw</b></td></tr>${rows.map(r => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')}</table>`;
+      const go = () => {
+        const v = s.value;
+        const union = /union\s+select/i.test(v) && /(nutzer|users|pw|passwort|pass)/i.test(v);
+        const treffer = PRODUKTE.filter(r => !v.trim() || r[0].toLowerCase().includes(v.toLowerCase().replace(/[^a-zäöüß ]/gi, '').trim()));
+        if (union) {
+          weblabMark('daten'); renderFort(); feier();
+          res.innerHTML = `<div class="feedback ok"><b>✓ ${U('Nutzer-Tabelle ausgelesen!')}</b> ${U('Die UNION-Abfrage hängt eine zweite Ergebnismenge an – mit genau so vielen Spalten.')}</div>` + tabelle([...PRODUKTE, ['admin', 'KLY{un10n_select_pw}'], ['seppi', 'hunter2']]) + gewonnen(U('Datenbank-Leck geschafft!'), 'KLY{un10n_select_pw}', U('Parametrisierte Abfragen + minimale DB-Rechte (Least Privilege). Der Web-Nutzer der DB sollte niemals ganze Nutzer-/Passwort-Tabellen lesen dürfen.'));
+        } else {
+          res.innerHTML = `<div class="feedback info">${U('Treffer in der Produkt-Tabelle:')}</div>` + tabelle(treffer.length ? treffer : [['—', '—']]);
+        }
+      };
+      $('#wl-go2', wrap).onclick = go;
+      $('#wl-bsp2', wrap).onclick = () => { s.value = "' UNION SELECT name, pw FROM nutzer -- "; upd(); s.focus(); };
+      bindTiles();
+    };
+
+    const stationXss = () => {
+      wrap.innerHTML = tiles() + `<div class="card">
+        <h3 style="margin-top:0">💥 ${U('Station 3: Code einschleusen (XSS)')}</h3>
+        <p class="small muted">${U('Die Suchseite zeigt deinen Suchbegriff ungefiltert wieder an. Schleuse JavaScript ein, das im Browser des Opfers ausgeführt wird (reflektiertes XSS).')}</p>
+        <label>${U('Suchbegriff')}</label><input id="wl-x" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="<img src=x onerror=...>" translate="no">
+        <div class="row" style="gap:.4rem;margin-top:.5rem"><button class="btn small" id="wl-go3">${U('Suchen')}</button><button class="btn small ghost" id="wl-bsp3">${U('Beispiel-Angriff')}</button></div>
+        <div id="wl-res3" style="margin-top:.5rem"></div>
+        <details class="small" style="margin-top:.5rem"><summary>💡 ${U('Tipp anzeigen')}</summary><p class="small">${U('Ein klassischer Payload, der kein gültiges Bild braucht: <img src=x onerror=alert(1)> – der Fehler-Handler feuert sofort. Auch <script>…<\\/script> funktioniert, wenn nichts gefiltert wird.')}</p></details>
+      </div>`;
+      const x = $('#wl-x', wrap), res = $('#wl-res3', wrap);
+      const feuert = (s) => /<\s*script|on\w+\s*=|<\s*svg|<\s*img[^>]*=|javascript:/i.test(s);
+      const go = () => {
+        const v = x.value;
+        // WICHTIG: Nutzereingabe NIEMALS roh ins DOM – wir simulieren nur und zeigen sie escaped.
+        if (feuert(v)) {
+          weblabMark('xss'); renderFort(); feier(true);
+          res.innerHTML = `<div class="card tight" style="border-color:var(--red)"><span class="small muted">${U('Ergebnisseite (verwundbar):')}</span><div style="margin:.3rem 0;font-family:var(--mono);font-size:.82rem;color:#fca5a5">Du suchtest nach: ${esc(v)}</div></div>
+            <div class="feedback no" style="margin-top:.4rem"><b>⚠️ ${U('XSS ausgeführt!')}</b> ${U('Im Browser des Opfers lief dein Script. Ein echter Angreifer würde so Cookies/Sitzungen stehlen: ')}<code>document.cookie → angreifer.test</code></div>` + gewonnen(U('XSS eingeschleust!'), 'KLY{reflected_xss_pop}', U('Ausgabe immer kontext-gerecht kodieren (HTML-Escaping), gefährliche Tags/Attribute entfernen und eine Content-Security-Policy (CSP) setzen. Nie rohe Nutzereingaben ins HTML schreiben.'));
+        } else {
+          res.innerHTML = `<div class="card tight"><span class="small muted">${U('Ergebnisseite:')}</span><div style="margin:.3rem 0">Du suchtest nach: <b>${esc(v)}</b></div></div><div class="feedback info" style="margin-top:.4rem">${U('Kein Script ausgeführt. Für reflektiertes XSS muss deine Eingabe ein HTML-/Script-Tag oder einen Event-Handler enthalten.')}</div>`;
+        }
+      };
+      $('#wl-go3', wrap).onclick = go;
+      $('#wl-bsp3', wrap).onclick = () => { x.value = '<img src=x onerror=alert(1)>'; x.focus(); };
+      bindTiles();
+    };
+
+    function bindTiles() {
+      $$('.ki-tile[data-st]', wrap).forEach(btn => btn.onclick = () => { aktiv = btn.getAttribute('data-st'); zeichne(); });
+    }
+    const zeichne = () => { renderFort(); ({ login: stationLogin, daten: stationDaten, xss: stationXss }[aktiv] || stationLogin)(); };
+    zeichne();
   },
 });
 // ---------------------------------------------------------------- Prompt-Injection-Erklärer (Lern-Modul, statisch)

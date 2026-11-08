@@ -770,5 +770,22 @@
   "du": "you",
   "Noch niemand – sei die oder der Erste!": "Nobody yet – be the first!",
   "Melde dich an, um auf die Wall zu kommen.": "Sign in to get on the wall.",
-  "Konnte nicht laden.": "Couldn't load."
+  "Konnte nicht laden.": "Couldn't load.",
+  "Web-Hacking-Lab": "Web hacking lab",
+  "im Browser": "in the browser",
+  "Verwundbare Web-App – zum Anfassen": "Vulnerable web app – hands-on",
+  "Login umgehen": "Bypass login",
+  "Daten auslesen": "Extract data",
+  "Code einschleusen": "Inject code",
+  "Web-Hacker-Fortschritt": "Web hacker progress",
+  "Alle drei Lücken ausgenutzt!": "All three flaws exploited!",
+  "Flag": "Flag",
+  "Benutzername": "Username",
+  "Passwort": "Password",
+  "Einloggen": "Log in",
+  "Beispiel-Angriff": "Example attack",
+  "Suchen": "Search",
+  "Suchbegriff": "Search term",
+  "Produktsuche": "Product search",
+  "So baut der Server die Abfrage:": "How the server builds the query:"
 }
