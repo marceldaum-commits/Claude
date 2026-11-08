@@ -123,11 +123,20 @@ Technische Bausteine (grobe Reihenfolge, Aufwand je ~Tage, nicht Wochen – Infr
    - **Kostendeckung über KI-Tageslimit (Fair-Use):** Gratis ~**10** KI-Nachrichten/Tag, Pro ~**60**/Tag (echte KI = Haiku-API,
      ~0,3–0,5 Ct/Nachricht → Limit schützt die Marge; Gratis-Nutzer kosten auch API, daher klein gedeckelt).
      *Wichtig: Gratis-Limit erst MIT dem Pro-Launch senken, nicht vorher (sonst Downgrade für heutige Nutzer).*
-   - **Technik:** Stripe als Zentrale (Karte + SEPA, Webhook → sofort auto-freischalten), optional PayPal (auch Webhook),
-     Banküberweisung = kostenlos aber verzögert/manuell. Plan-Status pro Konto in Supabase (Tabelle `abo` + Webhook-Edge-
-     Function), „frei vs. Pro" serverseitig gaten (`plan` steuert KI-Limit via `ki_llm_limit`/neuer Plan-Logik + Lab-Zugang),
-     Konto-/Rechnungs-UI. Jahresabo nach vorn stellen (1× Gebühr statt 12×). **Startet, sobald Marcel ein Stripe-Konto +
-     API-Schlüssel bereitstellt** (der eine Geheimnis-Schritt, den nur er machen kann).
+   - **⚠️ Firma wird in der UKRAINE angemeldet (Marcel 08.11.2026) → Stripe fällt weg** (Stripe unterstützt keine
+     UA-Firmen, lt. Stripe-Support). Zahlungs-Route ist daher offen; drei realistische Optionen:
+     (a) **Merchant of Record** (Paddle / Lemon Squeezy): werden rechtlicher Verkäufer, übernehmen **EU-Umsatzsteuer (OSS)**
+     + weltweite Kartenzahlung + Auszahlung → am einfachsten für Solo-Gründer. **ABER: UA-Firmen-Onboarding direkt bei
+     Paddle/LemonSqueezy prüfen** (nicht bestätigt). Gebühr ~5 %.
+     (b) **UA-Zahlungsanbieter** (WayForPay / Fondy / LiqPay / plata by mono): funktioniert für UA-Firma, günstiger, aber
+     EU-Karten-Akzeptanz + **EU-USt-Pflicht liegen dann bei Marcel**.
+     (c) **Firma im Ausland** (Estland e-Residency / US via Stripe Atlas) → dann ginge Stripe, aber zusätzliche Firma + Steuer/Bank.
+   - **EU-Umsatzsteuer:** Verkauf digitaler Abos an EU-Verbraucher löst EU-USt am Wohnort des Kunden aus (OSS). Ein MoR nimmt
+     einem das ab; sonst selbst OSS-registrieren. **→ Steuer/Recht mit Steuerberater klären (Business-Raum), nicht hier entscheiden.**
+   - **Technik (anbieter-unabhängig):** Egal welcher Anbieter – die Architektur bleibt gleich: Zahlung bestätigt →
+     **Webhook → Edge-Function → Plan-Status pro Konto in Supabase** (Tabelle `abo`), „frei vs. Pro" serverseitig gaten
+     (`plan` steuert KI-Limit + Lab-Zugang), Konto-/Rechnungs-UI. Banküberweisung = kostenlos/verzögert. Jahresabo nach vorn.
+     **Dienstag zuerst den Anbieter wählen** (statt Stripe-Keys), dann baue ich gegen dessen Webhooks/API.
 4. **🔜 OFFEN – Fairness/Anti-Cheat-Review** vor dem Scharfschalten des wertbaren Teils: keine client-seitigen Lücken,
    Rate-Limits auf `uebung`/Edge-Functions, Bestenlisten gegen Manipulation prüfen, Missbrauchs-Schutz.
 
