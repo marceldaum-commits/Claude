@@ -829,31 +829,127 @@ const KI_FAKE = [
   { frage: 'Was ist das beste allgemeine Gegenmittel gegen Deepfakes und KI-Phishing?',
     optionen: ['Der Technik vertrauen – Fälschungen sieht man schon', 'Ruhe + ein zweiter Kanal: nie unter Zeitdruck handeln, Echtheit unabhängig prüfen'], richtig: 1,
     erklaerung: 'Technik allein schützt nicht. Die stärkste Abwehr: Zeitdruck erkennen, innehalten und über einen unabhängigen, bekannten Weg verifizieren.' },
+  { frage: 'Auf dem Parkautomaten klebt ein QR-Code „Hier bequem per Handy zahlen". Was tust du?',
+    optionen: ['QR scannen und zahlen – praktisch', 'Ignorieren; den Automaten direkt oder die offizielle App der Stadt nutzen'], richtig: 1,
+    erklaerung: 'Aufgeklebte QR-Codes („Quishing") führen auf gefälschte Bezahlseiten. Scanne keine QR-Codes von Aufklebern an öffentlichen Automaten – nutze die offizielle App oder Kartenzahlung.' },
+  { frage: 'In einer Videokonferenz bittet dich dein „Finanzchef" um eine Eil-Überweisung. Sein Gesicht wirkt minimal ruckelig, die Lippen leicht asynchron. Was tust du?',
+    optionen: ['Überweisen – es ist ja ein Video-Call', 'Den Call beenden und ihn über die bekannte Nummer zurückrufen'], richtig: 1,
+    erklaerung: 'Auch Live-Video kann heute deepgefakt sein (Echtzeit-Face-Swap). Ruckeln, Artefakte an Brille/Haaren und asynchrone Lippen sind Warnzeichen. Geldflüsse immer über einen zweiten, bekannten Kanal bestätigen.' },
+  { frage: 'Eine Anzeige zeigt einen bekannten Promi, der (per KI-Video) eine „todsichere" Krypto-Anlage empfiehlt. Was tust du?',
+    optionen: ['Investieren – der Promi steht ja dahinter', 'Finger weg – Promi-Deepfakes bewerben Anlagebetrug'], richtig: 1,
+    erklaerung: 'Prominente werben nicht per Video-Anzeige für Krypto-Schnellreichtum. Das sind KI-Fälschungen für Anlagebetrug. Seriöse Geldanlage verspricht keine garantierten Gewinne.' },
+  { frage: 'Sprachnachricht: dein „Enkel" weint, hatte einen Unfall und braucht sofort Geld für die Kaution. Was tust du?',
+    optionen: ['Sofort zahlen, die Stimme klingt echt', 'Selbst beim Enkel / in der Familie anrufen und die Geschichte prüfen'], richtig: 1,
+    erklaerung: 'Stimmen lassen sich aus wenigen Sekunden Audio klonen (Enkeltrick 2.0). Weinen + Eile + Geld = Alarm. Leg auf und ruf die echte Person über die bekannte Nummer an.' },
+  { frage: 'Mail vom „Chef" (korrekte Signatur) bittet dich, schnell Gutscheinkarten zu kaufen und die Codes zu schicken. Was tust du?',
+    optionen: ['Karten kaufen – der Chef hat es eilig', 'Nicht kaufen; persönlich/telefonisch rückfragen'], richtig: 1,
+    erklaerung: 'Die „Chef-bittet-um-Gutscheinkarten"-Masche ist ein Klassiker. Kein echter Chef lässt Geschäfte über Gutscheincodes abwickeln. Immer über einen zweiten Kanal rückfragen.' },
+  { frage: 'Ein „Recruiter" bietet dir per Chat einen Traumjob und will vorab Ausweis-Scan und Bankdaten „für den Vertrag". Was tust du?',
+    optionen: ['Daten schicken – ist ja für den Job', 'Nichts schicken; Firma unabhängig prüfen, Daten erst nach echtem Vertrag'], richtig: 1,
+    erklaerung: 'Seriöse Firmen fordern Ausweis und Bankdaten nicht vor einem echten, geprüften Arbeitsverhältnis. Das ist Identitätsdiebstahl. Firma und Person unabhängig verifizieren.' },
+  { frage: 'Anruf vom „Microsoft-Support": dein PC sei infiziert, du sollst sofort eine Fernwartungs-Software installieren. Was tust du?',
+    optionen: ['Installieren – die wollen ja helfen', 'Auflegen; Microsoft ruft nicht ungefragt wegen Viren an'], richtig: 1,
+    erklaerung: 'Microsoft & Co. rufen niemals unaufgefordert an. Wer Fernzugriff will, übernimmt deinen Rechner. Auflegen, nichts installieren, keine Codes durchgeben.' },
+  { frage: 'Eine Mail behauptet, man habe ein peinliches Video von dir, und fordert Bitcoin, sonst wird es verschickt. Was tust du?',
+    optionen: ['Zahlen, damit Ruhe ist', 'Nicht zahlen, nicht antworten – melden und ggf. Anzeige'], richtig: 1,
+    erklaerung: 'Das ist Sextortion – meist leere Drohung ohne echtes Material. Zahlen macht dich nur zum Dauerziel. Nicht reagieren, Beweise sichern, melden/anzeigen.' },
 ];
+const DF_BEST = () => { try { return parseInt(localStorage.getItem('kly.dfbest') || '0', 10) || 0; } catch { return 0; } };
+const DF_SET = (n) => { try { localStorage.setItem('kly.dfbest', String(n)); } catch { /* */ } };
+const DF_RUNDE = 8; // Fragen pro Duell
 views.deepfake = () => ({
   title: 'Deepfakes & KI-Phishing erkennen',
   html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a>
     <div class="card adv-held"><div class="adv-held-kopf"><span class="adv-badge">🕵️ ${U('Deepfakes & KI-Phishing')}</span><span class="badge plain">${U('defensiv')}</span></div>
       <h1 style="margin:.4rem 0 .2rem">${U('Fälschungen entlarven')}</h1>
       <p class="small muted" style="margin:0">${U('KI macht Fälschungen billig: echte-klingende Stimmen, täuschende Videos, perfekte Phishing-Mails. Trainiere, sie zu erkennen – entscheide dich und lerne die Merkmale.')}</p>
+      <div class="ki-modus" role="group" aria-label="${esc(U('Modus'))}" style="margin-top:.6rem">
+        <button type="button" class="btn small" id="df-mode-lern">🎓 ${U('Lernmodus')}</button>
+        <button type="button" class="btn small ghost" id="df-mode-duell">⚡ ${U('Duell')}</button>
+      </div>
     </div>
-    <div id="dfwrap" class="stack">${KI_FAKE.map((q, i) => `
-      <div class="card" data-df="${i}">
-        <p style="margin:.1rem 0 .5rem"><b>${i + 1}.</b> ${esc(q.frage)}</p>
-        <div class="stack">${q.optionen.map((opt, j) => `<button class="btn small ghost df-opt" data-i="${i}" data-j="${j}" style="text-align:left">${esc(opt)}</button>`).join('')}</div>
-        <p class="small df-fb" data-fb="${i}" style="margin:.5rem 0 0"></p>
-      </div>`).join('')}</div>
-    <div class="card lime" style="margin-top:.4rem"><b>🛡️ ${U('Merksatz')}</b><br><span class="small">${U('„Keine Fehler" heißt nicht „echt". Bei Druck + Geld + Dringlichkeit: innehalten und über einen zweiten, bekannten Kanal prüfen.')}</span></div>
+    <div id="dfwrap" class="stack"></div>
     <p class="honest">${U('Defensives Wissen zum Selbstschutz – damit dich KI-Fälschungen nicht erwischen.')}</p>`,
   mount(root) {
-    $$('.df-opt', root).forEach(btn => btn.onclick = () => {
-      const i = +btn.dataset.i, j = +btn.dataset.j, q = KI_FAKE[i];
-      const fb = root.querySelector(`[data-fb="${i}"]`);
-      $$(`.df-opt[data-i="${i}"]`, root).forEach(b => { b.disabled = true; b.classList.remove('primary'); });
-      const richtig = j === q.richtig;
-      btn.classList.add(richtig ? 'primary' : 'danger');
-      if (fb) fb.innerHTML = `<b style="color:${richtig ? '#9be28f' : 'var(--red)'}">${richtig ? '✓ ' + U('Richtig!') : '✗ ' + U('Nicht ideal.')}</b> ${esc(q.erklaerung)}`;
-    });
+    const wrap = $('#dfwrap', root);
+    const bLern = $('#df-mode-lern', root), bDuell = $('#df-mode-duell', root);
+    const setMode = (m) => {
+      bLern.classList.toggle('ghost', m !== 'lern'); bLern.classList.toggle('primary', m === 'lern');
+      bDuell.classList.toggle('ghost', m !== 'duell'); bDuell.classList.toggle('primary', m === 'duell');
+    };
+
+    const zeigeLern = () => {
+      setMode('lern');
+      wrap.innerHTML = KI_FAKE.map((q, i) => `
+        <div class="card" data-df="${i}">
+          <p style="margin:.1rem 0 .5rem"><b>${i + 1}.</b> ${esc(q.frage)}</p>
+          <div class="stack">${q.optionen.map((opt, j) => `<button class="btn small ghost df-opt" data-i="${i}" data-j="${j}" style="text-align:left">${esc(opt)}</button>`).join('')}</div>
+          <p class="small df-fb" data-fb="${i}" style="margin:.5rem 0 0"></p>
+        </div>`).join('') +
+        `<div class="card lime"><b>🛡️ ${U('Merksatz')}</b><br><span class="small">${U('„Keine Fehler" heißt nicht „echt". Bei Druck + Geld + Dringlichkeit: innehalten und über einen zweiten, bekannten Kanal prüfen.')}</span></div>`;
+      $$('.df-opt', wrap).forEach(btn => btn.onclick = () => {
+        const i = +btn.dataset.i, j = +btn.dataset.j, q = KI_FAKE[i];
+        const fb = wrap.querySelector(`[data-fb="${i}"]`);
+        $$(`.df-opt[data-i="${i}"]`, wrap).forEach(b => { b.disabled = true; b.classList.remove('primary'); });
+        const richtig = j === q.richtig;
+        btn.classList.add(richtig ? 'primary' : 'danger');
+        if (fb) fb.innerHTML = `<b style="color:${richtig ? '#9be28f' : 'var(--red)'}">${richtig ? '✓ ' + U('Richtig!') : '✗ ' + U('Nicht ideal.')}</b> ${esc(q.erklaerung)}`;
+      });
+    };
+
+    const zeigeDuell = () => {
+      setMode('duell');
+      const n = Math.min(DF_RUNDE, KI_FAKE.length);
+      const order = shuffle(KI_FAKE.map((_, i) => i)).slice(0, n);
+      let idx = 0, score = 0;
+      const frage = () => {
+        const q = KI_FAKE[order[idx]];
+        // Antwort-Reihenfolge mischen, aber richtige Antwort nachhalten
+        const opts = q.optionen.map((opt, j) => ({ opt, richtig: j === q.richtig }));
+        const gem = shuffle(opts);
+        wrap.innerHTML = `
+          <div class="card violet">
+            <div class="row between"><b>⚡ ${Ut('Frage {n}/{t}', { n: idx + 1, t: n })}</b><span class="badge plain">🏅 ${Ut('Beste: {n}/{t}', { n: DF_BEST(), t: DF_RUNDE })}</span></div>
+            <div class="bar" style="margin:.4rem 0 .1rem"><i style="width:${Math.round(100 * idx / n)}%"></i></div>
+            <span class="small muted">${Ut('Punkte bisher: {n}', { n: score })}</span>
+          </div>
+          <div class="card" id="df-q">
+            <p style="margin:.1rem 0 .6rem"><b>${esc(q.frage)}</b></p>
+            <div class="stack">${gem.map((o, j) => `<button class="btn ghost df-a" data-j="${j}" data-ok="${o.richtig ? 1 : 0}" style="text-align:left">${esc(o.opt)}</button>`).join('')}</div>
+            <p class="small" id="df-note" style="margin:.6rem 0 0"></p>
+            <button class="btn primary" id="df-next" style="margin-top:.6rem;display:none">${idx + 1 < n ? U('Weiter →') : U('Ergebnis zeigen')}</button>
+          </div>`;
+        const note = $('#df-note', wrap), next = $('#df-next', wrap);
+        $$('.df-a', wrap).forEach(btn => btn.onclick = () => {
+          const ok = btn.dataset.ok === '1';
+          $$('.df-a', wrap).forEach(b => { b.disabled = true; if (b.dataset.ok === '1') b.classList.add('primary'); });
+          if (ok) { btn.classList.add('primary'); score++; } else btn.classList.add('danger');
+          note.innerHTML = `<b style="color:${ok ? '#9be28f' : 'var(--red)'}">${ok ? '✓ ' + U('Richtig!') : '✗ ' + U('Daneben.')}</b> ${esc(q.erklaerung)}`;
+          next.style.display = '';
+          next.focus();
+        });
+        next.onclick = () => { idx++; if (idx < n) frage(); else ergebnis(); };
+      };
+      const ergebnis = () => {
+        const best = DF_BEST(); const neuerRekord = score > best; if (neuerRekord) DF_SET(score);
+        const quote = Math.round(100 * score / n);
+        const titel = quote === 100 ? '🏆 ' + U('Perfekt! Dir macht keiner was vor.') : quote >= 75 ? '🥈 ' + U('Stark – sehr wachsam!') : quote >= 50 ? '🙂 ' + U('Solide – ein paar Fallen noch üben.') : '📚 ' + U('Weiter üben – die Maschen sind fies.');
+        if (neuerRekord || quote >= 75) feier(quote === 100);
+        wrap.innerHTML = `
+          <div class="card ${quote >= 75 ? 'lime' : quote >= 50 ? 'violet' : 'warn'}">
+            <h2 style="margin-top:0">${titel}</h2>
+            <div class="kpis" style="grid-template-columns:repeat(2,1fr)"><div class="kpi"><b>${score}/${n}</b><span>${U('richtig')}</span></div><div class="kpi"><b>${DF_BEST()}/${DF_RUNDE}</b><span>${U('Bestwert')}</span></div></div>
+            ${neuerRekord ? `<p class="small" style="color:#9be28f;margin:.5rem 0 0">✨ ${U('Neuer Bestwert!')}</p>` : ''}
+          </div>
+          <div class="card lime"><b>🛡️ ${U('Merksatz')}</b><br><span class="small">${U('„Keine Fehler" heißt nicht „echt". Bei Druck + Geld + Dringlichkeit: innehalten und über einen zweiten, bekannten Kanal prüfen.')}</span></div>
+          <button class="btn primary block" id="df-again">⚡ ${U('Nochmal spielen')}</button>`;
+        $('#df-again', wrap).onclick = zeigeDuell;
+      };
+      frage();
+    };
+
+    bLern.onclick = zeigeLern; bDuell.onclick = zeigeDuell;
+    zeigeLern();
   },
 });
 
