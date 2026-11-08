@@ -810,5 +810,12 @@
   "Geknackt!": "Cracked!",
   "Du hast das Monats-Rätsel gelöst.": "You solved the monthly puzzle.",
   "Hell/Dunkel umschalten": "Toggle light/dark",
-  "Design umschalten": "Toggle theme"
+  "Design umschalten": "Toggle theme",
+  "Übungs-Bestenliste": "Labs leaderboard",
+  "(serverseitig geprüft)": "(server-verified)",
+  "Noch keine Einträge – löse die Labs und sei vorn dabei!": "No entries yet – solve the labs and lead the board!",
+  "Fortschritt (alle Labs)": "Progress (all labs)",
+  "Alles gelöst!": "All solved!",
+  "Server prüft …": "Server checking …",
+  "Token aus dem Log hier einfügen …": "Paste the token from the log here …"
 }

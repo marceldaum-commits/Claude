@@ -110,10 +110,12 @@ Forensik/pcap, KI-Sicherheit, Blue-Team-Wellen, Pivoting). Es fehlen v. a.:
 Entscheidung getroffen: In 1–2 Monaten soll die Plattform wettbewerbsfähig sein und **Geld verdienen**.
 **Rollen-Trennung:** Preis-/Geschäftsmodell & Positionierung = **Marketing-Raum**; hier die **technischen Bausteine**.
 Technische Bausteine (grobe Reihenfolge, Aufwand je ~Tage, nicht Wochen – Infrastruktur steht großteils):
-1. **Server-seitiges Scoring der Browser-Labs** (Voraussetzung für faire Wertung): Prüfung von Web-/Forensik-/Monats-Lab
-   in eine Edge-Function verschieben (per-Konto-Flag, HMAC, serverseitig – wie KI-Bots & CTF). Web-Lab = mittel (Erkennung
-   serverseitig), Forensik/Monat = leicht (Antwort vergleichen). *Modell-unabhängig → kann sofort starten.*
-2. **Globale Bestenlisten / Ranglisten** über alle wertbaren Modi (fair, nur serverseitig geprüfte Punkte zählen).
+1. **✅ Server-seitiges Scoring der Browser-Labs (live, 08.11.2026):** Edge-Function `uebung` (v1) + Tabelle
+   `uebung_fortschritt`; Web-/Forensik-/Monats-Lab prüfen jetzt **serverseitig**, Rätsel/Flags pro Konto frisch (HMAC,
+   nie im Browser bekannt – Forensik-Log & Monats-String werden per Konto erzeugt, Web-Angriffe serverseitig erkannt).
+   App-Views auf Server umgestellt, `uebung()`-Caller in `sync.js`. Backend 16/16 + UI (gemockt) getestet. KLY_VERSION 3.5.0.
+2. **✅ Globale Bestenliste (live):** „Übungs-Bestenliste" (`uebung` Aktion `bestenliste`) auf allen drei Lab-Seiten,
+   Name nur bei opt-in-Profil, eigener Eintrag mit ★. *Als Nächstes: evtl. in ein gemeinsames „Bestenlisten"-Zentrum bündeln.*
 3. **Bezahlung & Abo-Gating** (sobald das Modell aus dem Marketing-Raum steht): Zahlungsanbieter (z. B. Stripe) anbinden,
    Plan/Abo pro Konto speichern, Inhalte „frei vs. Pro" serverseitig freischalten. *Hängt am Modell → danach.*
 4. **Fairness/Anti-Cheat-Review** des wertbaren Teils (keine client-seitigen Lücken, Rate-Limits).
