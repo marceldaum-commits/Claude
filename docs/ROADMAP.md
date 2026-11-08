@@ -116,9 +116,11 @@ Technische Bausteine (grobe Reihenfolge, Aufwand je ~Tage, nicht Wochen – Infr
    App-Views auf Server umgestellt, `uebung()`-Caller in `sync.js`. Backend 16/16 + UI (gemockt) getestet. KLY_VERSION 3.5.0.
 2. **✅ Globale Bestenliste (live):** „Übungs-Bestenliste" (`uebung` Aktion `bestenliste`) auf allen drei Lab-Seiten,
    Name nur bei opt-in-Profil, eigener Eintrag mit ★. *Als Nächstes: evtl. in ein gemeinsames „Bestenlisten"-Zentrum bündeln.*
-3. **Bezahlung & Abo-Gating** (sobald das Modell aus dem Marketing-Raum steht): Zahlungsanbieter (z. B. Stripe) anbinden,
-   Plan/Abo pro Konto speichern, Inhalte „frei vs. Pro" serverseitig freischalten. *Hängt am Modell → danach.*
-4. **Fairness/Anti-Cheat-Review** des wertbaren Teils (keine client-seitigen Lücken, Rate-Limits).
+3. **🔜 OFFEN – Bezahlung & Abo-Gating** (nächster großer Brocken; **wartet auf das Preis-/Geschäftsmodell aus dem
+   Marketing-Raum**: was ist frei, was „Pro", welcher Preis?). Technisch: Zahlungsanbieter (z. B. Stripe) anbinden,
+   Plan/Abo pro Konto speichern (Tabelle + Webhook), Inhalte „frei vs. Pro" serverseitig freischalten, Konto-/Rechnungs-UI.
+4. **🔜 OFFEN – Fairness/Anti-Cheat-Review** vor dem Scharfschalten des wertbaren Teils: keine client-seitigen Lücken,
+   Rate-Limits auf `uebung`/Edge-Functions, Bestenlisten gegen Manipulation prüfen, Missbrauchs-Schutz.
 
 ## 📌 Später / Backlog (mit Marcel terminiert, 08.11.2026)
 - **Zweisprachigkeit (DE/EN) einheitlich nachziehen:** Die neuen Module (KI-Labs, Deepfake-Szenarien, Web-/Forensik-/Monats-Lab, Wall) sind bisher **deutsch-primär**; lange Texte fallen für EN auf Deutsch zurück. Später **einheitlich** komplett übersetzen (eigener Durchlauf: alle neuen `U()`-Strings + die als JS-Literale hinterlegten Inhalte nach `i18n/en/` ziehen). Marcel: „machen wir später einheitlich".
