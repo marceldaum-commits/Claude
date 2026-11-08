@@ -52,6 +52,11 @@ lehren, kein Jailbreak-Kochbuch (hält uns auch bei den App-Stores sauber). **Le
   Nicht-Treffern bleibt. Siehe docs/PROJEKT.md Baulog.
 
 ## ✅ Kürzlich fertig
+- **08.11.2026 – 3 Wellen + Feinschliff (alle live, KLY_VERSION bis 3.4.0):**
+  - *Welle 1 (UI):* Konfetti-Erfolgsfeier, Fortschrittsbalken überall, „Starte hier"-Nudge im KI-Hub.
+  - *Welle 2 (einzigartige KI-Features):* Deepfake-**Duell** (13 Szenarien), **KI-Labs** (vergiftetes Dokument = indirekte Injektion + Agent-mit-Werkzeug = Exfiltration; neue Tabelle `ki_llm_labs`, Edge `ki-llm` v17), **Wall of Defenders** (Edge `verteidiger`, v18).
+  - *Welle 3 (Klassik-Labs, browser-nativ statt Docker → auch für „Nur-Browser"-/Handy-Nutzer):* **Web-Hacking-Lab** (SQLi-Login-Bypass + UNION + XSS, selbst nicht verwundbar), **Forensik-Lab** (Log-Analyse + Base64-Dekoder), **Monats-Challenge** (monatlich wechselndes Krypto-Rätsel + Dekoder-Werkzeugkasten).
+  - *Feinschliff „cool & modern":* Mikro-Animationen, Lade-Skelette, einheitliche Nav-SVG-Icons, optionales **Hell-Theme** (umschaltbar, gemerkt, Terminal/Code bleiben dunkel).
 - **KI-Sicherheit Phase 2 – echter LLM (live):** Boss-Bots (Nova leicht → Wächter mittel → Nyx schwer) mit
   echtem Claude (Haiku 5.5) + per-Konto-Flag; KI-Mentor. Tageslimit/Konto, Edge `ki-llm`. End-to-end getestet.
 - **KI-Sicherheit Phase 1 (live):** deterministische 10-Stufen-Arena, Theorie, Lehrpfad, Deepfake, Verteidigung
@@ -100,6 +105,15 @@ Forensik/pcap, KI-Sicherheit, Blue-Team-Wellen, Pivoting). Es fehlen v. a.:
 - **CI/CD- & Supply-Chain-Sicherheit** (vergiftete Pipelines, Dependency Confusion)
 - **Kubernetes-/Container-Orchestrierung-Sicherheit** (über Container-Escape hinaus)
 - **KI-Phishing / Deepfake-Erkennung** (defensiv, sehr aktuell)
+
+## 📌 Später / Backlog (mit Marcel terminiert, 08.11.2026)
+- **Zweisprachigkeit (DE/EN) einheitlich nachziehen:** Die neuen Module (KI-Labs, Deepfake-Szenarien, Web-/Forensik-/Monats-Lab, Wall) sind bisher **deutsch-primär**; lange Texte fallen für EN auf Deutsch zurück. Später **einheitlich** komplett übersetzen (eigener Durchlauf: alle neuen `U()`-Strings + die als JS-Literale hinterlegten Inhalte nach `i18n/en/` ziehen). Marcel: „machen wir später einheitlich".
+- **Serverprüfung der Browser-Labs (optional, nur falls wertbar):** Web-Hacking-/Forensik-/Monats-Lab prüfen die Flags aktuell **client-seitig** (super zum Lernen, aber schummelbar → bewusst **keine** Bestenliste/Punkte). Wenn sie mal zählen sollen: Prüfung in eine Edge-Function verschieben (per-Konto-Flag, HMAC, serverseitig – wie bei den KI-Bots & CTF des Tages).
+- **Zukunfts-Ideen (Leitstern-Ausbau, später):**
+  - **KI Angreifer-vs-Verteidiger-Arena / Duell (PvP):** einer baut den Schutz-Prompt, der andere versucht ihn zu knacken – aus dem „Scharfen Prüfer" + „Wall of Defenders" weiterentwickeln.
+  - **KI-Agent/Tool-Abuse tiefer** (mehr Werkzeuge, mehrstufig) · **RAG-Poisoning** (vergiftete Wissensquelle).
+  - **Echte Docker-Web-Ziele** als Ergänzung zum browser-nativen Web-Lab (für Kali-Nutzer), über die Arena.
+  - **Zertifikats-/Rang-Pfade** („Jr. Pentester", „SOC L1") mit klarem Ziel + Urkunde (siehe auch „Neue Trainings-Techniken").
 
 ## 🛠️ Technik / Betrieb
 - Backups verifizieren + Plesk→Google-Drive prüfen (mit Marcel) · Geheimnisse in Bitwarden
