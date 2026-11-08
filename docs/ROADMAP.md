@@ -18,7 +18,7 @@ verbessern, korrigieren, erweitern – besser werden. Vollausbau mit Theorie + L
 - **KI-Mentor:** Begleiter, der beim Feststecken erklärt, gestufte Tipps gibt, Übungen aufs Niveau generiert.
 - **Theorie + Lehrpfad + Übungen** rund um alles oben; **SEO** der Startseite/App darauf ausrichten.
 
-## 🎯 KI-Ausbau „Austricksen & Verteidigen" – Plan (Umsetzung ab Di 11.11.2026)
+## 🎯 KI-Ausbau „Austricksen & Verteidigen" – ✅ umgesetzt & live (08.11.2026, A–D)
 Großes Paket im Leitstern. **Umzugssicher & anti-cheat:** jede Flag `KLY{…}` würfelt der Server pro Anlauf frisch
 (HMAC, nie im Browser bekannt), prüft serverseitig; geknackter Code = Schlüssel fürs nächste Level. **Realistisch,
 nicht kitschig:** die Bots antworten wie echte, eingesetzte Assistenten (seriös, glaubwürdig) – kein Spiel-Gelaber;
@@ -43,8 +43,13 @@ lehren, kein Jailbreak-Kochbuch (hält uns auch bei den App-Stores sauber). **Le
   Unbekannte). Fallback, falls wackelig: zweiter KI-Aufruf als Schiedsrichter (urteilt nur, muss selbst nichts „verraten").
   Aufwand: mittel + Validierungsschritt.
 - **Phase D – Politur/später:** Bestenliste über alle Modi, Meilenstein-Zertifikat „KI-Red-Teamer", Schwierigkeits-Feinschliff.
-- **Entschieden (Marcel 07.11.2026):** voller Umfang **A–D**, **alles am Dienstag 11.11.** in einem Rutsch
-  (inkl. Freies-Spiel-Rollout nach `live`). Reihenfolge am Di: Freies Spiel live → Phase A → B → Prüf-Test → C → D.
+- **✅ Umgesetzt (Marcel 08.11.2026: „setze alles um"):** voller Umfang **A–D** gebaut, getestet und **live** –
+  zusammen mit dem Freien Spiel. Edge `ki-llm` v16 (Service-Bots mit Spiel-Token-Rahmung + Hart-Override,
+  verteidigung-Prüfer neu gerahmt, Bestenliste über alle Modi), Tabelle `ki_llm_service`; App-Views `kiservice`,
+  `kiinjektion`, „Scharfer Prüfer" in `kiverteidigung`, „KI-Red-Teamer"-Badge im Hub; KLY_VERSION 2.96.0.
+  Backend end-to-end (echter Haiku) + App-Views (Playwright) getestet. **Hebel für Haiku:** der geheime Code ist
+  im Bot-Prompt ein neutrales Spiel-Token (realistisches Label nur in der UI) → Alignment-Reflex fällt weg, Abwehr bei
+  Nicht-Treffern bleibt. Siehe docs/PROJEKT.md Baulog.
 
 ## ✅ Kürzlich fertig
 - **KI-Sicherheit Phase 2 – echter LLM (live):** Boss-Bots (Nova leicht → Wächter mittel → Nyx schwer) mit
