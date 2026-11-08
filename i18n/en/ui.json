@@ -750,5 +750,17 @@
   "Perfekt! Dir macht keiner was vor.": "Perfect! Nobody fools you.",
   "Stark – sehr wachsam!": "Strong – very sharp!",
   "Solide – ein paar Fallen noch üben.": "Solid – practise a few traps.",
-  "Weiter üben – die Maschen sind fies.": "Keep practising – these tricks are nasty."
+  "Weiter üben – die Maschen sind fies.": "Keep practising – these tricks are nasty.",
+  "KI-Labs: Dokument & Agent": "AI labs: document & agent",
+  "KI-Labs": "AI labs",
+  "fortgeschritten": "advanced",
+  "Labs": "labs",
+  "Lab: {n}": "Lab: {n}",
+  "Aufgabe": "Task",
+  "Was ist das?": "What is this?",
+  "Zwei Profi-Angriffe zum Anfassen: eine Anweisung im Dokument verstecken (indirekte Injektion) und einen KI-Agenten mit Werkzeug austricksen.": "Two hands-on pro attacks: hide an instruction inside a document (indirect injection) and trick an AI agent that has a tool.",
+  "Zwei fortgeschrittene Angriffe zum Anfassen: eine Anweisung IM Dokument verstecken (indirekte Injektion) und einen KI-Agenten mit Werkzeug austricksen, bis er ein Geheimnis nach außen schickt.": "Two hands-on advanced attacks: hide an instruction INSIDE the document (indirect injection) and trick an AI agent with a tool into sending a secret outward.",
+  "Füg unten ein Dokument ein – mit einer versteckten Anweisung.": "Paste a document below – with a hidden instruction.",
+  "Schreib {bot} eine Nachricht und trick ihn aus.": "Write {bot} a message and trick it.",
+  "Dein Dokument – bau mittendrin eine Anweisung an die KI ein …": "Your document – embed an instruction to the AI in the middle …"
 }
