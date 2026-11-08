@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kontakt – Nachtfalter</title>
+  <meta name="description" content="Kontaktformular – schreib uns eine Nachricht, wir melden uns per E-Mail.">
+  <meta name="theme-color" content="#0b0b12">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="index, follow">
+  <script>try{var t=localStorage.getItem('kly.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="top"><a class="brand" href="start.html" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter</span></a></header>
+  <main class="seite text">
+    <h1>Kontakt</h1>
+    <p>Eine Frage, ein Problem oder Feedback? Schreib uns – wir melden uns per E-Mail. Du kannst uns auch direkt unter
+      <a href="mailto:info@nachtfalter.tech">info@nachtfalter.tech</a> erreichen.</p>
+    <form id="kf" class="card" style="max-width:560px;margin-top:1rem" novalidate>
+      <label for="kf-name">Name <span class="muted small">(freiwillig)</span></label>
+      <input type="text" id="kf-name" name="name" maxlength="80" autocomplete="name">
+      <label for="kf-mail">E-Mail *</label>
+      <input type="email" id="kf-mail" name="email" maxlength="120" autocomplete="email" required placeholder="du@beispiel.de">
+      <label for="kf-msg">Nachricht *</label>
+      <textarea id="kf-msg" name="message" maxlength="4000" required placeholder="Wie können wir helfen?"></textarea>
+      <!-- Spam-Falle: für Menschen unsichtbar, nicht ausfüllen -->
+      <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;height:0;overflow:hidden">
+        <label>Firma</label><input type="text" id="kf-firma" name="firma" tabindex="-1" autocomplete="off">
+      </div>
+      <div class="row" style="margin-top:.8rem;align-items:center;gap:.8rem">
+        <button class="btn primary" id="kf-go" type="submit">Nachricht senden</button>
+        <span class="small" id="kf-stat" role="status" aria-live="polite"></span>
+      </div>
+      <p class="small muted" style="margin:.8rem 0 0">Mit dem Absenden stimmst du zu, dass wir deine Angaben zur Beantwortung
+        deiner Anfrage verarbeiten (siehe <a href="datenschutz.html">Datenschutz</a>).</p>
+    </form>
+  </main>
+  <footer class="fuss"><a href="start.html">Nachtfalter</a> · <a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a> · <a href="kontakt.html">Kontakt</a></footer>
+  <script src="config.js"></script>
+  <script>
+    (function () {
+      var cfg = window.KLY_CONFIG || {};
+      var form = document.getElementById('kf'), stat = document.getElementById('kf-stat'), btn = document.getElementById('kf-go');
+      var mailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (document.getElementById('kf-firma').value) { stat.innerHTML = '<b style="color:var(--lime)">✓ Danke!</b>'; form.reset(); return; }
+        var name = document.getElementById('kf-name').value.trim();
+        var email = document.getElementById('kf-mail').value.trim();
+        var msg = document.getElementById('kf-msg').value.trim();
+        if (!mailRe.test(email)) { stat.textContent = 'Bitte eine gültige E-Mail angeben.'; return; }
+        if (msg.length < 5) { stat.textContent = 'Bitte schreib kurz deine Nachricht.'; return; }
+        if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) { stat.textContent = 'Formular gerade nicht verfügbar – bitte direkt an info@nachtfalter.tech.'; return; }
+        btn.disabled = true; stat.textContent = 'Senden …';
+        try {
+          var res = await fetch(cfg.supabaseUrl + '/functions/v1/melden', {
+            method: 'POST',
+            headers: { apikey: cfg.supabaseAnonKey, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              bereich: 'Kontakt (Website)',
+              kontakt: (name ? name + ' ' : '') + '<' + email + '>',
+              text: msg,
+              kontext: { geraet: (navigator.userAgent || '').slice(0, 200), sprache: navigator.language || '' }
+            })
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (res.ok && data.ok) { stat.innerHTML = '<b style="color:var(--lime)">✓ Danke! Deine Nachricht ist unterwegs – wir melden uns per E-Mail.</b>'; form.reset(); }
+          else { stat.textContent = data.fehler || 'Senden fehlgeschlagen – bitte später erneut oder direkt an info@nachtfalter.tech.'; btn.disabled = false; }
+        } catch (err) { stat.textContent = 'Keine Verbindung – bitte später erneut oder direkt an info@nachtfalter.tech.'; btn.disabled = false; }
+      });
+    })();
+  </script>
+</body>
+</html>

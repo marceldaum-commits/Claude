@@ -8,6 +8,7 @@ const URL_ = Deno.env.get('SUPABASE_URL')!;
 const SERVICE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ORIGINS = new Set([
   'https://app.nachtfalter.tech', 'https://vorschau.nachtfalter.tech', 'https://arena.nachtfalter.tech',
+  'https://www.nachtfalter.tech', 'https://nachtfalter.tech',
 ]);
 const db = createClient(URL_, SERVICE, { auth: { persistSession: false, autoRefreshToken: false } });
 
