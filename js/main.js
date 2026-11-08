@@ -52,6 +52,27 @@ function toast(msg, ms = 2600) {
   setTimeout(() => t.remove(), ms);
 }
 
+// Lade-Skelett (Platzhalter mit Shimmer) statt „Lade …" – wirkt moderner.
+const skel = (kind) => kind === 'tiles'
+  ? `<div class="skeleton skel-line w40"></div><div class="skel-grid"><div class="skeleton skel-card"></div><div class="skeleton skel-card"></div><div class="skeleton skel-card"></div><div class="skeleton skel-card"></div></div><div class="card"><div class="skeleton skel-line w60"></div><div class="skeleton skel-line"></div><div class="skeleton skel-line w80"></div></div>`
+  : `<div class="card"><div class="skeleton skel-line w60"></div><div class="skeleton skel-line"></div><div class="skeleton skel-line w80"></div></div>`;
+
+// Hell/Dunkel-Theme (optional, umschaltbar; Standard = dunkel)
+function currentTheme() { try { return localStorage.getItem('kly.theme') || 'dark'; } catch { return 'dark'; } }
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem('kly.theme', t); } catch { /* */ }
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', t === 'light' ? '#f3f4f9' : '#0b0b12');
+}
+
+// Einheitliche, scharfe SVG-Icons für die untere Navigation (statt ASCII-Glyphen)
+const NAV_SVG = {
+  heute: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>',
+  pfad: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="8.4"/></svg>',
+  terminal: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3"/><path d="M13 15h4"/></svg>',
+  mehr: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>',
+};
+
 // Kleine Erfolgs-Feier (Konfetti) bei gewonnenen Momenten. Respektiert „reduzierte Bewegung".
 function feier(stark = false) {
   try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch { /* */ }
@@ -143,11 +164,13 @@ function renderTop() {
     <a class="brand" href="#/heute" translate="no"><img src="icons/icon.svg" alt=""><span>Nachtfalter <b>Hacklab</b></span></a>
     <span class="spacer"></span>
     ${location.hostname.startsWith('vorschau.') ? `<span class="chip" style="background:var(--warn,#f5a524);color:#000" translate="no" title="Vorschau – noch nicht freigegeben"><span class="lbl">VORSCHAU </span>${esc(self.KLY_VERSION || '')}</span>` : ''}
+    <button class="chip icon-only" id="themeChip" title="${esc(Ut('Hell/Dunkel umschalten'))}" aria-label="${esc(Ut('Design umschalten'))}">${currentTheme() === 'light' ? '☀️' : '🌙'}</button>
     <button class="chip" id="locChip" title="Lernort ändern">${loc ? loc.icon + ' <span class="lbl">' + U(loc.short) + '</span>' : '📍 <span class="lbl">Lernort?</span>'}</button>
     ${syncConfigured() && !st.user ? `<a class="chip" href="konto.html" title="Anmelden oder kostenloses Konto anlegen" aria-label="Anmelden">👤 <span class="lbl">Anmelden</span></a>` :
     `<a class="chip" href="#/mehr" title="${esc(st.msg)}"><span class="dot ${st.state === 'ok' ? 'ok' : st.state === 'err' ? 'err' : st.state === 'warn' || st.state === 'busy' ? 'warn' : ''}"></span>${st.state === 'ok' ? 'Sync' : st.state === 'off' ? 'Lokal' : st.state === 'busy' ? '…' : 'Sync'}</a>`}
     ${st.user ? `<button class="chip" id="logoutChip" title="Abmelden (${esc(st.user.email || '')})" aria-label="Abmelden">🚪 <span class="lbl">Abmelden</span></button>` : ''}`;
   $('#locChip').onclick = () => locationModal(true);
+  const tc = $('#themeChip'); if (tc) tc.onclick = () => { applyTheme(currentTheme() === 'light' ? 'dark' : 'light'); renderTop(); };
   const lo = $('#logoutChip'); if (lo) lo.onclick = async () => { if (!confirm('Wirklich abmelden? Dein Fortschritt ist im Konto gespeichert.')) return; try { await signOut(); } catch { /* offline */ } try { localStorage.removeItem('kly.auth'); } catch { /* */ } zurAnmeldung(); };
 }
 
@@ -157,7 +180,7 @@ function renderNav(route) {
   const map = { extern: 'pfad', kalipraxis: 'pfad', weblab: 'pfad', forensik: 'pfad', monatsctf: 'heute', ctf: 'heute', mission: 'heute', 'ki-sicherheit': 'pfad', melden: 'mehr', 'handy-labs': 'mehr', lektion: 'pfad', uebung: 'pfad', level: 'pfad', pruefung: 'pfad', archiv: 'mehr', werkzeuge: 'mehr', profil: 'mehr', raum: 'pfad', raeume: 'pfad', story: 'pfad', lernpfad: 'pfad', lernstufe: 'pfad' };
   const on = map[route] || route;
   $('#nav').setAttribute('translate', 'no');
-  $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${i}</span>${t}</a>`).join('');
+  $('#nav').innerHTML = items.map(([r, i, t]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}"><span class="i">${NAV_SVG[r] || i}</span>${t}</a>`).join('');
 }
 
 // Erfahrungsstufe (beim Erststart gefragt, im Profil änderbar). Anfänger ist die Voreinstellung.
@@ -234,6 +257,7 @@ function render() {
   main.innerHTML = langNoteHTML() + (r.html || '');
   const lb = main.querySelector('#lang-banner'); if (lb) bindLangPicker(lb);
   main.classList.toggle('wide', !!r.wide);
+  main.classList.remove('rt'); void main.offsetWidth; main.classList.add('rt'); // sanfte Seiten-Einblendung
   // Browser-Übersetzung (z. B. Google Translate): Befehle, Codes und Terminals NICHT übersetzen
   main.querySelectorAll('pre, code, .script, .syntax, input, textarea, [data-copy]').forEach(e => e.setAttribute('translate', 'no'));
   if (r.mount) cleanup = r.mount(main) || null;
@@ -317,9 +341,9 @@ views.heute = () => {
 
       <a class="card" href="#/mission" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🎯 ${U('Wochen-Mission')}</b><span class="badge plain">+50 XP</span></div><span class="small muted">${U('Eine größere Aufgabe pro Woche · Bonus-XP')} →</span></a>
 
-      <a class="card" href="#/ki-sicherheit" style="display:block;text-decoration:none;color:inherit;background:linear-gradient(160deg,#171326,#1d1836);border-color:rgba(167,139,250,.45)"><div class="row between"><b>🧠 ${U('KI-Sicherheit')}</b><span class="badge real">${U('Weltneuheit')}</span></div><span class="small muted">${U('Hacke eine echte KI im Browser – Prompt Injection, live')} →</span></a>
+      <a class="card feat-ki" href="#/ki-sicherheit" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🧠 ${U('KI-Sicherheit')}</b><span class="badge real">${U('Weltneuheit')}</span></div><span class="small muted">${U('Hacke eine echte KI im Browser – Prompt Injection, live')} →</span></a>
 
-      ${[10, 11].includes(new Date().getMonth()) ? `<a class="card" href="#/advent" style="display:block;text-decoration:none;color:inherit;background:linear-gradient(160deg,#17233b,#1d2b47);border-color:#c9a24a55"><div class="row between"><b>🎄 ${U('Advent of Hacking')}</b><span class="badge plain">${new Date().getMonth() === 11 ? U('offen') : U('ab 1. Dez')}</span></div><span class="small muted">${U('24 Türchen, jeden Tag ein Rätsel · Advent-Zertifikat')} →</span></a>` : ''}
+      ${[10, 11].includes(new Date().getMonth()) ? `<a class="card feat-advent" href="#/advent" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🎄 ${U('Advent of Hacking')}</b><span class="badge plain">${new Date().getMonth() === 11 ? U('offen') : U('ab 1. Dez')}</span></div><span class="small muted">${U('24 Türchen, jeden Tag ein Rätsel · Advent-Zertifikat')} →</span></a>` : ''}
 
       ${loc === 'browser' ? section('🌐', U('Direkt hier im Browser'), browserPicks().filter(r => r !== (cont || browserPicks()[0])).slice(0, 3)) + `<div class="card tight small muted">${U('🖥️ Mit einer eigenen Kali-VM gibt es später noch echte Labs (Kellerserver, Juice Shop …) – einfach oben den Lernort wechseln.')}</div>` : loc === 'pc' ? section('🖥️', U('Jetzt am PC'), pcList) + section('📱', U('Für unterwegs'), phoneList) : loc === 'phone' ? section('📱', U('Jetzt am Handy'), phoneList) + section('🖥️', U('Wenn du am PC bist'), pcList) : section('📱', U('Am Handy'), phoneList) + section('🖥️', U('Am PC (Kali)'), pcList)}
 
@@ -353,7 +377,7 @@ views.pfad = () => {
   return {
     html: `<h1>Lernen</h1>
     <p class="muted small">Vom Linux-Anfänger bis zum eJPT. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
-    <a class="card" href="#/ki-sicherheit" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;background:linear-gradient(160deg,#171326,#1d1836);border-color:rgba(167,139,250,.45)">
+    <a class="card feat-ki" href="#/ki-sicherheit" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <b>🧠 KI-Sicherheit</b> <span class="badge real">Weltneuheit</span><br>
       <span class="small muted">Hacke eine echte KI im Browser (Prompt Injection) – plus Theorie. Unser Schwerpunkt.</span>
     </a>
@@ -428,7 +452,7 @@ function ctfHTML(d) {
 }
 views.ctf = () => ({
   title: 'CTF des Tages',
-  html: `<a class="back" href="#/heute">← ${U('Start')}</a><h1 style="margin:.3rem 0 .6rem">🏁 ${U('CTF des Tages')}</h1><div id="ctfwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/heute">← ${U('Start')}</a><h1 style="margin:.3rem 0 .6rem">🏁 ${U('CTF des Tages')}</h1><div id="ctfwrap">${skel()}</div>`,
   mount(root) {
     const wrap = $('#ctfwrap', root);
     if (!syncStatus().user) {
@@ -511,7 +535,7 @@ function adventHTML(d, aktivNr) {
 }
 views.advent = () => ({
   title: 'Advent of Hacking',
-  html: `<a class="back" href="#/heute">← ${U('Start')}</a><h1 style="margin:.3rem 0 .6rem">🎄 ${U('Advent of Hacking')}</h1><div id="advwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/heute">← ${U('Start')}</a><h1 style="margin:.3rem 0 .6rem">🎄 ${U('Advent of Hacking')}</h1><div id="advwrap">${skel()}</div>`,
   mount(root) {
     const wrap = $('#advwrap', root);
     if (!syncStatus().user) {
@@ -620,7 +644,7 @@ function missionHTML(d) {
 }
 views.mission = () => ({
   title: 'Wochen-Mission',
-  html: `<a class="back" href="#/heute">← ${U('Start')}</a><h1 style="margin:.3rem 0 .6rem">🎯 ${U('Wochen-Mission')}</h1><div id="miwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/heute">← ${U('Start')}</a><h1 style="margin:.3rem 0 .6rem">🎯 ${U('Wochen-Mission')}</h1><div id="miwrap">${skel()}</div>`,
   mount(root) {
     const wrap = $('#miwrap', root);
     if (!syncStatus().user) {
@@ -695,7 +719,7 @@ function kiArenaHTML(d, aktiv, verlauf) {
 }
 views.kiarena = () => ({
   title: 'KI-Sicherheit: Angriffs-Labor',
-  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧠 ${U('KI hacken – live')}</h1><div id="kiwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧠 ${U('KI hacken – live')}</h1><div id="kiwrap">${skel('tiles')}</div>`,
   mount(root) {
     const wrap = $('#kiwrap', root);
     if (!syncStatus().user) {
@@ -1130,7 +1154,7 @@ function bosseHTML(d, aktiv, verlauf, lern) {
 }
 views.kibosse = () => ({
   title: 'KI Boss-Bots',
-  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🤖 ${U('Boss-Bots: echte KI hacken')}</h1><div id="bwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🤖 ${U('Boss-Bots: echte KI hacken')}</h1><div id="bwrap">${skel('tiles')}</div>`,
   mount(root) {
     const wrap = $('#bwrap', root);
     if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }
@@ -1194,7 +1218,7 @@ views.kibosse = () => ({
 // ---------------------------------------------------------------- KI-Hacken: Freies Spiel (adaptiver Spielleiter, Endlos-Modus)
 views.kifrei = () => ({
   title: 'KI-Hacken: Freies Spiel',
-  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">♾️ ${U('KI-Hacken: Freies Spiel')}</h1><div id="fwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">♾️ ${U('KI-Hacken: Freies Spiel')}</h1><div id="fwrap">${skel()}</div>`,
   mount(root) {
     const wrap = $('#fwrap', root);
     if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }
@@ -1262,7 +1286,7 @@ views.kifrei = () => ({
 // ---------------------------------------------------------------- Service-Bots austricksen (realistische Räume, Social Engineering)
 views.kiservice = () => ({
   title: 'Service-Bots austricksen',
-  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🎧 ${U('Service-Bots austricksen')}</h1><div id="swrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🎧 ${U('Service-Bots austricksen')}</h1><div id="swrap">${skel('tiles')}</div>`,
   mount(root) {
     const wrap = $('#swrap', root);
     if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }
@@ -1314,7 +1338,7 @@ views.kiservice = () => ({
 // ---------------------------------------------------------------- KI-Labs (fortgeschritten): vergiftetes Dokument + Agent mit Werkzeug
 views.kilabs = () => ({
   title: 'KI-Labs: Dokument & Agent',
-  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧪 ${U('KI-Labs: Dokument & Agent')}</h1><div id="lwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧪 ${U('KI-Labs: Dokument & Agent')}</h1><div id="lwrap">${skel('tiles')}</div>`,
   mount(root) {
     const wrap = $('#lwrap', root);
     if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }
@@ -1668,7 +1692,7 @@ views.kiinjektion = () => ({
 });
 views.kimentor = () => ({
   title: 'KI-Mentor',
-  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧑‍🏫 ${U('KI-Mentor')}</h1><div id="mwrap"><p class="muted">${U('Lade …')}</p></div>`,
+  html: `<a class="back" href="#/ki-sicherheit">← ${U('KI-Sicherheit')}</a><h1 style="margin:.3rem 0 .6rem">🧑‍🏫 ${U('KI-Mentor')}</h1><div id="mwrap">${skel()}</div>`,
   mount(root) {
     const wrap = $('#mwrap', root);
     if (!syncStatus().user) { wrap.innerHTML = `<div class="card warn"><b>🔐 ${U('Anmelden nötig.')}</b><br><span class="small"><a href="konto.html">${U('Jetzt anmelden oder registrieren')} →</a></span></div>`; return; }

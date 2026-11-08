@@ -399,3 +399,62 @@ ol.bl li.ich { border-color: var(--lime); color: var(--lime); }
 /* Nächster-Schritt-Knopf (roter Faden) */
 .weiter-btn { display: inline-flex; align-items: center; gap: .4rem; margin-top: .55rem; padding: .5rem .9rem; border-radius: 10px; background: var(--lime); border: 1px solid var(--lime); color: #111; font-weight: 700; text-decoration: none; min-height: 40px; }
 .weiter-btn:hover { background: #b6ef5a; }
+
+/* ---------- Lade-Skelette ---------- */
+.skeleton { position: relative; overflow: hidden; background: var(--card2); border-radius: 10px; }
+.skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, var(--skel-shine, rgba(255,255,255,.07)), transparent); animation: shimmer 1.3s infinite; }
+.skel-line { height: 13px; margin: .55rem 0; }
+.skel-line.w60 { width: 60%; } .skel-line.w40 { width: 40%; } .skel-line.w80 { width: 80%; }
+.skel-card { height: 88px; margin: .5rem 0; }
+.skel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .55rem; margin: .4rem 0; }
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+/* ---------- Mikro-Animationen ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  #main.rt { animation: pagein .22s ease both; }
+  @keyframes pagein { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+  .btn, .chip, .opt, .loc-opt, a.card, .df-opt, .weiter-btn, .reiter button, .ki-modus .btn { transition: transform .09s ease, border-color .15s, background .15s, box-shadow .15s; }
+  .btn:active, .chip:active, .opt:active, .loc-opt:active, .df-opt:active, .weiter-btn:active, .reiter button:active { transform: scale(.96); }
+  a.card:active, .list a:active { transform: scale(.988); }
+  .ki-tile:active:not(:disabled), .adv-tile:active:not(:disabled) { transform: scale(.97); }
+  .badge.real, .feedback.ok > b, .konfetti ~ * { }
+  .pop-in { animation: popin .28s cubic-bezier(.2,1.3,.5,1) both; }
+  @keyframes popin { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: none; } }
+}
+
+/* ---------- Hell-Theme (optional, umschaltbar) ---------- */
+:root[data-theme="light"] {
+  --bg: #f3f4f9; --bg2: #ffffff; --card: #ffffff; --card2: #eef0f6; --line: #dadce6;
+  --text: #15151f; --muted: #585869; --dim: #8a8a9c;
+  --violet: #6d28d9; --violet-d: #6d28d9; --violet-bg: rgba(124,58,237,.10);
+  --lime: #4d7c0f; --lime-d: #4d7c0f; --lime-bg: rgba(101,163,13,.14);
+  --red: #dc2626; --red-bg: rgba(220,38,38,.09);
+  --amber: #b45309; --amber-bg: rgba(217,119,6,.12);
+  --skel-shine: rgba(0,0,0,.05);
+  color-scheme: light;
+}
+:root[data-theme="light"] body { background: var(--bg); }
+:root[data-theme="light"] .top { background: rgba(255,255,255,.88); }
+:root[data-theme="light"] .nav { background: rgba(255,255,255,.95); }
+:root[data-theme="light"] .brand span b { color: var(--lime-d); }
+:root[data-theme="light"] .adv-held { background: linear-gradient(165deg, #efe9ff, #f7f3ff 70%); border-color: rgba(124,58,237,.22); }
+:root[data-theme="light"] .ki-tile, :root[data-theme="light"] .adv-tile { background: linear-gradient(165deg, #ffffff, #f0edfa); }
+:root[data-theme="light"] .ki-tile.done, :root[data-theme="light"] .adv-tile.done { background: linear-gradient(165deg, #edfbe6, #e6f6de); }
+:root[data-theme="light"] .card.violet { background: linear-gradient(180deg, var(--violet-bg), var(--card) 60%); }
+:root[data-theme="light"] .card.lime { background: linear-gradient(180deg, var(--lime-bg), var(--card) 60%); }
+:root[data-theme="light"] .kpi b { color: var(--lime-d); }
+:root[data-theme="light"] input[type=text], :root[data-theme="light"] input:not([type]), :root[data-theme="light"] input[type=number], :root[data-theme="light"] input[type=email], :root[data-theme="light"] input[type=password], :root[data-theme="light"] textarea, :root[data-theme="light"] select { background: #fff; color: var(--text); }
+:root[data-theme="light"] code { background: #eceaf6; color: #4c1d95; }
+:root[data-theme="light"] .card { box-shadow: 0 1px 2px rgba(20,20,40,.04); }
+/* Terminal, Code-Blöcke und Chat-Logs bleiben bewusst dunkel – wie in Editoren üblich und am besten lesbar. */
+
+/* Hervorgehobene Karten (vorher Inline-Gradient) – damit das Hell-Theme sie überschreiben kann */
+.card.feat-ki { background: linear-gradient(160deg, #171326, #1d1836); border-color: rgba(167, 139, 250, .45); }
+.card.feat-advent { background: linear-gradient(160deg, #17233b, #1d2b47); border-color: #c9a24a55; }
+:root[data-theme="light"] .card.feat-ki { background: linear-gradient(160deg, #efe9ff, #f7f3ff); border-color: rgba(124, 58, 237, .3); }
+:root[data-theme="light"] .card.feat-advent { background: linear-gradient(160deg, #eef3fb, #f5f8fd); border-color: #b5923e66; }
+
+/* ---------- Icon-Buttons (Kopfzeile) ---------- */
+.chip.icon-only { padding: .3rem .5rem; }
+.chip svg, .nav a .i svg { display: block; }
+.nav a .i svg { width: 24px; height: 24px; }
