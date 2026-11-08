@@ -1,7 +1,7 @@
 # Einrichtung des Nachtfalter-Servers (zweiter Server, ohne Kundendaten)
 
-Stand 03.11.2026. Grundlage: Erfahrungsbericht des „Leitstands“ (Sitzung Nachhilfe Online), der den
-ersten Server am 03.11. eingerichtet hat. Hier angepasst an Nachtfalter (Arena, KI-Werkstatt, Konto).
+Stand 03.11.2026. Grundlage: Erfahrungsbericht aus einer früheren Server-Einrichtung, hier angepasst
+an Nachtfalter (Arena, KI-Werkstatt, Konto).
 
 ## Grundregeln
 
