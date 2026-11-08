@@ -514,5 +514,20 @@ Deno.serve(async (req) => {
     return antwort(o, 200, { reply: r.text, rest: bud.rest - 1 });
   }
 
+  if (aktion === 'verteidiger') {
+    // „Wall of Defenders": wer hat den scharfen Pruefer (alle 6 Angriffe) abgewehrt? Name nur bei opt-in-Profil.
+    const { data: vd } = await db.from('ki_llm_verteidigung').select('user_id, updated_at').eq('gehalten', true);
+    const rows = (vd || []).slice().sort((a: any, b: any) => String(a.updated_at || '').localeCompare(String(b.updated_at || ''))).slice(0, 20);
+    const ids = rows.map((r: any) => r.user_id);
+    let namen = new Map<string, string>();
+    if (ids.length) {
+      const { data: pp } = await db.from('public_profiles').select('user_id, name').in('user_id', ids);
+      namen = new Map((pp || []).filter((p: any) => p.name).map((p: any) => [p.user_id, String(p.name).slice(0, 40)]));
+    }
+    const liste = rows.map((r: any, i: number) => ({ platz: i + 1, name: namen.get(r.user_id) || 'Anonym', ich: r.user_id === uid }));
+    const { data: me } = await db.from('ki_llm_verteidigung').select('gehalten').eq('user_id', uid).eq('gehalten', true).maybeSingle();
+    return antwort(o, 200, { liste, gesamt: (vd || []).length, ich: !!me });
+  }
+
   return antwort(o, 400, { fehler: 'Unbekannte Aktion.' });
 });

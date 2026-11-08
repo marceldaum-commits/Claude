@@ -762,5 +762,13 @@
   "Zwei fortgeschrittene Angriffe zum Anfassen: eine Anweisung IM Dokument verstecken (indirekte Injektion) und einen KI-Agenten mit Werkzeug austricksen, bis er ein Geheimnis nach außen schickt.": "Two hands-on advanced attacks: hide an instruction INSIDE the document (indirect injection) and trick an AI agent with a tool into sending a secret outward.",
   "Füg unten ein Dokument ein – mit einer versteckten Anweisung.": "Paste a document below – with a hidden instruction.",
   "Schreib {bot} eine Nachricht und trick ihn aus.": "Write {bot} a message and trick it.",
-  "Dein Dokument – bau mittendrin eine Anweisung an die KI ein …": "Your document – embed an instruction to the AI in the middle …"
+  "Dein Dokument – bau mittendrin eine Anweisung an die KI ein …": "Your document – embed an instruction to the AI in the middle …",
+  "Wall of Defenders": "Wall of Defenders",
+  "{n} Verteidiger": "{n} defenders",
+  "✓ Du bist dabei – deine Abwehr hält allen 6 Standard-Angriffen stand!": "✓ You're on it – your defense withstands all 6 standard attacks!",
+  "Wehr im „Scharfen Prüfer“ alle 6 Angriffe ab, und du kommst auf die Wall.": "Fend off all 6 attacks in the \"sharp tester\" and you make the wall.",
+  "du": "you",
+  "Noch niemand – sei die oder der Erste!": "Nobody yet – be the first!",
+  "Melde dich an, um auf die Wall zu kommen.": "Sign in to get on the wall.",
+  "Konnte nicht laden.": "Couldn't load."
 }

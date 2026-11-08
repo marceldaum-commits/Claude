@@ -1005,8 +1005,20 @@ views.kiverteidigung = () => ({
       <button class="btn primary" id="kip-run" style="margin-top:.5rem">⚔️ ${U('Prüfer starten (6 Angriffe)')}</button>
       <div id="kip-erg" style="margin-top:.5rem"></div>
     </div>
+    <div class="card" id="kiv-wall" style="margin-top:.7rem"><h3 style="margin-top:0">🏆 ${U('Wall of Defenders')}</h3><p class="small muted" style="margin:0">${U('Lade …')}</p></div>
     <p class="honest">${U('Dieselben Angriffe fährt echtes Red-Teaming gegen KI-Systeme. Wer sie kennt, baut die bessere Abwehr.')}</p>`,
   mount(root) {
+    const wallBox = $('#kiv-wall', root);
+    const ladeWall = () => {
+      if (!wallBox || !syncStatus().user) { if (wallBox) wallBox.innerHTML = `<h3 style="margin-top:0">🏆 ${U('Wall of Defenders')}</h3><p class="small muted" style="margin:0">${U('Melde dich an, um auf die Wall zu kommen.')}</p>`; return; }
+      kiLlm('verteidiger').then(r => {
+        const liste = r.liste || [];
+        wallBox.innerHTML = `<div class="row between"><h3 style="margin:0">🏆 ${U('Wall of Defenders')}</h3><span class="badge ${r.ich ? 'real' : 'plain'}">${Ut('{n} Verteidiger', { n: r.gesamt || 0 })}</span></div>
+          <p class="small muted" style="margin:.3rem 0 .4rem">${r.ich ? U('✓ Du bist dabei – deine Abwehr hält allen 6 Standard-Angriffen stand!') : U('Wehr im „Scharfen Prüfer“ alle 6 Angriffe ab, und du kommst auf die Wall.')}</p>
+          ${liste.length ? `<ul class="list">${liste.map(e => `<li><span class="state ${e.ich ? 'done' : ''}">${e.ich ? '★' : e.platz}</span><span class="grow"><span class="t">${esc(e.name)}${e.ich ? ' <span class="small muted">(' + U('du') + ')</span>' : ''}</span></span>🛡️</li>`).join('')}</ul>` : `<p class="small muted" style="margin:0">${U('Noch niemand – sei die oder der Erste!')}</p>`}`;
+      }).catch(() => { wallBox.innerHTML = `<h3 style="margin-top:0">🏆 ${U('Wall of Defenders')}</h3><p class="small muted" style="margin:0">${U('Konnte nicht laden.')}</p>`; });
+    };
+    ladeWall();
     const gewaehlt = new Set();
     $$('.kiv-m', root).forEach(btn => btn.onclick = () => {
       const id = btn.dataset.id;
@@ -1042,6 +1054,7 @@ views.kiverteidigung = () => ({
         }
       } catch (e) { kipErg.innerHTML = `<p class="small">${U('(Fehler)')}: ${esc(e.message || e)}</p>`; }
       kipRun.disabled = false; kipErg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      ladeWall();
     };
     $('#kiv-run', root).onclick = () => {
       const erg = KIV_ANGRIFFE.map(a => ({ a, ab: a.durch.some(d => gewaehlt.has(d)) }));
