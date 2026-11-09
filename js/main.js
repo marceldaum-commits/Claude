@@ -245,9 +245,41 @@ const MEILENSTEINE = [
 const erreichteMeilensteine = () => MEILENSTEINE.filter(m => { try { return m.test(); } catch { return false; } });
 const hoechsterMeilenstein = () => { const e = erreichteMeilensteine(); return e[e.length - 1] || null; };
 
+// „Weiter machen": zuletzt besuchte Lern-Aktivität merken (geräteübergreifend, da Teil von state).
+// Nur fürs Lernen sinnvolle Routen bekommen ein Kurz-Label; Home/Profil/Einstellungen nicht.
+const WEITER_LABEL = {
+  kibosse: () => U('KI Boss-Bots'),
+  kiservice: () => U('KI: Service-Bots austricksen'),
+  kilabs: () => U('KI-Labs'),
+  kifrei: () => U('KI-Hacken: Freies Spiel'),
+  'ki-sicherheit': () => U('KI-Sicherheit'),
+  weblab: () => U('Web-Hacking-Lab'),
+  forensik: () => U('Forensik-Lab'),
+  monatsctf: () => U('Challenge des Monats'),
+  ctf: () => U('CTF des Tages'),
+  mission: () => U('Wochen-Mission'),
+  advent: () => U('Advent of Hacking'),
+  lernpfad: () => U('Lernpfad'),
+  lernstufe: () => U('Lernpfad'),
+  story: () => U('Story'),
+  kalipraxis: () => U('Kali-Praxis'),
+  raum: (arg) => { const r = (typeof ROOMS !== 'undefined') && ROOMS.find(x => x.id === arg); return r ? roomText(r, 'title') : U('Raum'); },
+};
+function rememberSpot(route, arg) {
+  const fn = WEITER_LABEL[route]; if (!fn) return;
+  if (!syncStatus().user && !state.location) return; // ganz am Anfang (noch kein Lernort) nichts merken
+  const href = location.hash || ('#/' + route);
+  let label; try { label = fn(arg); } catch { return; }
+  if (!label) return;
+  if (state.lastSpot && state.lastSpot.href === href) { state.lastSpot.at = Date.now(); return; }
+  state.lastSpot = { href, label, at: Date.now() };
+  try { save(); } catch { /* */ }
+}
+
 function render() {
   const hash = location.hash.replace(/^#\/?/, '') || 'heute';
   const [route, arg] = hash.split('/');
+  rememberSpot(route, arg);
   if (cleanup) { try { cleanup(); } catch { /* */ } cleanup = null; }
   renderTop();
   renderNav(route);
@@ -287,8 +319,16 @@ function lastActivity(r) {
   const rs = state.rooms[r.id]; if (!rs) return 0;
   return Math.max(rs.startedAt || 0, ...Object.values(rs.answers || {}).map(a => a.at || 0), ...Object.values(rs.answers || {}).map(a => (a.attempts ? 1 : 0)));
 }
+// Auf welchem Gerät ist ein Raum JETZT spielbar? (verhindert PC-Vorschläge am Handy)
+const spielbarHier = (r) => {
+  const loc = state.location;
+  if (loc === 'pc' || loc === 'windows') return true;      // am PC: alles
+  if (loc === 'phone') return onPhone(r);                  // am Handy: Browser-Sandbox + Termux-Labs
+  if (loc === 'browser') return !needsKali(r);             // nur im Browser: nichts, das Kali braucht
+  return onPhone(r);                                       // Lernort unbekannt/beides: sicherheitshalber handytauglich
+};
 function continueRoom() {
-  const open = ROOMS.filter(r => !roomDone(r.id) && lastActivity(r) > 0 && visible(r)); // im Browser-Modus nur spielbare Räume
+  const open = ROOMS.filter(r => !roomDone(r.id) && lastActivity(r) > 0 && spielbarHier(r)); // nur auf diesem Gerät spielbare Räume
   open.sort((a, b) => lastActivity(b) - lastActivity(a));
   return open[0] || null;
 }
@@ -302,6 +342,8 @@ views.heute = () => {
   const loc = state.location || 'both';
   const cont = continueRoom();
   const nx = nextStep();
+  // „Weiter machen": zuletzt besuchte Lern-Aktivität (Boss-Leiter, Lab, Raum …) – damit man nach dem Login direkt weiterkommt.
+  const spot = (state.lastSpot && state.lastSpot.href && state.lastSpot.href !== '#/heute' && state.lastSpot.label) ? state.lastSpot : null;
   const done = ROOMS.filter(r => roomDone(r.id)).length;
   const rank = { sandbox: 0, ssh: 1, ext: 1, target: 2 }; // zuerst, was ohne Zusatz-Installation läuft
   const pick = (pred, phone) => ROOMS.filter(r => pred(r) && !roomDone(r.id) && r !== cont)
@@ -320,7 +362,11 @@ views.heute = () => {
         <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:.6rem"><div class="kpi"><b>${gesamtPunkte()}</b><span>${U('Punkte')}</span></div><div class="kpi"><b>${done}/${ROOMS.length}</b><span>${U('geknackt')}</span></div><div class="kpi"><b>${gesamtStreak()}🔥</b><span>${U('Tage in Folge')}</span></div></div>
       </div>
 
-      ${!cont && (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0] ? (() => { const f = (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0]; return `<a class="card lime" href="#/raum/${f.id}" style="display:block;text-decoration:none;color:inherit">
+      ${spot ? `<a class="card lime" href="${esc(spot.href)}" style="display:block;text-decoration:none;color:inherit">
+        <span class="badge real">▶ ${U('Weiter machen')}</span>
+        <h2 style="margin:.4rem 0 .2rem">${esc(spot.label)}</h2>
+        <span class="small muted">${U('Da warst du zuletzt – einfach weiter →')}</span>
+      </a>` : !cont && (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0] ? (() => { const f = (loc === 'pc' ? pcList : loc === 'browser' ? browserPicks() : phoneList.filter(visible))[0]; return `<a class="card lime" href="#/raum/${f.id}" style="display:block;text-decoration:none;color:inherit">
         <span class="badge real">${U('Los geht’s')}</span>
         <h2 style="margin:.4rem 0 .2rem">${roomText(f, 'title')}</h2>
         <span class="small muted">${roomText(f, 'desc')} →</span>
@@ -334,6 +380,7 @@ views.heute = () => {
         <h2 style="margin:.4rem 0 .2rem">${nx.titleHTML || esc(nx.title)}</h2>
         <span class="small muted">${U('Feststecken ist normal – jede Frage hat Tipps →')}</span>
       </a>`}
+      ${spot && nx && nx.kind === 'room' && nx.href !== spot.href ? `<a class="card tight" href="${nx.href}" style="display:block;text-decoration:none;color:inherit"><span class="small muted">${U('Oder neu anfangen:')} <b>${esc(nx.title.replace(/^Raum: /, ''))}</b> →</span></a>` : ''}
 
       <a class="card" href="#/ctf" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🏁 ${U('CTF des Tages')}</b><span class="badge plain">${U('neu')}</span></div><span class="small muted">${U('Jeden Tag 2 frische Rätsel · Streak &amp; Bestenliste')} →</span></a>
 

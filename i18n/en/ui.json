@@ -824,5 +824,10 @@
   "Prüfe …": "Checking …",
   "Noch nicht richtig.": "Not quite right.",
   "Echte KI mit einem geheimen Code. Jede Stufe verteidigt sich stärker: ab Stufe 4 blockt ein Ausgabe-Filter den Code am Stück – dann musst du ihn verschleiert herauslocken, selbst dekodieren und eintragen. Oben warten Eingangs-Filter, eine Richter-KI und ein stärkeres Modell. (Tageslimit schützt vor Kosten.)": "A real AI guarding a secret code. Each level defends harder: from level 4 an output filter blocks the code in one piece – so you must lure it out disguised, decode it yourself and submit it. Higher up wait an input filter, a judge AI and a stronger model. (A daily limit keeps costs down.)",
-  "8 Stufen mit echten, wachsenden Schutzschichten – von gutgläubig bis zum abgesicherten System mit Ausgabe-Filter, Eingangs-Filter und Richter-KI. Serverseitig, fair, pro Konto.": "8 levels with real, escalating defenses – from naive to a hardened system with output filter, input filter and a judge AI. Server-side, fair, per account."
+  "8 Stufen mit echten, wachsenden Schutzschichten – von gutgläubig bis zum abgesicherten System mit Ausgabe-Filter, Eingangs-Filter und Richter-KI. Serverseitig, fair, pro Konto.": "8 levels with real, escalating defenses – from naive to a hardened system with output filter, input filter and a judge AI. Server-side, fair, per account.",
+  "Weiter machen": "Continue",
+  "Da warst du zuletzt – einfach weiter →": "Where you left off – just carry on →",
+  "Oder neu anfangen:": "Or start something new:",
+  "KI: Service-Bots austricksen": "AI: outsmart service bots",
+  "Kali-Praxis": "Kali practice"
 }

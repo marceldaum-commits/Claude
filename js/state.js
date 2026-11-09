@@ -30,6 +30,7 @@ export function defaultState() {
     rooms: {},                // roomId -> { startedAt, answers:{ 'tX.qY': {ok, at, attempts} }, hints:{}, doneAt }
     activity: {},             // YYYY-MM-DD -> Anzahl erfolgreicher Lernaktionen (für Serien)
     extern: {},               // Schritt-ID externer Lernpfade -> erledigt am (Zeitstempel)
+    lastSpot: null,           // { href, label, at } – "Weiter machen": zuletzt besuchte Lern-Aktivität (geräteübergreifend)
     settings: { sound: false },
     updatedAt: 0,
   };
