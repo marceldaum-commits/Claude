@@ -366,6 +366,10 @@ a.karte:hover { border-color: var(--violet); }
 .ki-msg.du { align-self: flex-end; background: var(--violet-bg); border: 1px solid rgba(167, 139, 250, .35); }
 .ki-msg.bot { align-self: flex-start; background: var(--card2); border: 1px solid var(--line); }
 .ki-stufe { display: inline-block; font-size: .6rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: .1rem .35rem; border-radius: 6px; border: 1px solid; margin-top: .1rem; }
+.ki-schichten { display: flex; flex-wrap: wrap; gap: .3rem; margin: .1rem 0 .3rem; }
+.ki-schicht { font-size: .66rem; font-weight: 700; padding: .12rem .4rem; border-radius: 999px; background: rgba(167, 139, 250, .14); border: 1px solid rgba(167, 139, 250, .4); color: var(--text); }
+.ki-eintrag { border-color: rgba(163, 230, 53, .4) !important; background: linear-gradient(165deg, rgba(22,36,26,.6), rgba(21,35,26,.4)); }
+.ki-eintrag input { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; letter-spacing: .02em; }
 .ki-stufe.st-sehrleicht { color: var(--lime); border-color: rgba(163, 230, 53, .5); }
 .ki-stufe.st-leicht { color: #9be28f; border-color: rgba(155, 226, 143, .5); }
 .ki-stufe.st-mittel { color: var(--amber); border-color: var(--amber); }

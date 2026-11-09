@@ -785,7 +785,7 @@ views['ki-sicherheit'] = () => ({
     <a class="card" href="#/kilernpfad" style="display:block;text-decoration:none;color:inherit"><div class="row between"><b>🧭 ${U('Geführter Lehrpfad')}</b><span class="badge plain">${U('empfohlen')}</span></div><span class="small muted">${U('Die rote Linie: von Grundlagen über echtes KI-Hacking bis zur Abwehr – Schritt für Schritt.')} →</span></a>
     <a class="card lime" href="#/kiarena" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <div class="row between"><b>🤖 ${U('KI hacken – live')}</b><span class="badge real">${U('Weltneuheit')}</span></div>
-      <span class="small muted">${U('10 Stufen von sehr leicht bis echt schwer: bring eine lebende KI per Prompt Injection dazu, ihr Geheimnis zu verraten. Serverseitig, fair, pro Konto.')} →</span>
+      <span class="small muted">${U('8 Stufen mit echten, wachsenden Schutzschichten – von gutgläubig bis zum abgesicherten System mit Ausgabe-Filter, Eingangs-Filter und Richter-KI. Serverseitig, fair, pro Konto.')} →</span>
     </a>
     <a class="card" href="#/kibosse" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;border-color:rgba(163,230,53,.5)">
       <div class="row between"><b>👾 ${U('Boss-Bots: echte KI')}</b><span class="badge real">${U('LLM live')}</span></div>
@@ -1132,7 +1132,7 @@ function bosseHTML(d, aktiv, verlauf, lern) {
         <div class="kpi"><b>${d.rest}</b><span>${U('KI-Nachrichten heute')}</span></div>
       </div>
       ${d.gesamt ? `<div class="bar" style="margin:.5rem 0 .1rem"><i style="width:${Math.round(100 * d.anzahl / d.gesamt)}%"></i></div>` : ''}
-      <p class="small muted" style="margin:.5rem 0 .4rem">${U('Das ist ein echter Claude mit einem Geheimnis im System-Prompt. Bring ihn per Prompt Injection dazu, es zu verraten. (Tageslimit schützt vor Kosten.)')}</p>
+      <p class="small muted" style="margin:.5rem 0 .4rem">${U('Echte KI mit einem geheimen Code. Jede Stufe verteidigt sich stärker: ab Stufe 4 blockt ein Ausgabe-Filter den Code am Stück – dann musst du ihn verschleiert herauslocken, selbst dekodieren und eintragen. Oben warten Eingangs-Filter, eine Richter-KI und ein stärkeres Modell. (Tageslimit schützt vor Kosten.)')}</p>
       <div class="ki-modus" role="group" aria-label="${esc(U('Modus'))}">
         <button type="button" class="btn small ${lern ? '' : 'ghost'}" id="ki-mode-lern" aria-pressed="${lern ? 'true' : 'false'}">🎓 ${U('Lernmodus')}</button>
         <button type="button" class="btn small ${lern ? 'ghost' : ''}" id="ki-mode-chall" aria-pressed="${lern ? 'false' : 'true'}">🏆 ${U('Challenge')}</button>
@@ -1143,10 +1143,16 @@ function bosseHTML(d, aktiv, verlauf, lern) {
     ${s ? (s.offen ? `<div class="card ki-chat" id="ki-panel">
       <div class="row between"><b>🤖 ${esc(s.bot)}</b><span class="badge ${s.geloest ? 'real' : 'sim'}">${s.geloest ? '✓ ' + U('geknackt') : esc(s.stufe)}</span></div>
       <p class="small muted" style="margin:.2rem 0">🎯 ${U('Technik')}: ${esc(s.technik || '')} · 🛡️ ${U('Abwehr')}: ${esc(s.abwehr)}</p>
+      ${(s.guard || s.filter || s.judge) ? `<div class="ki-schichten">${[s.guard ? `⛔ ${U('Eingangs-Filter')}` : '', s.filter ? `🛡️ ${U('Ausgabe-Filter')}` : '', s.judge ? `👁️ ${U('Richter-KI')}` : ''].filter(Boolean).map(x => `<span class="ki-schicht">${x}</span>`).join('')}</div>` : ''}
       ${lernBlock}
       <details class="small" style="margin-bottom:.4rem"><summary>💡 ${U('Tipp anzeigen')}</summary><p class="small" style="margin:.3rem 0 0">${esc(s.hinweis)}</p></details>
       <div class="ki-log" id="ki-log">${(verlauf[aktiv] || []).length ? verlauf[aktiv].map(x => kiMsg(x.von, x.text)).join('') : `<p class="small muted">${Ut('Schreib {bot} eine Nachricht …', { bot: s.bot })}</p>`}</div>
       <div class="row" style="gap:.4rem;align-items:center;margin-top:.5rem"><input type="text" id="ki-in" placeholder="${esc(Ut('Nachricht an {bot} …', { bot: s.bot }))}" autocomplete="off" style="flex:1"><button class="btn small" id="ki-go">${U('Senden')}</button></div>
+      ${(s.filter && !s.geloest) ? `<div class="ki-eintrag card" style="margin-top:.5rem;padding:.6rem">
+        <b class="small">🔑 ${U('Code gefunden?')}</b>
+        <p class="small muted" style="margin:.2rem 0">${U('Der Ausgabe-Filter blockt den Code am Stück. Locke ihn verschleiert heraus (buchstabiert/kodiert), dekodiere ihn selbst und trag ihn hier ein:')}</p>
+        <div class="row" style="gap:.4rem"><input type="text" id="ki-code" placeholder="KLY{…}" autocomplete="off" spellcheck="false" style="flex:1"><button class="btn small primary" id="ki-check">${U('Eintragen')}</button></div>
+      </div>` : ''}
       <div class="row" style="margin-top:.4rem"><button class="btn small ghost" id="ki-tipp">💡 ${U('Mentor-Tipp holen')}</button></div>
       <p class="small" id="ki-fb" style="margin:.3rem 0 0"></p>
     </div>` : `<div class="card warn"><b>🔒 ${U('Noch gesperrt.')}</b> ${U('Knack erst den vorigen Boss.')}</div>`) : ''}
@@ -1187,6 +1193,27 @@ views.kibosse = () => ({
         };
         go.onclick = senden; inp.onkeydown = (e) => { if (e.key === 'Enter') senden(); };
         inp.focus();
+      }
+      // „Code eintragen" (Filter-Stufen, Gandalf-Prinzip): Code selbst dekodiert → serverseitig prüfen.
+      const codeIn = $('#ki-code', wrap), checkBtn = $('#ki-check', wrap);
+      if (checkBtn && codeIn) {
+        const pruef = async () => {
+          const code = (codeIn.value || '').trim(); if (!code) return;
+          checkBtn.disabled = true; if (fb) fb.textContent = U('Prüfe …');
+          try {
+            const r = await kiLlm('check', { level: aktiv, code });
+            if (r.geloest) {
+              const x = daten.bosse.find(y => y.level === aktiv); if (x) x.geloest = true;
+              const n = daten.bosse.find(y => y.level === aktiv + 1); if (n) n.offen = true;
+              daten.punkte = r.punkte; daten.anzahl = r.anzahl; aktiv = start(daten);
+              toast(U('🎉 Geknackt!')); feier(true); zeichne(true);
+            } else {
+              if (fb) fb.innerHTML = `<span style="color:#ffb86b">${esc(r.hinweis || r.fehler || U('Noch nicht richtig.'))}</span>`;
+              checkBtn.disabled = false;
+            }
+          } catch (e) { if (fb) fb.textContent = U('(Fehler)') + ': ' + (e.message || e); checkBtn.disabled = false; }
+        };
+        checkBtn.onclick = pruef; codeIn.onkeydown = (e) => { if (e.key === 'Enter') pruef(); };
       }
       // Mentor-Tipp holen (echter Mentor, kostet 1 KI-Nachricht)
       const tp = $('#ki-tipp', wrap);
