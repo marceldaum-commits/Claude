@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '3.8.0';
+self.KLY_VERSION = '3.8.1';
 self.KLY_FILES = [
   'index.html',
   'konto.html',
@@ -60,4 +60,4 @@ self.KLY_FILES = [
   'icons/apple-touch-icon.png',
 ];
 // Zusätzliche Dateien nur für den App-Download (nicht offline gecacht)
-self.KLY_EXTRA = ['i18n/en/w1.json', 'i18n/en/shell.json', 'i18n/en/w4.json', 'i18n/en/ui.json', 'i18n/en/level1.json', 'i18n/en/w5.json', 'i18n/en/w3.json', 'i18n/en/w8.json', 'i18n/en/p5.json', 'i18n/en/p6.json', 'i18n/en/p7.json', 'i18n/en/p8.json', 'i18n/en/p10.json', 'i18n/en/w6.json', 'i18n/en/w7.json', 'i18n/en/w9.json', 'i18n/en/h1.json', 'i18n/en/n1.json', 'i18n/en/b1.json', 'i18n/en/s1.json', 'README.md', 'supabase/schema.sql', 'docs/SUPABASE-SETUP.md', 'docs/CLOUDFLARE-DEPLOY.md', 'robots.txt', 'sitemap.xml'];
+self.KLY_EXTRA = ['i18n/en/w1.json', 'i18n/en/shell.json', 'i18n/en/w4.json', 'i18n/en/ui.json', 'i18n/en/level1.json', 'i18n/en/w5.json', 'i18n/en/w3.json', 'i18n/en/w8.json', 'i18n/en/p5.json', 'i18n/en/p6.json', 'i18n/en/p6b.json', 'i18n/en/p7.json', 'i18n/en/p7b.json', 'i18n/en/p8.json', 'i18n/en/p8b.json', 'i18n/en/p10.json', 'i18n/en/w6.json', 'i18n/en/w7.json', 'i18n/en/w9.json', 'i18n/en/h1.json', 'i18n/en/n1.json', 'i18n/en/b1.json', 'i18n/en/s1.json', 'README.md', 'supabase/schema.sql', 'docs/SUPABASE-SETUP.md', 'docs/CLOUDFLARE-DEPLOY.md', 'robots.txt', 'sitemap.xml'];
