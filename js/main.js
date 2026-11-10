@@ -1727,7 +1727,7 @@ views.kiinjektion = () => ({
         <p class="small" style="margin:.5rem 0 .2rem"><b>${U('Was')}:</b> ${esc(t.was)}</p>
         <p class="small" style="margin:.2rem 0"><b>${U('Warum es wirkt')}:</b> ${esc(t.warum)}</p>
         <p class="small" style="margin:.2rem 0 .1rem"><b>${U('Beispiel')}:</b></p>
-        <pre class="ki-bsp-text" translate="no" data-bsp="${i}">${esc(t.beispiel)}</pre>
+        <pre class="ki-bsp-text" translate="no" data-bsp="${i}">${esc(Ut(t.beispiel))}</pre>
         <div class="row" style="gap:.4rem;margin:.1rem 0 .3rem"><button class="btn small ghost" data-copy="${i}">📋 ${U('Beispiel kopieren')}</button><a class="btn small" href="#/kifrei">${U('Am Übungsbot testen')} →</a></div>
         <p class="small" style="margin:.2rem 0 0;color:var(--lime)"><b>🛡️ ${U('So schützt man sich')}:</b> ${esc(t.schutz)}</p>
       </details>`).join('')}</div>
@@ -1735,7 +1735,7 @@ views.kiinjektion = () => ({
   mount(root) {
     $$('[data-copy]', root).forEach(btn => btn.onclick = async () => {
       const t = KI_INJEKTION[+btn.dataset.copy];
-      try { await navigator.clipboard.writeText(t.beispiel); btn.textContent = '✓ ' + U('kopiert'); setTimeout(() => btn.textContent = '📋 ' + U('Beispiel kopieren'), 1500); }
+      try { await navigator.clipboard.writeText(Ut(t.beispiel)); btn.textContent = '✓ ' + U('kopiert'); setTimeout(() => btn.textContent = '📋 ' + U('Beispiel kopieren'), 1500); }
       catch { const pre = root.querySelector(`[data-bsp="${btn.dataset.copy}"]`); if (pre) { const rng = document.createRange(); rng.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rng); } }
     });
   },
