@@ -1167,7 +1167,7 @@ function bosseHTML(d, aktiv, verlauf, lern) {
         <b class="small">🎓 ${U('Lernmodus')}: ${esc(s.technik || '')}</b>
         <p class="small" style="margin:.3rem 0">${esc(s.erklaerung || '')}</p>
         ${s.beispiel ? `<p class="small muted" style="margin:.3rem 0 .1rem">${U('Beispiel-Angriff:')}</p>
-        <pre class="ki-bsp-text">${esc(s.beispiel)}</pre>
+        <pre class="ki-bsp-text">${esc(Ut(s.beispiel))}</pre>
         <button class="btn small ghost" type="button" id="ki-bsp">${U('Beispiel einsetzen')}</button>` : ''}
       </div>` : '';
   return `
@@ -1223,7 +1223,7 @@ views.kibosse = () => ({
       if (mc) mc.onclick = () => setLern(false);
       const go = $('#ki-go', wrap), inp = $('#ki-in', wrap), fb = $('#ki-fb', wrap), log = $('#ki-log', wrap);
       const bsp = $('#ki-bsp', wrap);
-      if (bsp && inp) bsp.onclick = () => { const s = daten.bosse.find(x => x.level === aktiv); if (s && s.beispiel) { inp.value = s.beispiel; inp.focus(); } };
+      if (bsp && inp) bsp.onclick = () => { const s = daten.bosse.find(x => x.level === aktiv); if (s && s.beispiel) { inp.value = Ut(s.beispiel); inp.focus(); } };
       if (scroll && log) log.scrollTop = log.scrollHeight;
       if (go && inp) {
         const senden = async () => {
@@ -1389,7 +1389,7 @@ views.kiservice = () => ({
       $$('.ki-tile[data-raum]', wrap).forEach(btn => { if (btn.disabled) return; btn.onclick = () => { aktiv = btn.getAttribute('data-raum'); zeichne(); const p=$('#s-panel',wrap); if(p)p.scrollIntoView({behavior:'smooth',block:'nearest'}); }; });
       const go=$('#s-go',wrap), inp=$('#s-in',wrap), log=$('#s-log',wrap), bsp=$('#s-bsp',wrap);
       if (scroll && log) log.scrollTop = log.scrollHeight;
-      if (bsp && inp) bsp.onclick = () => { if (r.beispiel) { inp.value = r.beispiel; inp.focus(); } };
+      if (bsp && inp) bsp.onclick = () => { if (r.beispiel) { inp.value = Ut(r.beispiel); inp.focus(); } };
       if (go && inp) {
         const senden = async () => {
           const text=(inp.value||'').trim(); if(!text) return;
@@ -1446,7 +1446,7 @@ views.kilabs = () => ({
       $$('.ki-tile[data-lab]', wrap).forEach(btn => btn.onclick = () => { aktiv = btn.getAttribute('data-lab'); zeichne(); const p = $('#l-panel', wrap); if (p) p.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
       const go = $('#l-go', wrap), inp = $('#l-in', wrap), log = $('#l-log', wrap), bsp = $('#l-bsp', wrap);
       if (scroll && log) log.scrollTop = log.scrollHeight;
-      if (bsp && inp) bsp.onclick = () => { if (l.beispiel) { inp.value = l.beispiel; inp.focus(); } };
+      if (bsp && inp) bsp.onclick = () => { if (l.beispiel) { inp.value = Ut(l.beispiel); inp.focus(); } };
       if (go && inp) {
         const senden = async () => {
           const text = (inp.value || '').trim(); if (!text) return;
