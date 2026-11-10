@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '3.8.4';
+self.KLY_VERSION = '3.9.0';
 self.KLY_FILES = [
   'index.html',
   'konto.html',
@@ -34,6 +34,7 @@ self.KLY_FILES = [
   'js/content/level1-tipps.js',
   'js/content/story1.js',
   'js/content/lernpfad.js', 'js/content/kalipraxis.js',
+  'js/content/karriere.js',
   'js/content/tools.js',
   'js/content/rooms.js',
   'js/content/wargames.js',

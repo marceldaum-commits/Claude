@@ -20,6 +20,7 @@ import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
 import { STORIES } from './content/story1.js';
 import { LERNPFAD } from './content/lernpfad.js';
+import { KARRIERE } from './content/karriere.js';
 import { TOOLS } from './content/tools.js';
 
 // ---------------------------------------------------------------- Daten
@@ -424,6 +425,10 @@ views.pfad = () => {
   return {
     html: `<h1>Lernen</h1>
     <p class="muted small">Vom Linux-Anfänger bis zum eJPT. Alles ist offen – fang an, wo du Lust hast. 📱 = geht am Handy, 🖥️ = Kali-VM.</p>
+    <a class="card" href="#/karriere" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem;border-color:rgba(167,139,250,.55)">
+      <b>🧭 ${U('Karriere-Pfade')}</b> <span class="badge plain">${U('neu')}</span><br>
+      <span class="small muted">${U('Trainier auf ein Ziel hin – Pentester, SOC-Analyst, KI-Red-Teamer oder Web-Hacker. Mit Fortschritt und Abschluss-Zertifikat.')}</span>
+    </a>
     <a class="card feat-ki" href="#/ki-sicherheit" style="display:block;text-decoration:none;color:inherit;margin-top:.6rem">
       <b>🧠 KI-Sicherheit</b> <span class="badge real">Weltneuheit</span><br>
       <span class="small muted">Hacke eine echte KI im Browser (Prompt Injection) – plus Theorie. Unser Schwerpunkt.</span>
@@ -465,6 +470,117 @@ views.pfad = () => {
   };
 };
 views.raeume = views.pfad;
+
+// ---------------------------------------------------------------- Karriere-Pfade („roter Faden"): Rollen-Ziele aus bestehenden Räumen/Modulen
+const karHref = (s) => s.href || (s.raum ? `#/raum/${s.raum}` : '#/pfad');
+const karSchrittDone = (s, C) => {
+  if (s.raum) return roomDone(s.raum);
+  if (s.forensik) return C.forensik;
+  if (s.web) return C.web.has(s.web);
+  if (s.ki === 'verteidigung') return C.verteidigt;
+  if (s.ki) return (C.ki[s.ki] || 0) >= (s.n || 1);
+  return false;
+};
+// Fortschritts-Kontext einsammeln: Räume lokal, KI-Module + Browser-Labs vom Server (nur mit Login).
+async function karContext() {
+  const C = { forensik: false, web: new Set(), ki: { bosse: 0, service: 0, labs: 0 }, verteidigt: false };
+  if (!syncStatus().user) return C;
+  const safe = (p) => p.then(r => r).catch(() => null);
+  const [info, sinfo, linfo, vert, ueb] = await Promise.all([
+    safe(kiLlm('info')), safe(kiLlm('service_info')), safe(kiLlm('lab_info')), safe(kiLlm('verteidiger')), safe(uebung('info')),
+  ]);
+  if (info) C.ki.bosse = info.anzahl || 0;
+  if (sinfo) C.ki.service = sinfo.anzahl || 0;
+  if (linfo) C.ki.labs = linfo.anzahl || 0;
+  if (vert) C.verteidigt = !!vert.ich;
+  if (ueb) {
+    (ueb.web?.stationen || []).forEach(s => { if (s.geloest) C.web.add(s.id); });
+    C.forensik = Object.values(ueb.forensik?.geloest || {}).filter(Boolean).length >= 3;
+  }
+  return C;
+}
+const karStand = (p, C) => { const done = p.schritte.filter(s => karSchrittDone(s, C)).length; return { done, total: p.schritte.length, fertig: done === p.schritte.length }; };
+function karCard(p, C) {
+  const states = p.schritte.map(s => karSchrittDone(s, C));
+  const done = states.filter(Boolean).length, total = p.schritte.length, fertig = done === total;
+  return `<details class="card kar-pf"${fertig ? '' : ' open'} style="margin-bottom:.7rem;border-color:rgba(167,139,250,.4)">
+    <summary style="cursor:pointer;list-style:none">
+      <div class="row between" style="align-items:center"><b>${p.icon} ${U(p.titel)}</b><span class="badge ${fertig ? 'real' : 'plain'}">${done}/${total}</span></div>
+      <span class="small muted">${U(p.kurz)}</span>
+      <div class="bar" style="margin:.4rem 0 .1rem"><i style="width:${Math.round(100 * done / total)}%"></i></div>
+    </summary>
+    <p class="small muted" style="margin:.5rem 0 .4rem">${U(p.ziel)}</p>
+    <ul class="list">${p.schritte.map((s, i) => `<li><a href="${karHref(s)}"><span class="state ${states[i] ? 'done' : ''}">${states[i] ? '✓' : i + 1}</span><span class="grow"><span class="t">${U(s.titel)}</span></span>${states[i] ? '' : '<span class="pfeil">→</span>'}</a></li>`).join('')}</ul>
+    ${fertig
+      ? `<a class="btn primary block" href="#/karriere/${p.id}">🎖️ ${U('Zertifikat ansehen')}</a>`
+      : `<p class="small muted" style="margin:.2rem 0 0">${Ut('Noch {n} bis zum Abschluss.', { n: total - done })}</p>`}
+  </details>`;
+}
+views.karriere = (arg) => {
+  if (arg) return karriereZert(arg);
+  return {
+    title: 'Karriere-Pfade',
+    html: `<a class="back" href="#/pfad">← ${U('Lernen')}</a>
+      <h1 style="margin:.3rem 0 .2rem">🧭 ${U('Karriere-Pfade')}</h1>
+      <p class="small muted" style="margin:0 0 .6rem">${U('Wähle ein Ziel. Jeder Pfad bündelt passende Räume und Module in sinnvoller Reihenfolge – mit Fortschritt und Abschluss-Zertifikat.')}</p>
+      ${!syncStatus().user ? `<div class="card warn"><span class="small">${U('Melde dich an, damit dein Fortschritt über alle Module zählt.')} <a href="konto.html">${U('Jetzt anmelden')} →</a></span></div>` : ''}
+      <div id="kar-wrap">${skel('tiles')}</div>`,
+    async mount(root) {
+      const wrap = $('#kar-wrap', root);
+      let C; try { C = await karContext(); } catch { C = { forensik: false, web: new Set(), ki: { bosse: 0, service: 0, labs: 0 }, verteidigt: false }; }
+      wrap.innerHTML = KARRIERE.map(p => karCard(p, C)).join('');
+    },
+  };
+};
+function karriereZert(id) {
+  const p = KARRIERE.find(x => x.id === id);
+  if (!p) return { title: 'Zertifikat', html: `<a class="back" href="#/karriere">← ${U('Karriere-Pfade')}</a><div class="card warn">${U('Unbekannter Pfad.')}</div>` };
+  const name = (state.profile.name || '').trim() || 'Nachtfalter';
+  const datum = new Date().toLocaleDateString(currentLang() === 'en' ? 'en-GB' : 'de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+  const h = Math.abs([...(name + ':' + p.id)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)).toString(36).toUpperCase().padStart(5, '0').slice(0, 5);
+  const code = 'NF-' + new Date().getFullYear() + '-' + p.id.slice(0, 3).toUpperCase() + '-' + h;
+  const style = `<style>
+.kz{max-width:720px;margin:0 auto;background:#fff;color:#1c1830;border:1px solid #d7d1ef;border-radius:14px;padding:30px 30px;text-align:center;font-family:system-ui,sans-serif}
+.kz-em{width:56px;height:56px;border-radius:50%;background:#15122b;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:1.7rem}
+.kz-mk{letter-spacing:.24em;font-size:.66rem;color:#5b5280;text-transform:uppercase;margin:.7rem 0 .2rem}
+.kz h2{font-family:Georgia,'Times New Roman',serif;color:#241d4a;margin:.2rem 0;font-size:1.7rem}
+.kz .who{font-size:1.15rem;color:#2c2648;margin:.5rem 0 .1rem;font-weight:600}
+.kz .zi{color:#6a6192;font-size:.9rem;max-width:460px;margin:.5rem auto 0}
+.kz .meta{color:#6a6192;font-size:.8rem;margin-top:1rem;border-top:1px solid #eee;padding-top:.7rem}
+@media print{@page{size:A4 landscape;margin:14mm}body{background:#fff !important}.top,.nav,.meldfab,#lang-banner,.zert-noprint{display:none !important}#main{margin:0 !important;padding:0 !important;max-width:none !important}.kz{border:none;max-width:none}}
+</style>`;
+  return {
+    title: 'Zertifikat',
+    html: `${style}
+    <div class="zert-noprint" style="margin-bottom:.8rem"><a class="back" href="#/karriere">← ${U('Karriere-Pfade')}</a>
+      <div id="kz-gate"></div></div>
+    <div id="kz-card" style="display:none">
+      <div class="kz">
+        <div class="kz-em">${p.icon}</div>
+        <p class="kz-mk">Nachtfalter Hacklab</p>
+        <p class="small" style="color:#6a6192;margin:.2rem 0">${U('Zertifikat')}</p>
+        <h2>${U(p.zert)}</h2>
+        <p class="who">${esc(name)}</p>
+        <p class="small" style="color:#6a6192;margin:.1rem 0">${U('hat den Pfad erfolgreich abgeschlossen')}</p>
+        <p class="zi">${U(p.ziel)}</p>
+        <p class="meta">${esc(datum)} · ${U('Zertifikat-Nr.')} ${code}</p>
+      </div>
+    </div>`,
+    async mount(root) {
+      const gate = $('#kz-gate', root), card = $('#kz-card', root);
+      let C; try { C = await karContext(); } catch { C = { forensik: false, web: new Set(), ki: { bosse: 0, service: 0, labs: 0 }, verteidigt: false }; }
+      const st = karStand(p, C);
+      if (!st.fertig) {
+        gate.innerHTML = `<div class="card warn" style="margin-top:.4rem"><b>🔒 ${U('Noch nicht abgeschlossen.')}</b><br><span class="small">${Ut('Erst {done}/{total} Schritte geschafft – schließ den Pfad ab, dann gibt es hier dein Zertifikat.', { done: st.done, total: st.total })} <a href="#/karriere">${U('Zum Pfad')} →</a></span></div>`;
+        return;
+      }
+      gate.innerHTML = `<div class="row between" style="align-items:center;margin-top:.3rem"><h1 style="margin:0">🎖️ ${U('Zertifikat')}</h1><button class="btn primary" id="kzdruck">🖨️ ${U('Als PDF speichern')}</button></div>`;
+      card.style.display = '';
+      const b = $('#kzdruck', root); if (b) b.onclick = () => window.print();
+      feier(true);
+    },
+  };
+}
 
 // ---------------------------------------------------------------- CTF des Tages (täglich 2 Rätsel, Streak, Bestenliste)
 function ctfCard(p, geloest) {
