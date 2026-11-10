@@ -2,6 +2,7 @@
 // Ablauf: Remote laden → konservativ mit lokal zusammenführen → speichern → hochladen.
 // Prüfungen werden dabei nur aus nachvollziehbaren Versuchen als bestanden übernommen (siehe state.js).
 import { mergeStates, upgrade, looksLikeState, pushBackup } from './state.js';
+import { currentLang } from './i18n.js';
 
 // Neuere Version zuerst (unterstützt das neue Key-Format sb_publishable_…), ältere als Rückfall.
 const SUPABASE_ESM = [
@@ -115,7 +116,7 @@ export async function kiLlm(aktion, payload = {}) {
   const { data: s } = await c.auth.getSession().catch(() => ({ data: null }));
   const token = s?.session?.access_token;
   if (!token) throw new Error('Bitte zuerst anmelden.');
-  const res = await c.functions.invoke('ki-llm', { body: { aktion, ...payload }, headers: { Authorization: `Bearer ${token}` } });
+  const res = await c.functions.invoke('ki-llm', { body: { aktion, lang: currentLang(), ...payload }, headers: { Authorization: `Bearer ${token}` } });
   if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
   return res.data;
 }
