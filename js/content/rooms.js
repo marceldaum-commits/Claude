@@ -12,6 +12,7 @@ import { LEVEL9_ROOMS } from './level9.js';
 import { FUNKTURM } from './funkturm.js';
 import { LEITERN } from './leitern.js';
 import { PURPLE } from './leitern2.js';
+import { PURPLE2 } from './leitern3.js';
 
 const T = (...lines) => lines.join('\n');
 
@@ -264,15 +265,16 @@ const BASE_ROOMS = [
 ];
 
 // Reihenfolge: erst Sandbox-Raum, dann die Wargames neben den Zielmaschinen-Räumen
-const byId = Object.fromEntries([...BASE_ROOMS, ...WARGAMES, ...WEB_ROOMS, ...NETZ_ROOMS, ...LEVEL4_ROOMS, ...LEVEL9_ROOMS, ...FUNKTURM, ...LEITERN, ...PURPLE].map(r => [r.id, r]));
+const byId = Object.fromEntries([...BASE_ROOMS, ...WARGAMES, ...WEB_ROOMS, ...NETZ_ROOMS, ...LEVEL4_ROOMS, ...LEVEL9_ROOMS, ...FUNKTURM, ...LEITERN, ...PURPLE, ...PURPLE2].map(r => [r.id, r]));
 // Leitern: Art (track) und Schwierigkeit (stufe) für die Übersicht
 const LEITER_INFO = {
   w1: ['linux', 'Einstieg'], w4: ['linux', 'mittel'], w3: ['linux', 'Skripte'], w5: ['linux', 'schwerer'], w8: ['linux', 'schwer'],
   w6: ['hacking', 'leicht'], w7: ['hacking', 'mittel'], w9: ['hacking', 'schwer'], w2: ['kali', 'echtes SSH'],
   p5: ['purple', 'Level 5'], p6: ['purple', 'Level 6'], p7: ['purple', 'Level 7'], p8: ['purple', 'Level 8'], p10: ['purple', 'Level 10'],
+  p6b: ['purple', 'Level 6'], p7b: ['purple', 'Level 7'], p8b: ['purple', 'Level 8'],
 };
 for (const [id, [track, stufe]] of Object.entries(LEITER_INFO)) Object.assign(byId[id], { track, stufe });
-export const ROOMS = ['r0', 'w1', 'w4', 'w5', 'w8', 'r1', 'w2', 'n1', 'r2', 'r3', 'h1', 'w6', 'w7', 'w9', 'j1', 'w3', 'p5', 'p6', 'p7', 'p8', 'b1', 'p10'].map(id => byId[id]);
+export const ROOMS = ['r0', 'w1', 'w4', 'w5', 'w8', 'r1', 'w2', 'n1', 'r2', 'r3', 'h1', 'w6', 'w7', 'w9', 'j1', 'w3', 'p5', 'p6', 'p6b', 'p7', 'p7b', 'p8', 'p8b', 'b1', 'p10'].map(id => byId[id]);
 
 // Abzeichen (aus dem Lernstand abgeleitet – nicht speicherbar, nicht fälschbar über Merge)
 export const BADGES = [

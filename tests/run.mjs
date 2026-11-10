@@ -538,7 +538,7 @@ await at('W4 Funkturm: alle 20 Etagen mit den Lösungswegen', async () => {
   ok(!s2.exec('ls ~/turm/etage03').err && s2.exec('ls ~/turm/etage04').err.includes('Keine Berechtigung'));
 });
 
-for (const id of ['w5', 'w6', 'w7', 'w8', 'w9', 'p5', 'p6', 'p7', 'p8', 'p10']) {
+for (const id of ['w5', 'w6', 'w7', 'w8', 'w9', 'p5', 'p6', 'p6b', 'p7', 'p7b', 'p8', 'p8b', 'p10']) {
   await at(`Leiter ${id}: alle Stufen mit den Lösungswegen`, async () => {
     const r = ROOMS.find(x => x.id === id); const F = {};
     for (const f of r.flags) F[f] = await flagFor(TOKEN, id, f);

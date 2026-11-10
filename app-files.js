@@ -1,5 +1,5 @@
 // Liste aller App-Dateien: genutzt vom Service Worker (Offline-Cache) und vom App-Download (ZIP).
-self.KLY_VERSION = '3.7.1';
+self.KLY_VERSION = '3.8.0';
 self.KLY_FILES = [
   'index.html',
   'konto.html',
@@ -45,6 +45,7 @@ self.KLY_FILES = [
   'js/content/leiter.js',
   'js/content/leitern.js',
   'js/content/leitern2.js',
+  'js/content/leitern3.js',
   'js/content/extern.js',
   'labs/kly-target/server.py',
   'labs/kly-target/Dockerfile',
