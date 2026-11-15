@@ -18,6 +18,26 @@ verbessern, korrigieren, erweitern – besser werden. Vollausbau mit Theorie + L
 - **KI-Mentor:** Begleiter, der beim Feststecken erklärt, gestufte Tipps gibt, Übungen aufs Niveau generiert.
 - **Theorie + Lehrpfad + Übungen** rund um alles oben; **SEO** der Startseite/App darauf ausrichten.
 
+## 🏆 „Der Auftrag" – Engagement-Engine + 8 Flaggschiff-Features (Marcel 14.11.2026)
+Großes Programm. Du wirst als Pentester von einer (erfundenen) Firma beauftragt, einen Server zu testen –
+**0 Tipps, jedes Mal neu generiert, Stufen sehr-einfach→extrem**. Ein Kern (Modul-Baukasten + Generator),
+zwei Ausgaben (Sandbox mobil + Docker/Arena). KI nur fürs Drumherum, Flags serverseitig (HMAC). **Zurücksetzen** eingebaut.
+Spec/Katalog: `docs/AUFTRAG-ENGINE.md`. Stand: Katalog ✅, Modul-Baukasten ✅, Generator ✅ (Node-getestet). Marcel wählte **alle 8** Zusatz-Features.
+
+**Bau-Reihenfolge (spielbare Phasen):**
+1. **MVP – Auftrag Stufe 1 im Browser** (Renderer + Engagement-UI + Edge `auftrag` start/flag/report, HMAC, KI-Briefing, 0 Tipps, Reset). *← in Arbeit; Fundament für 5 der 8.*
+2. **KI benotet den Report** – am Ende echter Pentest-Bericht, die KI bewertet ihn wie ein Kunde (Funde/Risiko/Fix). Größter Differenzierer.
+3. **Scope-Falle (Ethik)** – lockender Host außerhalb des Scope; Draufgehen kostet Punkte. Generator-Erweiterung (günstig).
+4. **Blue-Team-Wende** – nach dem Hack umdrehen: eigener Angriff in den Logs, Erkennungsregeln schreiben. Rot+Blau in einem.
+5. **Proctored Zertifikats-Prüfung** – getimte Prüfungs-Engagement, 0 Hilfe → verkaufbares eJPT-artiges Zertifikat (an Karriere-Pfade + Monetarisierung).
+6. **Firma der Woche** – geteilte, wöchentlich neue Kiste für alle + Bestenliste (Reichweiten-/Wiederkehr-Motor; nutzt Server-Zeitplan).
+7. **Rang-/Skill-Baum (RPG)** – XP, Ränge, Freischaltungen über alles; erweitert die Karriere-Pfade zu einem sichtbaren Baum. *(plattformweit)*
+8. **Saison / Event-Modus** – Themen-Saisons mit Story, Punkten, Badges, Zeitfenster (baut auf Advent-Kalender auf). *(plattformweit)*
+9. **Co-op / Team-Modus** – zwei Lernende auf einer Kiste / Clans. Schwerster Brocken (Echtzeit-Mehrspieler) → zuletzt.
+
+Grundsätze: mobil-first zuerst (Sandbox), Docker-Tier container-sicher (Binary-Exploits/Web/Misconfig); **Kernel-echt bleibt draußen**
+(Plesk-VPS ohne Nested-Virt), **AD via Samba AD-DC** als eigenes Teilprojekt (braucht internes Netz + Wächter-Erweiterung).
+
 ## 🎯 KI-Ausbau „Austricksen & Verteidigen" – ✅ umgesetzt & live (08.11.2026, A–D)
 Großes Paket im Leitstern. **Umzugssicher & anti-cheat:** jede Flag `KLY{…}` würfelt der Server pro Anlauf frisch
 (HMAC, nie im Browser bekannt), prüft serverseitig; geknackter Code = Schlüssel fürs nächste Level. **Realistisch,
