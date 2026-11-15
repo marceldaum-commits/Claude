@@ -115,10 +115,11 @@ SQLi-Login-Bypass · Creds-in-Datei · `sudo`-NOPASSWD-Privesc. Damit ist ein ko
 Immer **0 Tipps**. Timer + Report-Abgabe am Ende (was gefunden, wie ausgenutzt).
 
 ### Edge `auftrag` (serverseitig, Anti-Cheat)
-- `start`  : Generiert Engagement (Seed aus Konto+Stufe+Versuch), liefert Briefing (KI via `ki-llm`, gecacht) + Scope + Spec für den Adapter. Flags pro Konto per HMAC.
+- `start`  : Lädt den laufenden Auftrag ODER generiert einen neuen (Seed aus Konto+Stufe+**Versuch**), liefert Briefing (KI via `ki-llm`, gecacht) + Scope + Spec für den Adapter. Flags pro Konto per HMAC.
 - `frage`  : Auftraggeber-Rückfrage (KI, nur Scope/Orga – nie Lösung).
 - `flag`   : Prüft eine eingereichte Flag serverseitig.
 - `report` : Schließt das Engagement ab, wertet Flags + Report, vergibt Punkte/Zertifikat.
+- `neu` / **Zurücksetzen** : Verwirft die aktuelle Kiste, erhöht den **Versuch**-Zähler → beim nächsten `start` kommt eine **frisch generierte** Kiste (neue Zugangsdaten, neue Pfade, ggf. andere Modul-Mischung). Fortschritt der alten Kiste wird gelöscht. In der UI ein klarer Knopf „🔄 Auftrag zurücksetzen / neue Kiste". (Der Seed enthält den Versuch schon – siehe `seedVon('konto:stufe:versuch')` in `auftrag-gen.js`.)
 
 ## Phasen (Bau-Reihenfolge)
 1. **Kern + SIM, Stufe 1 (MVP, spielbar für alle):** Modul-Bank (3–4 Module), Generator, Edge `auftrag` (start/flag/report), KI-Briefing, Engagement-UI (Briefing, Scope, Terminal, Flag-Abgabe, Report), 0 Tipps. **Zweisprachig sofort.**
