@@ -41,8 +41,9 @@ function trifft(input, unlock) {
   return String(input).trim() === String(unlock).trim();
 }
 
-// Eigene Befehle der Kiste: simuliertes nmap, curl (Web) und der zentrale `zugang`-Befehl.
-export function auftragCommands(eng, fw) {
+// Eigene Befehle der Kiste: simuliertes nmap, curl (Web) und der `zugang`-Befehl (lokale Bestätigung).
+// Das gefundene Geheimnis reicht der Spieler oben beim Ziel ein – geprüft wird serverseitig (Edge `auftrag`).
+export function auftragCommands(eng) {
   const flags = eng.flags || [];
   return {
     nmap: (args) => {
@@ -61,7 +62,7 @@ export function auftragCommands(eng, fw) {
       const eingabe = args.join(' ').trim();
       if (!eingabe) return { out: 'Nutzung: zugang <geheimnis>  (z. B. ein gefundenes Passwort)\n', code: 1 };
       const treffer = flags.find(f => trifft(eingabe, f.unlock));
-      if (treffer) return { out: `✓ Zugang erhalten (${treffer.titel}).\n  Flag: ${fw[treffer.id]}\n  → Trag sie oben beim Ziel ein.\n`, code: 0 };
+      if (treffer) return { out: `✓ Zugang bestätigt (${treffer.titel}).\n  → Trag genau dieses Geheimnis oben beim passenden Ziel ein, dann prüft es der Server.\n`, code: 0 };
       return { out: '✗ Zugang verweigert. Das ist nicht das richtige Geheimnis – erkunde weiter.\n', code: 1 };
     },
   };

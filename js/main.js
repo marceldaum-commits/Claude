@@ -14,7 +14,7 @@ import { uebungsTipps } from './content/level1-tipps.js';
 import { initLang, langNoteHTML, langPickerHTML, bindLangPicker, NAV, currentLang, codeify, protectCodes, hasHand, handDict, loadHand, makeT, translateTree, loadShellT, loadUI, U, UN, Ut, roomText, loadLevel1 } from './i18n.js';
 import { EXTERN } from './content/extern.js';
 import { KALIPRAXIS, KALIPRAXIS_GEPLANT } from './content/kalipraxis.js';
-import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion, mission, kiSec, kiLlm, uebung } from './sync.js';
+import { initSync, syncConfigured, syncStatus, onSyncStatus, signIn, signUp, signOut, syncNow, schedulePush, meinStatus, arenaFortschritt, meldungSenden, taeglich, advent, profilAktion, mission, kiSec, kiLlm, uebung, auftrag } from './sync.js';
 import { exportStateJSON, readStateFile, exportApp, download } from './export.js';
 import { LEVELS, LOCATIONS, PFADE } from './content/curriculum.js';
 import { LEVEL1 } from './content/level1.js';
@@ -3416,56 +3416,63 @@ views.profil = () => {
 };
 
 // ---------------------------------------------------------------- Urkunde / Leistungsnachweis (PDF über Drucken)
-// ---------------------------------------------------------------- „Der Auftrag" – Engagement (Realbedingungen-Pentest, 0 Tipps)
-// VORSCHAU: Flags noch client-seitig geprüft; serverseitige HMAC-Prüfung + KI-Briefing folgen (Edge `auftrag`).
-const auftragState = { stufe: 1, versuch: 1, geloest: {} };
-const auftragSeed = () => { const u = (syncStatus().user && state.profile && state.profile.name) || 'gast'; return seedVon(`${u}:${auftragState.stufe}:${auftragState.versuch}`); };
-views.auftrag = () => {
-  const eng = generiere(auftragState.stufe, auftragSeed());
-  const fw = flagwerteFuer(eng);
-  const key = `${auftragState.stufe}:${auftragState.versuch}`;
-  const gel = auftragState.geloest[key] || (auftragState.geloest[key] = {});
-  const stufenBtns = AUFTRAG_STUFEN.map(s => `<button class="btn small ${s.stufe === auftragState.stufe ? 'primary' : 'ghost'} astufe" data-s="${s.stufe}">${s.stufe} · ${U(s.titel)}</button>`).join('');
-  return {
-    title: 'Der Auftrag',
-    html: `<a class="back" href="#/pfad">← ${U('Lernen')}</a>
-      <div class="card adv-held"><div class="adv-held-kopf"><span class="adv-badge">🎯 ${U('Der Auftrag')}</span><span class="badge real">${U('Realbedingungen')}</span></div>
-        <h1 style="margin:.3rem 0 .2rem">${U('Du wirst beauftragt')}</h1>
-        <p class="small muted" style="margin:0">${U('Eine Firma beauftragt dich, ihren Server zu testen. Keine Tipps – finde selbst heraus, was zu tun ist. Jede Lücke weist du mit der Flag nach.')}</p>
-        <div class="ki-modus" style="margin-top:.5rem">${stufenBtns}</div>
-      </div>
-      <div class="card violet"><b>📄 ${U('Auftrag')}</b><br>
-        <span class="small">${Ut('Die {firma} beauftragt dich mit einem Sicherheitstest von Host {host}. Verschaff dir Zugang und dokumentiere jeden Fund. Für jede nachgewiesene Lücke bekommst du eine Flag.', { firma: eng.firma, host: eng.host })}</span>
-        <div class="card tight" style="margin:.5rem 0 0;border-color:rgba(167,139,250,.4)"><span class="small">🚧 <b>${U('Scope')}:</b> ${Ut('Ausschließlich Host {host}. Erlaubt: testen, ausnutzen, Zugriff nachweisen. Verboten: Zerstörung, DoS, alles außerhalb.', { host: eng.host })}</span></div>
-      </div>
-      <div id="aziele" class="stack"></div>
-      <div class="card ki-chat"><div class="row between"><b>🖥️ ${Ut('Terminal · {host}', { host: eng.host })}</b><button class="btn small ghost" id="areset">🔄 ${U('Zurücksetzen / neue Kiste')}</button></div>
-        <div id="aterm" style="margin-top:.4rem"></div></div>
-      <p class="honest">${U('Simulierte Übungskiste – nachgebildete Realbedingungen. Vorschau: Flags werden derzeit lokal geprüft; serverseitige Prüfung + KI-Auftraggeber folgen.')}</p>`,
-    mount(root) {
-      const ziele = $('#aziele', root);
-      const zeichneZiele = () => {
-        const alle = eng.flags.every(f => gel[f.id]);
-        ziele.innerHTML = eng.flags.map((f, i) => `<div class="card tight"><div class="row between"><b>🎯 ${U('Ziel')} ${i + 1}: ${U(f.ziel)}</b>${gel[f.id] ? `<span class="badge real">✓ ${U('erledigt')}</span>` : ''}</div>
-          ${gel[f.id] ? '' : `<div class="row" style="gap:.4rem;margin-top:.4rem"><input class="aflag" data-id="${f.id}" placeholder="KLY{…}" autocomplete="off" style="flex:1;box-sizing:border-box"><button class="btn small aok" data-id="${f.id}">${U('Prüfen')}</button></div><span class="small afb" data-fb="${f.id}" style="display:block;margin-top:.25rem"></span>`}</div>`).join('')
-          + (alle ? `<div class="card lime"><b>🏆 ${U('Auftrag erfüllt!')}</b><br><span class="small">${U('Alle Lücken nachgewiesen. (Bald: Pentest-Report schreiben → die KI benotet ihn, plus Zertifikat.)')}</span></div>` : '');
-        $$('.aok', ziele).forEach(b => b.onclick = () => {
-          const id = b.dataset.id, inp = ziele.querySelector(`.aflag[data-id="${id}"]`), fb = ziele.querySelector(`.afb[data-fb="${id}"]`);
-          const val = (inp.value || '').trim();
-          if (val === fw[id]) { gel[id] = true; const nun = eng.flags.every(f => gel[f.id]); zeichneZiele(); if (nun) feier(true); else toast(U('✓ Flag korrekt!')); }
-          else if (fb) fb.innerHTML = `<b style="color:var(--red)">${U('Noch nicht richtig – erkunde weiter.')}</b>`;
-        });
-        $$('.aflag', ziele).forEach(inp => inp.onkeydown = e => { if (e.key === 'Enter') ziele.querySelector(`.aok[data-id="${inp.dataset.id}"]`)?.click(); });
-      };
-      zeichneZiele();
-      const sh = new Shell({ fs: baseFS(), commands: auftragCommands(eng, fw) });
+// ---------------------------------------------------------------- „Der Auftrag" – Engagement (Realbedingungen, 0 Tipps, serverseitig)
+// Edge `auftrag`: Briefing (KI) + Fortschritt (geräteübergreifend) + Antwort-Prüfung. Der Client erzeugt die Kiste
+// aus dem vom Server gelieferten Seed (gleicher Generator → gleiche Kiste). Flags = das gefundene Geheimnis, Server prüft.
+const auftragState = { stufe: 1 };
+views.auftrag = () => ({
+  title: 'Der Auftrag',
+  html: `<a class="back" href="#/pfad">← ${U('Lernen')}</a>
+    <div class="card adv-held"><div class="adv-held-kopf"><span class="adv-badge">🎯 ${U('Der Auftrag')}</span><span class="badge real">${U('Realbedingungen')}</span></div>
+      <h1 style="margin:.3rem 0 .2rem">${U('Du wirst beauftragt')}</h1>
+      <p class="small muted" style="margin:0">${U('Eine Firma beauftragt dich, ihren Server zu testen. Keine Tipps – finde selbst heraus, was zu tun ist. Jede Lücke weist du mit der Flag nach.')}</p>
+      <div class="ki-modus" style="margin-top:.5rem">${AUFTRAG_STUFEN.map(s => `<button class="btn small ${s.stufe === auftragState.stufe ? 'primary' : 'ghost'} astufe" data-s="${s.stufe}">${s.stufe} · ${U(s.titel)}</button>`).join('')}</div>
+    </div>
+    <div id="awrap">${skel()}</div>`,
+  async mount(root) {
+    const wrap = $('#awrap', root);
+    if (!syncStatus().user) { wrap.innerHTML = anmeldeKarte(); return; }
+    let daten = null;
+    const zeichne = () => {
+      const eng = generiere(daten.stufe, daten.seed);
+      const gel = new Set(daten.geloest || []);
+      const alle = (daten.ziele || []).length > 0 && (daten.ziele || []).every(z => gel.has(z.id));
+      wrap.innerHTML = `
+        <div class="card violet"><b>📄 ${U('Auftrag')}</b> <span class="small muted">· ${esc(daten.firma)} · ${esc(daten.host)}</span><br>
+          <span class="small" translate="no">${esc(daten.brief || '')}</span>
+          <div class="card tight" style="margin:.5rem 0 0;border-color:rgba(167,139,250,.4)"><span class="small">🚧 <b>${U('Scope')}:</b> ${Ut('Ausschließlich Host {host}. Erlaubt: testen, ausnutzen, Zugriff nachweisen. Verboten: Zerstörung, DoS, alles außerhalb.', { host: daten.host })}</span></div>
+        </div>
+        <div class="stack">${(daten.ziele || []).map((z, i) => `<div class="card tight"><div class="row between"><b>🎯 ${U('Ziel')} ${i + 1}: ${U(z.ziel)}</b>${gel.has(z.id) ? `<span class="badge real">✓ ${U('erledigt')}</span>` : ''}</div>
+          ${gel.has(z.id) ? '' : `<div class="row" style="gap:.4rem;margin-top:.4rem"><input class="aflag" data-id="${z.id}" placeholder="${esc(U('gefundenes Geheimnis …'))}" autocomplete="off" style="flex:1;box-sizing:border-box"><button class="btn small aok" data-id="${z.id}">${U('Einreichen')}</button></div><span class="small afb" data-fb="${z.id}" style="display:block;margin-top:.25rem"></span>`}</div>`).join('')}
+          ${alle ? `<div class="card lime"><b>🏆 ${U('Auftrag erfüllt!')}</b><br><span class="small">${U('Alle Lücken nachgewiesen. (Bald: Pentest-Report schreiben → die KI benotet ihn, plus Zertifikat.)')}</span></div>` : ''}</div>
+        <div class="card ki-chat"><div class="row between"><b>🖥️ ${Ut('Terminal · {host}', { host: daten.host })}</b><button class="btn small ghost" id="areset">🔄 ${U('Zurücksetzen / neue Kiste')}</button></div>
+          <div id="aterm" style="margin-top:.4rem"></div></div>
+        <p class="honest">${U('Simulierte Übungskiste – nachgebildete Realbedingungen. Die Prüfung läuft serverseitig; dein Auftrag ist geräteübergreifend gespeichert.')}</p>`;
+      const sh = new Shell({ fs: baseFS(), commands: auftragCommands(eng) });
       baueWelt(sh, eng);
-      mountTerminal($('#aterm', root), sh, { tall: true, title: Ut('Auftrag · {host}', { host: eng.host }), welcome: Ut('Du bist auf {host}. Start: cat LIESMICH.txt · nmap {host} · help zeigt Befehle.', { host: eng.host }) });
-      $$('.astufe', root).forEach(b => b.onclick = () => { auftragState.stufe = +b.dataset.s; render(); });
-      $('#areset', root).onclick = () => { auftragState.versuch++; toast(U('Neue Kiste generiert.')); render(); };
-    },
-  };
-};
+      mountTerminal($('#aterm', wrap), sh, { tall: true, title: Ut('Auftrag · {host}', { host: daten.host }), welcome: Ut('Du bist auf {host}. Start: cat LIESMICH.txt · nmap {host} · help zeigt Befehle.', { host: daten.host }) });
+      $('#areset', wrap).onclick = async () => { await lade('neu'); toast(U('Neue Kiste generiert.')); };
+      $$('.aok', wrap).forEach(b => b.onclick = async () => {
+        const id = b.dataset.id, inp = wrap.querySelector(`.aflag[data-id="${id}"]`), fb = wrap.querySelector(`.afb[data-fb="${id}"]`);
+        const antw = (inp.value || '').trim(); if (!antw) return;
+        b.disabled = true;
+        try {
+          const r = await auftrag('flag', { stufe: daten.stufe, flag: id, antwort: antw });
+          if (r.ok) { daten.geloest = r.geloest; const fertig = r.fertig; zeichne(); if (fertig) feier(true); else toast(U('✓ Nachgewiesen!')); }
+          else { if (fb) fb.innerHTML = `<b style="color:var(--red)">${U('Noch nicht richtig – erkunde weiter.')}</b>`; b.disabled = false; }
+        } catch (e) { if (fb) fb.textContent = e.message || e; b.disabled = false; }
+      });
+      $$('.aflag', wrap).forEach(inp => inp.onkeydown = e => { if (e.key === 'Enter') wrap.querySelector(`.aok[data-id="${inp.dataset.id}"]`)?.click(); });
+    };
+    const lade = async (aktion) => {
+      wrap.innerHTML = skel();
+      try { daten = await auftrag(aktion, { stufe: auftragState.stufe }); } catch (e) { wrap.innerHTML = `<div class="card warn"><b>${U('Konnte nicht laden')}</b><br><span class="small">${esc(e.message || e)}</span></div>`; return; }
+      zeichne();
+    };
+    $$('.astufe', root).forEach(b => b.onclick = () => { if (+b.dataset.s === auftragState.stufe) return; auftragState.stufe = +b.dataset.s; $$('.astufe', root).forEach(x => { const on = +x.dataset.s === auftragState.stufe; x.classList.toggle('primary', on); x.classList.toggle('ghost', !on); }); lade('start'); });
+    lade('start');
+  },
+});
 
 views.zertifikat = (arg) => {
   const voll = arg === 'voll';

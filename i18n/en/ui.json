@@ -1082,5 +1082,9 @@
   "Durchsuche die Web-Wurzel nach vergessenen Dateien mit Geheimnissen.": "Search the web root for forgotten files holding secrets.",
   "Umgehe das Login der Web-App ohne gültiges Passwort.": "Bypass the web app login without a valid password.",
   "Finde wiederverwendete Zugangsdaten für ein höheres Konto.": "Find reused credentials for a higher account.",
-  "Nutze eine sudo-Regel, um Root zu werden.": "Use a sudo rule to become root."
+  "Nutze eine sudo-Regel, um Root zu werden.": "Use a sudo rule to become root.",
+  "Einreichen": "Submit",
+  "gefundenes Geheimnis …": "found secret …",
+  "✓ Nachgewiesen!": "✓ Proven!",
+  "Simulierte Übungskiste – nachgebildete Realbedingungen. Die Prüfung läuft serverseitig; dein Auftrag ist geräteübergreifend gespeichert.": "Simulated practice box – modelled real conditions. Checking runs server-side; your assignment is saved across devices."
 }

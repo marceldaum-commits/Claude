@@ -120,6 +120,17 @@ export async function kiLlm(aktion, payload = {}) {
   if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
   return res.data;
 }
+// „Der Auftrag" – Engagement-Engine (Briefing/Flags/Report serverseitig, braucht Anmeldung).
+export async function auftrag(aktion, payload = {}) {
+  const c = await getClient();
+  if (!c) throw new Error('Keine Verbindung.');
+  const { data: s } = await c.auth.getSession().catch(() => ({ data: null }));
+  const token = s?.session?.access_token;
+  if (!token) throw new Error('Bitte zuerst anmelden.');
+  const res = await c.functions.invoke('auftrag', { body: { aktion, lang: currentLang(), ...payload }, headers: { Authorization: `Bearer ${token}` } });
+  if (res.error) throw new Error(res.error.message || 'Konnte nicht laden');
+  return res.data;
+}
 // Browser-Labs serverseitig werten (Web-Hacking / Forensik / Monats-Rätsel) – fair & schummelsicher.
 export async function uebung(aktion, payload = {}) {
   const c = await getClient();
