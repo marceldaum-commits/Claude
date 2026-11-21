@@ -33,7 +33,7 @@ export function generiere(stufe, seed) {
     for (const c of (w.creds || [])) creds.push(c);
     for (const s of (w.sudo || [])) sudo.push(s);
     if (w.app) apps.push({ ...w.app, pfad: resolve(w.app.pfad, p) });
-    if (m.flag) flags.push({ id: m.id, titel: m.titel, wo: m.flag.wo, pfad: resolve(m.flag.pfad, p), hinweis: resolve(m.flag.hinweis || '', p) });
+    if (m.flag) flags.push({ id: m.id, titel: m.titel, ziel: m.ziel, wo: m.flag.wo, pfad: resolve(m.flag.pfad, p), hinweis: resolve(m.flag.hinweis || '', p), unlock: m.unlock ? String(m.unlock(p)) : null });
   }
 
   const scope = `In-Scope ist ausschließlich der Host ${host} (${firma}). Erlaubt: Testen, Ausnutzen, Zugriff nachweisen. Verboten: Datenzerstörung, DoS, alles außerhalb dieses Hosts.`;

@@ -34,6 +34,7 @@ export const MODULE = [
     titel: 'Schwaches Dienst-Passwort', beschreibung: 'Ein Dienstkonto hat ein ratbares Passwort – klassischer Erst-Zugang.',
     ziel: 'Finde gültige Zugangsdaten und verschaffe dir Zugang zum Host.',
     params: (rng) => ({ user: pick(rng, NAMEN), pass: pick(rng, SCHWACH) }),
+    unlock: (p) => p.pass,
     welt: (p) => ({
       dienste: [{ port: 22, name: 'ssh' }],
       creds: [{ user: p.user, pass: p.pass, dienst: 'ssh' }],
@@ -48,6 +49,7 @@ export const MODULE = [
     titel: 'Exponiertes .git / .env', beschreibung: 'Ein offenes Verzeichnis gibt Quellcode und Secrets preis.',
     ziel: 'Durchsuche die Web-Wurzel nach vergessenen Dateien mit Geheimnissen.',
     params: (rng) => ({ dbpass: pick(rng, SCHWACH), dbuser: pick(rng, NAMEN) }),
+    unlock: (p) => p.dbpass,
     welt: (p) => ({
       dienste: [{ port: 80, name: 'http' }],
       dateien: [
@@ -63,6 +65,7 @@ export const MODULE = [
     titel: 'SQL-Injection im Login', beschreibung: 'Ein Login prüft Eingaben nicht – man kommt ohne Passwort rein.',
     ziel: 'Umgehe das Login der Web-App ohne gültiges Passwort.',
     params: (rng) => ({ pfad: pick(rng, ['/admin', '/portal', '/intern', '/verwaltung']) }),
+    unlock: () => "' OR '1'='1",
     welt: (p) => ({
       dienste: [{ port: 80, name: 'http' }],
       app: { typ: 'login', pfad: p.pfad, schwaeche: 'sqli', nutzer: 'admin' },
@@ -77,6 +80,7 @@ export const MODULE = [
     titel: 'Passwort in Datei', beschreibung: 'Ein Klartext-Passwort in Config/History öffnet das nächste Konto.',
     ziel: 'Finde wiederverwendete Zugangsdaten für ein höheres Konto.',
     params: (rng) => ({ user: pick(rng, ['root', 'deploy', 'dbadmin']), pass: pick(rng, SCHWACH) }),
+    unlock: (p) => p.pass,
     welt: (p) => ({
       dateien: [
         { pfad: '/home/{user}/.bash_history', inhalt: `ls -la\nmysql -u${p.user} -p'${p.pass}'\ncat /etc/passwd\nsudo -l\n`, modus: 0o600, leak: 'cred' },
@@ -91,6 +95,7 @@ export const MODULE = [
     titel: 'sudo-Fehlkonfiguration', beschreibung: 'Ein erlaubter sudo-Befehl lässt sich zur Root-Shell zweckentfremden (GTFOBins).',
     ziel: 'Nutze eine sudo-Regel, um Root zu werden.',
     params: (rng) => ({ bin: pick(rng, ['find', 'vim', 'awk', 'less', 'tar']) }),
+    unlock: (p) => p.bin,
     welt: (p) => ({
       dateien: [
         { pfad: '/etc/sudoers.d/90-dienst', inhalt: `svc-web ALL=(root) NOPASSWD: /usr/bin/${p.bin}\n`, modus: 0o440, leak: 'hinweis' },
